@@ -276,6 +276,9 @@ dependencies {
 	
 	 testCompileOnly 'org.projectlombok:lombok:1.18.22'
 	 testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+
+    implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
 }
 
 if (project.hasProperty("gae")) {
