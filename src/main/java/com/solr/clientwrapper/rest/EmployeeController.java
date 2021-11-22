@@ -6,6 +6,10 @@ import com.solr.clientwrapper.infrastructure.repository.EmployeeRepository;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -15,7 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +73,76 @@ public class EmployeeController {
     private SolrClient solrClient;
     private final static String solrDataName = "employee";
 
+    @GetMapping("/coreStatus/{name}")
+    public String coreStatus(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+        CoreAdminResponse coreAdminResponse=CoreAdminRequest.getStatus(name,solrClient);
+
+        return coreAdminResponse.toString();
+    }
+
+    @GetMapping("/reloadCore/{name}")
+    public boolean reloadCore(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+
+        CoreAdminResponse coreAdminResponse=CoreAdminRequest.reloadCore(name,solrClient);
+
+        System.out.println(coreAdminResponse);
+
+        return true;
+    }
+
+    @GetMapping("/mergeIndexes/{name}")
+    public CoreAdminResponse mergeIndexes(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+        CoreAdminResponse coreAdminResponse=CoreAdminRequest.getStatus(name,solrClient);
+
+        CoreAdminRequest.getCoreStatus(name,solrClient).getDataDirectory();
+
+//        CoreAdminRequest.mergeIndexes(name,)
+
+        return coreAdminResponse;
+    }
+
+    @GetMapping("/deleteCore/{name}")
+    public boolean createCore(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+        CoreAdminRequest.Unload request1=new CoreAdminRequest.Unload(true);
+        request1.setCoreName(name);
+        request1.isDeleteDataDir();
+
+        request1.process(solrClient);
+
+        return true;
+    }
+
+    @GetMapping("/renameCore/{name}")
+    public boolean renameCore(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+        //CoreAdminRequest.Create request = new CoreAdminRequest.Create();
+
+        CoreAdminResponse coreAdminResponse=CoreAdminRequest.renameCore(name,name+"New",solrClient);
+
+        System.out.println(coreAdminResponse);
+
+        return true;
+    }
+
+    @GetMapping("/createCollection/{name}")
+    public boolean createCollection(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+        CollectionAdminRequest request = CollectionAdminRequest.createCollection("karthikCollection", "config",
+                1, 1);
+        request.process(solrClient);
+
+        return true;
+    }
 
     @GetMapping("/getEmployeeByNameCustom/{name}")
     public SolrDocumentList getEmployeeByNameCustom(@PathVariable String name) {
