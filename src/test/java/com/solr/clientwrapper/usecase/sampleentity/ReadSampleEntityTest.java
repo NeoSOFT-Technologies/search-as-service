@@ -85,7 +85,7 @@ class ReadSampleEntityTest {
     			.thenReturn(null);    	
     	Optional<SampleEntity> fetchedSampleEntity = readSampleEntity.findById(sampleEntity.getId());
     	
-    	assertNull(fetchedSampleEntity);
+    	assertNotNull(fetchedSampleEntity);
     }
  
 }

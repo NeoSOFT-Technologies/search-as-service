@@ -2,6 +2,9 @@ package com.solr.clientwrapper.infrastructure.repository;
 
 
 import com.solr.clientwrapper.infrastructure.entity.Employee;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
@@ -21,6 +24,7 @@ public interface EmployeeRepository extends SolrCrudRepository<Employee, Integer
 
     List<Employee> findByNameAndAddress(String name, String address);
 
-
+    @Query("name:*?0* OR address:*?0*")
+	Page<Employee> findByCustomerQuery(String searchTerm, Pageable pageable);
 
 }

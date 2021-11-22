@@ -101,7 +101,6 @@ public class UserResource {
 
     public UserResource(CreateUser createUser, RegisterUser registerUser, ReadUser readUser, UpdateUser updateUser,
 			DeleteUser deleteUser) {
-		super();
 		this.createUser = createUser;
 		this.registerUser = registerUser;
 		this.readUser = readUser;
