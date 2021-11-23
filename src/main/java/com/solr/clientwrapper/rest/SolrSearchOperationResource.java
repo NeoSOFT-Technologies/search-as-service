@@ -30,21 +30,20 @@ public class SolrSearchOperationResource {
 	 * Author: Piyush Ojha; NeoSOFT Tech.
 	 */    
 	
+    private static final String SOLR_DATA_NAME = "techproducts";
+    private static final String SOLR_DATA_NAME_DEFAULT = "techproducts";
+    
     @Autowired
     private SolrClient solrClient;
-    private final static String solrDataNameDefault = "techproducts";
-    private final static String solrDataName = "techproducts";
-    
 	@Autowired
 	SolrSearchResult solrSearchResult;
-	
 	@Autowired
 	SolrCollectionIndex solrCollectionIndex;
 
 
 	@GetMapping(value = "/search")
 	public ResponseEntity<SolrSearchResult> searchRecordsInGivenCollection(
-											@RequestParam(defaultValue = solrDataNameDefault) String collection, 
+											@RequestParam(defaultValue = SOLR_DATA_NAME_DEFAULT) String collection, 
 											@RequestParam(defaultValue = "name") String queryField, 
 											@RequestParam(defaultValue = "*") String searchTerm,
 											@RequestParam(defaultValue = "0") String startRecord, 
@@ -66,9 +65,7 @@ public class SolrSearchOperationResource {
 		
 		// testing... : start /////////
 		DocumentObjectBinder binder = new DocumentObjectBinder();
-		
 		List<SolrCollectionIndex> docs = binder.getBeans(SolrCollectionIndex.class, numdocs);
-		
 		// testing: end  ////////////
 		
 		response.getDebugMap();
@@ -81,7 +78,7 @@ public class SolrSearchOperationResource {
 	
 	@GetMapping(value = "/search/paginated")
 	public ResponseEntity<SolrSearchResult> paginatedSearch(
-											@RequestParam(defaultValue = solrDataNameDefault) String collection, 
+											@RequestParam(defaultValue = SOLR_DATA_NAME_DEFAULT) String collection, 
 											@RequestParam(defaultValue = "name") String queryField, 
 											@RequestParam(defaultValue = "*") String searchTerm,
 											@RequestParam(defaultValue = "0") String startRecord, 
