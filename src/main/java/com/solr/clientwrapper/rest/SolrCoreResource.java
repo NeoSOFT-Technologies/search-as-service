@@ -5,6 +5,8 @@ import com.solr.clientwrapper.usecase.solr.core.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,32 +43,67 @@ public class SolrCoreResource {
 
     @PostMapping("/createCore")
     @Operation(summary = "/create-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean createCore(@RequestBody SolrCreateCoreDTO solrCreateCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return createSolrCore.createCore(solrCreateCoreDTO.getCoreName());
+    public ResponseEntity<SolrResponseDTO> createCore(@RequestBody SolrCreateCoreDTO solrCreateCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+
+        SolrResponseDTO solrResponseDTO=createSolrCore.createCore(solrCreateCoreDTO.getCoreName());
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
     }
 
     @PutMapping("/renameCore")
     @Operation(summary = "/rename-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean renameCore(@RequestBody SolrRenameCoreDTO solrRenameCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return renameSolrCore.renameCore(solrRenameCoreDTO.getCoreName(), solrRenameCoreDTO.getNewName());
+    public ResponseEntity<SolrResponseDTO> renameCore(@RequestBody SolrRenameCoreDTO solrRenameCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+        SolrResponseDTO solrResponseDTO= renameSolrCore.renameCore(solrRenameCoreDTO.getCoreName(), solrRenameCoreDTO.getNewName());
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
     }
 
     @DeleteMapping("/deleteCore")
     @Operation(summary = "/delete-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean deleteCore(@RequestBody SolrDeleteCoreDTO solrDeleteCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return deleteSolrCore.deleteCore(solrDeleteCoreDTO.getCoreName(),solrDeleteCoreDTO.isDeleteIndex(),solrDeleteCoreDTO.isDeleteDataDir(),solrDeleteCoreDTO.isDeleteInstanceDir());
+    public ResponseEntity<SolrResponseDTO> deleteCore(@RequestBody SolrDeleteCoreDTO solrDeleteCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+        SolrResponseDTO solrResponseDTO=deleteSolrCore.deleteCore(solrDeleteCoreDTO.getCoreName(),solrDeleteCoreDTO.isDeleteIndex(),solrDeleteCoreDTO.isDeleteDataDir(),solrDeleteCoreDTO.isDeleteInstanceDir());
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
     }
 
     @PutMapping("/swapCore")
     @Operation(summary = "/swap-cores", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean swapCore(@RequestBody SolrSwapCoreDTO solrSwapCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return swapSolrCore.swapCore(solrSwapCoreDTO.getCoreOne(), solrSwapCoreDTO.getCoreTwo());
+    public ResponseEntity<SolrResponseDTO> swapCore(@RequestBody SolrSwapCoreDTO solrSwapCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+        SolrResponseDTO solrResponseDTO= swapSolrCore.swapCore(solrSwapCoreDTO.getCoreOne(), solrSwapCoreDTO.getCoreTwo());
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
     }
 
     @PostMapping("/reloadCore")
     @Operation(summary = "/reload-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean createCore(@RequestBody SolrReloadCoreDTO solrReloadCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return reloadSolrCore.reloadCore(solrReloadCoreDTO.getCoreName());
+    public ResponseEntity<SolrResponseDTO> createCore(@RequestBody SolrReloadCoreDTO solrReloadCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+        SolrResponseDTO solrResponseDTO= reloadSolrCore.reloadCore(solrReloadCoreDTO.getCoreName());
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
     }
 
 }

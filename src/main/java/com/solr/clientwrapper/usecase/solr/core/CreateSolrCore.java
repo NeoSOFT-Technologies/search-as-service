@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.usecase.solr.core;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,8 @@ public class CreateSolrCore {
         this.solrCoreServicePort = solrCoreServicePort;
     }
 
-    public boolean createCore(String coreName) {
-        solrCoreServicePort.createCore(coreName);
-        return true;
+    public SolrResponseDTO createCore(String coreName) {
+        return solrCoreServicePort.createCore(coreName);
     }
 
 }

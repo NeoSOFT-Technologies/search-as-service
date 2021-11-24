@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.domain.service;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -17,7 +18,7 @@ public class SolrCoreService implements SolrCoreServicePort {
     HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
 
     @Override
-    public boolean createCore(String coreName) {
+    public SolrResponseDTO createCore(String coreName) {
         //HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
         CoreAdminRequest.Create request = new CoreAdminRequest.Create();
         request.setCoreName(coreName);
@@ -25,84 +26,183 @@ public class SolrCoreService implements SolrCoreServicePort {
         request.setConfigSet("_default");
         request.setDataDir("data");
 
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO();
+        solrResponseDTO.setCoreName(coreName);
+
         try {
             CoreAdminResponse coreAdminResponse =request.process(solrClient);
+
+            solrResponseDTO.setStatusCode(200);
+            solrResponseDTO.setMessage("Successfully created Solr Core: "+coreName);
+
         } catch (SolrServerException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to create Solr Core: "+coreName+". SolrServerException.");
+
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to create Solr Core: "+coreName+". IOException.");
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to create Solr Core: "+coreName+". Exception.");
+
         }
 
-        return true;
+        return solrResponseDTO;
     }
 
     @Override
-    public boolean renameCore(String coreName, String newName) {
+    public SolrResponseDTO renameCore(String coreName, String newName) {
+
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO();
+        solrResponseDTO.setCoreName(coreName);
 
         try {
             CoreAdminResponse coreAdminResponse=CoreAdminRequest.renameCore(coreName,newName,solrClient);
+
+            solrResponseDTO.setStatusCode(200);
+            solrResponseDTO.setMessage("Successfully renamed Solr Core: "+coreName+" to "+newName);
+
         } catch (SolrServerException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to rename Solr Core: "+coreName+" to "+newName+". SolrServerException.");
+
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to rename Solr Core: "+coreName+" to "+newName+". IOException.");
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to rename Solr Core: "+coreName+" to "+newName+". Exception.");
+
         }
 
-        return true;
+        return solrResponseDTO;
     }
 
     @Override
-    public boolean deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir) {
+    public SolrResponseDTO deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir) {
         CoreAdminRequest.Unload request=new CoreAdminRequest.Unload(true);
         request.setCoreName(coreName);
         request.setDeleteIndex(deleteIndex);
         request.setDeleteDataDir(deleteDataDir);
         request.setDeleteInstanceDir(deleteInstanceDir);
 
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO();
+        solrResponseDTO.setCoreName(coreName);
 
         try {
             request.process(solrClient);
+
+            solrResponseDTO.setStatusCode(200);
+            solrResponseDTO.setMessage("Successfully deleted Solr Core: "+coreName);
+
         } catch (SolrServerException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to delete Solr Core: "+coreName+". SolrServerException.");
+
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to delete Solr Core: "+coreName+". IOException.");
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to delete Solr Core: "+coreName+". Exception.");
+
         }
-        return true;
+
+        return solrResponseDTO;
 
     }
 
     @Override
-    public boolean swapCore(String coreOne, String coreTwo) {
+    public SolrResponseDTO swapCore(String coreOne, String coreTwo) {
+
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO();
+        solrResponseDTO.setCoreName(coreOne);
+
         try {
             CoreAdminRequest.swapCore(coreOne,coreTwo,solrClient);
+
+            solrResponseDTO.setStatusCode(200);
+            solrResponseDTO.setMessage("Successfully swapped Solr Core: "+coreOne+" to "+coreTwo);
+
         } catch (SolrServerException e) {
             e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to swap Solr Core: "+coreOne+" to "+coreTwo+". SolrServerException.");
+
         } catch (IOException e) {
             e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to swap Solr Core: "+coreOne+" to "+coreTwo+". IOException.");
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to swap Solr Core: "+coreOne+" to "+coreTwo+". Exception.");
+
         }
-        return true;
+
+        return solrResponseDTO;
     }
 
     @Override
-    public boolean reloadCore(String coreName) {
+    public SolrResponseDTO reloadCore(String coreName) {
+
+
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO();
+        solrResponseDTO.setCoreName(coreName);
 
         try {
             CoreAdminResponse coreAdminResponse=CoreAdminRequest.reloadCore(coreName,solrClient);
-//            System.out.println(coreAdminResponse);
+
+            solrResponseDTO.setStatusCode(200);
+            solrResponseDTO.setMessage("Successfully reloaded Solr Core: "+coreName);
+
         } catch (SolrServerException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to reload Solr Core: "+coreName+". SolrServerException.");
+
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to reload Solr Core: "+coreName+". IOException.");
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Unable to reload Solr Core: "+coreName+". Exception.");
+
         }
 
-        return true;
+        return solrResponseDTO;
     }
 
     @Override

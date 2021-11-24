@@ -1,16 +1,18 @@
 package com.solr.clientwrapper.domain.port.api;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
+
 public interface SolrCoreServicePort {
 
-    boolean createCore(String coreName);
+    SolrResponseDTO createCore(String coreName);
 
-    boolean renameCore(String coreName, String newName);
+    SolrResponseDTO renameCore(String coreName, String newName);
 
-    boolean deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir);
+    SolrResponseDTO deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir);
 
-    boolean swapCore(String coreOne, String coreTwo);
+    SolrResponseDTO swapCore(String coreOne, String coreTwo);
 
-    boolean reloadCore(String coreName);
+    SolrResponseDTO reloadCore(String coreName);
 
     String statusCore(String coreName);
 

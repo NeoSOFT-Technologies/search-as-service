@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.usecase.solr.core;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,8 @@ public class RenameSolrCore {
         this.solrCoreServicePort = solrCoreServicePort;
     }
 
-    public boolean renameCore(String coreName,String newName) {
-        solrCoreServicePort.renameCore(coreName,newName);
-        return true;
+    public SolrResponseDTO renameCore(String coreName, String newName) {
+        return solrCoreServicePort.renameCore(coreName,newName);
     }
 
 }

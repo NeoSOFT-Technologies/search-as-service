@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.usecase.solr.core;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,8 @@ public class DeleteSolrCore {
         this.solrCoreServicePort = solrCoreServicePort;
     }
 
-    public boolean deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir) {
-        solrCoreServicePort.deleteCore(coreName,deleteIndex,deleteDataDir,deleteInstanceDir);
-        return true;
+    public SolrResponseDTO deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir) {
+        return solrCoreServicePort.deleteCore(coreName,deleteIndex,deleteDataDir,deleteInstanceDir);
     }
 
 }
