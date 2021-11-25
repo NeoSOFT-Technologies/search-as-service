@@ -16,7 +16,7 @@ public class RenameSolrCore {
     }
 
     public SolrResponseDTO renameCore(String coreName, String newName) {
-        return solrCoreServicePort.renameCore(coreName,newName);
+        return solrCoreServicePort.rename(coreName,newName);
     }
 
 }

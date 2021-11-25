@@ -16,7 +16,7 @@ public class CreateSolrCore {
     }
 
     public SolrResponseDTO createCore(String coreName) {
-        return solrCoreServicePort.createCore(coreName);
+        return solrCoreServicePort.create(coreName);
     }
 
 }

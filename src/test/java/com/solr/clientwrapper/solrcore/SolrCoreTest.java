@@ -31,26 +31,26 @@ public class SolrCoreTest {
     @Transactional
     void testCreateSolrCore() throws Exception {
 
-        SolrCreateCoreDTO solrCreateCoreDTO=new SolrCreateCoreDTO(coreName);
+        SolrSingleCoreDTO solrSingleCoreDTO =new SolrSingleCoreDTO(coreName);
 
         //CREATE CORE
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/createCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtil.convertObjectToJsonBytes(solrCreateCoreDTO)))
+                .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
 
         //CREATE CORE WITH SAME NAME AND TEST
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/createCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrCreateCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED CORE
-        SolrDeleteCoreDTO solrDeleteCoreDTO=new SolrDeleteCoreDTO(coreName,true,true,true);
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
 
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/deleteCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
     }
 
@@ -60,25 +60,24 @@ public class SolrCoreTest {
     void testDeleteSolrCore() throws Exception {
 
         //DELETE A NON EXISTING CORE
-        SolrDeleteCoreDTO solrDeleteCoreDTO=new SolrDeleteCoreDTO(coreName,true,true,true);
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/deleteCore/")
+        SolrSingleCoreDTO solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isBadRequest());
 
 
         //CREATE CORE
-        SolrCreateCoreDTO solrCreateCoreDTO=new SolrCreateCoreDTO(coreName);
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/createCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrCreateCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
 
 
         //DELETE THE CREATED CORE
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/deleteCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
     }
 
@@ -87,36 +86,34 @@ public class SolrCoreTest {
     @Transactional
     void testRenameSolrCore() throws Exception {
 
-        SolrCreateCoreDTO solrCreateCoreDTO=new SolrCreateCoreDTO(coreName);
+        SolrSingleCoreDTO solrSingleCoreDTO =new SolrSingleCoreDTO(coreName);
 
         //CREATE CORE
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/createCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrCreateCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
 
         //RENAME THE CORE
-        SolrRenameCoreDTO solrRenameCoreDTO=new SolrRenameCoreDTO(coreName,coreName+"2");
-        restAMockMvc.perform(MockMvcRequestBuilders.put(solrEndpoint+"/renameCore/")
+        SolrDoubleCoreDTO solrDoubleCoreDTO=new SolrDoubleCoreDTO(coreName,coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.put(solrEndpoint+"/rename/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrRenameCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrDoubleCoreDTO)))
                 .andExpect(status().isOk());
 
         //TRY TO DELETE USING THE OLD CORE NAME
-        SolrDeleteCoreDTO solrDeleteCoreDTO=new SolrDeleteCoreDTO(coreName,true,true,true);
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/deleteCore/")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isBadRequest());
 
         //TRY TO DELETE USING THE NEW CORE NAME
-        solrDeleteCoreDTO=new SolrDeleteCoreDTO(coreName+"2",true,true,true);
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/deleteCore/")
+        solrSingleCoreDTO =new SolrSingleCoreDTO(coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCoreDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
                 .andExpect(status().isOk());
     }
-
 
 
 

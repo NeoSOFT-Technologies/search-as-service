@@ -16,7 +16,7 @@ public class ReloadSolrCore {
     }
 
     public SolrResponseDTO reloadCore(String coreName) {
-        return solrCoreServicePort.reloadCore(coreName);
+        return solrCoreServicePort.reload(coreName);
     }
 
 }

@@ -4,16 +4,16 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 
 public interface SolrCoreServicePort {
 
-    SolrResponseDTO createCore(String coreName);
+    SolrResponseDTO create(String coreName);
 
-    SolrResponseDTO renameCore(String coreName, String newName);
+    SolrResponseDTO rename(String coreName, String newName);
 
-    SolrResponseDTO deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir);
+    SolrResponseDTO delete(String coreName);
 
-    SolrResponseDTO swapCore(String coreOne, String coreTwo);
+    SolrResponseDTO swap(String coreOne, String coreTwo);
 
-    SolrResponseDTO reloadCore(String coreName);
+    SolrResponseDTO reload(String coreName);
 
-    String statusCore(String coreName);
+    String status(String coreName);
 
 }

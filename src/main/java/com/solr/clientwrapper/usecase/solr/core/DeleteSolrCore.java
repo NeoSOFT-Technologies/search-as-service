@@ -15,8 +15,8 @@ public class DeleteSolrCore {
         this.solrCoreServicePort = solrCoreServicePort;
     }
 
-    public SolrResponseDTO deleteCore(String coreName, boolean deleteIndex, boolean deleteDataDir, boolean deleteInstanceDir) {
-        return solrCoreServicePort.deleteCore(coreName,deleteIndex,deleteDataDir,deleteInstanceDir);
+    public SolrResponseDTO deleteCore(String coreName) {
+        return solrCoreServicePort.delete(coreName);
     }
 
 }

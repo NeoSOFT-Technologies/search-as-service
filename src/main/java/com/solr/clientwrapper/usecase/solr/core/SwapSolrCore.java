@@ -16,7 +16,7 @@ public class SwapSolrCore {
     }
 
     public SolrResponseDTO swapCore(String coreOne, String coreTwo) {
-        return solrCoreServicePort.swapCore(coreOne,coreTwo);
+        return solrCoreServicePort.swap(coreOne,coreTwo);
     }
 
 }

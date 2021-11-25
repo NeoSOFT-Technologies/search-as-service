@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SolrCreateCoreDTO {
+public class SolrSingleCoreDTO {
 
     String coreName;
 
-    public SolrCreateCoreDTO(String coreName) {
+    public SolrSingleCoreDTO(String coreName) {
         this.coreName = coreName;
     }
 

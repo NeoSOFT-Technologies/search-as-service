@@ -15,7 +15,7 @@ public class StatusSolrCore {
     }
 
     public String coreStatus(String coreName) {
-        return solrCoreServicePort.statusCore(coreName);
+        return solrCoreServicePort.status(coreName);
     }
 
 }

@@ -13,5 +13,7 @@ public class SolrResponseDTO {
     String coreName;
     String message;
 
-
+    public SolrResponseDTO(String coreName) {
+        this.coreName = coreName;
+    }
 }

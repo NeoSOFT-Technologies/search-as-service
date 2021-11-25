@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SolrSwapCoreDTO {
+public class SolrDoubleCoreDTO {
 
     String coreOne;
     String coreTwo;
 
-    public SolrSwapCoreDTO(String coreOne, String coreTwo) {
+    public SolrDoubleCoreDTO(String coreOne, String coreTwo) {
         this.coreOne = coreOne;
         this.coreTwo = coreTwo;
     }
