@@ -37,8 +37,16 @@ public class SolrCoreResource {
 
     @GetMapping("/coreStatus/{name}")
     @Operation(summary = "/core-status", security = @SecurityRequirement(name = "bearerAuth"))
-    public String coreStatus(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
-        return statusSolrCore.coreStatus(name);
+    public ResponseEntity<String> coreStatus(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+        String responseString=statusSolrCore.coreStatus(name);
+
+        if(responseString.length()>=150){
+            //CORE EXISTS
+            return ResponseEntity.status(HttpStatus.OK).body(responseString);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseString);
+        }
+
     }
 
     @PostMapping("/createCore")
