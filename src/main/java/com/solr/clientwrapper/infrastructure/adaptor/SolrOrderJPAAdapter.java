@@ -23,17 +23,17 @@ public class SolrOrderJPAAdapter implements SolrOrderPersistencePort {
 	}
 
 	@Override
-	public Page<SolrOrderPojo> findByOrderDescription(String searchTerm, Pageable pageable) {
+	public Page<SolrOrderPojo> findOrdersByOrderDescription(String searchTerm, Pageable pageable) {
 		return solrOrderRepository.findByOrderDescription(searchTerm, pageable);
 	}
 
 	@Override
-	public Page<SolrOrderPojo> findByCustomerQuery(String searchTerm, Pageable pageable) {
+	public Page<SolrOrderPojo> findOrdersBySearchTerm(String searchTerm, Pageable pageable) {
 		return solrOrderRepository.findByCustomerQuery(searchTerm, pageable);
 	}
 
 	@Override
-	public List<SolrOrderPojo> findByCustomerQuery2(String searchTerm, Pageable pageable) {
+	public List<SolrOrderPojo> findListOfOrdersBySearchTerm(String searchTerm, Pageable pageable) {
 		return solrOrderRepository.findByCustomerQuery2(searchTerm, pageable);
 	}
 

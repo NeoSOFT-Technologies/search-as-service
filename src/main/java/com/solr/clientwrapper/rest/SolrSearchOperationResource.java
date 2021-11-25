@@ -16,7 +16,6 @@ import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
 public class SolrSearchOperationResource {
 	/*
 	 * /////// ############## Solr Search Operation ################ /////////
-	 * Author: Piyush Ojha; NeoSOFT Tech.
 	 */    
 	
     private static final String SOLR_DATA_NAME_DEFAULT = "techproducts";

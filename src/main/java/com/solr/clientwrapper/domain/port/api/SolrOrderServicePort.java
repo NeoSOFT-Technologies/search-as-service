@@ -9,10 +9,10 @@ import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
 
 public interface SolrOrderServicePort {
 
-	Page<SolrOrderPojo> findByOrderDescription(String searchTerm, Pageable pageable);
+	Page<SolrOrderPojo> findOrdersByOrderDescription(String searchTerm, Pageable pageable);
 
-	Page<SolrOrderPojo> findByCustomerQuery(String searchTerm, Pageable pageable);
+	Page<SolrOrderPojo> findOrdersBySearchTerm(String searchTerm, Pageable pageable);
 	
-	List<SolrOrderPojo> findByCustomerQuery2(String searchTerm, Pageable pageable);
+	List<SolrOrderPojo> findListOfOrdersBySearchTerm(String searchTerm, Pageable pageable);
 	
 }

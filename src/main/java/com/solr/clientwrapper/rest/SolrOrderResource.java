@@ -33,32 +33,28 @@ public class SolrOrderResource {
 		this.solrOrderServicePort = solrOrderServicePort;
 	}
 	
-
 	/*
 	 * /////// ############## Solr Search Operation for Order Collection ################ /////////
-	 * Author: Piyush Ojha; NeoSOFT Tech.
 	 */
 	@GetMapping("/search")
-	public List<SolrOrderPojo> findDesiredOrders(
+	public List<SolrOrderPojo> findOrdersBySearchTerm(
 			@RequestParam(defaultValue = "*") String searchTerm, 
-			@RequestParam(defaultValue = "0") int page, 
-			@RequestParam(defaultValue = "3") int pagesize) {
-		return solrOrderServicePort.findByCustomerQuery(searchTerm, PageRequest.of(page, pagesize)).getContent();
+			@RequestParam(defaultValue = "0") int startPage, 
+			@RequestParam(defaultValue = "3") int pageSize) {
+		return solrOrderServicePort.findOrdersBySearchTerm(searchTerm, PageRequest.of(startPage, pageSize))
+									.getContent();
 	}
 	
-	@GetMapping("/search/{searchTerm}/{page}/{pagesize}")
-	public List<SolrOrderPojo> findOrdersBySearchTerm(@PathVariable String searchTerm, @PathVariable int page, @PathVariable int pagesize) {
-		return solrOrderServicePort.findByCustomerQuery(searchTerm, PageRequest.of(page, pagesize)).getContent();
+	@GetMapping("/search/{orderDescription}/{startPage}/{pageSize}")
+	public List<SolrOrderPojo> findOrdersByDescription(	@PathVariable String orderDescription, 
+														@PathVariable int startPage, 
+														@PathVariable int pageSize) {
+		return solrOrderServicePort.findOrdersByOrderDescription(orderDescription, PageRequest.of(startPage, pageSize))
+									.getContent();
 	}
-	
-	@GetMapping("/search/findByDesc/{orderDesc}/{page}/{pagesize}")
-	public List<SolrOrderPojo> findOrdersByDescription(@PathVariable String orderDesc, @PathVariable int page, @PathVariable int pagesize) {
-		return solrOrderServicePort.findByOrderDescription(orderDesc, PageRequest.of(page, pagesize)).getContent();
-	}
-
 	
 	/*
-	 * // CRUD operations for Order Collection
+	 * CRUD operations for Order Collection
 	 */	
 	@PostMapping("/placeorder")
 	public String createOrder(@RequestBody SolrOrderPojo order) {

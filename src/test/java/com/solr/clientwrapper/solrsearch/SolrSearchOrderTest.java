@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -25,7 +22,6 @@ import com.solr.clientwrapper.domain.port.spi.SolrOrderPersistencePort;
 import com.solr.clientwrapper.domain.service.SolrOrderService;
 import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
 import com.solr.clientwrapper.infrastructure.repository.SolrOrderRepository;
-import com.solr.clientwrapper.rest.SolrOrderResource;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -56,7 +52,7 @@ public class SolrSearchOrderTest {
 	private SolrOrderPersistencePort solrOrderPersistencePort;
 	
 	@InjectMocks
-	private SolrOrderService orderPojoSolrService;
+	private SolrOrderService solrOrderService;
 //	@InjectMocks
 //	private SolrOrderResource solrOrderResource;
 //	
@@ -86,7 +82,7 @@ public class SolrSearchOrderTest {
 		TEST_PRODUCTS = new ArrayList<>(); 
 		TEST_PRODUCTS.add(solrOrderPojo);
 		
-		orderPojoSolrService = new SolrOrderService(solrOrderPersistencePort);
+		solrOrderService = new SolrOrderService(solrOrderPersistencePort);
     }
 	
 	@Test
@@ -106,14 +102,12 @@ public class SolrSearchOrderTest {
 		 * PageImpl<>(users.subList(start, end), pageable, users.size());
 		 */
 		
-		Mockito.when(solrOrderServicePort.findByCustomerQuery2(Mockito.any(), Mockito.any()))
+		Mockito.when(solrOrderServicePort.findListOfOrdersBySearchTerm(Mockito.any(), Mockito.any()))
 		.thenReturn(TEST_PRODUCTS);
 		
-		orders = orderPojoSolrService.findByCustomerQuery2(SEARCH_TERM, PageRequest.of(PAGE, PAGE_SIZE));
+		orders = solrOrderService.findListOfOrdersBySearchTerm(SEARCH_TERM, PageRequest.of(PAGE, PAGE_SIZE));
 		
-		
-    	// testing
-    	System.out.println("BP 5: "+"########################");
+    	// testing on console
 		System.out.println("\tOrders: "+TEST_PRODUCTS.size());
 		
 		assertNotNull(orders);

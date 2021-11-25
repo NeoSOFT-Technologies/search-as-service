@@ -22,18 +22,18 @@ public class SolrOrderService implements SolrOrderServicePort {
 	}
 
 	@Override
-	public Page<SolrOrderPojo> findByOrderDescription(String searchTerm, Pageable pageable) {
-		return solrOrderPersistencePort.findByOrderDescription(searchTerm, pageable);
+	public Page<SolrOrderPojo> findOrdersByOrderDescription(String searchTerm, Pageable pageable) {
+		return solrOrderPersistencePort.findOrdersByOrderDescription(searchTerm, pageable);
 	}
 
 	@Override
-	public Page<SolrOrderPojo> findByCustomerQuery(String searchTerm, Pageable pageable) {
-		return solrOrderPersistencePort.findByCustomerQuery(searchTerm, pageable);
+	public Page<SolrOrderPojo> findOrdersBySearchTerm(String searchTerm, Pageable pageable) {
+		return solrOrderPersistencePort.findOrdersBySearchTerm(searchTerm, pageable);
 	}
 
 	@Override
-	public List<SolrOrderPojo> findByCustomerQuery2(String searchTerm, Pageable pageable) {
-		return solrOrderPersistencePort.findByCustomerQuery2(searchTerm, pageable);
+	public List<SolrOrderPojo> findListOfOrdersBySearchTerm(String searchTerm, Pageable pageable) {
+		return solrOrderPersistencePort.findListOfOrdersBySearchTerm(searchTerm, pageable);
 	}
 	
 }
