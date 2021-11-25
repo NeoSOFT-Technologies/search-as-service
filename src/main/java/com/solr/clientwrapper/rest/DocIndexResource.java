@@ -176,12 +176,12 @@ public class DocIndexResource {
 					      String name =  (String) books.get("name");
 					      String author =  (String) books.get("author");
 					      
-					      //Adding fields to the document 
-					      doc.addField("name", name); 
-					      doc.addField("author", author); 
+					      
 					    });
 					 
-					
+					//Adding fields to the document 
+				      doc.addField("name",obj.get("name")); 
+				      doc.addField("author", obj.get("author")); 
 					
 					
 					//Adding the document to Solr 
