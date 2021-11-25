@@ -13,11 +13,11 @@ import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
 
 @Service
 @Transactional
-public class OrderPojoSolrService implements SolrOrderServicePort {
+public class SolrOrderService implements SolrOrderServicePort {
 
 	private final SolrOrderPersistencePort solrOrderPersistencePort;
 
-	public OrderPojoSolrService(SolrOrderPersistencePort solrOrderPersistencePort) {
+	public SolrOrderService(SolrOrderPersistencePort solrOrderPersistencePort) {
 		this.solrOrderPersistencePort = solrOrderPersistencePort;
 	}
 

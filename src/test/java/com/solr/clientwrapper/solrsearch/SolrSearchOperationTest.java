@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.solr.clientwrapper.domain.service.OrderPojoSolrService;
+import com.solr.clientwrapper.domain.service.SolrOrderService;
 import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
 import com.solr.clientwrapper.infrastructure.solrbean.SolrCollectionIndex;
 import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
@@ -54,7 +54,7 @@ public class SolrSearchOperationTest {
 	private static String ORDER;
 	
 	private SolrOrderPojo solrOrderPojo;
-	private OrderPojoSolrService orderPojoSolrService;
+	private SolrOrderService orderPojoSolrService;
 	
 	@Autowired
 	SolrSearchResult solrSearchResult;

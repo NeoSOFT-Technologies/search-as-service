@@ -1,16 +1,5 @@
 package com.solr.clientwrapper.rest;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
-import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.solr.clientwrapper.infrastructure.solrbean.SolrCollectionIndex;
+import com.solr.clientwrapper.domain.service.SolrSearchOperationService;
 import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
 
 @RestController
@@ -30,16 +19,12 @@ public class SolrSearchOperationResource {
 	 * Author: Piyush Ojha; NeoSOFT Tech.
 	 */    
 	
-    private static final String SOLR_DATA_NAME = "techproducts";
     private static final String SOLR_DATA_NAME_DEFAULT = "techproducts";
     
-    @Autowired
-    private SolrClient solrClient;
 	@Autowired
 	SolrSearchResult solrSearchResult;
 	@Autowired
-	SolrCollectionIndex solrCollectionIndex;
-
+	SolrSearchOperationService solrSearchOperationService;
 
 	@GetMapping(value = "/search")
 	public ResponseEntity<SolrSearchResult> searchRecordsInGivenCollection(
@@ -49,31 +34,16 @@ public class SolrSearchOperationResource {
 											@RequestParam(defaultValue = "0") String startRecord, 
 											@RequestParam(defaultValue = "5") String pageSize, 
 											@RequestParam(defaultValue = "id") String tag, 
-											@RequestParam(defaultValue = "asc") String order)
-													throws SolrServerException, IOException {
-		SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/"+collection).build();
-		SolrQuery query = new SolrQuery();
-		query.set("q", queryField + ":" + searchTerm);
-		query.set("start", startRecord);
-		query.set("rows", pageSize);
+											@RequestParam(defaultValue = "asc") String order) {
 
-		SortClause sortClause = new SortClause(tag, order);
-		query.setSort(sortClause);
-		
-		QueryResponse response = client.query(query);
-		SolrDocumentList numdocs = response.getResults();
-		
-		// testing... : start /////////
-		DocumentObjectBinder binder = new DocumentObjectBinder();
-		List<SolrCollectionIndex> docs = binder.getBeans(SolrCollectionIndex.class, numdocs);
-		// testing: end  ////////////
-		
-		response.getDebugMap();
-		long numDocs = numdocs.getNumFound();
-		solrSearchResult.setNumDocs(numDocs);
-		solrSearchResult.setSolrCollectionIndex(docs);
+		solrSearchOperationService.setUpSelectQuery(collection, 
+													queryField, 
+													searchTerm, 
+													startRecord, 
+													pageSize, 
+													tag, 
+													order);
 		return new ResponseEntity<>(solrSearchResult, HttpStatus.OK);
-
 	}
 	
 	@GetMapping(value = "/search/paginated")
@@ -85,31 +55,15 @@ public class SolrSearchOperationResource {
 											@RequestParam(defaultValue = "5") String pageSize, 
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order, 
-											@RequestParam(defaultValue = "0") int startPage)
-													throws SolrServerException, IOException {
-		SolrClient client = new HttpSolrClient.Builder("http://localhost:8983/solr/"+collection).build();
-		SolrQuery query = new SolrQuery();
-		query.set("q", queryField + ":" + searchTerm);
-		query.set("start", startRecord);
-		query.set("rows", pageSize);
-
-		// set sorting strategy
-		SortClause sortClause = new SortClause(tag, order);
-		query.setSort(sortClause);
-		
-		QueryResponse response = client.query(query);
-		SolrDocumentList numdocs = response.getResults();
-		
-		// testing... : start /////////
-		DocumentObjectBinder binder = new DocumentObjectBinder();
-		List<SolrCollectionIndex> docs = binder.getBeans(SolrCollectionIndex.class, numdocs);	
-		// testing: end  ////////////
-		
-		response.getDebugMap();
-		long numDocs = numdocs.getNumFound();
-		solrSearchResult.setNumDocs(numDocs);
-		solrSearchResult.setSolrCollectionIndex(docs);
+											@RequestParam(defaultValue = "0") String startPage) {
+		solrSearchOperationService.setUpSelectQueryWithPagination(collection, 
+				queryField, 
+				searchTerm, 
+				startRecord, 
+				pageSize, 
+				tag, 
+				order, 
+				startPage);
 		return new ResponseEntity<>(solrSearchResult, HttpStatus.OK);
-
 	}
 }

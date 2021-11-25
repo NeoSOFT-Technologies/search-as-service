@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.solr.clientwrapper.domain.port.api.SolrOrderServicePort;
 import com.solr.clientwrapper.domain.port.spi.SolrOrderPersistencePort;
-import com.solr.clientwrapper.domain.service.OrderPojoSolrService;
+import com.solr.clientwrapper.domain.service.SolrOrderService;
 import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
 import com.solr.clientwrapper.infrastructure.repository.SolrOrderRepository;
 import com.solr.clientwrapper.rest.SolrOrderResource;
@@ -56,7 +56,7 @@ public class SolrSearchOrderTest {
 	private SolrOrderPersistencePort solrOrderPersistencePort;
 	
 	@InjectMocks
-	private OrderPojoSolrService orderPojoSolrService;
+	private SolrOrderService orderPojoSolrService;
 //	@InjectMocks
 //	private SolrOrderResource solrOrderResource;
 //	
@@ -86,7 +86,7 @@ public class SolrSearchOrderTest {
 		TEST_PRODUCTS = new ArrayList<>(); 
 		TEST_PRODUCTS.add(solrOrderPojo);
 		
-		orderPojoSolrService = new OrderPojoSolrService(solrOrderPersistencePort);
+		orderPojoSolrService = new SolrOrderService(solrOrderPersistencePort);
     }
 	
 	@Test

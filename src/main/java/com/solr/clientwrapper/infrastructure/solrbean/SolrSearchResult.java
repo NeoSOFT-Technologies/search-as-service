@@ -1,11 +1,7 @@
 package com.solr.clientwrapper.infrastructure.solrbean;
 
 import java.util.List;
-
 import org.springframework.stereotype.Component;
-
-import com.solr.clientwrapper.infrastructure.entity.SolrOrderPojo;
-
 import lombok.Data;
 
 

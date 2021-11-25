@@ -3,17 +3,15 @@ package com.solr.clientwrapper.infrastructure.solrbean;
 import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
-import org.springframework.data.solr.core.mapping.SolrDocument;
 import org.springframework.stereotype.Component;
 
-//@SolrDocument(collection = "techproducts")
 @Component
 public class SolrCollectionIndex {
 	
 	private String id;
 	private String name;
 	private List<String> features;
-	private List<String> cat;
+	private List<String> category;
 
 	public String getId() {
 		return id;
@@ -43,12 +41,12 @@ public class SolrCollectionIndex {
 	}
 
 	public List<String> getCat() {
-		return cat;
+		return category;
 	}
 
 	@Field
-	public void setCat(List<String> cat) {
-		this.cat = cat;
+	public void setCat(List<String> category) {
+		this.category = category;
 	}
 
 }

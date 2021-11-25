@@ -14,11 +14,11 @@ import com.solr.clientwrapper.infrastructure.repository.SolrOrderRepository;
 
 @Service
 @Transactional
-public class OrderPojoSolrAdapter implements SolrOrderPersistencePort {
+public class SolrOrderJPAAdapter implements SolrOrderPersistencePort {
 	@Autowired
 	private final SolrOrderRepository solrOrderRepository;
 
-	public OrderPojoSolrAdapter(SolrOrderRepository solrOrderRepository) {
+	public SolrOrderJPAAdapter(SolrOrderRepository solrOrderRepository) {
 		this.solrOrderRepository = solrOrderRepository;
 	}
 
