@@ -1,5 +1,7 @@
 package com.solr.clientwrapper.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
 @RestController
 @RequestMapping("/solr")
 public class SolrSearchOperationResource {
+	
+	private final Logger log = LoggerFactory.getLogger(SolrSearchOperationResource.class);
+	
 	/*
 	 * /////// ############## Solr Search Operation ################ /////////
 	 */    
@@ -34,7 +39,7 @@ public class SolrSearchOperationResource {
 											@RequestParam(defaultValue = "5") String pageSize, 
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order) {
-
+		log.debug("REST request to search in the collection : {}", collection);
 		solrSearchOperationService.setUpSelectQuery(collection, 
 													queryField, 
 													searchTerm, 
@@ -55,6 +60,7 @@ public class SolrSearchOperationResource {
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order, 
 											@RequestParam(defaultValue = "0") String startPage) {
+		log.debug("REST request to search(paginated) in the collection : {}", collection);
 		solrSearchOperationService.setUpSelectQueryWithPagination(collection, 
 				queryField, 
 				searchTerm, 
