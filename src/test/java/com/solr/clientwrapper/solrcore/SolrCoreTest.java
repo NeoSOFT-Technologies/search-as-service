@@ -115,6 +115,116 @@ public class SolrCoreTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @Transactional
+    void testSwapSolrCore() throws Exception {
+
+        //CREATE CORE 1
+        SolrSingleCoreDTO solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //TRY SWAPPING EXISTING CORE WITH NON-EXISTING CORE
+        SolrDoubleCoreDTO solrDoubleCoreDTO=new SolrDoubleCoreDTO(coreName,coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.put(solrEndpoint+"/swap/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrDoubleCoreDTO)))
+                .andExpect(status().isBadRequest());
+
+        //CREATE CORE 2
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //SWAP THE 2 CORES
+        solrDoubleCoreDTO=new SolrDoubleCoreDTO(coreName,coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.put(solrEndpoint+"/swap/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrDoubleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //DELETE THE CREATED CORE 1
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //DELETE THE CREATED CORE 2
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName+"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @Transactional
+    void testReloadSolrCore() throws Exception {
+
+        //RELOAD NON EXISTING CORE
+        SolrSingleCoreDTO solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/reload/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isBadRequest());
+
+        //CREATE CORE
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //RELOAD THE CREATED CORE
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/reload/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //DELETE THE CREATED CORE
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @Transactional
+    void testSolrCoreStatus() throws Exception {
+
+        //GET STATUS OF NON EXISTING CORE
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrEndpoint+"/status/"+"nonExistingCore")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        //CREATE CORE
+        SolrSingleCoreDTO solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrEndpoint+"/create/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+
+        //GET STATUS OF CREATED CORE
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrEndpoint+"/status/"+coreName)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //DELETE THE CREATED CORE
+        solrSingleCoreDTO=new SolrSingleCoreDTO(coreName);
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrEndpoint+"/delete/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(solrSingleCoreDTO)))
+                .andExpect(status().isOk());
+    }
 
 
 }
