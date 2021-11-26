@@ -21,6 +21,8 @@ public class SolrCoreService implements SolrCoreServicePort {
     @Override
     public SolrResponseDTO create(String coreName) {
 
+        log.debug("create");
+
         CoreAdminRequest.Create request = new CoreAdminRequest.Create();
         request.setCoreName(coreName);
         request.setInstanceDir(coreName);
@@ -49,6 +51,8 @@ public class SolrCoreService implements SolrCoreServicePort {
     @Override
     public SolrResponseDTO rename(String coreName, String newName) {
 
+        log.debug("rename");
+
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
 
         try {
@@ -70,6 +74,10 @@ public class SolrCoreService implements SolrCoreServicePort {
 
     @Override
     public SolrResponseDTO delete(String coreName) {
+
+        log.debug("delete");
+
+
         CoreAdminRequest.Unload request=new CoreAdminRequest.Unload(true);
         request.setCoreName(coreName);
         request.setDeleteIndex(true);
@@ -99,6 +107,8 @@ public class SolrCoreService implements SolrCoreServicePort {
     @Override
     public SolrResponseDTO swap(String coreOne, String coreTwo) {
 
+        log.debug("swap");
+
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreOne);
 
         try {
@@ -121,6 +131,7 @@ public class SolrCoreService implements SolrCoreServicePort {
     @Override
     public SolrResponseDTO reload(String coreName) {
 
+        log.debug("reload");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
 
@@ -143,6 +154,8 @@ public class SolrCoreService implements SolrCoreServicePort {
 
     @Override
     public String status(String coreName) {
+
+        log.debug("status");
 
         CoreAdminResponse coreAdminResponse= null;
         try {
