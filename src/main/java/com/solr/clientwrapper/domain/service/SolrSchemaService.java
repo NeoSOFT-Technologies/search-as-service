@@ -15,7 +15,7 @@ import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 public class SolrSchemaService implements SolrSchemaServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaService.class);
-	
+
 	HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
 
 	@Override
