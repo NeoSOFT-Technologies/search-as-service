@@ -25,5 +25,5 @@ public class GetSolarSchema {
 		return solrSchemaServicePort.get(name);
 
 	}
-	
+
 }

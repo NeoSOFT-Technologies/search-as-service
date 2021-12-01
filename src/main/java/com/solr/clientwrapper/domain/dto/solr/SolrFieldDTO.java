@@ -5,12 +5,12 @@ import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
 public class SolrFieldDTO {
 
-	
 	String name;
 	SolrFieldType type;
 	String default_;

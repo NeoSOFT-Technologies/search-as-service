@@ -14,15 +14,14 @@ public class UpdateSolarSchema {
 
 	private final Logger log = LoggerFactory.getLogger(UpdateSolarSchema.class);
 	private final SolrSchemaServicePort solrSchemaServicePort;
+
 	public UpdateSolarSchema(SolrSchemaServicePort solrSchemaServicePort) {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
-	
+
 	public SolrSchemaDTO update(String name) {
 		log.debug("update Schema");
 		return solrSchemaServicePort.update(name);
 	}
-	
-	
 
 }

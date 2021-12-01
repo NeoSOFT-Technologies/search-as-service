@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,38 +33,58 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class SolrSchemaResource {
 
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaResource.class);
-	
+
 	private final CreateSolrSchema createSolrSchema;
 	private final DeleteSolarSchema deleteSolrSchema;
 	private final UpdateSolarSchema updateSolrSchema;
 	private final GetSolarSchema getSolarSchema;
-	public SolrSchemaResource(CreateSolrSchema createSolrSchema, DeleteSolarSchema deleteSolrSchema, UpdateSolarSchema updateSolrSchema, GetSolarSchema getSolarSchema) {
-		
+
+	public SolrSchemaResource(CreateSolrSchema createSolrSchema, DeleteSolarSchema deleteSolrSchema,
+			UpdateSolarSchema updateSolrSchema, GetSolarSchema getSolarSchema) {
+
 		this.createSolrSchema = createSolrSchema;
 		this.deleteSolrSchema = deleteSolrSchema;
 		this.updateSolrSchema = updateSolrSchema;
 		this.getSolarSchema = getSolarSchema;
 	}
-	
+
 	@PostMapping("/create")
 	@Operation(summary = "/create-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> create(@RequestBody SolrSchemaDTO solrSchemaDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException{
+	public ResponseEntity<SolrSchemaDTO> create(@RequestBody SolrSchemaDTO solrSchemaDTO) throws SolrServerException,
+			IOException, URISyntaxException, ParserConfigurationException, InterruptedException {
 		log.debug("Solr Schema Create");
-		SolrSchemaDTO solrSchemaDTO2 = createSolrSchema.create(solrSchemaDTO.getTableName(),solrSchemaDTO.getName(), solrSchemaDTO.getAttributes());
-			return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO2);
-	
+		SolrSchemaDTO solrSchemaDTO2 = createSolrSchema.create(solrSchemaDTO.getTableName(), solrSchemaDTO.getName(),
+				solrSchemaDTO.getAttributes());
+		return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO2);
+
 	}
-	
-	@DeleteMapping("/delete")
-	@Operation(summary = "/delete-schema",security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> delete(@RequestBody SolrSchemaDTO solrSchemaDTO) throws SolrServerException, IOException, URISyntaxException {
+
+	@DeleteMapping("/delete/{name}")
+	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<Void> delete(@PathVariable String name)
+			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("Schema Delete");
-		
-		SolrSchemaDTO solrResposeDTO = deleteSolrSchema.delete(solrSchemaDTO.getName());
-		return ResponseEntity.status(HttpStatus.OK).body(solrResposeDTO);
+		deleteSolrSchema.delete(name);
+		return ResponseEntity.noContent().build();
 	}
-	
-//	@PutMapping("/update")
-//	@Operation(summary = "/update-schema",security = @SecurityRequirement(name = "bearerAuth"))
-//	public ResponseEntity<SolrSchemaDTO>
+
+	@PutMapping("/update")
+	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<SolrSchemaDTO> update(@RequestBody SolrSchemaDTO solrSchemaDTO)
+			throws SolrServerException, IOException, URISyntaxException {
+		log.debug("solr schema update");
+
+		SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getName());
+		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+	}
+
+	@GetMapping("/getSchema/{name}")
+	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<SolrSchemaDTO> get(@PathVariable String name)
+			throws SolrServerException, IOException, URISyntaxException {
+		log.debug("get solar schema");
+		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(name);
+		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+	}
+
 }
