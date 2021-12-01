@@ -59,7 +59,7 @@ public class SolrSchemaResource {
 
 	}
 
-	@DeleteMapping("/delete")
+	@DeleteMapping("/delete/{name}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Void> delete(@PathVariable String name)
 			throws SolrServerException, IOException, URISyntaxException {
