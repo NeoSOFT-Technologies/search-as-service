@@ -12,17 +12,16 @@ import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 @Transactional
 public class DeleteSolarSchema {
 
-    private final Logger log = LoggerFactory.getLogger(DeleteSolarSchema.class);
-    private final SolrSchemaServicePort solrSchemaServicePort;
+	private final Logger log = LoggerFactory.getLogger(DeleteSolarSchema.class);
+	private final SolrSchemaServicePort solrSchemaServicePort;
+
 	public DeleteSolarSchema(SolrSchemaServicePort solrSchemaServicePort) {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
-	
+
 	public SolrSchemaDTO delete(String name) {
 		log.debug("delete");
 		return solrSchemaServicePort.delete(name);
 	}
-    
-    
 
 }

@@ -11,7 +11,6 @@ public class SolrSchemaDTO {
 
 	String tableName;
 	String name;
-	SolrFieldDTO [] attributes;
-	
-	
+	SolrFieldDTO[] attributes;
+
 }
