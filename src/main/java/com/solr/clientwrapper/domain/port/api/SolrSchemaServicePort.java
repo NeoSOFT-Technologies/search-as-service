@@ -9,4 +9,8 @@ public interface SolrSchemaServicePort {
 	SolrSchemaDTO update(String name);
 	SolrSchemaDTO delete(String name);
 	SolrSchemaDTO get(String name);
+	
+	String validateSchema();
+	String storeSchema();
+	String getSchema(String tableName);
 }
