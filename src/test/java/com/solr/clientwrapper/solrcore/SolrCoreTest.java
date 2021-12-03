@@ -1,7 +1,8 @@
 package com.solr.clientwrapper.solrcore;
 
 import com.solr.clientwrapper.IntegrationTest;
-import com.solr.clientwrapper.domain.dto.solr.*;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrDoubleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrSingleCoreDTO;
 import com.solr.clientwrapper.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

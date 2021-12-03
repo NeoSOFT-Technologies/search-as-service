@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,8 @@ public class SolrCoreService implements SolrCoreServicePort {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreService.class);
 
-    HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
+    @Value("${base-solr-url}")
+    private String baseSolrUrl;
 
     @Override
     public SolrResponseDTO create(String coreName) {
@@ -30,7 +32,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         request.setDataDir("data");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             CoreAdminResponse coreAdminResponse =request.process(solrClient);
 
@@ -54,7 +56,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("rename");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             CoreAdminResponse coreAdminResponse=CoreAdminRequest.renameCore(coreName,newName,solrClient);
 
@@ -85,7 +87,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         request.setDeleteInstanceDir(true);
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             request.process(solrClient);
 
@@ -110,7 +112,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("swap");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreOne);
-
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             CoreAdminRequest.swapCore(coreOne,coreTwo,solrClient);
 
@@ -134,7 +136,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("reload");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             CoreAdminResponse coreAdminResponse=CoreAdminRequest.reloadCore(coreName,solrClient);
 
@@ -158,6 +160,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("status");
 
         CoreAdminResponse coreAdminResponse= null;
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
             coreAdminResponse = CoreAdminRequest.getStatus(coreName,solrClient);
             return coreAdminResponse.toString();

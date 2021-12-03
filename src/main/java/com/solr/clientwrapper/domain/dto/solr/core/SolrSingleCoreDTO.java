@@ -1,4 +1,4 @@
-package com.solr.clientwrapper.domain.dto.solr;
+package com.solr.clientwrapper.domain.dto.solr.core;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

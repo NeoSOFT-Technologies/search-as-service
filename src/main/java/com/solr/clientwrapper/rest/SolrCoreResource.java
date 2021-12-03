@@ -1,8 +1,8 @@
 package com.solr.clientwrapper.rest;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrDoubleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrDoubleCoreDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSingleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrSingleCoreDTO;
 import com.solr.clientwrapper.usecase.solr.core.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/solr")
+@RequestMapping("/solr-core")
 public class SolrCoreResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreResource.class);
