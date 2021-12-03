@@ -25,19 +25,19 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaDTO update(String name) {
+	public SolrSchemaDTO update(String tableName,String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SolrSchemaDTO delete(String name) {
+	public SolrSchemaDTO delete(String tableName, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SolrSchemaDTO get(String name) {
+	public SolrSchemaDTO get(String tableName, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}

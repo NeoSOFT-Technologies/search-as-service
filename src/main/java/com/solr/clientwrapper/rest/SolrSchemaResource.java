@@ -59,12 +59,12 @@ public class SolrSchemaResource {
 
 	}
 
-	@DeleteMapping("/delete/{name}")
+	@DeleteMapping("/delete/{tableName}/{name}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Void> delete(@PathVariable String name)
+	public ResponseEntity<Void> delete(@PathVariable String tableName, String name)
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("Schema Delete");
-		deleteSolrSchema.delete(name);
+		deleteSolrSchema.delete(tableName, name);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -74,17 +74,21 @@ public class SolrSchemaResource {
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("solr schema update");
 
-		SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getName());
+		SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getTableName(), solrSchemaDTO.getName());
 		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 	}
 
-	@GetMapping("/getSchema/{name}")
+	@GetMapping("/getSchema/{tableName}/{name}")
 	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> get(@PathVariable String name)
+	public ResponseEntity<SolrSchemaDTO> get(@PathVariable String tableName, String name)
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("get solar schema");
-		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(name);
+		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(tableName, name);
+		if(solrResponseDTO != null) {
 		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+		}
 	}
-
 }

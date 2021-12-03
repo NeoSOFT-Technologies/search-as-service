@@ -19,9 +19,9 @@ public class UpdateSolarSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public SolrSchemaDTO update(String name) {
+	public SolrSchemaDTO update(String tableName,String name) {
 		log.debug("update Schema");
-		return solrSchemaServicePort.update(name);
+		return solrSchemaServicePort.update(tableName, name);
 	}
 
 }
