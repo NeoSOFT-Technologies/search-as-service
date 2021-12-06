@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/solr-schema")
+@RequestMapping("/schema")
 public class SolrSchemaResource {
 
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaResource.class);
@@ -68,13 +68,15 @@ public class SolrSchemaResource {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/update")
+	@PutMapping("/update/{tableName}/{name}")
 	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> update(@RequestBody SolrSchemaDTO solrSchemaDTO)
+	public ResponseEntity<SolrSchemaDTO> update(@PathVariable String tableName, String name,@RequestBody SolrSchemaDTO solrSchemaDTO1)
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("solr schema update");
 
-		SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getTableName(), solrSchemaDTO.getName());
+		//SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getTableName(), solrSchemaDTO.getName());
+		SolrSchemaDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
+		SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
 		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 	}
 

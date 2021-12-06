@@ -25,7 +25,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaDTO update(String tableName,String name) {
+	public SolrSchemaDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -34,7 +34,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	public SolrSchemaDTO delete(String tableName, String name) {
 		// TODO Auto-generated method stub
 		return null;
-	}
+		}
 
 	@Override
 	public SolrSchemaDTO get(String tableName, String name) {
