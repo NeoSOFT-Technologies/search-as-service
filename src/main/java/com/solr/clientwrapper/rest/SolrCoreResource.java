@@ -135,6 +135,24 @@ public class SolrCoreResource {
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
         }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
 
 }

@@ -6,6 +6,8 @@ import com.solr.clientwrapper.infrastructure.entity.SampleEntity;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface SampleEntityServicePort {
 
     SampleEntity save(SampleEntityDTO sampleEntityDTO);
@@ -22,6 +24,6 @@ public interface SampleEntityServicePort {
 
     Optional<SampleEntity> patch(Long id, SampleEntityDTO sampleEntityDTO);
 
-
+  
 
 }

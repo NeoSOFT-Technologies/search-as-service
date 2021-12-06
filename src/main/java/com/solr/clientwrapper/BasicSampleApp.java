@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
+
 import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
@@ -25,6 +27,7 @@ import java.util.Optional;
 
 @SpringBootApplication(scanBasePackages={"com.solr.clientwrapper"})
 @EnableJpaRepositories
+@EnableAsync
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
 //@ComponentScan({"com.solr.clientwrapper.rest"})
 //@EntityScan("com.solr.clientwrapper.infrastructure.entity")

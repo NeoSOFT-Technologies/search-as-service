@@ -1,23 +1,38 @@
 package com.solr.clientwrapper.domain.service;
 
-import com.solr.clientwrapper.domain.dto.SampleEntityDTO;
-import com.solr.clientwrapper.domain.port.api.SampleEntityServicePort;
-import com.solr.clientwrapper.mapper.SampleEntityMapper;
-import com.solr.clientwrapper.rest.errors.BadRequestAlertException;
-import com.solr.clientwrapper.domain.port.spi.SampleEntityPersistencePort;
-import com.solr.clientwrapper.infrastructure.entity.SampleEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.solr.clientwrapper.domain.dto.SampleEntityDTO;
+import com.solr.clientwrapper.domain.port.api.SampleEntityServicePort;
+import com.solr.clientwrapper.domain.port.spi.SampleEntityPersistencePort;
+import com.solr.clientwrapper.infrastructure.entity.SampleEntity;
+import com.solr.clientwrapper.infrastructure.repository.SampleEntityRepository;
+import com.solr.clientwrapper.mapper.SampleEntityMapper;
+import com.solr.clientwrapper.rest.errors.BadRequestAlertException;
 @Service
 @Transactional
 public class SampleEntityService implements SampleEntityServicePort {
 
     private static final String ENTITY_NAME = "a";
+
+    
+    
+    
+    private String uploadFolderPaths = "/Users/uploaded_";
+   
+    @Autowired
+    private SampleEntityRepository sampleEntityRepository;
 
     private final SampleEntityPersistencePort sampleEntityPersistencePort;
     private final SampleEntityMapper sampleEntityMapper;
@@ -109,5 +124,7 @@ public class SampleEntityService implements SampleEntityServicePort {
                 });
     
     }
+
+	
 
 }
