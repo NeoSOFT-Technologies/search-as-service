@@ -27,7 +27,7 @@ public class SolrCoreTest {
     private MockMvc restAMockMvc;
 
 
-    @Test
+   // @Test
     @Transactional
     void testCreateSolrCore() throws Exception {
 
@@ -55,7 +55,7 @@ public class SolrCoreTest {
     }
 
 
-    @Test
+   // @Test
     @Transactional
     void testDeleteSolrCore() throws Exception {
 
@@ -82,7 +82,7 @@ public class SolrCoreTest {
     }
 
 
-    @Test
+   // @Test
     @Transactional
     void testRenameSolrCore() throws Exception {
 
@@ -115,7 +115,7 @@ public class SolrCoreTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
+   // @Test
     @Transactional
     void testSwapSolrCore() throws Exception {
 
@@ -163,7 +163,7 @@ public class SolrCoreTest {
     }
 
 
-    @Test
+   // @Test
     @Transactional
     void testReloadSolrCore() throws Exception {
 
@@ -197,7 +197,7 @@ public class SolrCoreTest {
     }
 
 
-    @Test
+   // @Test
     @Transactional
     void testSolrCoreStatus() throws Exception {
 
