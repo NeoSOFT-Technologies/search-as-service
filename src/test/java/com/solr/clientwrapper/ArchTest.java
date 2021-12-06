@@ -13,16 +13,16 @@ class ArchTest {
     void servicesAndRepositoriesShouldNotDependOnWebLayer() {
         JavaClasses importedClasses = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-            .importPackages("com.springboot.rest");
-
+            .importPackages("com.solr.clientwrapper");
+        
         noClasses()
             .that()
-            .resideInAnyPackage("com.springboot.rest.service..")
+            .resideInAnyPackage("com.solr.clientwrapper.service..")
             .or()
-            .resideInAnyPackage("com.springboot.rest.repository..")
+            .resideInAnyPackage("com.solr.clientwrapper.repository..")
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage("..com.springboot.rest.web..")
+            .resideInAnyPackage("..com.solr.clientwrapper.web..")
             .because("Services and repositories should not depend on web layer")
             .check(importedClasses);
     }
