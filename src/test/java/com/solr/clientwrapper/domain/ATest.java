@@ -1,8 +1,5 @@
 package com.solr.clientwrapper.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
 class ATest {
 
   // @Test
