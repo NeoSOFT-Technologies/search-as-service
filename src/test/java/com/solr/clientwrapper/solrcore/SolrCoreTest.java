@@ -59,6 +59,9 @@ public class SolrCoreTest {
         Mockito.when(solrCoreService.create(Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCoreService.delete(Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCoreService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        Mockito.when(solrCoreService.swap(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        Mockito.when(solrCoreService.reload(Mockito.any())).thenReturn(solrResponseDTO);
+        Mockito.when(solrCoreService.status(Mockito.any())).thenReturn("{message={this is a sample response lesser than 150 characters}");
     }
 
     @Test
