@@ -1,4 +1,5 @@
-package com.solr.clientwrapper.rest;
+package com.solr.clientwrapper.solrcore;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 

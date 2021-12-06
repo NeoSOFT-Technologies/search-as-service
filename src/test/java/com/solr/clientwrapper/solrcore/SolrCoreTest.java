@@ -1,8 +1,7 @@
 package com.solr.clientwrapper.solrcore;
 
-import com.solr.clientwrapper.IntegrationTest;
-import com.solr.clientwrapper.domain.dto.solr.*;
-import com.solr.clientwrapper.rest.TestUtil;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,7 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.solr.clientwrapper.IntegrationTest;
+import com.solr.clientwrapper.domain.dto.solr.SolrDoubleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSingleCoreDTO;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -27,7 +28,10 @@ public class SolrCoreTest {
     private MockMvc restAMockMvc;
 
 
-   // @Test
+
+
+    @Test
+
     @Transactional
     void testCreateSolrCore() throws Exception {
 
@@ -55,7 +59,10 @@ public class SolrCoreTest {
     }
 
 
-   // @Test
+
+    @Test
+
+ 
     @Transactional
     void testDeleteSolrCore() throws Exception {
 
@@ -82,7 +89,10 @@ public class SolrCoreTest {
     }
 
 
-   // @Test
+
+
+    @Test
+
     @Transactional
     void testRenameSolrCore() throws Exception {
 
@@ -115,7 +125,9 @@ public class SolrCoreTest {
                 .andExpect(status().isOk());
     }
 
-   // @Test
+
+    @Test
+
     @Transactional
     void testSwapSolrCore() throws Exception {
 
@@ -163,7 +175,9 @@ public class SolrCoreTest {
     }
 
 
-   // @Test
+
+    @Test
+
     @Transactional
     void testReloadSolrCore() throws Exception {
 
@@ -197,7 +211,9 @@ public class SolrCoreTest {
     }
 
 
-   // @Test
+
+    @Test
+
     @Transactional
     void testSolrCoreStatus() throws Exception {
 
