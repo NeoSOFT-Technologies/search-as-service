@@ -55,6 +55,7 @@ public class SolrSchemaResource {
 		log.debug("Solr Schema Create");
 		SolrSchemaDTO solrSchemaDTO2 = createSolrSchema.create(solrSchemaDTO.getTableName(), solrSchemaDTO.getName(),
 				solrSchemaDTO.getAttributes());
+
 		return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO2);
 
 	}
@@ -70,11 +71,13 @@ public class SolrSchemaResource {
 
 	@PutMapping("/update/{tableName}/{name}")
 	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> update(@PathVariable String tableName, String name,@RequestBody SolrSchemaDTO solrSchemaDTO1)
-			throws SolrServerException, IOException, URISyntaxException {
+	public ResponseEntity<SolrSchemaDTO> update(@PathVariable String tableName, String name,
+			@RequestBody SolrSchemaDTO solrSchemaDTO1) throws SolrServerException, IOException, URISyntaxException {
 		log.debug("solr schema update");
 
-		//SolrSchemaDTO solrResponseDTO = updateSolrSchema.update(solrSchemaDTO.getTableName(), solrSchemaDTO.getName());
+		// SolrSchemaDTO solrResponseDTO =
+		// updateSolrSchema.update(solrSchemaDTO.getTableName(),
+		// solrSchemaDTO.getName());
 		SolrSchemaDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
 		SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
 		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -86,10 +89,9 @@ public class SolrSchemaResource {
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("get solar schema");
 		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(tableName, name);
-		if(solrResponseDTO != null) {
-		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
-		}
-		else {
+		if (solrResponseDTO != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 		}
 	}
