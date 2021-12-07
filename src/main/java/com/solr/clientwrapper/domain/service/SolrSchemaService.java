@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
@@ -19,25 +20,25 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	HttpSolrClient solrClient = new HttpSolrClient.Builder("http://localhost:8983/solr").build();
 
 	@Override
-	public SolrSchemaDTO create(String tableName, String name, SolrFieldDTO[] attributes) {
+	public SolrSchemaResponseDTO create(String tableName, String name, SolrFieldDTO[] attributes) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SolrSchemaDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO) {
+	public SolrSchemaResponseDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SolrSchemaDTO delete(String tableName, String name) {
+	public SolrSchemaResponseDTO delete(String tableName, String name) {
 		// TODO Auto-generated method stub
 		return null;
 		}
 
 	@Override
-	public SolrSchemaDTO get(String tableName, String name) {
+	public SolrSchemaResponseDTO get(String tableName, String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}

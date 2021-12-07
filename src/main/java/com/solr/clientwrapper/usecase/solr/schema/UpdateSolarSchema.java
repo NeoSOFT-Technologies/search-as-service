@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
@@ -19,7 +20,7 @@ public class UpdateSolarSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public SolrSchemaDTO update(String tableName,String name,SolrSchemaDTO solrSchemaDTO) {
+	public SolrSchemaResponseDTO update(String tableName,String name,SolrSchemaDTO solrSchemaDTO) {
 		log.debug("update Schema");
 		return solrSchemaServicePort.update(tableName, name,solrSchemaDTO);
 	}

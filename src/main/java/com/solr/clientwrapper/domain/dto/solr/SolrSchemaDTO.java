@@ -21,4 +21,5 @@ public class SolrSchemaDTO {
 	private String name;
 	private SolrFieldDTO[] attributes;
 
+	
 }

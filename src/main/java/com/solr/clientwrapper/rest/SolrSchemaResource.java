@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.usecase.solr.schema.CreateSolrSchema;
 import com.solr.clientwrapper.usecase.solr.schema.DeleteSolarSchema;
 import com.solr.clientwrapper.usecase.solr.schema.GetSolarSchema;
@@ -50,45 +51,57 @@ public class SolrSchemaResource {
 
 	@PostMapping("/create")
 	@Operation(summary = "/create-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> create(@RequestBody SolrSchemaDTO solrSchemaDTO) throws SolrServerException,
+	public ResponseEntity<SolrSchemaResponseDTO> create(@RequestBody SolrSchemaDTO solrSchemaDTO) throws SolrServerException,
 			IOException, URISyntaxException, ParserConfigurationException, InterruptedException {
 		log.debug("Solr Schema Create");
-		SolrSchemaDTO solrSchemaDTO2 = createSolrSchema.create(solrSchemaDTO.getTableName(), solrSchemaDTO.getName(),
+		SolrSchemaResponseDTO solrSchemaDTO2 = createSolrSchema.create(solrSchemaDTO.getTableName(), solrSchemaDTO.getName(),
 				solrSchemaDTO.getAttributes());
-
-		return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO2);
-
+		if(solrSchemaDTO2.getStatusCode()==200) {
+			return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO2);
+		}else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrSchemaDTO2);
+		}
+			
 	}
 
 	@DeleteMapping("/delete/{tableName}/{name}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Void> delete(@PathVariable String tableName, String name)
+	public ResponseEntity<SolrSchemaResponseDTO> delete(@PathVariable String tableName, String name)
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("Schema Delete");
-		deleteSolrSchema.delete(tableName, name);
-		return ResponseEntity.noContent().build();
+		SolrSchemaResponseDTO solrResponseDto =  deleteSolrSchema.delete(tableName, name);
+		if(solrResponseDto.getStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDto);
+		}else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDto);
+		}
 	}
 
 	@PutMapping("/update/{tableName}/{name}")
 	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> update(@PathVariable String tableName, String name,
+	public ResponseEntity<SolrSchemaResponseDTO> update(@PathVariable String tableName, String name,
 			@RequestBody SolrSchemaDTO solrSchemaDTO1) throws SolrServerException, IOException, URISyntaxException {
 		log.debug("solr schema update");
 
 		// SolrSchemaDTO solrResponseDTO =
 		// updateSolrSchema.update(solrSchemaDTO.getTableName(),
 		// solrSchemaDTO.getName());
-		SolrSchemaDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
-		SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
+		SolrSchemaResponseDTO solrResponseDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
+		//SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
+		if(solrResponseDTO.getStatusCode() == 200) {
 		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+		}
 	}
 
 	@GetMapping("/getSchema/{tableName}/{name}")
 	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> get(@PathVariable String tableName, String name)
+	public ResponseEntity<SolrSchemaResponseDTO> get(@PathVariable String tableName, String name)
 			throws SolrServerException, IOException, URISyntaxException {
 		log.debug("get solar schema");
-		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(tableName, name);
+		SolrSchemaResponseDTO solrResponseDTO = getSolarSchema.get(tableName, name);
 		if (solrResponseDTO != null) {
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		} else {
