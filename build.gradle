@@ -211,6 +211,9 @@ dependencies {
 
      implementation "com.googlecode.json-simple:json-simple:1.1.1"
      
+     // https://mvnrepository.com/artifact/net.sf.ehcache/ehcache
+implementation group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.6'
+     
      
      
 // https://mvnrepository.com/artifact/com.google.guava/guava
