@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,7 +26,7 @@ import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-//@SpringBootTest(properties = { "base=solr-url=hrrp://localhost:8983/solr" })
+@SpringBootTest(properties = { "base=solr-url=hrrp://localhost:8983/solr" })
 class SolrSchemaResourceTest {
 
 	String solrendpoint = "/schema";
