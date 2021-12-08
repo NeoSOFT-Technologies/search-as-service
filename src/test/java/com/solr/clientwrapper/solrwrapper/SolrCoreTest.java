@@ -1,4 +1,4 @@
-package com.solr.clientwrapper.solrcore;
+package com.solr.clientwrapper.solrwrapper;
 
 import com.solr.clientwrapper.IntegrationTest;
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -23,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-@SpringBootTest(properties = { "base-solr-url=http://localhost:8983/solr" })
+//@SpringBootTest(properties = { "base-solr-url=http://localhost:8983/solr" })
 public class SolrCoreTest {
 
     String solrCoreEndpoint ="/solr-core";

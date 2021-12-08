@@ -116,13 +116,19 @@ public class SolrCollectionResource {
 
     }
 
-    @GetMapping("/isCollectionExits/{collectionName}")
-    @Operation(summary = "/isCollectionExits", security = @SecurityRequirement(name = "bearerAuth"))
-    public boolean isCollectionExits(@PathVariable String collectionName) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    @GetMapping("/isCollectionExists/{collectionName}")
+    @Operation(summary = "/isCollectionExists", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Boolean> isCollectionExits(@PathVariable String collectionName) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
 
         log.debug("isCollectionExits");
 
-        return  getIsCollectionExists.isCollectionExists(collectionName);
+        Boolean isCollectionExists=getIsCollectionExists.isCollectionExists(collectionName);
+
+        if(isCollectionExists){
+            return ResponseEntity.status(HttpStatus.OK).body(isCollectionExists);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isCollectionExists);
+        }
 
     }
 

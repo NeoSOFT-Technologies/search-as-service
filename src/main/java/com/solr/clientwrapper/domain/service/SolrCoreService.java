@@ -7,7 +7,6 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +16,8 @@ public class SolrCoreService implements SolrCoreServicePort {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreService.class);
 
-    @Value("${base-solr-url}")
-    private String baseSolrUrl;
+//    @Value("${base-solr-url}")
+    private String baseSolrUrl="http://localhost:8983/solr";
 
     @Override
     public SolrResponseDTO create(String coreName) {
