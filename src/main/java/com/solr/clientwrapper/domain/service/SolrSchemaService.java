@@ -365,12 +365,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		log.debug("validate schema.");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		String urlString = "http://localhost:8985/solr/";
-		SolrClient solr = new HttpSolrClient.Builder(urlString+DEFAULT_COLLECTION).build();
+		SolrClient solr = new HttpSolrClient.Builder(URL_STRING+solrSchemaDTO.getTableName()).build();
 
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
-			
 			// explore response content
 			System.out.println("Response header : "+schemaResponse.getResponseHeader());
 			System.out.println("Response class : "+schemaResponse.getResponseHeader().getClass());
