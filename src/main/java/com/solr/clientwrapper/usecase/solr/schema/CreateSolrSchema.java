@@ -21,8 +21,8 @@ public class CreateSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 	
-	public SolrSchemaDTO create(String tableName,String name,SolrFieldDTO [] attributes ) {
+	public SolrSchemaDTO create(String tableName,String name, SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("create Schema");
-		return solrSchemaServicePort.create(tableName, name, attributes);
+		return solrSchemaServicePort.create(tableName, name, newSolrSchemaDTO);
 	}
 }

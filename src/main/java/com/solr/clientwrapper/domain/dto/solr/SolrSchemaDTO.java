@@ -13,4 +13,9 @@ public class SolrSchemaDTO {
 	String name;
 	SolrFieldDTO[] attributes;
 
+	public SolrSchemaDTO(SolrSchemaDTO solrSchemaDTO) {
+		this.tableName = solrSchemaDTO.getTableName();
+		this.name = solrSchemaDTO.getName();
+		this.attributes=solrSchemaDTO.getAttributes();
+	}
 }

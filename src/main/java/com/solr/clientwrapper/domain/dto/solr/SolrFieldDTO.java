@@ -19,4 +19,5 @@ public class SolrFieldDTO {
 	boolean isStorable;
 	boolean isMultiValue;
 	boolean isSortable;
+	
 }
