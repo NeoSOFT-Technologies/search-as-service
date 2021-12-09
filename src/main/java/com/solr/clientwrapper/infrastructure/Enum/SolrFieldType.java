@@ -1,5 +1,7 @@
 package com.solr.clientwrapper.infrastructure.Enum;
 
+import org.apache.commons.lang3.StringUtils;
+
 public enum SolrFieldType {
 	_nest_path_,
 	 ancestor_path,
@@ -18,7 +20,19 @@ public enum SolrFieldType {
 	 pdouble,
 	 pfloat,
 	 currency;
-	 
+	
+    public static Boolean doesExist(String name) {
+        if(StringUtils.isBlank(name)) {
+            return false;
+        }
+
+        for(SolrFieldType item : SolrFieldType.values()) {
+            if(name.equals(fromEnumToString(item))) {
+                return true;
+            }
+        }
+        return false;
+    }
 	
 	public static SolrFieldType fromObject(String fieldType) {
 		if(fieldType.equals("string")) {

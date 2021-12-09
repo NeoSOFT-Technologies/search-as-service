@@ -13,15 +13,15 @@ public interface SolrSchemaServicePort {
 	 */
 	SolrSchemaDTO create(String tableName, String name, SolrSchemaDTO newSolrSchemaDTO);
 	SolrSchemaDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO);
-	SolrSchemaDTO update1(String tableName, String name, SolrSchemaDTO newSolrSchemaDTO);
 	void delete(String tableName, String name);
 	SolrSchemaDTO get(String tableName, String name);
 	
 	/*
 	 * Validation of solr schema and External API callings 
 	 */
-	String validateSchema();
-	String storeSchema();
+	boolean validateSchema(SolrSchemaDTO solrSchemaDTO);
+	boolean validateSchemaField(SolrFieldDTO solrFieldDTO);
+	boolean validateSchemaFieldBooleanAttributes(SolrFieldDTO solrFieldDTO);
 	String getSolrClient(String tableName);
 
 	/* 
