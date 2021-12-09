@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/solr-collection")
+@RequestMapping("/searchservice/table")
 public class SolrCollectionResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrCollectionResource.class);

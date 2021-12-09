@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-//@SpringBootTest(properties = { "base-solr-url=http://localhost:8983/solr" })
 public class SolrCoreTest {
 
     String solrCoreEndpoint ="/solr-core";

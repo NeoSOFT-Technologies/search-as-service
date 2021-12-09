@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +23,8 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
     private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
 
-//    @Value("${base-solr-url}")
-    private String baseSolrUrl="http://localhost:8983/solr";
+    @Value("${base-solr-url}")
+    private String baseSolrUrl;//="http://localhost:8983/solr";
 
     @Autowired
     CapacityPlanProperties capacityPlanProperties;
