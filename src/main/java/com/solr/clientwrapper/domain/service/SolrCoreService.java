@@ -17,8 +17,9 @@ public class SolrCoreService implements SolrCoreServicePort {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreService.class);
 
+    //http://localhost:8983/solr
     @Value("${base-solr-url}")
-    private String baseSolrUrl;//="http://localhost:8983/solr";
+    private String baseSolrUrl;
 
     @Override
     public SolrResponseDTO create(String coreName) {

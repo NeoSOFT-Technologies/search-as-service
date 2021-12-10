@@ -5,17 +5,11 @@ import com.solr.clientwrapper.domain.dto.solr.collection.*;
 import com.solr.clientwrapper.usecase.solr.collection.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/searchservice/table")
@@ -42,7 +36,7 @@ public class SolrCollectionResource {
 
     @GetMapping("/capacity-plans")
     @Operation(summary = "/capacity-plans", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() {
 
         log.debug("Get capacity plans");
 
@@ -54,7 +48,7 @@ public class SolrCollectionResource {
 
     @PostMapping("/create")
     @Operation(summary = "/create-collection", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrCreateCollectionDTO solrCreateCollectionDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrCreateCollectionDTO solrCreateCollectionDTO) {
 
         log.debug("Solr Collection create");
 
@@ -70,7 +64,7 @@ public class SolrCollectionResource {
 
     @DeleteMapping("/delete")
     @Operation(summary = "/delete-collection", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrDeleteCollectionDTO solrDeleteCollectionDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrDeleteCollectionDTO solrDeleteCollectionDTO) {
 
         log.debug("Solr Collection delete");
 
@@ -86,7 +80,7 @@ public class SolrCollectionResource {
 
     @PutMapping("/rename")
     @Operation(summary = "/rename-collection", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) {
 
         log.debug("Solr Collection rename");
 
@@ -102,7 +96,7 @@ public class SolrCollectionResource {
 
     @GetMapping("/collections")
     @Operation(summary = "/all-collections", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrGetCollectionsResponseDTO> collections() throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrGetCollectionsResponseDTO> collections() {
 
         log.debug("Get all collections");
 
@@ -118,13 +112,13 @@ public class SolrCollectionResource {
 
     @GetMapping("/isCollectionExists/{collectionName}")
     @Operation(summary = "/isCollectionExists", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Boolean> isCollectionExits(@PathVariable String collectionName) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<Boolean> isCollectionExits(@PathVariable String collectionName) {
 
         log.debug("isCollectionExits");
 
         Boolean isCollectionExists=getIsCollectionExists.isCollectionExists(collectionName);
 
-        if(isCollectionExists){
+        if(Boolean.TRUE.equals(isCollectionExists)){
             return ResponseEntity.status(HttpStatus.OK).body(isCollectionExists);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isCollectionExists);

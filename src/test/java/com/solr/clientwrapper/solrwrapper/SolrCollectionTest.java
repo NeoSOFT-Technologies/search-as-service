@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class SolrCollectionTest {
+class SolrCollectionTest {
 
     String solrCollectionEndpoint ="/searchservice/table";
 

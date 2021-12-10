@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class SolrCoreTest {
+class SolrCoreTest {
 
     String solrCoreEndpoint ="/solr-core";
 

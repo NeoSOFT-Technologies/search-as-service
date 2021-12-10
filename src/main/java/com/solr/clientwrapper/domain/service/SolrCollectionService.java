@@ -23,8 +23,9 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
     private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
 
+    //http://localhost:8983/solr
     @Value("${base-solr-url}")
-    private String baseSolrUrl;//="http://localhost:8983/solr";
+    private String baseSolrUrl;
 
     @Autowired
     CapacityPlanProperties capacityPlanProperties;
@@ -33,8 +34,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
     public SolrGetCapacityPlanDTO capacityPlans() {
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 
-        SolrGetCapacityPlanDTO solrGetCapacityPlanDTO=new SolrGetCapacityPlanDTO(capacityPlans);
-        return solrGetCapacityPlanDTO;
+        return new SolrGetCapacityPlanDTO(capacityPlans);
     }
 
 
@@ -163,11 +163,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
             List<String> allCollections=(List<String>) response.getResponse().get("collections");
 
-            if(allCollections.contains(collectionName)){
-                return true;
-            }else{
-                return false;
-            }
+            return allCollections.contains(collectionName);
 
         } catch (Exception e) {
             log.error(e.toString());

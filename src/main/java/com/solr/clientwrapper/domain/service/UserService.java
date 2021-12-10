@@ -43,12 +43,6 @@ public class UserService implements UserServicePort {
 
     private final CacheManager cacheManager;
 
-	/*
-	 * public UserService(UserPersistencPort userRepository, PasswordEncoder
-	 * passwordEncoder, CacheManager cacheManager) { this.userPersistencePort =
-	 * userRepository; this.passwordEncoder = passwordEncoder; this.cacheManager =
-	 * cacheManager; }
-	 */
     
     public UserService(UserPersistencPort userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, CacheManager cacheManager) {
         this.userPersistencePort = userRepository;
