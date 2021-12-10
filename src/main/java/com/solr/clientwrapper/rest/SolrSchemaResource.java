@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.usecase.solr.schema.CreateSolrSchema;
-import com.solr.clientwrapper.usecase.solr.schema.DeleteSolarSchema;
-import com.solr.clientwrapper.usecase.solr.schema.GetSolarSchema;
-import com.solr.clientwrapper.usecase.solr.schema.UpdateSolarSchema;
+import com.solr.clientwrapper.usecase.solr.schema.DeleteSolrSchema;
+import com.solr.clientwrapper.usecase.solr.schema.GetSolrSchema;
+import com.solr.clientwrapper.usecase.solr.schema.UpdateSolrSchema;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,12 +29,12 @@ public class SolrSchemaResource {
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaResource.class);
 
 	private final CreateSolrSchema createSolrSchema;
-	private final DeleteSolarSchema deleteSolrSchema;
-	private final UpdateSolarSchema updateSolrSchema;
-	private final GetSolarSchema getSolarSchema;
+	private final DeleteSolrSchema deleteSolrSchema;
+	private final UpdateSolrSchema updateSolrSchema;
+	private final GetSolrSchema getSolarSchema;
 
-	public SolrSchemaResource(CreateSolrSchema createSolrSchema, DeleteSolarSchema deleteSolrSchema,
-			UpdateSolarSchema updateSolrSchema, GetSolarSchema getSolarSchema) {
+	public SolrSchemaResource(CreateSolrSchema createSolrSchema, DeleteSolrSchema deleteSolrSchema,
+			UpdateSolrSchema updateSolrSchema, GetSolrSchema getSolarSchema) {
 		this.createSolrSchema = createSolrSchema;
 		this.deleteSolrSchema = deleteSolrSchema;
 		this.updateSolrSchema = updateSolrSchema;

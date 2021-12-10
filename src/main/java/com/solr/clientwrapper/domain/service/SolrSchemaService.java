@@ -79,6 +79,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
 			// explore response content
+			log.debug("\nSchema Response : {}", schemaResponse);
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
 			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
 			

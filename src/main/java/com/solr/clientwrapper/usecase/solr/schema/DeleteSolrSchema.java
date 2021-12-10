@@ -10,19 +10,18 @@ import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
 @Transactional
-public class GetSolarSchema {
+public class DeleteSolrSchema {
 
-	private final Logger log = LoggerFactory.getLogger(GetSolarSchema.class);
-
+	private final Logger log = LoggerFactory.getLogger(DeleteSolrSchema.class);
 	private final SolrSchemaServicePort solrSchemaServicePort;
 
-	public GetSolarSchema(SolrSchemaServicePort solrSchemaServicePort) {
+	public DeleteSolrSchema(SolrSchemaServicePort solrSchemaServicePort) {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public SolrSchemaDTO get(String tableName, String name) {
-		log.debug("get Schema");
-		return solrSchemaServicePort.get(tableName, name);
+	public void delete(String tableName, String name) {
+		log.debug("Calling delete schema field Port");
+		solrSchemaServicePort.delete(tableName, name);
 	}
 
 }

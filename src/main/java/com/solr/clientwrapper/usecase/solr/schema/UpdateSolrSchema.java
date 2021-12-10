@@ -10,12 +10,12 @@ import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
 @Transactional
-public class UpdateSolarSchema {
+public class UpdateSolrSchema {
 
-	private final Logger log = LoggerFactory.getLogger(UpdateSolarSchema.class);
+	private final Logger log = LoggerFactory.getLogger(UpdateSolrSchema.class);
 	private final SolrSchemaServicePort solrSchemaServicePort;
 
-	public UpdateSolarSchema(SolrSchemaServicePort solrSchemaServicePort) {
+	public UpdateSolrSchema(SolrSchemaServicePort solrSchemaServicePort) {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
