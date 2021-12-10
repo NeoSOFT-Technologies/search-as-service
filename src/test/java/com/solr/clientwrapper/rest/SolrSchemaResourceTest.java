@@ -26,7 +26,6 @@ import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-@SpringBootTest(properties = { "base=solr-url=hrrp://localhost:8983/solr" })
 class SolrSchemaResourceTest {
 
 	String solrendpoint = "/schema";
@@ -120,6 +119,7 @@ class SolrSchemaResourceTest {
 				.andExpect(status().isOk());
 
 		// update Schema
+	
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(solrendpoint + "/update/" + tableName + "/" + name)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)

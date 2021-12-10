@@ -33,8 +33,8 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 
 	@Override
 	public SolrSchemaResponseDTO delete(String tableName, String name) {
-		// TODO Auto-generated method stub
 		return null;
+		// TODO Auto-generated method stub
 		}
 
 	@Override

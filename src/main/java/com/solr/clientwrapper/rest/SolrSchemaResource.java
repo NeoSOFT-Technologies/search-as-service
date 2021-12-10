@@ -66,14 +66,13 @@ public class SolrSchemaResource {
 
 	@DeleteMapping("/delete/{tableName}/{name}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaResponseDTO> delete(@PathVariable String tableName, String name)
-			throws SolrServerException, IOException, URISyntaxException {
+	public ResponseEntity<Void> delete(@PathVariable String tableName, String name) {
 		log.debug("Schema Delete");
 		SolrSchemaResponseDTO solrResponseDto =  deleteSolrSchema.delete(tableName, name);
 		if(solrResponseDto.getStatusCode() == 200) {
-			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDto);
+			return ResponseEntity.status(HttpStatus.OK).build();
 		}else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDto);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
 
@@ -83,16 +82,13 @@ public class SolrSchemaResource {
 			@RequestBody SolrSchemaDTO solrSchemaDTO1) throws SolrServerException, IOException, URISyntaxException {
 		log.debug("solr schema update");
 
-		// SolrSchemaDTO solrResponseDTO =
-		// updateSolrSchema.update(solrSchemaDTO.getTableName(),
-		// solrSchemaDTO.getName());
-		SolrSchemaResponseDTO solrResponseDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
-		//SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
-		if(solrResponseDTO.getStatusCode() == 200) {
-		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		SolrSchemaResponseDTO solrSchemaResponseDTO = updateSolrSchema.update(tableName, name, solrSchemaDTO1);
+		SolrSchemaResponseDTO solrSchemaResponseDTO2 = new SolrSchemaResponseDTO(solrSchemaResponseDTO);
+		if(solrSchemaResponseDTO.getStatusCode() == 200) {
+		return ResponseEntity.status(HttpStatus.OK).body(solrSchemaResponseDTO2);
 		}
 		else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrSchemaResponseDTO2);
 		}
 	}
 
