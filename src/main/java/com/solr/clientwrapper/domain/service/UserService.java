@@ -132,13 +132,7 @@ public class UserService implements UserServicePort {
        
     }
 
-    /**
-     * Update all information for a specific user, and return the modified user.
-     *
-     * @param userEntity
-     *            user to update.
-     * @return updated user.
-     */
+
     @Override
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
 
