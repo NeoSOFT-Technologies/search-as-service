@@ -12,7 +12,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class SolrGetCapacityPlanDTO {
 
-    List<CapacityPlanProperties.Plan> plans;
+    private List<CapacityPlanProperties.Plan> plans;
 
     public SolrGetCapacityPlanDTO(List<CapacityPlanProperties.Plan> plans) {
         this.plans = plans;

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrCreateCollectionDTO {
 
-    String collectionName;
-    String sku;
+    private String collectionName;
+    private String sku;
 
     public SolrCreateCollectionDTO(String collectionName, String sku) {
         this.collectionName = collectionName;

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrDoubleCoreDTO {
 
-    String coreOne;
-    String coreTwo;
+    private String coreOne;
+    private String coreTwo;
 
     public SolrDoubleCoreDTO(String coreOne, String coreTwo) {
         this.coreOne = coreOne;

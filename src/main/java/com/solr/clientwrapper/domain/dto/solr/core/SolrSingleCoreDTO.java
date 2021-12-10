@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrSingleCoreDTO {
 
-    String coreName;
+    private String coreName;
 
     public SolrSingleCoreDTO(String coreName) {
         this.coreName = coreName;

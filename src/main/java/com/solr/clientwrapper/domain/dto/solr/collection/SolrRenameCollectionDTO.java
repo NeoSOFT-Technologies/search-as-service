@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrRenameCollectionDTO {
 
-    String collectionName;
-    String collectionNewName;
+    private String collectionName;
+    private String collectionNewName;
 
     public SolrRenameCollectionDTO(String collectionName, String collectionNewName) {
         this.collectionName = collectionName;

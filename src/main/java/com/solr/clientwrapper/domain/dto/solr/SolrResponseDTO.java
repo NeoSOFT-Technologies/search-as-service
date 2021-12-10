@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrResponseDTO {
 
-    int statusCode;
-    String name;
-    String message;
+    private int statusCode;
+    private String name;
+    private String message;
 
     public SolrResponseDTO(String name) {
         this.name = name;

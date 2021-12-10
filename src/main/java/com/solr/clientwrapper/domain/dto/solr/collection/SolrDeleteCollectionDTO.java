@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrDeleteCollectionDTO {
 
-    String collectionName;
+    private String collectionName;
 
     public SolrDeleteCollectionDTO(String collectionName) {
         this.collectionName = collectionName;

@@ -63,6 +63,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
         HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
 
+
         request.setMaxShardsPerNode(selectedCapacityPlan.getShards()*selectedCapacityPlan.getReplicas());
 
         try {
