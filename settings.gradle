@@ -14,4 +14,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "rest-java-spring-boots"
+rootProject.name = "search-as-a-service"

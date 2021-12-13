@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.service.SolrSchemaService;
 import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc

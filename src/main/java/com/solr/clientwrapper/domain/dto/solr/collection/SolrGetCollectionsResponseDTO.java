@@ -1,19 +1,18 @@
-package com.solr.clientwrapper.domain.dto.solr;
+package com.solr.clientwrapper.domain.dto.solr.collection;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SolrResponseDTO {
+public class SolrGetCollectionsResponseDTO {
 
     private int statusCode;
-    private String name;
     private String message;
+    private List<String> collections;
 
-    public SolrResponseDTO(String name) {
-        this.name = name;
-    }
 }

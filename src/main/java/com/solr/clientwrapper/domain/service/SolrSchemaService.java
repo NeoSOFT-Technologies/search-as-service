@@ -425,7 +425,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
 			// explore response content
-			log.debug("Response header : {}", schemaResponse.getResponseHeader());			
+			log.debug("Response header : {}", schemaResponse.getResponseHeader());	
 			schemaFieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
 			int numOfFieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes().size();
 			log.debug("Response schema size : {}", schemaFieldTypes.size());

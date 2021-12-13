@@ -43,12 +43,6 @@ public class UserService implements UserServicePort {
 
     private final CacheManager cacheManager;
 
-	/*
-	 * public UserService(UserPersistencPort userRepository, PasswordEncoder
-	 * passwordEncoder, CacheManager cacheManager) { this.userPersistencePort =
-	 * userRepository; this.passwordEncoder = passwordEncoder; this.cacheManager =
-	 * cacheManager; }
-	 */
     
     public UserService(UserPersistencPort userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, CacheManager cacheManager) {
         this.userPersistencePort = userRepository;
@@ -138,13 +132,7 @@ public class UserService implements UserServicePort {
        
     }
 
-    /**
-     * Update all information for a specific user, and return the modified user.
-     *
-     * @param userEntity
-     *            user to update.
-     * @return updated user.
-     */
+
     @Override
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
 

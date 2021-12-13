@@ -1,25 +1,19 @@
 package com.solr.clientwrapper.rest;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrDoubleCoreDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSingleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrDoubleCoreDTO;
+import com.solr.clientwrapper.domain.dto.solr.core.SolrSingleCoreDTO;
 import com.solr.clientwrapper.usecase.solr.core.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @RestController
-@RequestMapping("/solr")
+@RequestMapping("/solr-core")
 public class SolrCoreResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreResource.class);
@@ -43,7 +37,7 @@ public class SolrCoreResource {
 
     @GetMapping("/status/{name}")
     @Operation(summary = "/core-status", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<String> status(@PathVariable String name) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<String> status(@PathVariable String name)  {
 
         log.debug("Solr Core status");
 
@@ -60,7 +54,7 @@ public class SolrCoreResource {
 
     @PostMapping("/create")
     @Operation(summary = "/create-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
 
         log.debug("Solr Core create");
 
@@ -76,7 +70,7 @@ public class SolrCoreResource {
 
     @PutMapping("/rename")
     @Operation(summary = "/rename-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO)  {
 
         log.debug("Solr Core rename");
 
@@ -92,7 +86,7 @@ public class SolrCoreResource {
 
     @DeleteMapping("/delete")
     @Operation(summary = "/delete-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
 
         log.debug("Solr Core delete");
 
@@ -108,7 +102,7 @@ public class SolrCoreResource {
 
     @PutMapping("/swap")
     @Operation(summary = "/swap-cores", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> swap(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> swap(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO)  {
 
         log.debug("Solr Core swap");
 
@@ -124,7 +118,7 @@ public class SolrCoreResource {
 
     @PostMapping("/reload")
     @Operation(summary = "/reload-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> reload(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO) throws SolrServerException, IOException, URISyntaxException, ParserConfigurationException, InterruptedException, TransformerException, org.xml.sax.SAXException {
+    public ResponseEntity<SolrResponseDTO> reload(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
 
         log.debug("Solr Core reload");
 
