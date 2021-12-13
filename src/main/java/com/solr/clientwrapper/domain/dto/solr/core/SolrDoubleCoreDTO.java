@@ -1,4 +1,4 @@
-package com.solr.clientwrapper.domain.dto.solr;
+package com.solr.clientwrapper.domain.dto.solr.core;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class SolrDoubleCoreDTO {
 
-    String coreOne;
-    String coreTwo;
+    private String coreOne;
+    private String coreTwo;
 
     public SolrDoubleCoreDTO(String coreOne, String coreTwo) {
         this.coreOne = coreOne;
