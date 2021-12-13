@@ -417,7 +417,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	
 	@Override
 	public List<FieldTypeDefinition> getSchemaFieldTypes(SolrSchemaDTO solrSchemaDTO) {
-		log.debug("validate schema.");
+		log.debug("get schema field types.");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		SolrClient solr = new HttpSolrClient.Builder(URL_STRING+solrSchemaDTO.getTableName()).build();
@@ -427,11 +427,9 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			// explore response content
 			log.debug("Response header : {}", schemaResponse.getResponseHeader());			
 			schemaFieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
-			int NumOfFieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes().size();
-			log.debug("Response schema size : {}", schemaResponse.getSchemaRepresentation().getFieldTypes().size()+"\n");
-			log.debug("Response schema 1 : {}", schemaResponse.getSchemaRepresentation().getFieldTypes().get(0).getAttributes()+"\n");
-			log.debug("Response schema 2 : {}", schemaResponse.getSchemaRepresentation().getFieldTypes().get(1).getAttributes()+"\n");
-			for(int i=0; i<NumOfFieldTypes; i++) {
+			int numOfFieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes().size();
+			log.debug("Response schema size : {}", schemaFieldTypes.size());
+			for(int i=0; i<numOfFieldTypes; i++) {
 				log.debug("Field Types : {}", schemaFieldTypes.get(i).getAttributes());
 			}
 		} catch (SolrServerException e) {
