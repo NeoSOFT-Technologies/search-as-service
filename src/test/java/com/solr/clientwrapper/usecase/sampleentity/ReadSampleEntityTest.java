@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +28,6 @@ import static org.junit.Assert.assertNull;
 class ReadSampleEntityTest {
 	
 	private static final String DEFAULT_LOGIN = "johndoe";
-	
     private SampleEntityMapper sampleEntityMapper;
     private SampleEntity sampleEntity;
     private SampleEntityDTO sampleEntityDto;

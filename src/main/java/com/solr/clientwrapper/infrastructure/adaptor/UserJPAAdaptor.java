@@ -166,7 +166,7 @@ public class UserJPAAdaptor implements UserPersistencPort {
 			user.setEmail(userDTO.getEmail().toLowerCase());
 		}
 		if (userDTO.getLangKey() == null) {
-			user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language } else {
+			user.setLangKey(Constants.DEFAULT_LANGUAGE);
 			user.setLangKey(userDTO.getLangKey());
 		}
 		String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
