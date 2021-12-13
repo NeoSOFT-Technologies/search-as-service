@@ -20,6 +20,8 @@
 solr-client-base-url-static: http://localhost:8985/solr/
 solr-client-base-url-cloud: http://localhost:8983/solr/
 
+#Solr Configurations
+base-solr-url: http://localhost:8983/solr
 
 management:
   endpoints:
