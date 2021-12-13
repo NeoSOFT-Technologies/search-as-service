@@ -3,6 +3,8 @@ package com.solr.clientwrapper.domain.port.api;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
+
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
@@ -20,7 +22,7 @@ public interface SolrSchemaServicePort {
 	/*
 	 * Validation of solr schema and External API callings 
 	 */
-	boolean validateSchema(SolrSchemaDTO solrSchemaDTO);
+	List<FieldTypeDefinition> getSchemaFieldTypes(SolrSchemaDTO solrSchemaDTO);
 	boolean validateSchemaField(SolrFieldDTO solrFieldDTO);
 	boolean validateSchemaFieldBooleanAttributes(SolrFieldDTO solrFieldDTO);
 	String getSolrClient(String tableName);
