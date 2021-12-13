@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
@@ -21,7 +22,7 @@ public class CreateSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 	
-	public SolrSchemaDTO create(String tableName,String name, SolrSchemaDTO newSolrSchemaDTO) {
+	public SolrSchemaResponseDTO create(String tableName,String name, SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("create Schema");
 		return solrSchemaServicePort.create(tableName, name, newSolrSchemaDTO);
 	}

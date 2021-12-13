@@ -5,16 +5,17 @@ import java.util.Map;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 
 public interface SolrSchemaServicePort {
 
 	/* 
 	 * CRUD operations on solr schema
 	 */
-	SolrSchemaDTO create(String tableName, String name, SolrSchemaDTO newSolrSchemaDTO);
-	SolrSchemaDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO);
-	void delete(String tableName, String name);
-	SolrSchemaDTO get(String tableName, String name);
+	SolrSchemaResponseDTO create(String tableName, String name, SolrSchemaDTO newSolrSchemaDTO);
+	SolrSchemaResponseDTO update(String tableName, String name, SolrSchemaDTO solrSchemaDTO);
+	SolrSchemaResponseDTO delete(String tableName, String name);
+	SolrSchemaResponseDTO get(String tableName, String name);
 	
 	/*
 	 * Validation of solr schema and External API callings 

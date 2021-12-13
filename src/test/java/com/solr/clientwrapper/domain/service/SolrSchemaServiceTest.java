@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
@@ -67,6 +68,11 @@ class SolrSchemaServiceTest {
 			TABLE_NAME, 
 			SCHEMA_NAME, 
 			ATTRIBUTES);
+	private SolrSchemaResponseDTO solrSchemaResponseDTO = new SolrSchemaResponseDTO(
+					solrSchemaDTO.getTableName(),
+					solrSchemaDTO.getName(),
+					solrSchemaDTO.getAttributes());
+	// solrSchemaResponseDTO.setStatusCode(200);
 	
 	@MockBean
 	private SolrSchemaServicePort solrSchemaServicePort;
@@ -77,6 +83,7 @@ class SolrSchemaServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
+		log.debug("Service layer test cases are disabled because \"expected schemaResponse\" definintion would be required");
 		Mockito.when(solrSchemaAPIAdapter.getCloudSolrClient(Mockito.any(), Mockito.any()))
 			.thenReturn(cloudSolrClient);
 	}
@@ -91,8 +98,8 @@ class SolrSchemaServiceTest {
 	@Test
 	void testGet() {
 		Mockito.when(solrSchemaServicePort.get(Mockito.any(), Mockito.any()))
-				.thenReturn(solrSchemaDTO);
-		SolrSchemaDTO getSchemaResponse = solrSchemaService.get(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME);
+				.thenReturn(solrSchemaResponseDTO);
+		SolrSchemaResponseDTO getSchemaResponse = solrSchemaService.get(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME);
 		assertNotNull(getSchemaResponse);
 		log.debug("Get Business Logic tested successfully");
 	}
@@ -101,8 +108,8 @@ class SolrSchemaServiceTest {
 	@Test
 	void testUpdate() {
 		Mockito.when(solrSchemaServicePort.update(Mockito.any(), Mockito.any(), Mockito.any()))
-				.thenReturn(solrSchemaDTO);
-		SolrSchemaDTO updateSchemaResponse = solrSchemaService.update(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME, solrSchemaDTO);
+				.thenReturn(solrSchemaResponseDTO);
+		SolrSchemaResponseDTO updateSchemaResponse = solrSchemaService.update(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME, solrSchemaDTO);
 		assertNotNull(updateSchemaResponse);
 		log.debug("Update Business Logic tested successfully");
 	}
@@ -111,8 +118,8 @@ class SolrSchemaServiceTest {
 	@Test
 	void testCreate() {
 		Mockito.when(solrSchemaServicePort.create(Mockito.any(), Mockito.any(), Mockito.any()))
-			.thenReturn(solrSchemaDTO);
-		SolrSchemaDTO createSchemaResponse = solrSchemaService.create(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME, solrSchemaDTO);
+			.thenReturn(solrSchemaResponseDTO);
+		SolrSchemaResponseDTO createSchemaResponse = solrSchemaService.create(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME, solrSchemaDTO);
 		assertNotNull(createSchemaResponse);
 		log.debug("Create Business Logic tested successfully");
 	}
@@ -120,9 +127,10 @@ class SolrSchemaServiceTest {
 	@Disabled
 	@Test
 	void testDelete() {
-		Mockito.doNothing()
-				.when(solrSchemaServicePort).delete(Mockito.any(), Mockito.any());
-		solrSchemaService.delete(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME);
+		Mockito.when(solrSchemaServicePort.delete(Mockito.any(), Mockito.any()))
+				.thenReturn(solrSchemaResponseDTO);
+		SolrSchemaResponseDTO deleteSchemaResponse = solrSchemaService.delete(DEFAULT_SOLR_COLLECTION, SCHEMA_NAME);
+		assertNotNull(deleteSchemaResponse);
 		log.debug("Delete Business Logic tested successfully");
 	}
 	

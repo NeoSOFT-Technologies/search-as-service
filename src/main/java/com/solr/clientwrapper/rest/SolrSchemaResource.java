@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.usecase.solr.schema.CreateSolrSchema;
 import com.solr.clientwrapper.usecase.solr.schema.DeleteSolrSchema;
 import com.solr.clientwrapper.usecase.solr.schema.GetSolrSchema;
@@ -23,7 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/solr-schema")
+@RequestMapping("/schema")
 public class SolrSchemaResource {
 
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaResource.class);
@@ -43,52 +44,61 @@ public class SolrSchemaResource {
 
 	@PostMapping("/create")
 	@Operation(summary = "/create-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> create(
+	public ResponseEntity<SolrSchemaResponseDTO> create(
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr Schema Create");
-		log.debug("(((((((((((()))))))) Received Schema as in Request Body: {}", newSolrSchemaDTO);
-		SolrSchemaDTO solrSchemaDTO = createSolrSchema.create(
-				newSolrSchemaDTO.getTableName(), 
-				newSolrSchemaDTO.getName(),
-				newSolrSchemaDTO);
-		return ResponseEntity.status(HttpStatus.OK).body(solrSchemaDTO);
+		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
+		SolrSchemaResponseDTO solrResponseDTO = 
+				createSolrSchema.create(
+						newSolrSchemaDTO.getTableName(), 
+						newSolrSchemaDTO.getName(), 
+						newSolrSchemaDTO);
+		if(solrResponseDTO.getStatusCode() == 200)
+			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 	}
 
 	@DeleteMapping("/delete/{tableName}/{name}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Void> delete(
+	public ResponseEntity<SolrSchemaResponseDTO> delete(
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("Schema Delete");
-		deleteSolrSchema.delete(tableName, name);
-		return ResponseEntity.ok().build();
+		SolrSchemaResponseDTO solrSchemaResponseDTO = deleteSolrSchema.delete(tableName, name);
+		if(solrSchemaResponseDTO.getStatusCode() == 200)
+			return ResponseEntity.ok().body(solrSchemaResponseDTO);
+		else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrSchemaResponseDTO);
+		
 	}
 
 	@PutMapping("/update/{tableName}/{name}")
 	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> update(
+	public ResponseEntity<SolrSchemaResponseDTO> update(
 			@PathVariable String tableName, 
 			@PathVariable String name, 
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
-		SolrSchemaDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, newSolrSchemaDTO);
-		SolrSchemaDTO solrResponseDTO = new SolrSchemaDTO(solrSchemaDTO);
-		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		SolrSchemaResponseDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, newSolrSchemaDTO);
+		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(solrSchemaDTO);
+		if(solrResponseDTO.getStatusCode() == 200)
+			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 	}
 
 	@GetMapping("/get/{tableName}/{name}")
 	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SolrSchemaDTO> get(
+	public ResponseEntity<SolrSchemaResponseDTO> get(
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("get solar schema");
-		SolrSchemaDTO solrResponseDTO = getSolarSchema.get(tableName, name);
-		if(solrResponseDTO != null) {
-		return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
-		}
-		else {
+		SolrSchemaResponseDTO solrResponseDTO = getSolarSchema.get(tableName, name);
+		if(solrResponseDTO.getStatusCode() == 200)
+			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+		else
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
-		}
 	}
 }

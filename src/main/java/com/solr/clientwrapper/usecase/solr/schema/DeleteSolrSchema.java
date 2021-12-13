@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 
 @Service
@@ -19,9 +20,9 @@ public class DeleteSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public void delete(String tableName, String name) {
+	public SolrSchemaResponseDTO delete(String tableName, String name) {
 		log.debug("Calling delete schema field Port");
-		solrSchemaServicePort.delete(tableName, name);
+		return solrSchemaServicePort.delete(tableName, name);
 	}
 
 }
