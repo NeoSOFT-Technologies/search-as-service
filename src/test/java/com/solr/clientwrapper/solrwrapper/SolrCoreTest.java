@@ -5,6 +5,7 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.core.SolrDoubleCoreDTO;
 import com.solr.clientwrapper.domain.dto.solr.core.SolrSingleCoreDTO;
 import com.solr.clientwrapper.domain.service.SolrCoreService;
+import com.solr.clientwrapper.solrcore.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
