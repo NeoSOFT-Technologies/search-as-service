@@ -13,10 +13,6 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
-# Solr client configurations
-solr-client-base-url-static: http://localhost:8985/solr/
-solr-client-base-url-cloud: http://localhost:8983/solr/
-
 spring:
   profiles:
     # Uncomment the following line to enable tests against production database type rather than H2, using Testcontainers
@@ -116,6 +112,6 @@ jhipster:
 # application:
 user-registration:
   setActivationKey: true
-  
+
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr

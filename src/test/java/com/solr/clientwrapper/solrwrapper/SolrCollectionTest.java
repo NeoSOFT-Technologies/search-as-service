@@ -7,6 +7,7 @@ import com.solr.clientwrapper.domain.dto.solr.collection.SolrDeleteCollectionDTO
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrRenameCollectionDTO;
 import com.solr.clientwrapper.domain.service.SolrCollectionService;
+import com.solr.clientwrapper.solrcore.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
