@@ -38,7 +38,9 @@ public class DataIngectionService  implements DataIngectionServicePort{
 			  jArray = (JSONArray) jsonObject.get(key);
 			  
 			  }
+
 		  log.debug("input array :-" + jArray.toString());
+
 		return jArray.toString();
 	}
 
@@ -61,7 +63,11 @@ public class DataIngectionService  implements DataIngectionServicePort{
 				  String object = (String) al.get(i);					
 				   jArray.put((JSONArray) jsonObject2.getJSONArray(object));					  
 				  }
+
 			  log.debug("json Object :" + jArray.toString());			
+
+		   		
+
 		return jArray.toString();
 	}
 

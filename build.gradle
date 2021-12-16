@@ -142,7 +142,7 @@ liquibase {
             driver "com.mysql.cj.jdbc.Driver"
             url "jdbc:mysql://localhost:3306/basicSample"
             username "root"
-            password "achhadata"
+            password "Ravikiran@123"
 
             changeLogFile "src/main/resources/config/liquibase/master.xml"
             defaultSchemaName "basicSample"
@@ -153,7 +153,7 @@ liquibase {
             driver "com.mysql.cj.jdbc.Driver"
             url "jdbc:mysql://localhost:3306/basicSample"
             username "root"
-            password "achhadata"
+            password "Ravikiran@123"
 
             changeLogFile project.ext.diffChangelogFile
             referenceUrl "hibernate:spring:com.solr.clientwrapper.domain?dialect=org.hibernate.dialect.MySQL8Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
@@ -208,9 +208,21 @@ dependencies {
     if (!project.hasProperty("gae")) {
         implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
     }
+<<<<<<< Updated upstream
+	implementation 'com.github.cliftonlabs:json-simple:3.1.0'
+	compile group: 'org.apache.solr', name: 'solr-cell', version: '6.6.0'
+=======
+	// https://mvnrepository.com/artifact/org.json/json
+	implementation group: 'org.json', name: 'json', version: '20200518'
 
+>>>>>>> Stashed changes
     // Use ", version: jhipsterDependenciesVersion, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    import org.json.simple.parser.*;
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
     implementation group: "tech.jhipster", name: "jhipster-framework"
     implementation "javax.annotation:javax.annotation-api"
     implementation "org.springframework.boot:spring-boot-starter-cache"
@@ -259,6 +271,9 @@ dependencies {
         implementation "io.jsonwebtoken:jjwt-impl"
         implementation "io.jsonwebtoken:jjwt-jackson"
     }
+    
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+    
     implementation ("io.springfox:springfox-oas")
     implementation ("io.springfox:springfox-swagger2")
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.10'
@@ -280,7 +295,7 @@ dependencies {
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
     // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation "org.modelmapper:modelmapper:2.4.4"
-
+	compile('org.springframework.boot:spring-boot-starter-data-solr')
   compileOnly 'org.projectlombok:lombok:1.18.22'
 	 annotationProcessor 'org.projectlombok:lombok:1.18.22'
 	

@@ -29,6 +29,7 @@ public class DataIngectionResource {
 			log.debug("json array ingection ");
 			String objectdata= dataIngectionService.parseSolrSchemaArray(data);
 			log.debug("controller :-" + objectdata.length());
+
 			if (!objectdata.isEmpty()) {
 				// File is EXISTS
 				return ResponseEntity.status(HttpStatus.OK).body(objectdata);
@@ -42,9 +43,11 @@ public class DataIngectionResource {
 		@PostMapping(path = "/batch")	
 		public ResponseEntity<String> parseBatch(@RequestBody String data)  {
 			
+
 			log.debug("json Batch ingection ");
 			String objectBatch= dataIngectionService.parseSolrSchemaBtch(data);
 			log.debug("controller :-" + objectBatch);
+
 			if (!objectBatch.isEmpty()) {
 				// File is EXISTS
 				return ResponseEntity.status(HttpStatus.OK).body(objectBatch);
