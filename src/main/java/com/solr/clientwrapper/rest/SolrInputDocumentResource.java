@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/searchservice/document")
+@RequestMapping("/document")
 public class SolrInputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrInputDocumentResource.class);
