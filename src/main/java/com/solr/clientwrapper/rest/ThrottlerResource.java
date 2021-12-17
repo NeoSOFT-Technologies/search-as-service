@@ -15,28 +15,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.domain.service.throttler.ThrottlerService;
 
+import java.net.ConnectException;
 import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/throttle")
 public class ThrottlerResource {
+	/*
+	 * This Controller is created for implementing & testing
+	 * throttler features:
+	 * 	1. Rate Limiting
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(ThrottlerResource.class);
-	
     @Value("${base-solr-url}")
 	String baseSolrUrl;
-    @Value("${resilience4j.ratelimiter.instances.testThrottleService.limitForPeriod}")
-    int maxRequestAllowedForCurrentWindow;
-    @Value("${resilience4j.ratelimiter.instances.testThrottleService.limitRefreshPeriod}")
-    String currentRefreshWindow;
-    
-    private static final String TEST_THROTTLE_SERVICE = "testThrottleService";
-    private static final String SOLR_DATA_INJECTION_THROTTLE_SERVICE = "solrDataInjectionThrottleService";    
-    
+
+    private static final String DEFAULT_THROTTLE_SERVICE = "defaultRateLimitThrottler";
+   
 	@Bean
     public RestTemplate getRestTemplate() {
         return new RestTemplate();
@@ -45,7 +47,7 @@ public class ThrottlerResource {
     private RestTemplate restTemplate;
 
     @GetMapping("/health")
-    @RateLimiter(name=TEST_THROTTLE_SERVICE, fallbackMethod = "rateLimiter")
+    @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
     public ResponseEntity<String> checkHealth() {
         String response = restTemplate.getForObject("http://localhost:8080/management/actuator/health", String.class);
         logger.info("{} Health Call processing finished = {}", LocalTime.now(), Thread.currentThread().getName());
@@ -53,10 +55,16 @@ public class ThrottlerResource {
     }
 
     @GetMapping("/test")
-    @RateLimiter(name=TEST_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
-    public ResponseEntity<String> createThrottler() {    	
-        String response = restTemplate.getForObject(
-        		"http://localhost:8081/test/throttle", String.class);
+    @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
+    public ResponseEntity<String> demoRateLimiterThrottler() {    	
+    	String response = null;
+    	try {
+        	response = restTemplate.getForObject(
+            		"http://localhost:8081/test/throttle", String.class);
+        } catch(ResourceAccessException | InternalServerError e) {
+        	logger.error("Probably target server is not up!", e);
+        	return new ResponseEntity<>("Target Server is down", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         logger.info("{} | Call processing finished = {}", 
         		LocalTime.now(), 
         		Thread.currentThread().getName());
@@ -64,7 +72,7 @@ public class ThrottlerResource {
     }
     
     @GetMapping("/collections")
-    @RateLimiter(name=TEST_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
+    @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
     public ResponseEntity<String> throttleCollectionResource() {
         String response = restTemplate.getForObject(
         		"http://localhost:8080/searchservice/table/collections", String.class);
@@ -74,23 +82,10 @@ public class ThrottlerResource {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
-    public ResponseEntity<ThrottlerRateLimitResponseDTO> rateLimiterFallback(RequestNotPermitted exception) {
-        logger.error("Max request limit is applied, no further calls are accepted", exception);
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Retry-after:", "1s"); // retry the request after one second
-
-        // prepare Rate Limiting Response DTO
-        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = new ThrottlerRateLimitResponseDTO();
-        rateLimitResponseDTO.setResponseMsg(
-        		"Too many requests made! "
-        		+ "No further calls are accepted right now");
-        rateLimitResponseDTO.setStatusCode(429);
-        rateLimitResponseDTO.setMaxRequestsAllowed(maxRequestAllowedForCurrentWindow);
-        rateLimitResponseDTO.setCurrentRefreshWindow(currentRefreshWindow);
-        
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                .headers(responseHeaders) // attach retry-info header
-                .body(rateLimitResponseDTO);
+    public ResponseEntity<String> rateLimiterFallback(Exception e){
+    	logger.error("Rate Limiter fallback executed", e);
+        return ResponseEntity
+        		.status(HttpStatus.TOO_MANY_REQUESTS)
+        		.body("order service does not permit further calls");
     }
 }

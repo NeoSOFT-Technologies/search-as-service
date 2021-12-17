@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.domain.service.DataIngectionService;
+import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -22,21 +23,17 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 @RestController
 @RequestMapping("/ingection")
 public class DataIngectionResource {
-
 	private final Logger logger = LoggerFactory.getLogger(DataIngectionResource.class);
     @Value("${base-solr-url}")
 	String baseSolrUrl;
-    @Value("${resilience4j.ratelimiter.instances.testThrottleService.limitForPeriod}")
-    int maxRequestAllowedForCurrentWindow;
-    @Value("${resilience4j.ratelimiter.instances.testThrottleService.limitRefreshPeriod}")
-    String currentRefreshWindow;
     
-    private static final String TEST_THROTTLE_SERVICE = "testThrottleService";
-    private static final String SOLR_DATA_INJECTION_THROTTLE_SERVICE = "solrDataInjectionThrottleService";
-
+    private static final String DEFAULT_THROTTLE_SERVICE = "defaultRateLimitThrottler";
+    private static final String SOLR_DATA_INJECTION_THROTTLE_SERVICE = "solrDataInjectionRateLimitThrottler";
 	
 	@Autowired
 	DataIngectionService dataIngectionService;
+	@Autowired
+	LimitRateThrottler limitRateThrottler;
 
 	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/data")
@@ -53,7 +50,7 @@ public class DataIngectionResource {
 
 	}
 
-	@RateLimiter(name = TEST_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
+	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/batch")
 	public ResponseEntity<String> parseBatch(@RequestBody String data) {
 		logger.debug("json array injection : {}; Class: {}", data, data.getClass());
@@ -78,19 +75,11 @@ public class DataIngectionResource {
     		String data, 
     		RequestNotPermitted exception) {
         logger.info("Max request limit is applied, no further calls are accepted");
-
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Retry-after:", "1s"); // retry the request after one second
 
         // prepare Rate Limiting Response DTO
-        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = new ThrottlerRateLimitResponseDTO();
-        rateLimitResponseDTO.setResponseMsg(
-        		"Too many requests made! "
-        		+ "No further calls are accepted right now");
-        rateLimitResponseDTO.setStatusCode(429);
-        rateLimitResponseDTO.setMaxRequestsAllowed(maxRequestAllowedForCurrentWindow);
-        rateLimitResponseDTO.setCurrentRefreshWindow(currentRefreshWindow);
-        
+        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = limitRateThrottler.dataInjectionRateLimiter();
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .headers(responseHeaders) // attach retry-info header
                 .body(rateLimitResponseDTO);
