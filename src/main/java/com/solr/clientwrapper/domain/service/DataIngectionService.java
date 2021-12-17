@@ -28,7 +28,7 @@ public class DataIngectionService  implements DataIngectionServicePort{
 		
 		
 		JSONObject jsonObject = new JSONObject(jsonString);
-		  System.out.println("json Object :-" + jsonObject);
+		log.debug("json Object :-" + jsonObject);
 		  JSONArray jArray = new JSONArray();
 		  
 		  
