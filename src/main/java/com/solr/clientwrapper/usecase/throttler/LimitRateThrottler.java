@@ -21,5 +21,4 @@ public class LimitRateThrottler {
 		logger.info("apply rate limit");
 		return throttlerServicePort.dataInjectionRateLimiter();
 	}
-	
 }

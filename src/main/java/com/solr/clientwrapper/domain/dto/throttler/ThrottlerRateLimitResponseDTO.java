@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class ThrottlerRateLimitResponseDTO {
 	private int statusCode;
 	private String responseMsg;
-	private int maxRequestsAllowed; // maximum number of requests allowed for current limitRefreshPeriod
+	private String maxRequestsAllowed; // maximum number of requests allowed for current limitRefreshPeriod
 	private String currentRefreshWindow; // limitrefreshPeriod, in seconds
 }

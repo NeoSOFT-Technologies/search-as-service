@@ -17,7 +17,7 @@ public class ThrottlerService implements ThrottlerServicePort {
     @Value("${base-solr-url}")
 	String baseSolrUrl;
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.limitForPeriod}")
-    int maxRequestAllowedForCurrentWindow;
+    String maxRequestAllowedForCurrentWindow;
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.limitRefreshPeriod}")
     String currentRefreshWindow;
     
