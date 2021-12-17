@@ -20,13 +20,15 @@ public class ThrottlerService implements ThrottlerServicePort {
     String maxRequestAllowedForCurrentWindow;
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.limitRefreshPeriod}")
     String currentRefreshWindow;
+    @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.timeoutDuration}")
+    String requestRetryWindow;
     
 	@Override
 	public ThrottlerRateLimitResponseDTO dataInjectionRateLimiter() {
         logger.info("Max request limit is applied, no further calls are accepted");
 
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Retry-after:", "1s"); // retry the request after one second
+        responseHeaders.set("Retry-after:", requestRetryWindow+"s"); // retry the request after one second
 
         // prepare Rate Limiting Response DTO
         ThrottlerRateLimitResponseDTO rateLimitResponseDTO = new ThrottlerRateLimitResponseDTO();
@@ -36,6 +38,7 @@ public class ThrottlerService implements ThrottlerServicePort {
         rateLimitResponseDTO.setStatusCode(429);
         rateLimitResponseDTO.setMaxRequestsAllowed(maxRequestAllowedForCurrentWindow);
         rateLimitResponseDTO.setCurrentRefreshWindow(currentRefreshWindow);
+        rateLimitResponseDTO.setRequestTimeoutDuration(requestRetryWindow);
         return rateLimitResponseDTO;
 	}
 

@@ -1,9 +1,7 @@
 package com.solr.clientwrapper.rest;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
-import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import org.springframework.web.client.HttpServerErrorException.InternalServerErr
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.domain.service.throttler.ThrottlerService;
+import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
 
 import java.net.ConnectException;
 import java.time.LocalTime;
@@ -45,6 +44,8 @@ public class ThrottlerResource {
     }
     @Autowired
     private RestTemplate restTemplate;
+	@Autowired
+	LimitRateThrottler limitRateThrottler;
 
     @GetMapping("/health")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
@@ -72,7 +73,7 @@ public class ThrottlerResource {
     }
     
     @GetMapping("/collections")
-    @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
+    @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "solrCollectionsRateLimiter")
     public ResponseEntity<String> throttleCollectionResource() {
         String response = restTemplate.getForObject(
         		"http://localhost:8080/searchservice/table/collections", String.class);
@@ -87,5 +88,18 @@ public class ThrottlerResource {
         return ResponseEntity
         		.status(HttpStatus.TOO_MANY_REQUESTS)
         		.body("order service does not permit further calls");
+    }
+    
+    public ResponseEntity<ThrottlerRateLimitResponseDTO> solrCollectionsRateLimiter(
+    				RequestNotPermitted exception) {
+        logger.info("Max request limit is being applied");
+
+        // prepare Rate Limiting Response DTO
+        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = limitRateThrottler.dataInjectionRateLimiter();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration()); // retry the request after given timeoutDuration
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .headers(responseHeaders) // attach retry-info header
+                .body(rateLimitResponseDTO);
     }
 }

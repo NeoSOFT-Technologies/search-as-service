@@ -21,7 +21,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
-@RequestMapping("/ingection")
+@RequestMapping("/injection")
 public class DataIngectionResource {
 	private final Logger logger = LoggerFactory.getLogger(DataIngectionResource.class);
     @Value("${base-solr-url}")
@@ -75,11 +75,11 @@ public class DataIngectionResource {
     		String data, 
     		RequestNotPermitted exception) {
         logger.info("Max request limit is applied, no further calls are accepted");
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Retry-after:", "1s"); // retry the request after one second
-
+        
         // prepare Rate Limiting Response DTO
         ThrottlerRateLimitResponseDTO rateLimitResponseDTO = limitRateThrottler.dataInjectionRateLimiter();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration()); // retry the request after given timeoutDuration
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .headers(responseHeaders) // attach retry-info header
                 .body(rateLimitResponseDTO);
