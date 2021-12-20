@@ -45,6 +45,24 @@ public class SolrDocumentService implements SolrDocumentServicePort {
         return false;
     }
 
+    public boolean isBoolean(Object object) {
+
+        String objectAsString=object.toString();
+
+        log.debug(String.format("isBoolean Check: %s , Object as String: %s ", object, objectAsString));
+
+        if(object.getClass().equals(Boolean.class) || objectAsString.equals("true") || objectAsString.equals("True") || objectAsString.equals("false") || objectAsString.equals("False")){
+            return true;
+        }else if (isNumeric(objectAsString)){
+            if(Integer.parseInt(objectAsString)==1 || Integer.parseInt(objectAsString)==0){
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
     public ObjectSatisfiesSchemaResponse isObjectSatisfySchema(Map<String,Map<String, Object>> schemaKeyValuePair, JSONObject payloadJSON){
 
         Iterator<String> itr = payloadJSON.keySet().iterator();
@@ -74,7 +92,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
                         break;
                     case "strings":
                         if(!payloadJsonObjectValue.getClass().equals(JSONArray.class)){
-                            System.out.println("Not a JSONArray");
+                            System.out.println("Not a JSONArray of Strings");
                             return new ObjectSatisfiesSchemaResponse(false,"Not a JSONArray");
                         }
                         break;
@@ -93,7 +111,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
                             JSONArray jsonArrayOfLongOrStrings=(JSONArray) payloadJsonObjectValue;
 
                             for(int i=0;i<jsonArrayOfLongOrStrings.length();i++){
-                                if(!isNumeric(jsonArrayOfLongOrStrings.getString(i))){
+                                if(!isNumeric(jsonArrayOfLongOrStrings.get(i).toString())){
                                     System.out.println("JSONArray of Long Numbers contains a string and not long");
                                     return new ObjectSatisfiesSchemaResponse(false,"JSONArray of Long Numbers doesn't contains a string and not long");
                                 }
@@ -101,7 +119,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
                         }
                         break;
                     case "boolean":
-                        if(!payloadJsonObjectValue.getClass().equals(Boolean.class)){
+                        if(!isBoolean(payloadJsonObjectValue)){
                             System.out.println("Not a Boolean");
                             return new ObjectSatisfiesSchemaResponse(false,"Not a Boolean");
                         }
@@ -115,7 +133,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
                             JSONArray jsonArrayOfBooleanOrStrings=(JSONArray) payloadJsonObjectValue;
 
                             for(int i=0;i<jsonArrayOfBooleanOrStrings.length();i++){
-                                if(!jsonArrayOfBooleanOrStrings.get(i).getClass().equals(Boolean.class)){
+                                if(!isBoolean(jsonArrayOfBooleanOrStrings.get(i))){
                                     System.out.println("JSONArray of Booleans contains a string and not boolean");
                                     return new ObjectSatisfiesSchemaResponse(false,"JSONArray of Booleans contains a string and not boolean");
                                 }
@@ -179,7 +197,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
         Set<String> res=payloadJSON.keySet();
         System.out.println("Key sets : " + res);
 
-        System.out.println(schemaKeyValuePair);
+        System.out.println("Solr Schema : "+schemaKeyValuePair);
         ObjectSatisfiesSchemaResponse objectSatisfiesSchemaResponse = isObjectSatisfySchema(schemaKeyValuePair,payloadJSON);
 
         solrResponseDTO.setMessage(objectSatisfiesSchemaResponse.getMessage());
