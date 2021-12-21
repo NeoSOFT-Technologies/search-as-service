@@ -18,10 +18,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
-import com.solr.clientwrapper.domain.service.throttler.ThrottlerService;
 import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
+import com.solr.clientwrapper.usecase.throttler.LimitRequestSizeThrottler;
 
-import java.net.ConnectException;
 import java.time.LocalTime;
 
 @RestController
@@ -46,6 +45,8 @@ public class ThrottlerResource {
     private RestTemplate restTemplate;
 	@Autowired
 	LimitRateThrottler limitRateThrottler;
+	@Autowired
+	LimitRequestSizeThrottler limitRequestSizeThrottler;
 
     @GetMapping("/health")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")

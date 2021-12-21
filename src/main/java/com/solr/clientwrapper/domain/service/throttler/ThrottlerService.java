@@ -3,10 +3,10 @@ package com.solr.clientwrapper.domain.service.throttler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.solr.clientwrapper.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.domain.port.api.ThrottlerServicePort;
 
@@ -27,9 +27,6 @@ public class ThrottlerService implements ThrottlerServicePort {
 	public ThrottlerRateLimitResponseDTO dataInjectionRateLimiter() {
         logger.info("Max request limit is applied, no further calls are accepted");
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Retry-after:", requestRetryWindow+"s"); // retry the request after one second
-
         // prepare Rate Limiting Response DTO
         ThrottlerRateLimitResponseDTO rateLimitResponseDTO = new ThrottlerRateLimitResponseDTO();
         rateLimitResponseDTO.setResponseMsg(
@@ -40,6 +37,25 @@ public class ThrottlerService implements ThrottlerServicePort {
         rateLimitResponseDTO.setCurrentRefreshWindow(currentRefreshWindow);
         rateLimitResponseDTO.setRequestTimeoutDuration(requestRetryWindow);
         return rateLimitResponseDTO;
+	}
+
+	@Override
+	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(
+			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO) {
+		logger.info("Max request size limiter is under process...");
+		
+		if(throttlerMaxRequestSizeResponseDTO.getIncomingRequestSize()
+				> throttlerMaxRequestSizeResponseDTO.getMaxAllowedRequestSize()) {
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(429);
+			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+					"Incoming request size exceeded the limit! "
+					+ "This request can't be processed");
+		} else {
+			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+					"Incoming request size is under the limit, can be processed");
+		}
+		logger.info("Max request size limiting has been applied");
+		return throttlerMaxRequestSizeResponseDTO;
 	}
 
 }
