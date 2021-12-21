@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ThrottlerMaxRequestSizeResponseDTO {
 	private int statusCode;
 	private String responseMessage;
-	private double maxAllowedRequestSize;
-	private double incomingRequestSize;
+	private String maxAllowedRequestSize;
+	private String incomingRequestSize;
+	private String apiResponseData;
 }

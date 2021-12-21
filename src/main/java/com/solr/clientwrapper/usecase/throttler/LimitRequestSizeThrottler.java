@@ -17,11 +17,19 @@ public class LimitRequestSizeThrottler {
 		this.throttlerServicePort = throttlerServicePort;
 	}
 	
-	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(
+	public ThrottlerMaxRequestSizeResponseDTO applyDataInjectionRequestSizeLimiter(
 			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO) {
 		logger.info("apply max request size limit");
 
-		return throttlerServicePort.dataInjectionRequestSizeLimiter(
+		return throttlerServicePort.applyDataInjectionRequestSizeLimiter(
 				throttlerMaxRequestSizeResponseDTO);
+	}
+	
+	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(
+			String incomingRequestData) {
+		logger.info("apply max request size limit");
+
+		return throttlerServicePort.dataInjectionRequestSizeLimiter(
+				incomingRequestData);
 	}
 }

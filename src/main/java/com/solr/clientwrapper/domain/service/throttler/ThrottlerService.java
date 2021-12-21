@@ -16,12 +16,17 @@ public class ThrottlerService implements ThrottlerServicePort {
 	private final Logger logger = LoggerFactory.getLogger(ThrottlerService.class);
     @Value("${base-solr-url}")
 	String baseSolrUrl;
+    
+    // Rate Limiter configuration values
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.limitForPeriod}")
     String maxRequestAllowedForCurrentWindow;
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.limitRefreshPeriod}")
     String currentRefreshWindow;
     @Value("${resilience4j.ratelimiter.instances.solrDataInjectionRateLimitThrottler.timeoutDuration}")
     String requestRetryWindow;
+    // Max request size configuration values
+    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSize}")
+    String maxAllowedRequestSize;
     
 	@Override
 	public ThrottlerRateLimitResponseDTO dataInjectionRateLimiter() {
@@ -40,12 +45,13 @@ public class ThrottlerService implements ThrottlerServicePort {
 	}
 
 	@Override
-	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(
+	public ThrottlerMaxRequestSizeResponseDTO applyDataInjectionRequestSizeLimiter(
 			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO) {
 		logger.info("Max request size limiter is under process...");
 		
-		if(throttlerMaxRequestSizeResponseDTO.getIncomingRequestSize()
-				> throttlerMaxRequestSizeResponseDTO.getMaxAllowedRequestSize()) {
+		throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize);
+		
+		if(isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(429);
 			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
 					"Incoming request size exceeded the limit! "
@@ -57,5 +63,37 @@ public class ThrottlerService implements ThrottlerServicePort {
 		logger.info("Max request size limiting has been applied");
 		return throttlerMaxRequestSizeResponseDTO;
 	}
+	
+	@Override
+	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(String incomingData) {
+		logger.info("Max request size limiter is under process...");
+		
+    	double incomingRequestSizeInKBs = ThrottlerUtils.getSizeInkBs(incomingData);
+    	ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO
+    		= new ThrottlerMaxRequestSizeResponseDTO();
+    	throttlerMaxRequestSizeResponseDTO.setIncomingRequestSize(incomingRequestSizeInKBs+"kB");
+    	
+    	// Max Request Size Limiter Logic
+		throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize);
+		if(isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(405);
+			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+					"Incoming request size exceeded the limit! "
+					+ "This request can't be processed");
+		} else {
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
+			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+					"Incoming request size is under the limit, can be processed");
+		}
+		logger.info("Max request size limiting has been applied");
+		return throttlerMaxRequestSizeResponseDTO;
+	}
+
+	@Override
+	public boolean isRequestSizeExceedingLimit(ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO) {
+		return (ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getIncomingRequestSize())
+				> ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getMaxAllowedRequestSize()));
+	}
+
 
 }

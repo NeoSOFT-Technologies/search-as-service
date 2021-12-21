@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.solr.clientwrapper.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.domain.service.DataIngectionService;
 import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
+import com.solr.clientwrapper.usecase.throttler.LimitRequestSizeThrottler;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -34,6 +36,8 @@ public class DataIngectionResource {
 	DataIngectionService dataIngectionService;
 	@Autowired
 	LimitRateThrottler limitRateThrottler;
+	@Autowired
+	LimitRequestSizeThrottler limitRequestSizeThrottler;
 
 	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/data")
@@ -52,8 +56,13 @@ public class DataIngectionResource {
 
 	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/batch")
-	public ResponseEntity<String> parseBatch(@RequestBody String data) {
+	public ResponseEntity<?> parseBatch(@RequestBody String data) {
 		logger.debug("json array injection : {}; Class: {}", data, data.getClass());
+		
+		// Apply MRS Limiter onto the incoming data
+		ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO = 
+				limitRequestSizeThrottler.dataInjectionRequestSizeLimiter(data);
+		
 		if(data.equals("data=just-testing")) {
 			logger.info("Unexpected data detected in the request body!!");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -62,11 +71,17 @@ public class DataIngectionResource {
 		logger.info("Valid data found. Injection starts..");
 		String objectBatch = dataIngectionService.parseSolrSchemaBtch(data);
 		logger.debug("controller :- {}", objectBatch);
-		if (!objectBatch.isEmpty()) {
-			// File is EXISTS
-			return ResponseEntity.status(HttpStatus.OK).body(objectBatch);
+		
+		if(throttlerMaxRequestSizeResponseDTO.getStatusCode() == 405) {
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(throttlerMaxRequestSizeResponseDTO);
+		}
+		else if (!objectBatch.isEmpty()) {
+			// File EXISTS
+			// Set API response data in throttlerResponseDTO
+			throttlerMaxRequestSizeResponseDTO.setApiResponseData(objectBatch);
+			return ResponseEntity.status(HttpStatus.OK).body(throttlerMaxRequestSizeResponseDTO);
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something is Wrong");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something is wrong");
 		}
 
 	}
