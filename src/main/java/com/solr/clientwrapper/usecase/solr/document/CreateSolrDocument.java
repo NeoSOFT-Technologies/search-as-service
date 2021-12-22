@@ -19,9 +19,13 @@ public class CreateSolrDocument {
         this.solrDocumentServicePort = solrDocumentServicePort;
     }
 
-    public SolrResponseDTO create(String collectionName, String payload) {
+    public SolrResponseDTO addDocument(String collectionName, String payload) {
         log.debug("create");
-        return solrDocumentServicePort.create(collectionName, payload);
+        return solrDocumentServicePort.addDocument(collectionName, payload);
     }
 
+    public SolrResponseDTO addDocuments(String collectionName, String payload) {
+        log.debug("create");
+        return solrDocumentServicePort.addDocuments(collectionName, payload);
+    }
 }

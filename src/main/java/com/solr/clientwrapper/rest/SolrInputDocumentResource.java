@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/document")
 public class SolrInputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrInputDocumentResource.class);
@@ -22,14 +21,29 @@ public class SolrInputDocumentResource {
         this.createSolrDocument=createSolrDocument;
     }
 
-
-    @PostMapping("/create/{collectionName}")
-    @Operation(summary = "/create-document", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> create(@PathVariable String collectionName, @RequestBody String payload) {
+    @PostMapping("/document/{collectionName}")
+    @Operation(summary = "/add-document", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<SolrResponseDTO> document(@PathVariable String collectionName, @RequestBody String payload) {
 
         log.debug("Solr document create");
 
-        SolrResponseDTO solrResponseDTO=createSolrDocument.create(collectionName, payload);
+        SolrResponseDTO solrResponseDTO=createSolrDocument.addDocument(collectionName, payload);
+
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
+    }
+
+    @PostMapping("/documents/{collectionName}")
+    @Operation(summary = "/add-documents", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<SolrResponseDTO> documents(@PathVariable String collectionName, @RequestBody String payload) {
+
+        log.debug("Solr documents add");
+
+        SolrResponseDTO solrResponseDTO=createSolrDocument.addDocuments(collectionName, payload);
 
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
