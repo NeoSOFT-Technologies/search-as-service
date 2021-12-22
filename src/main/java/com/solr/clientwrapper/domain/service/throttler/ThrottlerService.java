@@ -41,22 +41,26 @@ public class ThrottlerService implements ThrottlerServicePort {
         rateLimitResponseDTO.setMaxRequestsAllowed(maxRequestAllowedForCurrentWindow);
         rateLimitResponseDTO.setCurrentRefreshWindow(currentRefreshWindow);
         rateLimitResponseDTO.setRequestTimeoutDuration(requestRetryWindow);
+        
         return rateLimitResponseDTO;
 	}
 
 	@Override
 	public ThrottlerMaxRequestSizeResponseDTO applyDataInjectionRequestSizeLimiter(
 			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO) {
+		/*
+		 * This method can apply Request Size Limiter Filter
+		 * accepting the ThrottlerMaxRequestSizeResponseDTO as argument  
+		 */
 		logger.info("Max request size limiter is under process...");
 		
-		throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize);
-		
 		if(isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
-			throttlerMaxRequestSizeResponseDTO.setStatusCode(429);
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(405);
 			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
 					"Incoming request size exceeded the limit! "
 					+ "This request can't be processed");
 		} else {
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
 			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
 					"Incoming request size is under the limit, can be processed");
 		}
@@ -66,6 +70,10 @@ public class ThrottlerService implements ThrottlerServicePort {
 	
 	@Override
 	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(String incomingData) {
+		/*
+		 * This method can apply Request Size Limiter Filter
+		 * accepting the raw incoming data in form of string as argument  
+		 */
 		logger.info("Max request size limiter is under process...");
 		
     	double incomingRequestSizeInKBs = ThrottlerUtils.getSizeInkBs(incomingData);
@@ -94,6 +102,4 @@ public class ThrottlerService implements ThrottlerServicePort {
 		return (ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getIncomingRequestSize())
 				> ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getMaxAllowedRequestSize()));
 	}
-
-
 }
