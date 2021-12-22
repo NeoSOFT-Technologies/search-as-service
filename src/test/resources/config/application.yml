@@ -131,6 +131,11 @@ resilience4j.ratelimiter:
       timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
+resilience4j:
+  maxRequestSize:
+    maxAllowedRequestSize202: 10kB
+    maxAllowedRequestSize405: 0kB
+    maxAllowedRequestSize: 0.06kB
 throttle-service:
   solr:
     data-injection: solrDataInjectionRateLimitThrottler
