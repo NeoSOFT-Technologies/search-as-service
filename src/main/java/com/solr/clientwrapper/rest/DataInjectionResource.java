@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
-import com.solr.clientwrapper.domain.service.DataIngectionService;
+import com.solr.clientwrapper.domain.service.DataInjectionService;
 import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
 import com.solr.clientwrapper.usecase.throttler.LimitRequestSizeThrottler;
 
@@ -24,8 +24,8 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
 @RequestMapping("/injection")
-public class DataIngectionResource {
-	private final Logger logger = LoggerFactory.getLogger(DataIngectionResource.class);
+public class DataInjectionResource {
+	private final Logger logger = LoggerFactory.getLogger(DataInjectionResource.class);
     @Value("${base-solr-url}")
 	String baseSolrUrl;
     
@@ -33,7 +33,7 @@ public class DataIngectionResource {
     private static final String SOLR_DATA_INJECTION_THROTTLE_SERVICE = "solrDataInjectionRateLimitThrottler";
 	
 	@Autowired
-	DataIngectionService dataIngectionService;
+	DataInjectionService dataIngectionService;
 	@Autowired
 	LimitRateThrottler limitRateThrottler;
 	@Autowired

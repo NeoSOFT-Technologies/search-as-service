@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.solr.clientwrapper.domain.port.api.DataIngectionServicePort;
+import com.solr.clientwrapper.domain.port.api.DataInjectionServicePort;
 
 @Service
 @Transactional
-public class DataIngectionService  implements DataIngectionServicePort{
+public class DataInjectionService  implements DataInjectionServicePort{
 	
-	private final Logger log = LoggerFactory.getLogger(DataIngectionService.class);
+	private final Logger log = LoggerFactory.getLogger(DataInjectionService.class);
 	SolrClient solrClient=new HttpSolrClient.Builder("http://localhost:8983/solr/docparse").build();
 	
 	@Override
