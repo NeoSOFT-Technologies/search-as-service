@@ -36,6 +36,10 @@ public class ThrottlerResource {
 	private static final Logger logger = LoggerFactory.getLogger(ThrottlerResource.class);
     @Value("${base-solr-url}")
 	String baseSolrUrl;
+    @Value("${base-app-url}")
+    String baseAppUrl;
+    @Value("${throttler-test-app-url}")
+    String throttlerTestAppUrl;
 
     private static final String DEFAULT_THROTTLE_SERVICE = "defaultRateLimitThrottler";
    
@@ -53,7 +57,7 @@ public class ThrottlerResource {
     @GetMapping("/health")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
     public ResponseEntity<String> checkHealth() {
-        String response = restTemplate.getForObject("http://localhost:8080/management/actuator/health", String.class);
+        String response = restTemplate.getForObject(baseAppUrl+"/management/actuator/health", String.class);
         logger.info("{} Health Call processing finished = {}", LocalTime.now(), Thread.currentThread().getName());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -64,7 +68,7 @@ public class ThrottlerResource {
     	String response = null;
     	try {
         	response = restTemplate.getForObject(
-            		"http://localhost:8081/test/throttle", String.class);
+        			throttlerTestAppUrl+"/test/throttle", String.class);
         } catch(ResourceAccessException | InternalServerError e) {
         	logger.error("Probably target server is not up!", e);
         	return new ResponseEntity<>("Target Server is down", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,7 +83,7 @@ public class ThrottlerResource {
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "solrCollectionsRateLimiter")
     public ResponseEntity<String> throttleCollectionResource() {
         String response = restTemplate.getForObject(
-        		"http://localhost:8080/searchservice/table/collections", String.class);
+        		baseAppUrl+"/searchservice/table/collections", String.class);
         logger.info("{} | REST Call processing finished = {}", 
         		LocalTime.now(), 
         		Thread.currentThread().getName());
@@ -89,6 +93,9 @@ public class ThrottlerResource {
     ////////// Testing Max Request Size Limiter /////////////
     @GetMapping("/testMRS")
     public ResponseEntity<?> demoMRSThrottler(@RequestParam String data) {
+    	/*
+    	 * MRS stands for- Max RequestBody Size
+    	 */
     	ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO
     		= limitRequestSizeThrottler.dataInjectionRequestSizeLimiter(data);
     	return ResponseEntity.status(HttpStatus.OK).body(throttlerMaxRequestSizeResponseDTO);

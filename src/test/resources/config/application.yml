@@ -117,6 +117,8 @@ user-registration:
 base-solr-url: http://localhost:8983/solr
 
 # Throttler configurations
+base-app-url: http://localhost:8080
+throttler-test-app-url: http://localhost:8081
 resilience4j.ratelimiter:
   instances:
     solrDataInjectionRateLimitThrottler:

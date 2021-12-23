@@ -229,6 +229,8 @@ capacity-plan:
       storage: 2
       
 # Throttler configurations
+base-app-url: http://localhost:8080
+throttler-test-app-url: http://localhost:8081
 resilience4j.ratelimiter:
   instances:
     solrDataInjectionRateLimitThrottler:
