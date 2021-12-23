@@ -32,14 +32,10 @@ public class DataIngectionResource {
 
 		log.debug("json array ingection ");
 		String objectdata = dataIngectionService.parseSolrSchemaArray(collectionName, data);
-		log.debug("controller :-" + objectdata.length());
-
-		if (!objectdata.isEmpty()) {
+		log.debug("controller :-" + objectdata.length());		
 			// File is EXISTS
 			return ResponseEntity.status(HttpStatus.OK).body(objectdata);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something is Wrong");
-		}
+		
 
 	}
 
@@ -50,13 +46,7 @@ public class DataIngectionResource {
 		log.debug("json Batch ingection ");
 		String objectBatch = dataIngectionService.parseSolrSchemaBatch(collectionName, data);
 		log.debug("controller :-" + objectBatch);
-
-		if (!objectBatch.isEmpty()) {
-			// File is EXISTS
 			return ResponseEntity.status(HttpStatus.OK).body(objectBatch);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something is Wrong");
-		}
 
 	}
 }
