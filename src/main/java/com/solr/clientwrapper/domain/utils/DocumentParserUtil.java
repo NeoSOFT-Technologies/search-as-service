@@ -99,7 +99,7 @@ public class DocumentParserUtil {
             Object payloadJsonObjectValue = payloadJSON.get(payloadJsonObjectKey);
 
             log.debug(payloadJsonObjectKey + "=" + payloadJsonObjectValue);
-            log.debug(schemaKeyValuePair.get(payloadJsonObjectKey).toString());
+            //log.debug(schemaKeyValuePair.get(payloadJsonObjectKey).toString());
 
             if(schemaKeyValuePair.containsKey(payloadJsonObjectKey)) {
 
