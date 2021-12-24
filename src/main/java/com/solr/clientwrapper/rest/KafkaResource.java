@@ -24,13 +24,13 @@ public class KafkaResource {
 	@Autowired
 	private KafkaSender sender;
 
-	@PostMapping("/Add/{AddToQueue}")
-	@Operation(summary = "/Add To Queue", security = @SecurityRequirement(name = "bearerAuth"))
+	@PostMapping("/add/{addtoQueue}")
+	@Operation(summary = "/Add-To-Queue", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<String> sendData(@RequestBody String payload) {
 
 		log.debug("Add To Queue");
 
-		String responseString = sender.AddToQueue(payload);
+		String responseString = sender.addToQueue(payload);
 
 		if (!responseString.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.OK).body(responseString);

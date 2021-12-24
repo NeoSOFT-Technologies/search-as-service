@@ -11,10 +11,10 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
-import com.solr.clientwrapper.domain.port.api.kafkaSender;
+import com.solr.clientwrapper.domain.port.api.KafkaSenders;
 
 @Service
-public class KafkaSender implements kafkaSender {
+public class KafkaSender implements KafkaSenders {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSender.class);
 
 	@Autowired
@@ -24,7 +24,7 @@ public class KafkaSender implements kafkaSender {
 	private String topicName;
 
 	@Override
-	public String AddToQueue(String payload) {
+	public String addToQueue(String payload) {
 		// TODO Auto-generated method stub
 
 		Map<String, Object> headers = new HashMap<>();

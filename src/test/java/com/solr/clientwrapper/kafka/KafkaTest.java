@@ -40,7 +40,7 @@ public class KafkaTest {
 
 	@Test
 	public void AddToQueue() {
-		String s = sender.AddToQueue(payload);
+		String s = sender.addToQueue(payload);
 		Assertions.assertEquals(payload, "\r\n"
 				+ "         \"id\": \"01\",\r\n"
 				+ "         \"language\": \"Java\",\r\n"
