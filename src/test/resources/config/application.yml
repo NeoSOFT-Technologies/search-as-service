@@ -123,3 +123,30 @@ user-registration:
 
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr
+
+# Throttler configurations
+base-app-url: http://localhost:8080
+throttler-test-app-url: http://localhost:8081
+resilience4j.ratelimiter:
+  instances:
+    solrDataInjectionRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 4s
+      timeoutDuration: 0s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+    defaultRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 5s
+      timeoutDuration: 0s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+resilience4j:
+  maxRequestSize:
+    maxAllowedRequestSize202: 10kB
+    maxAllowedRequestSize405: 0kB
+    maxAllowedRequestSize: 0.06kB
+throttle-service:
+  solr:
+    data-injection: solrDataInjectionRateLimitThrottler
+  test: defaultRateLimitThrottler

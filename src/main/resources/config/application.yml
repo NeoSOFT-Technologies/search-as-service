@@ -28,10 +28,11 @@ management:
           ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump', 'caches', 'liquibase']
   endpoint:
     health:
-      show-details: when-authorized
-      roles: 'ROLE_ADMIN'
-      probes:
-        enabled: true
+      show-details: always
+      #show-details: when-authorized
+      #roles: 'ROLE_ADMIN'
+      #probes:
+      #  enabled: true
     jhimetrics:
       enabled: true
   info:
@@ -73,6 +74,11 @@ management:
 spring:
   application:
     name: basicSample
+    data:
+    solr:
+      host: http://localhost:8983/solr/
+      repositories:
+        enabled: false
   profiles:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by gradle when building the JAR file
@@ -137,6 +143,8 @@ server:
     session:
       cookie:
         http-only: true
+        
+ 
 
 # Properties to be exposed on the /info management endpoint
 info:
@@ -241,3 +249,28 @@ capacity-plan:
       replicas: 3
       shards: 5
       storage: 2
+      
+# Throttler configurations
+base-app-url: http://localhost:8080
+throttler-test-app-url: http://localhost:8081
+resilience4j.ratelimiter:
+  instances:
+    solrDataInjectionRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 4s
+      timeoutDuration: 1s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+    defaultRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 5s
+      timeoutDuration: 1s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+resilience4j:
+  maxRequestSize:
+    maxAllowedRequestSize: 10kB
+throttle-service:
+  solr:
+    data-injection: solrDataInjectionRateLimitThrottler
+  test: defaultRateLimitThrottler
