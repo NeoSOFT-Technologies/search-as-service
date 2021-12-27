@@ -108,6 +108,14 @@ jhipster:
 # More documentation is available at:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
+kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: group_id
+      
+    producer:
+      bootstrap-servers: localhost:9092
+    topic-name: Topic_Name   
 
 # application:
 user-registration:

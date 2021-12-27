@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,9 @@ import java.util.Map;
 @Transactional
 public class SolrDocumentService implements SolrDocumentServicePort {
 
-    @Value("${base-solr-url}")
+
+	
+   @Value("${base-solr-url}")
     private String baseSolrUrl;
 
     private final Logger log = LoggerFactory.getLogger(SolrDocumentService.class);
@@ -43,6 +46,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
             solrResponseDTO.setStatusCode(400);
             return solrResponseDTO;
         }
+
 
 //        log.debug(payload);
 

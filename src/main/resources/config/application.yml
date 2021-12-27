@@ -16,6 +16,9 @@
 
 #server.port: 8090
 
+  
+  
+  
 management:
   endpoints:
     web:
@@ -197,6 +200,18 @@ jhipster:
 
 # application:
 # There is an application.yml in test module also
+#
+kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: group_id
+      
+    producer:
+      bootstrap-servers: localhost:9092
+    topic-name: Topic_Name   
+
+   
+   
 user-registration:
   setActivationKey: true
 
