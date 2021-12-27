@@ -1,6 +1,13 @@
 package com.solr.clientwrapper;
 
-import com.solr.clientwrapper.config.ApplicationProperties;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -9,19 +16,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
+
+import com.solr.clientwrapper.config.ApplicationProperties;
+
 import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
-
-import javax.annotation.PostConstruct;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
 
 @SpringBootApplication(scanBasePackages={"com.solr.clientwrapper"})
 @EnableJpaRepositories
@@ -29,6 +33,7 @@ import java.util.Optional;
 //@ComponentScan({"com.solr.clientwrapper.rest"})
 //@EntityScan("com.solr.clientwrapper.infrastructure.entity")
 @EnableSolrRepositories("com.solr.clientwrapper.infrastructure.repository")
+@EnableCaching
 public class BasicSampleApp {
 	
 	// Creating ModelMapper Bean for DTO Mapping

@@ -22,12 +22,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrDocumentDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrDocumentResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrInMemoryCacheServicePort;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
@@ -36,9 +41,10 @@ import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 @Service
 @Transactional
 @SuppressWarnings({"deprecation", "unused"})
-public class SolrSchemaService implements SolrSchemaServicePort {
 
-	private final Logger log = LoggerFactory.getLogger(SolrSchemaService.class);
+public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
+
+	private final Logger log = LoggerFactory.getLogger(SolrInMemeoryCacheService.class);
 	
 	@Value("techproducts")
 	private static String TEST1;
@@ -66,15 +72,16 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaResponseDTO get(String tableName, String name) {
+	@Cacheable(value = "solrcache", key= "#tableName")
+	public SolrDocumentResponseDTO get(String tableName, String name) {
 		log.debug("Get Solr Schema: {}", name);
 
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO();
-		SolrSchemaResponseDTO solrSchemaResponseDTO = new SolrSchemaResponseDTO();
+		SolrDocumentDTO solrSchemaDTO = new SolrDocumentDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTO = new SolrDocumentResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
@@ -146,18 +153,19 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 	
 	@Override
-	public SolrSchemaResponseDTO update(String tableName, 
+	//@Cacheable("solrcache")
+	public SolrDocumentResponseDTO update(String tableName, 
 								String name, 
-								SolrSchemaDTO newSolrSchemaDTO) {
+								SolrDocumentDTO solrDocumentDTO) {
 		log.debug("Update Solr Schema: {}", name);
-		log.debug("Target Schema: {}", newSolrSchemaDTO);
+		log.debug("Target Schema: {}", solrDocumentDTO);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
-		SolrSchemaResponseDTO solrSchemaResponseDTOBefore = new SolrSchemaResponseDTO();
-		SolrSchemaResponseDTO solrSchemaResponseDTOAfter = new SolrSchemaResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOBefore = new SolrDocumentResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOAfter = new SolrDocumentResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -177,8 +185,8 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			log.debug("Total number of fields: {}", numOfFields);
 			
 			// Get all fields from incoming(from req Body) schemaDTO
-			SolrFieldDTO[] newSchemaFields = newSolrSchemaDTO.getAttributes();
-			List<Map<String, Object>> targetSchemafields = parseSchemaFieldDtosToListOfMaps(newSolrSchemaDTO);
+			SolrFieldDTO[] newSchemaFields = solrDocumentDTO.getAttributes();
+			List<Map<String, Object>> targetSchemafields = parseSchemaFieldDtosToListOfMaps(solrDocumentDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if(validationEntry.containsKey("validated")) {
@@ -243,17 +251,17 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 	
 	@Override
-	public SolrSchemaResponseDTO create(String tableName, 
+	public SolrDocumentResponseDTO create(String tableName, 
 								String name, 
-								SolrSchemaDTO newSolrSchemaDTO) {
+								SolrDocumentDTO newSolrDocumentDTO) {
 		log.debug("Create Solr Schema: {}", name);
 
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		SolrSchemaResponseDTO solrSchemaResponseDTOBefore = new SolrSchemaResponseDTO();
-		SolrSchemaResponseDTO solrSchemaResponseDTOAfter = new SolrSchemaResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOBefore = new SolrDocumentResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOAfter = new SolrDocumentResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -272,7 +280,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			log.debug("\nDefault Schema fields : {}", schemaFields);
 			
 			// Add new fields present in the Target Schema to the given collection schema
-			SolrFieldDTO[] newSolrFieldDTOs = newSolrSchemaDTO.getAttributes();
+			SolrFieldDTO[] newSolrFieldDTOs = newSolrDocumentDTO.getAttributes();
 			log.debug("\nTarget Schema fields : {}", (Object[]) newSolrFieldDTOs);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse = new UpdateResponse();
@@ -341,14 +349,14 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaResponseDTO delete(String tableName, String name) {
+	public SolrDocumentResponseDTO delete(String tableName, String name) {
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		SolrSchemaResponseDTO solrSchemaResponseDTOBefore = new SolrSchemaResponseDTO();
-		SolrSchemaResponseDTO solrSchemaResponseDTOAfter = new SolrSchemaResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOBefore = new SolrDocumentResponseDTO();
+		SolrDocumentResponseDTO solrSchemaResponseDTOAfter = new SolrDocumentResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -416,11 +424,11 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 	
 	@Override
-	public List<FieldTypeDefinition> getSchemaFieldTypes(SolrSchemaDTO solrSchemaDTO) {
+	public List<FieldTypeDefinition> getSchemaFieldTypes(SolrDocumentDTO solrDocumentDTO) {
 		log.debug("get schema field types.");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		SolrClient solr = new HttpSolrClient.Builder(URL_STRING+solrSchemaDTO.getTableName()).build();
+		SolrClient solr = new HttpSolrClient.Builder(URL_STRING+solrDocumentDTO.getTableName()).build();
 		List<FieldTypeDefinition> schemaFieldTypes = null;
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
@@ -515,9 +523,9 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(SolrSchemaDTO solrSchemaDTO) {
+	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(SolrDocumentDTO solrDocumentDTO) {
 		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		SolrFieldDTO[] schemaFields = solrSchemaDTO.getAttributes();
+		SolrFieldDTO[] schemaFields = solrDocumentDTO.getAttributes();
 		
 		Map<String, Object> fieldDtoMap = new HashMap<String, Object>();
 		for(SolrFieldDTO fieldDto: schemaFields) {

@@ -22,6 +22,7 @@ public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {
 		return new HttpSolrClient.Builder(urlString+tableName).build();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public SolrClient getSolrCloudClient(String urlString, String tableName) {
 		log.debug("Getting Solr Cloud Client for collection/table: {}", tableName);

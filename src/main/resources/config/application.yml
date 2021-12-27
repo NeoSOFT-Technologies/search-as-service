@@ -97,12 +97,21 @@ spring:
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
+      
+      
       # modify batch size as necessary
       hibernate.jdbc.batch_size: 25
       hibernate.order_inserts: true
       hibernate.order_updates: true
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
+      
+      
+      spring:
+        cache:
+          ehcache:
+            config: classpath:ehcaches.xml
+      
     hibernate:
       ddl-auto: none
       naming:
@@ -134,6 +143,7 @@ server:
     session:
       cookie:
         http-only: true
+        
 
 # Properties to be exposed on the /info management endpoint
 info:
@@ -186,6 +196,7 @@ jhipster:
 # More documentation is available at:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
+
 
 # application:
 # There is an application.yml in test module also
