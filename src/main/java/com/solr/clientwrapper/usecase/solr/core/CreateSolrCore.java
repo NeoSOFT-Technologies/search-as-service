@@ -20,7 +20,7 @@ public class CreateSolrCore {
     }
 
     public SolrResponseDTO create(String coreName) {
-        log.debug("create");
+        log.debug("create core");
         return solrCoreServicePort.create(coreName);
     }
 
