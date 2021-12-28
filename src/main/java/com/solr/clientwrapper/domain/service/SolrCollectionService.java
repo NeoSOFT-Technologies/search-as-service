@@ -24,6 +24,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
     private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
 
     //http://localhost:8983/solr
+    //
     @Value("${base-solr-url}")
     private String baseSolrUrl;
 
