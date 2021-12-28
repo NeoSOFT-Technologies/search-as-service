@@ -35,7 +35,7 @@ public class KafkaResource {
 		if (!responseString.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.OK).body(responseString);
 		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(responseString);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseString);
 		}
 
 	}

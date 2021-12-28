@@ -1,7 +1,5 @@
   package com.solr.clientwrapper.domain.service;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.solr.clientwrapper.domain.port.api.KafkaSenders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,8 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
-import com.solr.clientwrapper.domain.port.api.KafkaSenders;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class KafkaSender implements KafkaSenders {
@@ -32,7 +31,7 @@ public class KafkaSender implements KafkaSenders {
 		kafkaTemplate.send(new GenericMessage<String>(payload, headers));
 		// use the below to send String values through kafka
 		// kafkaTemplate.send(topicName, "some string value")
-		LOGGER.info("Data - " + payload.toString() + " sent to Kafka Topic - " + topicName);
+		//LOGGER.info("Data - " + payload.toString() + " sent to Kafka Topic - " + topicName);
 		return payload;
 
 	}

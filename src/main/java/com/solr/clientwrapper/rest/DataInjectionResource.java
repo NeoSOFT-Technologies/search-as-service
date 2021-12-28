@@ -57,7 +57,7 @@ public class DataInjectionResource {
 	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/batch")
 	public ResponseEntity<?> parseBatch(@RequestBody String data) {
-		logger.debug("json array injection : {}; Class: {}", data, data.getClass());
+		//logger.debug("json array injection : {}; Class: {}", data, data.getClass());
 		
 		// Apply MRS Limiter onto the incoming data
 		ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO = 

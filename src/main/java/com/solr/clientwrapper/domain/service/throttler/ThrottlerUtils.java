@@ -8,6 +8,6 @@ public class ThrottlerUtils {
 	
 	public static double getSizeInkBs(String data) {
 		int numberOfChars = data.length();
-		return (8 * (int)((((numberOfChars) * 2) + 45) / 8))/1000;
+		return (double) (8 * (int)((((numberOfChars) * 2) + 45) / 8))/1000;
 	}
 }

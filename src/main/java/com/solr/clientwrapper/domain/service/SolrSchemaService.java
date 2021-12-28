@@ -1,11 +1,12 @@
 package com.solr.clientwrapper.domain.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
+import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
+import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -25,13 +26,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
-import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
-import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -128,19 +127,19 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			solrSchemaResponseDTO.setStatusCode(200);
 		} catch (SolrServerException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. "
 					+ "Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
 			log.error("The collection - {} is Not Found in the Solr Cloud!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		return solrSchemaResponseDTO;
 	}
@@ -214,27 +213,27 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (NullPointerException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("Null value detected!", e);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. "
 					+ "Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrSchemaValidationException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("Error Message: {}", e.getMessage());
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		solrSchemaResponseDTOAfter = get(tableName, schemaName);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
@@ -324,15 +323,15 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} 
 		solrSchemaResponseDTOAfter = get(tableName, name);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
@@ -398,15 +397,15 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} 
 		solrSchemaResponseDTOAfter = get(tableName, schemaName);
 		// Compare Pre-and-Post DELETE Operation
@@ -433,9 +432,9 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 				log.debug("Field Types : {}", schemaFieldTypes.get(i).getAttributes());
 			}
 		} catch (SolrServerException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		return schemaFieldTypes;
 	}

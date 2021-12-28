@@ -1,15 +1,14 @@
 package com.solr.clientwrapper.domain.service;
 
 
-import java.io.IOException;
-
+import com.solr.clientwrapper.domain.port.api.SolarDocParseServicePort;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.solr.clientwrapper.domain.port.api.SolarDocParseServicePort;
+import java.io.IOException;
 
 @Service
 public class SolrParseDocSerice implements SolarDocParseServicePort {
@@ -25,11 +24,11 @@ public class SolrParseDocSerice implements SolarDocParseServicePort {
 				try {
 					bytes = file.getBytes();
 				} catch (IOException e) {
-
-					e.printStackTrace();
+					//e.printStackTrace();
+					log.debug(e.toString());
 				}
 	            String completeData = new String(bytes);
-	            log.debug(completeData);
+	            //log.debug(completeData);
 	            
 	         JSONObject jsonObject = new JSONObject(completeData);
 	   
