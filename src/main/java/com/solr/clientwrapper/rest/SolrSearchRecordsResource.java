@@ -79,7 +79,7 @@ public class SolrSearchRecordsResource {
 	}
 	
 	@GetMapping(value = "/ordered")
-	public ResponseEntity<SolrSearchResponseDTO> searchRecordsInGivenCollectionByQueryFieldOrdredByTag(
+	public ResponseEntity<SolrSearchResponseDTO> searchRecordsInGivenCollectionByQueryFieldOrderedByTag(
 											@RequestParam(defaultValue = SOLR_DATA_NAME_DEFAULT) String collection, 
 											@RequestParam(defaultValue = "name") String queryField, 
 											@RequestParam(defaultValue = "*") String searchTerm, 

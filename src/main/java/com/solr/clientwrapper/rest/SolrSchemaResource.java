@@ -47,7 +47,6 @@ public class SolrSchemaResource {
 	public ResponseEntity<SolrSchemaResponseDTO> create(
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr Schema Create");
-		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
 		SolrSchemaResponseDTO solrResponseDTO = 
 				createSolrSchema.create(
 						newSolrSchemaDTO.getTableName(), 
@@ -80,7 +79,6 @@ public class SolrSchemaResource {
 			@PathVariable String name, 
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr schema update");
-		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
 		SolrSchemaResponseDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, newSolrSchemaDTO);
 		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)

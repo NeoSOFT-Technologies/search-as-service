@@ -18,4 +18,9 @@ public class SolrSearchResponseDTO {
 	private int statusCode;
 	private String responseMessage;
 	private SolrSearchResult solrSearchResultResponse;
+	
+	public SolrSearchResponseDTO(String responseMessage, SolrSearchResult solrSearchResultResponse) {
+		this.responseMessage = responseMessage;
+		this.solrSearchResultResponse = solrSearchResultResponse;
+	}
 }
