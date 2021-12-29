@@ -62,13 +62,13 @@ public class SolrCollectionResource {
 
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{collectionName}")
     @Operation(summary = "/delete-collection", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrDeleteCollectionDTO solrDeleteCollectionDTO) {
+    public ResponseEntity<SolrResponseDTO> delete(@PathVariable String collectionName) {
 
         log.debug("Solr Collection delete");
 
-        SolrResponseDTO solrResponseDTO=deleteSolrCollection.delete(solrDeleteCollectionDTO.getCollectionName());
+        SolrResponseDTO solrResponseDTO=deleteSolrCollection.delete(collectionName);
 
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
