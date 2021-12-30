@@ -31,12 +31,12 @@ import com.solr.clientwrapper.solrwrapper.TestUtil;
 class SolrSchemaResourceTest {
 
 	String solrendpoint = "/schema";
-	String tableName = "gettingstarted2";
+	String tableName = "gettingstarted3";
 	String name = "default-config";
 	SolrFieldDTO solr = new SolrFieldDTO("testField6", SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	SolrFieldDTO[] attributes = { solr };
 	String expectedGetResponse = "{\n"
-			  +"\"tableName\": \"gettingstarted2\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
@@ -51,7 +51,7 @@ class SolrSchemaResourceTest {
 		      +"\"statusCode\": 200\n"
 		      +"}";
 	String expectedCreateResponse400 = "{\n"
-			  +"\"tableName\": \"gettingstarted2\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
@@ -110,7 +110,7 @@ class SolrSchemaResourceTest {
 				.post(solrendpoint + "/create")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)));
 		//.andExpect(content().json(expectedCreateResponse400));
-
+		
 		// DELETE THE CREATED SCHEMA
 		setMockitoSucccessResponseForService();
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);

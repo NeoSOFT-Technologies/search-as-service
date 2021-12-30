@@ -46,7 +46,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 	@Value("techproducts")
 	private static String TEST1;
 	private static String DEFAULT_COLLECTION = "techproducts";
-	private static String DEFAULT_SOLR_CLOUD_COLLECTION = "gettingstarted";
+	private static String DEFAULT_SOLR_CLOUD_COLLECTION = "gettingstarted3";
 	@Value("solr.client.url.static")
 	private static String TEST2;
 	private static String URL_STRING = "http://localhost:8984/solr/";

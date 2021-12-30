@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/schema")
+@RequestMapping("/cacheschema")
 public class SolrInMemeoryCacheResource {
 
 	private final Logger log = LoggerFactory.getLogger(SolrInMemeoryCacheResource.class);

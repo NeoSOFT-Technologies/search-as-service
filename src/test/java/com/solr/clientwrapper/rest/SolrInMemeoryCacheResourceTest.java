@@ -28,13 +28,13 @@ import com.solr.clientwrapper.solrwrapper.TestUtil;
 @WithMockUser
 class SolrInMemeoryCacheResourceTest {
 
-	String solrendpoint = "/schema";
-	String tableName = "gettingstarted1";
+	String solrendpoint = "/cacheschema";
+	String tableName = "gettingstarted3";
 	String name = "default-config";
 	SolrFieldDTO solr = new SolrFieldDTO("testField6", SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	SolrFieldDTO[] attributes = { solr };
 	String expectedGetResponse = "{\n"
-			  +"\"tableName\": \"gettingstarted1\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
@@ -49,7 +49,7 @@ class SolrInMemeoryCacheResourceTest {
 		      +"\"statusCode\": 200\n"
 		      +"}";
 	String expectedCreateResponse400 = "{\n"
-			  +"\"tableName\": \"gettingstarted1\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
