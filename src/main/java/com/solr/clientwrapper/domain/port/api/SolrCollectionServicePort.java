@@ -16,6 +16,6 @@ public interface SolrCollectionServicePort {
 
     SolrGetCapacityPlanDTO capacityPlans();
 
-    boolean isCollectionExists(String collectionName);
+    SolrResponseDTO isCollectionExists(String collectionName);
 
 }

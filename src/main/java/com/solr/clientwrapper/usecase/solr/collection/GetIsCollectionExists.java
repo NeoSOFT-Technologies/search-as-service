@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.usecase.solr.collection;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrCollectionServicePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class GetIsCollectionExists {
         this.solrCollectionServicePort = solrCollectionServicePort;
     }
 
-    public boolean isCollectionExists(String collectionName) {
+    public SolrResponseDTO isCollectionExists(String collectionName) {
         log.debug("isCollectionExists");
         return solrCollectionServicePort.isCollectionExists(collectionName);
     }

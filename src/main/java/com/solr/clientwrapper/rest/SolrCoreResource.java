@@ -84,13 +84,13 @@ public class SolrCoreResource {
 
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{coreName}")
     @Operation(summary = "/delete-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
+    public ResponseEntity<SolrResponseDTO> delete(@PathVariable String coreName)  {
 
         log.debug("Solr Core delete");
 
-        SolrResponseDTO solrResponseDTO=deleteSolrCore.delete(solrSingleCoreDTO.getCoreName());
+        SolrResponseDTO solrResponseDTO=deleteSolrCore.delete(coreName);
 
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
