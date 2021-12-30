@@ -1,11 +1,7 @@
 package com.solr.clientwrapper.config;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-import javax.cache.Cache;
 import javax.cache.CacheManager;
 
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -19,23 +15,15 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomi
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.cache.ehcache.EhCacheCache;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
-import com.solr.clientwrapper.domain.service.SolrInMemeoryCacheService;
 import com.solr.clientwrapper.infrastructure.entity.Authority;
 import com.solr.clientwrapper.infrastructure.entity.User;
 import com.solr.clientwrapper.infrastructure.repository.UserRepository;
 
-import liquibase.pro.packaged.be;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.config.cache.PrefixedKeyGenerator;
 
@@ -78,9 +66,13 @@ public class CacheConfiguration {
 //        return bean;
 //    }
     
+    
+    
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cm -> {
+            createCache(cm, "solrcache");
+
             createCache(cm, UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, UserRepository.USERS_BY_EMAIL_CACHE);
             createCache(cm, User.class.getName());

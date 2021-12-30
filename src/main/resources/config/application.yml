@@ -107,10 +107,7 @@ spring:
       hibernate.query.in_clause_parameter_padding: true
       
       
-      spring:
-        cache:
-          ehcache:
-            config: classpath:ehcaches.xml
+ 
       
     hibernate:
       ddl-auto: none

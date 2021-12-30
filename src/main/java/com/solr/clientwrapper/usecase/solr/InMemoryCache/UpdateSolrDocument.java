@@ -2,6 +2,7 @@ package com.solr.clientwrapper.usecase.solr.InMemoryCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class UpdateSolrDocument {
 		this.inMemoryCacheServicePort = inMemoryCacheServicePort;
 	}
 	
+	//@CachePut(value = "solrcache",key = "#tableName")
 	public SolrDocumentResponseDTO update(String tableName, String name, SolrDocumentDTO solrDocumentDTO) {
 		log.debug("update Schema");
 		return inMemoryCacheServicePort.update(tableName, name, solrDocumentDTO);

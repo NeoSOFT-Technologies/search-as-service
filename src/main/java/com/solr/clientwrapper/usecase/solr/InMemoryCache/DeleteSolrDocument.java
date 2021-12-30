@@ -2,6 +2,8 @@ package com.solr.clientwrapper.usecase.solr.InMemoryCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,9 @@ public class DeleteSolrDocument {
 		this.inMemoryCacheServicePort = inMemoryCacheServicePort;
 	}
 	
+	//@CacheEvict(value="solrcache", key = "#tableName")
 	public SolrDocumentResponseDTO delete(String tableName, String name) {
-		log.debug("create Schema");
+		log.debug("delete Schema");
 		return inMemoryCacheServicePort.delete(tableName, name);
 	}
 
