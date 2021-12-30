@@ -155,7 +155,10 @@ public class SolrCollectionService implements SolrCollectionServicePort {
     }
 
     @Override
-    public boolean isCollectionExists(String collectionName) {
+    public SolrResponseDTO isCollectionExists(String collectionName) {
+
+        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
+
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
 
@@ -164,13 +167,23 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
             List<String> allCollections=(List<String>) response.getResponse().get("collections");
 
-            return allCollections.contains(collectionName);
+            if(allCollections.contains(collectionName)){
+                solrResponseDTO.setStatusCode(200);
+                solrResponseDTO.setMessage("true");
+            }else{
+                solrResponseDTO.setStatusCode(200);
+                solrResponseDTO.setMessage("false");
+            }
 
         } catch (Exception e) {
             log.error(e.toString());
 
-            return false;
+            solrResponseDTO.setStatusCode(400);
+            solrResponseDTO.setMessage("Error!");
+
         }
+
+        return solrResponseDTO;
 
     }
 

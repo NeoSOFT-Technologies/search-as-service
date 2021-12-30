@@ -112,16 +112,16 @@ public class SolrCollectionResource {
 
     @GetMapping("/isCollectionExists/{collectionName}")
     @Operation(summary = "/isCollectionExists", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Boolean> isCollectionExits(@PathVariable String collectionName) {
+    public ResponseEntity<SolrResponseDTO> isCollectionExits(@PathVariable String collectionName) {
 
         log.debug("isCollectionExits");
 
-        Boolean isCollectionExists=getIsCollectionExists.isCollectionExists(collectionName);
+        SolrResponseDTO solrResponseDTO=getIsCollectionExists.isCollectionExists(collectionName);
 
-        if(Boolean.TRUE.equals(isCollectionExists)){
-            return ResponseEntity.status(HttpStatus.OK).body(isCollectionExists);
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isCollectionExists);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
         }
 
     }
