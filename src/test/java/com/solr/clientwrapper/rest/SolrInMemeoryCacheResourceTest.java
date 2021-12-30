@@ -170,8 +170,6 @@ class SolrInMemeoryCacheResourceTest {
 				.andExpect(status().isOk());
 
 	}
-
-	
 	@Test
 	@Transactional
 	void testGetSchema() throws Exception {		
