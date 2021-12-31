@@ -25,7 +25,7 @@ public class SolrSearchOrdered {
 			String sortTag, 
 			String sortOrder
 			) {
-		logger.debug("Ordered search for table: {}", tableName);
+		logger.debug("Ordered search for the given table");
 		return solrSearchRecordsServicePort.setUpSelectQueryOrderedSearch(
 				tableName, 
 				queryField, 

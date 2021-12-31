@@ -21,7 +21,7 @@ public class SolrSearchUnfiltered {
 	public SolrSearchResponseDTO unfilteredSearch(
 			String tableName
 			) {
-		logger.debug("Unfiltered search for table: {}", tableName);
+		logger.debug("Unfiltered search for the given table");
 		return solrSearchRecordsServicePort.setUpSelectQueryUnfiltered(
 				tableName);
 	}

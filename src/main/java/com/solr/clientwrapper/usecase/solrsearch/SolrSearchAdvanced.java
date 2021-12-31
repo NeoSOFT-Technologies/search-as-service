@@ -27,7 +27,7 @@ public class SolrSearchAdvanced {
 			String sortTag, 
 			String sortOrder
 			) {
-		logger.debug("Advanced search for table: {}", tableName);
+		logger.debug("Advanced search for the given table");
 		return solrSearchRecordsServicePort.setUpSelectQueryAdvancedSearch(
 				tableName, 
 				queryField, 

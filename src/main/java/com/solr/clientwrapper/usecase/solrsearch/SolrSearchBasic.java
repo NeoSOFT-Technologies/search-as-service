@@ -23,7 +23,7 @@ public class SolrSearchBasic {
 			String queryField, 
 			String queryFieldSearchTerm
 			) {
-		logger.debug("Basic search for table: {}", tableName);
+		logger.debug("Basic search for the given table");
 		return solrSearchRecordsServicePort.setUpSelectQueryBasicSearch(
 				tableName, 
 				queryField, 

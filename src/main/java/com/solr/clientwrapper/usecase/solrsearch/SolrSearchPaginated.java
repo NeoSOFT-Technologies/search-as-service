@@ -28,7 +28,7 @@ public class SolrSearchPaginated {
 			String sortOrder, 
 			String startPage
 			) {
-		logger.debug("Paginated search for table: {}", tableName);
+		logger.debug("Paginated search for the given table");
 		return solrSearchRecordsServicePort.setUpSelectQueryAdvancedSearchWithPagination(
 				tableName, 
 				queryField, 

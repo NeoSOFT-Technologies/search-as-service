@@ -49,7 +49,7 @@ public class SolrSearchRecordsResource {
 	@GetMapping(value = "/unfiltered")
 	public ResponseEntity<SolrSearchResponseDTO> searchRecordsInGivenCollectionUnfiltered(
 					@RequestParam(defaultValue = SOLR_DATA_NAME_DEFAULT) String collection) {
-		logger.debug("REST call for UNFILTERED SEARCH search in the collection : {}", collection);
+		logger.debug("REST call for UNFILTERED SEARCH search in the given collection");
 		SolrSearchResponseDTO solrSearchResponseDTO = solrSearchUnfiltered.unfilteredSearch(collection);
 		if(solrSearchResponseDTO.getStatusCode() == 200) {
 			return ResponseEntity.status(HttpStatus.OK)
@@ -65,7 +65,7 @@ public class SolrSearchRecordsResource {
 											@RequestParam(defaultValue = SOLR_DATA_NAME_DEFAULT) String collection, 
 											@RequestParam(defaultValue = "name") String queryField, 
 											@RequestParam(defaultValue = "*") String queryFieldSearchTerm) {
-		logger.debug("REST call for BASIC SEARCH search in the collection : {}", collection);
+		logger.debug("REST call for BASIC SEARCH search in the given collection");
 		SolrSearchResponseDTO solrSearchResponseDTO = solrSearchBasic.basicSearch(collection, 
 									queryField, 
 									queryFieldSearchTerm);
@@ -85,7 +85,7 @@ public class SolrSearchRecordsResource {
 											@RequestParam(defaultValue = "*") String searchTerm, 
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order) {
-		logger.debug("REST call for ORDERED SEARCH search in the collection : {}", collection);
+		logger.debug("REST call for ORDERED SEARCH search in the given collection");
 		SolrSearchResponseDTO solrSearchResponseDTO = solrSearchOrdered.orderedSearch(collection, 
 													queryField, 
 													searchTerm, 
@@ -109,7 +109,7 @@ public class SolrSearchRecordsResource {
 											@RequestParam(defaultValue = "5") String pageSize, 
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order) {
-		logger.debug("REST call for ADVANCED SEARCH search in the collection : {}", collection);
+		logger.debug("REST call for ADVANCED SEARCH search in the given collection");
 		SolrSearchResponseDTO solrSearchResponseDTO = solrSearchAdvanced.advancedSearch(collection, 
 													queryField, 
 													searchTerm, 
@@ -136,7 +136,7 @@ public class SolrSearchRecordsResource {
 											@RequestParam(defaultValue = "id") String tag, 
 											@RequestParam(defaultValue = "asc") String order, 
 											@RequestParam(defaultValue = "0") String startPage) {
-		logger.debug("REST call for PAGINATED SEARCH search in the collection : {}", collection);
+		logger.debug("REST call for PAGINATED SEARCH search in the given collection");
 		SolrSearchResponseDTO solrSearchResponseDTO = solrSearchPaginated.paginatedSearch(collection, 
 				queryField, 
 				searchTerm, 
