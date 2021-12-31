@@ -19,8 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.solr.clientwrapper.domain.dto.solr.SolrAPIAdapterResponseDTO;
 import com.solr.clientwrapper.domain.dto.solrsearch.SolrSearchResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSearchRecordsServicePort;
+import com.solr.clientwrapper.infrastructure.adaptor.SolrAPIAdapter;
 import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
 
 
@@ -36,25 +38,37 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 	private static final String SUCCESS_LOG = "Solr search operation is peformed successfully for collection";
 	private static final String FAILURE_LOG = "An exception occured while performing Solr Search Operation! ";
 	
+	//@Autowired
+	SolrSearchResult solrSearchResult = new SolrSearchResult();
+	//@Autowired
+	SolrSearchResponseDTO solrSearchResponseDTO = new SolrSearchResponseDTO();
+	// call for solr client
 	@Autowired
-	SolrSearchResult solrSearchResult;
-	@Autowired
-	SolrSearchResponseDTO solrSearchResponseDTO;
+	SolrAPIAdapter solrSchemaAPIAdapter = new SolrAPIAdapter();
 	
 	@Value("${base-solr-url-8985}")
 	//	@Value("${base-solr-url}")
 	String solrUrl;
 	
-	
+	public SolrSearchRecordsService(
+			SolrSearchResult solrSearchResult, 
+			SolrSearchResponseDTO solrSearchResponseDTO) {
+		this.solrSearchResult = solrSearchResult;
+		this.solrSearchResponseDTO = solrSearchResponseDTO;
+	}
+
 	@Override
 	public SolrSearchResponseDTO setUpSelectQueryUnfiltered(
 											String collection) {
 		/* Egress API -- solr collection records -- UNFILTERED SEARCH */
 		logger.debug("Performing UNFILTERED solr search for collection: {}", collection);
-		SolrClient client = new HttpSolrClient.Builder(solrUrl+"/"+collection).build();
+		
+		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
 		query.set("q", "*:*");
+		solrSearchResponseDTO = new SolrSearchResponseDTO();
 		try {
+			solrSearchResult = new SolrSearchResult();
 			QueryResponse response = client.query(query);
 			SolrDocumentList docs = response.getResults();
 			List<SolrDocument> solrDocuments = new ArrayList<>();
@@ -65,12 +79,12 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResult.setNumDocs(numDocs);
 			solrSearchResult.setSolrDocuments(solrDocuments);
 			// Prepare SolrSearchResponse
-			solrSearchResponseDTO.setStatusCode(200);
+			solrSearchResponseDTO.setStatusCode(200);	
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);
+			logger.debug(SUCCESS_LOG+": {}", collection);	
 			return solrSearchResponseDTO;
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
 			solrSearchResponseDTO.setResponseMessage(FAILURE_MSG);
 			logger.error(FAILURE_LOG, e);
@@ -85,10 +99,13 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 														String searchTerm) {
 		/* Egress API -- solr collection records -- BASIC SEARCH (by QUERY FIELD) */
 		logger.debug("Performing BASIC solr search for collection: {}", collection);
-		SolrClient client = new HttpSolrClient.Builder(solrUrl+"/"+collection).build();
+
+		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
 		query.set("q", queryField + ":" + searchTerm);
+		solrSearchResponseDTO = new SolrSearchResponseDTO();
 		try {
+			solrSearchResult = new SolrSearchResult();
 			QueryResponse response = client.query(query);
 			SolrDocumentList docs = response.getResults();
 			
@@ -105,7 +122,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
 			logger.debug(SUCCESS_LOG+": {}", collection);
 			return solrSearchResponseDTO;
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
 			solrSearchResponseDTO.setResponseMessage(FAILURE_MSG);
 			logger.error(FAILURE_LOG, e);
@@ -122,12 +139,15 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 												String order) {
 		/* Egress API -- solr collection records -- ORDERED SEARCH */
 		logger.debug("Performing ORDERED solr search for collection: {}", collection);
-		SolrClient client = new HttpSolrClient.Builder(solrUrl+"/"+collection).build();
+
+		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
 		query.set("q", queryField + ":" + searchTerm);
 		SortClause sortClause = new SortClause(tag, order);
 		query.setSort(sortClause);
+		solrSearchResponseDTO = new SolrSearchResponseDTO();
 		try {
+			solrSearchResult = new SolrSearchResult();
 			QueryResponse response = client.query(query);
 			SolrDocumentList docs = response.getResults();
 			List<SolrDocument> solrDocuments = new ArrayList<>();
@@ -143,7 +163,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
 			logger.debug(SUCCESS_LOG+": {}", collection);
 			return solrSearchResponseDTO;
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
 			solrSearchResponseDTO.setResponseMessage(FAILURE_MSG);
 			logger.error(FAILURE_LOG, e);
@@ -162,7 +182,8 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 												String order) {
 		/* Egress API -- solr collection records -- ADVANCED SEARCH */
 		logger.debug("Performing ADVANCED solr search for collection: {}", collection);
-		SolrClient client = new HttpSolrClient.Builder(solrUrl+"/"+collection).build();
+
+		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
 		
 		query.set("q", queryField + ":" + searchTerm);
@@ -170,7 +191,9 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 		query.set("rows", pageSize);
 		SortClause sortClause = new SortClause(tag, order);
 		query.setSort(sortClause);
+		solrSearchResponseDTO = new SolrSearchResponseDTO();
 		try {
+			solrSearchResult = new SolrSearchResult();
 			QueryResponse response = client.query(query);
 			SolrDocumentList docs = response.getResults();
 			List<SolrDocument> solrDocuments = new ArrayList<>();
@@ -186,7 +209,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
 			logger.debug(SUCCESS_LOG+": {}", collection);
 			return solrSearchResponseDTO;
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
 			solrSearchResponseDTO.setResponseMessage(FAILURE_MSG);
 			logger.error(FAILURE_LOG, e);
@@ -205,14 +228,17 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 															String startPage) {
 		/* Egress API -- solr collection records -- PAGINATED SEARCH */
 		logger.debug("Performing PAGINATED solr search for collection: {}", collection);
-		SolrClient client = new HttpSolrClient.Builder(solrUrl+"/"+collection).build();
+
+		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
 		query.set("q", queryField + ":" + searchTerm);
 		query.set("start", startRecord);
 		query.set("rows", pageSize);
 		SortClause sortClause = new SortClause(tag, order);
 		query.setSort(sortClause);
+		solrSearchResponseDTO = new SolrSearchResponseDTO();
 		try {
+			solrSearchResult = new SolrSearchResult();
 			QueryResponse response = client.query(query);
 			SolrDocumentList docs = response.getResults();
 			List<SolrDocument> solrDocuments = new ArrayList<>();
@@ -228,7 +254,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
 			logger.debug(SUCCESS_LOG+": {}", collection);
 			return solrSearchResponseDTO;
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
 			solrSearchResponseDTO.setResponseMessage(FAILURE_MSG);
 			logger.error(FAILURE_LOG, e);

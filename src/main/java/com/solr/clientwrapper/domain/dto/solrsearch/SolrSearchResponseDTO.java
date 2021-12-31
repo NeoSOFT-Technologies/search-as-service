@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
 @Component
 public class SolrSearchResponseDTO {
 	private int statusCode;
@@ -22,5 +20,12 @@ public class SolrSearchResponseDTO {
 	public SolrSearchResponseDTO(String responseMessage, SolrSearchResult solrSearchResultResponse) {
 		this.responseMessage = responseMessage;
 		this.solrSearchResultResponse = solrSearchResultResponse;
+	}
+
+	@Override
+	public String toString() {
+		return "SolrSearchResponseDTO [statusCode=" + statusCode + ", "
+						+ "responseMessage=" + responseMessage + ", "
+						+ "solrSearchResultResponse=" + solrSearchResultResponse + "]";
 	}
 }
