@@ -8,7 +8,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrAPIAdapterResponseDTO;
 import com.solr.clientwrapper.domain.dto.solrsearch.SolrSearchResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSearchRecordsServicePort;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrAPIAdapter;

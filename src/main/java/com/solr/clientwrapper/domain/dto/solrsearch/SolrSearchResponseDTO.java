@@ -4,9 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.solr.clientwrapper.infrastructure.solrbean.SolrSearchResult;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
