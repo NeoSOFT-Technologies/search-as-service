@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;*/
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +90,7 @@ class SolrSearchRecordsServiceTest {
 	 * @throws IOException 
 	 * @throws SolrServerException 
 	 */
+	@Disabled
 	@Test
 	@DisplayName("Test Solr Search UNFILTERED Service for the given collection")
 	void testSetUpSelectQueryUnfiltered() throws SolrServerException, IOException {
@@ -116,6 +118,7 @@ class SolrSearchRecordsServiceTest {
 	/**
 	 * Test method for {@link com.solr.clientwrapper.domain.service.SolrSearchRecordsService#setUpSelectQueryBasicSearch(java.lang.String, java.lang.String, java.lang.String)}.
 	 */
+	@Disabled
 	@Test
 	@DisplayName("Test Solr BASIC Search Service for the given collection")
 	void testSetUpSelectQueryBasicSearch() {
@@ -149,6 +152,7 @@ class SolrSearchRecordsServiceTest {
 	/**
 	 * Test method for {@link com.solr.clientwrapper.domain.service.SolrSearchRecordsService#setUpSelectQueryOrderedSearch(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
 	 */
+	@Disabled
 	@Test
 	@DisplayName("Test Solr Search ORDERED Service for the given collection")
 	void testSetUpSelectQueryOrderedSearch() {
@@ -186,6 +190,7 @@ class SolrSearchRecordsServiceTest {
 	/**
 	 * Test method for {@link com.solr.clientwrapper.domain.service.SolrSearchRecordsService#setUpSelectQueryAdvancedSearch(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
 	 */
+	@Disabled
 	@Test
 	@DisplayName("Test Solr Search ADVANCED Service for the given collection")
 	void testSetUpSelectQueryAdvancedSearch() {
@@ -227,6 +232,7 @@ class SolrSearchRecordsServiceTest {
 	/**
 	 * Test method for {@link com.solr.clientwrapper.domain.service.SolrSearchRecordsService#setUpSelectQueryAdvancedSearchWithPagination(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
 	 */
+	@Disabled
 	@Test
 	@DisplayName("Test Solr Search PAGINATED Service for the given collection")
 	void testSetUpSelectQueryAdvancedSearchWithPagination() {
