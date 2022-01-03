@@ -7,7 +7,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main-dev-S6 ]
+    branches: [ main ]
 
 jobs:
   build:
