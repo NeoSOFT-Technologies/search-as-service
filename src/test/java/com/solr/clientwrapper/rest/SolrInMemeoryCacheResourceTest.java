@@ -87,8 +87,7 @@ class SolrInMemeoryCacheResourceTest {
 		Mockito.when(solrInMemeoryCacheService.create(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
 		Mockito.when(solrInMemeoryCacheService.update(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
 		Mockito.when(solrInMemeoryCacheService.delete(Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
-		Mockito.when(solrInMemeoryCacheService.get(Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
-		
+		Mockito.when(solrInMemeoryCacheService.get(Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);	
 	}
 
 	@Test
@@ -204,5 +203,4 @@ class SolrInMemeoryCacheResourceTest {
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrDocumentDTO)))
 		.andExpect(status().isOk());
 	}
-
 }
