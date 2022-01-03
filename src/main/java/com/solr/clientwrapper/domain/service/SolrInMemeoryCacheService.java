@@ -22,9 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +33,7 @@ import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
 import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 
+@SuppressWarnings("deprecation")
 @Service
 @Transactional
 
@@ -43,16 +41,22 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(SolrInMemeoryCacheService.class);
 	
-	@Value("techproducts")
-	private static String TEST1;
-	private static String DEFAULT_COLLECTION = "techproducts";
-	private static String DEFAULT_SOLR_CLOUD_COLLECTION = "gettingstarted3";
-	@Value("solr.client.url.static")
-	private static String TEST2;
-	private static String URL_STRING = "http://localhost:8984/solr/";
-	@Value("solr.client.url.cloud")
-	private static String TEST3;
-	private static String URL_STRING_SOLR_CLOUD = "http://localhost:8984/solr/";
+//	@Value("techproducts")
+//	private static String TEST1;
+//	private static String DEFAULT_COLLECTION = "techproducts";
+//	private static String DEFAULT_SOLR_CLOUD_COLLECTION = "gettingstarted3";
+//	@Value("solr.client.url.static")
+//	private static String TEST2;
+//	private static String URL_STRING = "http://localhost:8984/solr/";
+//	@Value("solr.client.url.cloud")
+//	private static String TEST3;
+//	private static String URL_STRING_SOLR_CLOUD = "http://localhost:8984/solr/";
+	
+	@Value("${base-solr-url-8984}")
+	String URL_STRING;
+	
+//	@Value("${base-solr-url-8984}")
+//	String URL_STRING_SOLR_CLOUD;
 	
 	// call for solr client
 	@Autowired
@@ -61,7 +65,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 	@Override
 	public String getSolrClient(String tableName) {
 		SolrClient solr = solrSchemaAPIAdapter.getSolrClient(URL_STRING, tableName);
-		CloudSolrClient solrCloud = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
+		CloudSolrClient solrCloud = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solrCloud.setDefaultCollection(tableName);
 		log.debug("@Solr client : {}", solr);
 		log.debug("@Solr cloud client : {}", solrCloud);
@@ -74,7 +78,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 	public SolrDocumentResponseDTO get(String tableName, String name) {
 		log.debug("Get Solr Schema: {}", name);
 
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -159,7 +163,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 		log.debug("Target Schema: {}", solrDocumentDTO);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SolrDocumentResponseDTO solrSchemaResponseDTOBefore = new SolrDocumentResponseDTO();
@@ -254,7 +258,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 								SolrDocumentDTO newSolrDocumentDTO) {
 		log.debug("Create Solr Schema: {}", name);
 
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
@@ -349,7 +353,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 	@Override
 	//@CacheEvict(value="solrcache", key = "#tableName")
 	public SolrDocumentResponseDTO delete(String tableName, String name) {
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();

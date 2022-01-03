@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.solr.clientwrapper.domain.port.spi.SolrSchemaAPIPort;
-import com.solr.clientwrapper.domain.service.SolrSchemaService;
 
 @Service
 public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {

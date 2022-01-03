@@ -22,6 +22,7 @@ public class DeleteSolrDocument {
 		this.inMemoryCacheServicePort = inMemoryCacheServicePort;
 	}
 	
+	
 	//@CacheEvict(value="solrcache", key = "#tableName")
 	public SolrDocumentResponseDTO delete(String tableName, String name) {
 		log.debug("delete Schema");

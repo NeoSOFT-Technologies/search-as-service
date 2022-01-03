@@ -19,7 +19,6 @@ public class CreateSolrDocument {
 	private final SolrInMemoryCacheServicePort inMemoryCacheServicePort;
 	
 	public CreateSolrDocument(SolrInMemoryCacheServicePort inMemoryCacheServicePort) {
-		super();
 		this.inMemoryCacheServicePort = inMemoryCacheServicePort;
 	}
 
