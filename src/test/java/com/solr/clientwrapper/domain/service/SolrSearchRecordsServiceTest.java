@@ -1,12 +1,11 @@
-/**
- * 
- */
 package com.solr.clientwrapper.domain.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+
+import javax.ws.rs.core.Application;
 
 /*import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -24,10 +23,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.solr.clientwrapper.config.YamlFileApplicationContextInitializer;
 import com.solr.clientwrapper.domain.dto.solr.SolrAPIAdapterResponseDTO;
 import com.solr.clientwrapper.domain.dto.solrsearch.SolrSearchResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSearchRecordsServicePort;
@@ -39,13 +43,13 @@ import com.solr.clientwrapper.infrastructure.adaptor.SolrAPIAdapter;
 @TestPropertySource(
         properties = {
                 "test-solr-url: http://localhost:8985/solr", 
-                "base-solr-collection: techproducts"
+                "test-solr-collection: techproducts"
         }
 )
 class SolrSearchRecordsServiceTest {
 	private final Logger logger = LoggerFactory.getLogger(SolrSearchRecordsServiceTest.class);
 
-	@Value("${base-solr-collection}")
+	@Value("${test-solr-collection}")
 	private String SOLR_COLLECTION;
 	@Value("${test-solr-url}")
 	private String SOLR_URL;

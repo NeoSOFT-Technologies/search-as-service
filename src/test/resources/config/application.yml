@@ -123,7 +123,7 @@ user-registration:
 
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr
-base-solr-url-8985: http://localhost:8985/solr
+test-solr-url: http://localhost:8985/solr
 
 # Throttler configurations
 base-app-url: http://localhost:8080
@@ -151,3 +151,6 @@ throttle-service:
   solr:
     data-injection: solrDataInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
+  
+# SolrSearch Configurations
+test-solr-collection: techproducts
