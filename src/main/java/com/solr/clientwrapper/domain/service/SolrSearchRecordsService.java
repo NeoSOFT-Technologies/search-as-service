@@ -33,7 +33,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 	private final Logger logger = LoggerFactory.getLogger(SolrSearchRecordsService.class); 
 	private static final String SUCCESS_MSG = "Records fetched successfully";
 	private static final String FAILURE_MSG = "Records couldn't be fetched for given collection";
-	private static final String SUCCESS_LOG = "Solr search operation is peformed successfully for collection";
+	private static final String SUCCESS_LOG = "Solr search operation is peformed successfully for given collection";
 	private static final String FAILURE_LOG = "An exception occured while performing Solr Search Operation! ";
 	
 	//@Autowired
@@ -59,7 +59,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 	public SolrSearchResponseDTO setUpSelectQueryUnfiltered(
 											String collection) {
 		/* Egress API -- solr collection records -- UNFILTERED SEARCH */
-		logger.debug("Performing UNFILTERED solr search for collection: {}", collection);
+		logger.debug("Performing UNFILTERED solr search for given collection");
 		
 		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
@@ -80,7 +80,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setStatusCode(200);	
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);	
+			logger.debug(SUCCESS_LOG);
 			return solrSearchResponseDTO;
 		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
@@ -96,7 +96,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 														String queryField, 
 														String searchTerm) {
 		/* Egress API -- solr collection records -- BASIC SEARCH (by QUERY FIELD) */
-		logger.debug("Performing BASIC solr search for collection: {}", collection);
+		logger.debug("Performing BASIC solr search for given collection");
 
 		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
@@ -118,7 +118,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setStatusCode(200);
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);
+			logger.debug(SUCCESS_LOG);
 			return solrSearchResponseDTO;
 		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
@@ -136,7 +136,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 												String tag, 
 												String order) {
 		/* Egress API -- solr collection records -- ORDERED SEARCH */
-		logger.debug("Performing ORDERED solr search for collection: {}", collection);
+		logger.debug("Performing ORDERED solr search for given collection");
 
 		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
@@ -159,7 +159,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setStatusCode(200);
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);
+			logger.debug(SUCCESS_LOG);
 			return solrSearchResponseDTO;
 		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
@@ -179,7 +179,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 												String tag, 
 												String order) {
 		/* Egress API -- solr collection records -- ADVANCED SEARCH */
-		logger.debug("Performing ADVANCED solr search for collection: {}", collection);
+		logger.debug("Performing ADVANCED solr search for given collection");
 
 		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
@@ -205,7 +205,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setStatusCode(200);
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);
+			logger.debug(SUCCESS_LOG);
 			return solrSearchResponseDTO;
 		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
@@ -225,7 +225,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 															String tag, String order, 
 															String startPage) {
 		/* Egress API -- solr collection records -- PAGINATED SEARCH */
-		logger.debug("Performing PAGINATED solr search for collection: {}", collection);
+		logger.debug("Performing PAGINATED solr search for given collection");
 
 		SolrClient client = solrSchemaAPIAdapter.getSolrClient(solrUrl, collection);
 		SolrQuery query = new SolrQuery();
@@ -250,7 +250,7 @@ public class SolrSearchRecordsService implements SolrSearchRecordsServicePort {
 			solrSearchResponseDTO.setStatusCode(200);
 			solrSearchResponseDTO.setResponseMessage(SUCCESS_MSG);
 			solrSearchResponseDTO.setSolrSearchResultResponse(solrSearchResult);
-			logger.debug(SUCCESS_LOG+": {}", collection);
+			logger.debug(SUCCESS_LOG);
 			return solrSearchResponseDTO;
 		} catch (SolrServerException | IOException | NullPointerException e) {
 			solrSearchResponseDTO.setStatusCode(400);
