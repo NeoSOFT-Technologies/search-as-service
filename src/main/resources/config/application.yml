@@ -217,7 +217,7 @@ user-registration:
 
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr
-base-solr-url-8985: http://localhost:8985/solr
+test-solr-url: http://localhost:8985/solr
 
 capacity-plan:
   plans:
