@@ -28,7 +28,6 @@ import com.solr.clientwrapper.infrastructure.adaptor.SolrAPIAdapter;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
-//@ActiveProfiles("test")
 @TestPropertySource(
         properties = {
                 "test-solr-url: http://localhost:8985/solr", 
