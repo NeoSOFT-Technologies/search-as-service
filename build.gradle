@@ -218,8 +218,6 @@ dependencies {
     implementation "javax.transaction:javax.transaction-api"
     implementation group: 'javax.cache', name: 'cache-api', version: '1.1.1'
     implementation group: 'org.ehcache', name: 'ehcache', version: '3.8.1'
-    // https://mvnrepository.com/artifact/net.sf.ehcache/ehcache
-	implementation group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.9.2'
     implementation "org.hibernate:hibernate-jcache"
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate.validator:hibernate-validator"
