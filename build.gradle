@@ -201,6 +201,9 @@ repositories {
 
 dependencies {
 
+implementation "org.springframework.boot:spring-boot-starter-amqp"
+
+
 // https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
 implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: '2.8.0'
 // https://mvnrepository.com/artifact/net.mguenther.kafka/kafka-junit
