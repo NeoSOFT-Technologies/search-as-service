@@ -19,18 +19,18 @@ public class RabbitMQConfiguration {
 
 	private final Logger log = LoggerFactory.getLogger(RabbitMQConfiguration.class);
 	
-	public static final String QUEUE = "QUEUE_queue";
-    public static final String EXCHANGE = "EXCHANGE_exchange";
-    public static final String ROUTING_KEY = "SROUTING_KEY_routingKey";
+	public static final String QUEUES = "message_queue";
+    public static final String EXCHANGES = "message_exchange";
+    public static final String ROUTING_KEY = "message_routingKey";
 
     @Bean
     public Queue queue() {
-        return new Queue(QUEUE);
+        return new Queue(QUEUES);
     }
 
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE);
+        return new TopicExchange(EXCHANGES);
     }
 
     @Bean
