@@ -13,10 +13,18 @@ public class RabbitMQReciverService implements RabbitMQRecieverServicePort {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQReciverService.class);
 
+	private String listener = null;
+	
 	@Override
 	  @RabbitListener(queues = RabbitMQConfiguration.QUEUES)
-	public void listener(String payloads) {
+	public void listener(String payload) {
 		
-		LOGGER.info("Start Recive the Message "+ payloads);
+		LOGGER.info("Start Recive the Message "+ payload);
+		this.listener = payload;
+		
+	}
+	
+	public String listener() {
+		return this.listener;
 	}
 }

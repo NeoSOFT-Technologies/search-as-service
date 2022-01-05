@@ -15,18 +15,24 @@ public class RabbitMQSenderService implements RabbitMQSenderServicePort{
 	  @Autowired
      RabbitTemplate rabbitTemplate;
 	
+		private String message = null;
 
 		private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQSenderService.class);
 		
 	@Override
-	public void Sender(String payload) {
+	public void Sender(String payload) { 
 		
 		LOGGER.info("Start Sending the Message ");
 		
 	rabbitTemplate.convertAndSend(RabbitMQConfiguration.EXCHANGES, RabbitMQConfiguration.ROUTING_KEY,payload);
-		 
+		 this.message=payload;
 	
 		
 	}
+	//For testing
+	public String message() {
+		return this.message;
+	}
+
 
 }
