@@ -33,7 +33,7 @@ public class RabbitMQTest {
 	RabbitMQReciverService rabbitMQReciverService;
 
 	private final String payload = "String";
-	
+
 	@Test
 	public void testSendMassagess() {
 
@@ -46,9 +46,9 @@ public class RabbitMQTest {
 	@Test
 	public void MassagessRecive() {
 
-		rabbitMQSenderService.Sender(payload);
-		Assertions.assertNotEquals("Omkar", rabbitMQReciverService.listener());
-
+		rabbitMQReciverService.listener(payload);
+		Assertions.assertNotEquals("strings", rabbitMQReciverService.message());
+		Assertions.assertEquals("String", rabbitMQReciverService.message());
 	}
 
 	@Test
