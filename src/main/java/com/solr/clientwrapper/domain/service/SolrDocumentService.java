@@ -39,18 +39,31 @@ public class SolrDocumentService implements SolrDocumentServicePort {
         }
 
 
-        payload=payload.substring(1, payload.length() - 1);
+
 
         JSONArray payloadJSONArray=null;
         try {
             payloadJSONArray = new JSONArray(payload);
         }catch (Exception e){
-            log.debug(e.toString());
-            String message="Invalid input JSON array of document.";
-            log.debug(message);
-            solrResponseDTO.setMessage(message);
-            solrResponseDTO.setStatusCode(400);
-            return solrResponseDTO;
+
+            //TRY BY REMOVING THE QUOTES FROM THE STRING
+            try{
+
+                payload=payload.substring(1, payload.length() - 1);
+                payloadJSONArray = new JSONArray(payload);
+
+            }catch (Exception e1){
+
+                log.debug(e.toString());
+                log.debug(e1.toString());
+
+                String message="Invalid input JSON array of document.";
+                log.debug(message);
+                solrResponseDTO.setMessage(message);
+                solrResponseDTO.setStatusCode(400);
+                return solrResponseDTO;
+
+            }
         }
 
 
