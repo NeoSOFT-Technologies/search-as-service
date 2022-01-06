@@ -48,7 +48,7 @@ public class UploadDocumentSolrUtil {
             return new UploadDocumentSolrUtilRespnse(true,"Document Added Successfully!");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.toString());
 
             return new UploadDocumentSolrUtilRespnse(false,"Document not uploaded! IOException.");
 
