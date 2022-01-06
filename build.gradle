@@ -305,6 +305,9 @@ testImplementation group: 'org.springframework.kafka', name: 'spring-kafka-test'
     implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.5.0'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.5.4'
+    // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
+    implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+
 
 }
 
