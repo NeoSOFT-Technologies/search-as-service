@@ -19,11 +19,6 @@ public class CreateSolrDocument {
         this.solrDocumentServicePort = solrDocumentServicePort;
     }
 
-//    public SolrResponseDTO addDocument(String collectionName, String payload) {
-//        log.debug("create");
-//        return solrDocumentServicePort.addDocument(collectionName, payload);
-//    }
-
     public SolrResponseDTO addDocuments(String collectionName, String payload, boolean isNRT) {
         log.debug("create");
         return solrDocumentServicePort.addDocuments(collectionName, payload, isNRT);

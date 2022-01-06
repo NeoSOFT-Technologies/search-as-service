@@ -21,22 +21,6 @@ public class SolrInputDocumentResource {
         this.createSolrDocument=createSolrDocument;
     }
 
-//    @PostMapping("/document/{collectionName}")
-//    @Operation(summary = "/add-document", security = @SecurityRequirement(name = "bearerAuth"))
-//    public ResponseEntity<SolrResponseDTO> document(@PathVariable String collectionName, @RequestBody String payload) {
-//
-//        log.debug("Solr document create");
-//
-//        SolrResponseDTO solrResponseDTO=createSolrDocument.addDocument(collectionName, payload);
-//
-//        if(solrResponseDTO.getStatusCode()==200){
-//            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
-//        }else{
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
-//        }
-//
-//    }
-
     @PostMapping("/documents/{collectionName}")
     @Operation(summary = "/add-documents", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> documents(@PathVariable String collectionName, @RequestBody String payload, @RequestParam boolean isNRT) {

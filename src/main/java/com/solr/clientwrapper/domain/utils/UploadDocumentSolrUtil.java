@@ -43,7 +43,8 @@ public class UploadDocumentSolrUtil {
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
+            //Response response =
+                    client.newCall(request).execute();
 
             return new UploadDocumentSolrUtilRespnse(true,"Document Added Successfully!");
 
