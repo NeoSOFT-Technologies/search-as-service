@@ -34,7 +34,7 @@ public class SolrInputDocumentResource {
         SolrResponseDTO solrResponseDTO=createSolrDocument.addDocuments(collectionName, payload, isNRT);
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
-        System.out.println("Time taken: "+ timeElapsed.toMillis() +" milliseconds or "+(timeElapsed.toMillis()/1000)+" seconds");
+       log.debug("Time taken: "+ timeElapsed.toMillis() +" milliseconds or "+(timeElapsed.toMillis()/1000)+" seconds");
 
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
