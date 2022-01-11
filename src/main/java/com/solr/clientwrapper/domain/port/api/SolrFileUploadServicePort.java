@@ -2,13 +2,8 @@ package com.solr.clientwrapper.domain.port.api;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface SolarDocParseServicePort {
+public interface SolrFileUploadServicePort {
 
-	
-	String MultipartUploder(MultipartFile file);
-	
-
-		
-		
+	String multipartUploader(MultipartFile file);
 	
 }

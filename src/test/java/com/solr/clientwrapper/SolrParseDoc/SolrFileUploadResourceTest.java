@@ -12,17 +12,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import com.solr.clientwrapper.domain.service.SolrParseDocSerice;
+import com.solr.clientwrapper.domain.service.SolrFileUploadService;
 import com.solr.clientwrapper.IntegrationTest;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class SolrDocParserResourceTest  {
+class SolrFileUploadResourceTest {
   
 
     
 	  @MockBean
-	SolrParseDocSerice SolrParseDocSerice;
+	  SolrFileUploadService SolrFileUploadService;
     
 
     @Autowired
