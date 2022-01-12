@@ -17,7 +17,7 @@ import com.solr.clientwrapper.IntegrationTest;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class SolrFileUploadResourceTest {
+class FileUploadResourceTest {
   
 
     

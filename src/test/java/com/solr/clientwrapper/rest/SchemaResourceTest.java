@@ -27,7 +27,7 @@ import com.solr.clientwrapper.solrwrapper.TestUtil;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class SolrSchemaResourceTest {
+class SchemaResourceTest {
 
 	String solrendpoint = "/schema";
 	String tableName = "gettingstarted1";
