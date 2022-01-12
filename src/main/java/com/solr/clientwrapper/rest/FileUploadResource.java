@@ -16,16 +16,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/ingest")
-public class SolrFileUploadResource {
+@RequestMapping("/api")
+public class FileUploadResource {
 	
 	
-	private final Logger log = LoggerFactory.getLogger(SolrFileUploadResource.class);
+	private final Logger log = LoggerFactory.getLogger(FileUploadResource.class);
 
 	@Autowired
 	SolrFileUploadServicePort solrFileUploadServicePort;
 	
-	@RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/file-upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
 		log.debug("Multipart File Upload ");

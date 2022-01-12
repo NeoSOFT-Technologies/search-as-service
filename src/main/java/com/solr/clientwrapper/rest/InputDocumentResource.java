@@ -14,24 +14,25 @@ import java.time.Duration;
 import java.time.Instant;
 
 @RestController
-public class SolrInputDocumentResource {
+@RequestMapping("/api")
+public class InputDocumentResource {
 
-    private final Logger log = LoggerFactory.getLogger(SolrInputDocumentResource.class);
+    private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
 
     CreateSolrDocument createSolrDocument;
 
-    public SolrInputDocumentResource(CreateSolrDocument createSolrDocument) {
+    public InputDocumentResource(CreateSolrDocument createSolrDocument) {
         this.createSolrDocument=createSolrDocument;
     }
 
-    @PostMapping("/documents/{collectionName}")
+    @PostMapping("/documents/{tableName}")
     @Operation(summary = "/add-documents", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> documents(@PathVariable String collectionName, @RequestBody String payload, @RequestParam boolean isNRT) {
+    public ResponseEntity<SolrResponseDTO> documents(@PathVariable String tableName, @RequestBody String payload, @RequestParam boolean isNRT) {
 
         log.debug("Solr documents add");
 
         Instant start = Instant.now();
-        SolrResponseDTO solrResponseDTO=createSolrDocument.addDocuments(collectionName, payload, isNRT);
+        SolrResponseDTO solrResponseDTO=createSolrDocument.addDocuments(tableName, payload, isNRT);
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
