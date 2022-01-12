@@ -35,7 +35,7 @@ class FileUploadResourceTest {
 		
 		String text = "Text to be uploaded.";
 		MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", text.getBytes());
-		restAMockMvc.perform(MockMvcRequestBuilders.multipart("/ingest/upload").file(file).characterEncoding("UTF-8"))
+		restAMockMvc.perform(MockMvcRequestBuilders.multipart("/api/file-upload").file(file).characterEncoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 
 	}
