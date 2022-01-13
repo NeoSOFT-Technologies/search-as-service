@@ -1,9 +1,13 @@
 package com.solr.clientwrapper.domain.service;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrDocumentServicePort;
-import com.solr.clientwrapper.domain.utils.DocumentParserUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
@@ -11,14 +15,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrDocumentServicePort;
+import com.solr.clientwrapper.domain.utils.DocumentParserUtil;
 
 @Service
 @Transactional
@@ -32,7 +34,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
     private final Logger log = LoggerFactory.getLogger(SolrDocumentService.class);
 
     @Override
-    public SolrResponseDTO addDocument(String collectionName, String payload) {
+    public SolrResponseDTO addDocument(String collectionName, String payload) throws NullPointerException, SolrServerException, IOException {
 
         SolrClient solrClient=new HttpSolrClient.Builder(baseSolrUrl+"/"+collectionName).build();
 
@@ -47,9 +49,6 @@ public class SolrDocumentService implements SolrDocumentServicePort {
             return solrResponseDTO;
         }
 
-
-//        log.debug(payload);
-
         JSONObject payloadJSON=null;
         try {
             payloadJSON = new JSONObject(payload);
@@ -63,10 +62,6 @@ public class SolrDocumentService implements SolrDocumentServicePort {
         }
 
         //CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE STRUCTURALLY CORRECT
-
-//        Set<String> res=payloadJSON.keySet();
-//        log.debug("Key sets : " + res);
-//        log.debug("Solr Schema : "+schemaKeyValuePair);
 
 
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse = DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
@@ -112,7 +107,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
     }
 
     @Override
-    public SolrResponseDTO addDocuments(String collectionName, String payload) {
+    public SolrResponseDTO addDocuments(String collectionName, String payload) throws NullPointerException, SolrServerException, IOException {
 
         SolrClient solrClient=new HttpSolrClient.Builder(baseSolrUrl+"/"+collectionName).build();
 
@@ -126,8 +121,6 @@ public class SolrDocumentService implements SolrDocumentServicePort {
             solrResponseDTO.setStatusCode(400);
             return solrResponseDTO;
         }
-
-       //log.debug(payload);
 
         JSONArray payloadJSONArray=null;
         try {
@@ -144,9 +137,6 @@ public class SolrDocumentService implements SolrDocumentServicePort {
 
         //CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE STRUCTURALLY CORRECT
 
-//        Set<String> res=payloadJSON.keySet();
-//        log.debug("Key sets : " + res);
-//        log.debug("Solr Schema : "+schemaKeyValuePair);
 
         SolrInputDocument inputDocumentMaster=new SolrInputDocument();
         List<SolrInputDocument> solrInputDocumentList = new ArrayList<>();

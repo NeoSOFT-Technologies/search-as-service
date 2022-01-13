@@ -16,7 +16,7 @@ public class SolrParseDocSerice implements SolarDocParseServicePort {
 	   private final Logger log = LoggerFactory.getLogger(SolrParseDocSerice.class);
 
 	@Override
-	public String MultipartUploder(MultipartFile file) {
+	public String multipartUploder(MultipartFile file) {
 		
 		if (!file.isEmpty()) {
 	        try {
@@ -24,19 +24,19 @@ public class SolrParseDocSerice implements SolarDocParseServicePort {
 				try {
 					bytes = file.getBytes();
 				} catch (IOException e) {
-					//e.printStackTrace();
 					log.debug(e.toString());
 				}
 	            String completeData = new String(bytes);
-	            //log.debug(completeData);
 	            
 	         JSONObject jsonObject = new JSONObject(completeData);
 	   
 	        
-	            System.out.println(jsonObject);
+	         log.debug(jsonObject.toString());
 	           
 	         
-	        }finally {}
+	        }finally {
+	        	log.debug("Solr field");
+	        }
 		}
 		return null;
 	

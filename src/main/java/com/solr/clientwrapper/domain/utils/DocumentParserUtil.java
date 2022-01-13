@@ -1,7 +1,10 @@
 package com.solr.clientwrapper.domain.utils;
 
-import com.solr.clientwrapper.domain.service.SolrDocumentService;
-import lombok.Data;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
@@ -12,22 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import lombok.Data;
 
 public class DocumentParserUtil {
 
     @Value("${base-solr-url}")
     private String baseSolrUrl;
 
-    private final Logger log = LoggerFactory.getLogger(SolrDocumentService.class);
-
     private static boolean isNumeric(String string) {
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
-
-        long longValue;
 
         log.debug(String.format("Parsing string: \"%s\"", string));
 
@@ -36,7 +32,7 @@ public class DocumentParserUtil {
             return false;
         }
         try {
-            longValue = Long.parseLong(string);
+            Long.parseLong(string);
             return true;
         } catch (NumberFormatException e) {
             log.debug("Input String cannot be parsed to Integer.");
@@ -51,12 +47,8 @@ public class DocumentParserUtil {
 
         log.debug(String.format("isBoolean Check: %s , Object as String: %s ", object, objectAsString));
 
-        if(object.getClass().equals(Boolean.class) || objectAsString.equals("true") || objectAsString.equals("True") || objectAsString.equals("false") || objectAsString.equals("False")){
+        if(object.getClass().equals(Boolean.class) || objectAsString.equals("true") || objectAsString.equals("True") || objectAsString.equals("false") || objectAsString.equals("False") || (isNumeric(objectAsString) && (Integer.parseInt(objectAsString)==1 || Integer.parseInt(objectAsString)==0))){
             return true;
-        }else if (isNumeric(objectAsString)){
-            if(Integer.parseInt(objectAsString)==1 || Integer.parseInt(objectAsString)==0){
-                return true;
-            }
         }
 
         return false;
@@ -66,17 +58,11 @@ public class DocumentParserUtil {
     private static DocumentSatisfiesSchemaResponse checkIfRequiredFieldsAreAvailable(Map<String,Map<String, Object>> schemaKeyValuePair, JSONObject payloadJSON){
 
         for (Map.Entry<String,Map<String, Object>> entry : schemaKeyValuePair.entrySet()){
-            if(entry.getValue().containsKey("required")){
-                if(entry.getValue().get("required").toString().equals("true")){
-                    if(!payloadJSON.has(entry.getKey())){
-                        return new DocumentSatisfiesSchemaResponse(false, "Required field is missing in document. Field: "+entry.getKey());
-                    }
-                }
+            if(entry.getValue().containsKey("required") && entry.getValue().get("required").toString().equals("true") && !payloadJSON.has(entry.getKey())){
+               return new DocumentSatisfiesSchemaResponse(false, "Required field is missing in document. Field: "+entry.getKey()); 
             }
         }
-
         return new DocumentSatisfiesSchemaResponse(true, "All the required fields are available.");
-
     }
 
     public static DocumentSatisfiesSchemaResponse isDocumentSatisfySchema(Map<String, Map<String, Object>> schemaKeyValuePair, JSONObject payloadJSON){
@@ -99,7 +85,6 @@ public class DocumentParserUtil {
             Object payloadJsonObjectValue = payloadJSON.get(payloadJsonObjectKey);
 
             log.debug(payloadJsonObjectKey + "=" + payloadJsonObjectValue);
-            //log.debug(schemaKeyValuePair.get(payloadJsonObjectKey).toString());
 
             if(schemaKeyValuePair.containsKey(payloadJsonObjectKey)) {
 
@@ -109,13 +94,9 @@ public class DocumentParserUtil {
                     String fieldTypeDefinedInSchema = fieldValueForTheKey.get("type").toString();
 
                     boolean isMultivaluedField = false;
-                    if (fieldValueForTheKey.containsKey("multiValued")) {
-                        if (fieldValueForTheKey.get("multiValued").toString().equals("true")) {
-                            isMultivaluedField = true;
-                        }
+                    if (fieldValueForTheKey.containsKey("multiValued") && fieldValueForTheKey.get("multiValued").toString().equals("true")) {
+                    	isMultivaluedField = true;
                     }
-
-                    //log.debug(fieldTypeDefinedInSchema);
 
                     switch (fieldTypeDefinedInSchema) {
                         case "string":
@@ -208,7 +189,7 @@ public class DocumentParserUtil {
         return new DocumentSatisfiesSchemaResponse(true,"Success!");
     }
 
-    public static Map<String,Map<String, Object>> getSchemaOfCollection(String baseSolrUrl, String collectionName){
+    public static Map<String,Map<String, Object>> getSchemaOfCollection(String baseSolrUrl, String collectionName)throws NullPointerException{
 
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
 
@@ -220,7 +201,7 @@ public class DocumentParserUtil {
             schemaResponse = schemaRequest.process(solrClient);
         } catch (Exception e) {
             log.error(e.toString());
-            return null;
+         
         }
 
         List<Map<String, Object>> schemaResponseFields= schemaResponse.getSchemaRepresentation().getFields();
@@ -228,7 +209,7 @@ public class DocumentParserUtil {
         // Converting response schema from Solr to HashMap for quick access
         //Key contains the field name and value contains the object which has schema description of that key eg. multivalued etc
         Map<String,Map<String, Object>> schemaKeyValuePair=new HashMap<>();
-        schemaResponseFields.forEach((fieldObject)->schemaKeyValuePair.put(fieldObject.get("name").toString(),fieldObject));
+        schemaResponseFields.forEach(fieldObject->schemaKeyValuePair.put(fieldObject.get("name").toString(),fieldObject));
 
         return schemaKeyValuePair;
     }

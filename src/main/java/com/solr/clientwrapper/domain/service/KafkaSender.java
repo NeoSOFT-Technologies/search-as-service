@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Service
 public class KafkaSender implements KafkaSenders {
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSender.class);
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;

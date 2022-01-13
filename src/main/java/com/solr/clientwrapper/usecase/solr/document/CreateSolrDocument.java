@@ -2,6 +2,10 @@ package com.solr.clientwrapper.usecase.solr.document;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrDocumentServicePort;
+
+import java.io.IOException;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,12 +23,12 @@ public class CreateSolrDocument {
         this.solrDocumentServicePort = solrDocumentServicePort;
     }
 
-    public SolrResponseDTO addDocument(String collectionName, String payload) {
+    public SolrResponseDTO addDocument(String collectionName, String payload) throws NullPointerException, SolrServerException, IOException {
         log.debug("create");
         return solrDocumentServicePort.addDocument(collectionName, payload);
     }
 
-    public SolrResponseDTO addDocuments(String collectionName, String payload) {
+    public SolrResponseDTO addDocuments(String collectionName, String payload) throws NullPointerException, SolrServerException, IOException {
         log.debug("create");
         return solrDocumentServicePort.addDocuments(collectionName, payload);
     }

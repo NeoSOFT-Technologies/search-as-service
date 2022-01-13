@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface SolarDocParseServicePort {
 
 	
-	String MultipartUploder(MultipartFile file);
+	String multipartUploder(MultipartFile file);
 	
 
 		

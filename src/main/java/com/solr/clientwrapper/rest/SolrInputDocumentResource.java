@@ -4,6 +4,10 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.usecase.solr.document.CreateSolrDocument;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import java.io.IOException;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,7 +27,7 @@ public class SolrInputDocumentResource {
 
     @PostMapping("/document/{collectionName}")
     @Operation(summary = "/add-document", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> document(@PathVariable String collectionName, @RequestBody String payload) {
+    public ResponseEntity<SolrResponseDTO> document(@PathVariable String collectionName, @RequestBody String payload) throws NullPointerException, SolrServerException, IOException {
 
         log.debug("Solr document create");
 
@@ -39,7 +43,7 @@ public class SolrInputDocumentResource {
 
     @PostMapping("/documents/{collectionName}")
     @Operation(summary = "/add-documents", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> documents(@PathVariable String collectionName, @RequestBody String payload) {
+    public ResponseEntity<SolrResponseDTO> documents(@PathVariable String collectionName, @RequestBody String payload) throws NullPointerException, SolrServerException, IOException {
 
         log.debug("Solr documents add");
 

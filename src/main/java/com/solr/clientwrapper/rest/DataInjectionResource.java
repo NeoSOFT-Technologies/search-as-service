@@ -1,5 +1,7 @@
 package com.solr.clientwrapper.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -8,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
@@ -19,7 +18,6 @@ import com.solr.clientwrapper.domain.service.DataInjectionService;
 import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
 import com.solr.clientwrapper.usecase.throttler.LimitRequestSizeThrottler;
 
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
@@ -29,7 +27,6 @@ public class DataInjectionResource {
     @Value("${base-solr-url}")
 	String baseSolrUrl;
     
-    private static final String DEFAULT_THROTTLE_SERVICE = "defaultRateLimitThrottler";
     private static final String SOLR_DATA_INJECTION_THROTTLE_SERVICE = "solrDataInjectionRateLimitThrottler";
 	
 	@Autowired
@@ -56,8 +53,8 @@ public class DataInjectionResource {
 
 	@RateLimiter(name = SOLR_DATA_INJECTION_THROTTLE_SERVICE, fallbackMethod = "dataInjectionRateLimiter")
 	@PostMapping(path = "/batch")
-	public ResponseEntity<?> parseBatch(@RequestBody String data) {
-		//logger.debug("json array injection : {}; Class: {}", data, data.getClass());
+	public ResponseEntity<Object> parseBatch(@RequestBody String data) {
+		logger.debug("json array injection : {}; Class: {}", data, data.getClass());
 		
 		// Apply MRS Limiter onto the incoming data
 		ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO = 
@@ -86,9 +83,7 @@ public class DataInjectionResource {
 
 	}
 
-    public ResponseEntity<ThrottlerRateLimitResponseDTO> dataInjectionRateLimiter(
-    		String data, 
-    		RequestNotPermitted exception) {
+    public ResponseEntity<ThrottlerRateLimitResponseDTO> dataInjectionRateLimiter() {
         logger.info("Max request limit is applied, no further calls are accepted");
         
         // prepare Rate Limiting Response DTO

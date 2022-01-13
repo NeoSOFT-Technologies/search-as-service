@@ -1,7 +1,7 @@
 package com.solr.clientwrapper.rest;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import java.time.LocalTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.solr.clientwrapper.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
 import com.solr.clientwrapper.usecase.throttler.LimitRateThrottler;
 import com.solr.clientwrapper.usecase.throttler.LimitRequestSizeThrottler;
 
-import java.time.LocalTime;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
 @RequestMapping("/throttle")
@@ -92,7 +92,7 @@ public class ThrottlerResource {
     
     ////////// Testing Max Request Size Limiter /////////////
     @GetMapping("/testMRS")
-    public ResponseEntity<?> demoMRSThrottler(@RequestParam String data) {
+    public ResponseEntity<ThrottlerMaxRequestSizeResponseDTO> demoMRSThrottler(@RequestParam String data) {
     	/*
     	 * MRS stands for- Max RequestBody Size
     	 */
@@ -109,8 +109,7 @@ public class ThrottlerResource {
         		.body("order service does not permit further calls");
     }
     
-    public ResponseEntity<ThrottlerRateLimitResponseDTO> solrCollectionsRateLimiter(
-    				RequestNotPermitted exception) {
+    public ResponseEntity<ThrottlerRateLimitResponseDTO> solrCollectionsRateLimiter() {
         logger.info("Max request rate limit is being applied");
 
         // prepare Rate Limiting Response DTO

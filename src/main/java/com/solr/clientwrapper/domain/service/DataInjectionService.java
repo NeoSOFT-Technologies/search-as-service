@@ -45,8 +45,8 @@ public class DataInjectionService  implements DataInjectionServicePort{
 
 		JSONArray batchObj = (JSONArray) jsonObject.get("batch");
 		JSONObject jsonObject2 = batchObj.getJSONObject(0);
-		Iterator keys = (Iterator) jsonObject2.keySet().iterator();
-		ArrayList al = new ArrayList();
+		Iterator<String> keys = jsonObject2.keySet().iterator();
+		ArrayList<String> al = new ArrayList<>();
 
 		while (keys.hasNext()) {
 			al.add(keys.next());
@@ -54,10 +54,10 @@ public class DataInjectionService  implements DataInjectionServicePort{
 		JSONArray jArray = new JSONArray();
 
 		for (int i = 0; i < al.size(); i++) {
-			String object = (String) al.get(i);
-			jArray.put((JSONArray) jsonObject2.getJSONArray(object));
+			String object = al.get(i);
+			jArray.put(jsonObject2.getJSONArray(object));
 		}
-		System.out.println("json Object :" + jArray.toString());
+		log.debug("json Object :" + jArray);
 		return jArray.toString();
 	}
 

@@ -39,7 +39,7 @@ public class KafkaConsumerConfig {
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 		log.debug("KafkaConsumerConfig");
-		return new DefaultKafkaConsumerFactory<>(config, null, new JsonDeserializer<String>(String.class));
+		return new DefaultKafkaConsumerFactory<>(config, null, new JsonDeserializer<>(String.class));
 
 	}
 

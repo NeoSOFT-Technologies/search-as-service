@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.solr.clientwrapper.domain.port.spi.SolrSchemaAPIPort;
-import com.solr.clientwrapper.domain.service.SolrSchemaService;
 
 @Service
 public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {
@@ -22,6 +21,7 @@ public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {
 		return new HttpSolrClient.Builder(urlString+tableName).build();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public SolrClient getSolrCloudClient(String urlString, String tableName) {
 		log.debug("Getting Solr Cloud Client for collection/table: {}", tableName);
@@ -30,6 +30,7 @@ public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {
 		return new CloudSolrClient.Builder().withSolrUrl(urlString).build();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public CloudSolrClient getCloudSolrClient(String urlString, String tableName) {
 		log.debug("Getting Cloud Solr Client for collection/table: {}", tableName);

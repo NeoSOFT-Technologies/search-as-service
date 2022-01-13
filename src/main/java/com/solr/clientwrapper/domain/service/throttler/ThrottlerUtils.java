@@ -10,4 +10,7 @@ public class ThrottlerUtils {
 		int numberOfChars = data.length();
 		return (double) (8 * (int)((double)((numberOfChars * 2) + 45) / 8))/1000;
 	}
+	
+	private ThrottlerUtils() {
+	}
 }

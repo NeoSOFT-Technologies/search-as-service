@@ -31,7 +31,7 @@ class SolrDocParserResourceTest  {
     
 	
 	@Test
-	public void whenFileUploaded_thenVerifyStatus() throws Exception {
+	void whenFileUploaded_thenVerifyStatus() throws Exception {
 		
 		String text = "Text to be uploaded.";
 		MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", text.getBytes());

@@ -43,7 +43,7 @@ class DataIngectionResourceTest {
 			+ "  }\r\n" + "]\r\n" + "  }\r\n" + "]\r\n" + "}";
 
 	@Test
-	public void parseSolrSchemaArray() throws JSONException {
+	void parseSolrSchemaArray() throws JSONException {
 		System.out.println("data" + data);
 		final String data1 = dataIngectionService.parseSolrSchemaArray("docparse", data);
 		System.out.println("data1" + data1);
@@ -52,7 +52,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaArrayfalse() throws JSONException {
+	void parseSolrSchemaArrayfalse() throws JSONException {
 		System.out.println("data2" + data);
 		final String data1 = dataIngectionService.parseSolrSchemaArray("docparse", data);
 		System.out.println("data3" + data1);
@@ -61,7 +61,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaBatch() throws JSONException {
+	void parseSolrSchemaBatch() throws JSONException {
 
 		System.out.println("data11" + data);
 		final String data11 = dataIngectionService.parseSolrSchemaBatch("docparse", batchdata);
@@ -71,7 +71,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaBatchfalse() throws JSONException {
+	void parseSolrSchemaBatchfalse() throws JSONException {
 		System.out.println("data2" + batchdata);
 		final String data1 = dataIngectionService.parseSolrSchemaBatch("docparse", batchdata);
 		System.out.println("data3" + data1);
