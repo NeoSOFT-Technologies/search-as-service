@@ -1,7 +1,6 @@
 package com.solr.clientwrapper.rest;
 
-import java.io.IOException;
-
+import com.solr.clientwrapper.domain.port.api.SolrFileUploadServicePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,24 +13,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.solr.clientwrapper.domain.service.SolrParseDocSerice;
+import java.io.IOException;
 
 @RestController
-@RequestMapping("/ingest")
-public class SolrDocParserResource {
+@RequestMapping("/api")
+public class FileUploadResource {
 	
 	
-	  private final Logger log = LoggerFactory.getLogger(SolrDocParserResource.class);
-	
-	
+	private final Logger log = LoggerFactory.getLogger(FileUploadResource.class);
+
 	@Autowired
-	SolrParseDocSerice solarParseDocSerice;
+	SolrFileUploadServicePort solrFileUploadServicePort;
 	
-	@RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/file-upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
 		log.debug("Multipart File Upload ");
-		solarParseDocSerice.MultipartUploder(file);
+		solrFileUploadServicePort.multipartUploader(file);
 		if (!file.isEmpty()) {
 			// File is EXISTS
 			return ResponseEntity.status(HttpStatus.OK).body("File Upload Successfully");

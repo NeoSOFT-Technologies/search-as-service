@@ -27,13 +27,13 @@ import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/throttle")
-public class ThrottlerResource {
+public class ThrottlerTestResource {
 	/*
 	 * This Controller is created for implementing & testing
 	 * throttler features:
 	 * 	1. Rate Limiting
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(ThrottlerResource.class);
+	private static final Logger logger = LoggerFactory.getLogger(ThrottlerTestResource.class);
     @Value("${base-solr-url}")
 	String baseSolrUrl;
     @Value("${base-app-url}")

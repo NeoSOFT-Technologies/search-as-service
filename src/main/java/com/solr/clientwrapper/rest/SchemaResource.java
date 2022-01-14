@@ -24,25 +24,25 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/schema")
-public class SolrSchemaResource {
+@RequestMapping("/api/schema")
+public class SchemaResource {
 
-	private final Logger log = LoggerFactory.getLogger(SolrSchemaResource.class);
+	private final Logger log = LoggerFactory.getLogger(SchemaResource.class);
 
 	private final CreateSolrSchema createSolrSchema;
 	private final DeleteSolrSchema deleteSolrSchema;
 	private final UpdateSolrSchema updateSolrSchema;
 	private final GetSolrSchema getSolarSchema;
 
-	public SolrSchemaResource(CreateSolrSchema createSolrSchema, DeleteSolrSchema deleteSolrSchema,
-			UpdateSolrSchema updateSolrSchema, GetSolrSchema getSolarSchema) {
+	public SchemaResource(CreateSolrSchema createSolrSchema, DeleteSolrSchema deleteSolrSchema,
+						  UpdateSolrSchema updateSolrSchema, GetSolrSchema getSolarSchema) {
 		this.createSolrSchema = createSolrSchema;
 		this.deleteSolrSchema = deleteSolrSchema;
 		this.updateSolrSchema = updateSolrSchema;
 		this.getSolarSchema = getSolarSchema;
 	}			
 
-	@PostMapping("/create")
+	@PostMapping
 	@Operation(summary = "/create-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> create(
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
@@ -59,13 +59,12 @@ public class SolrSchemaResource {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 	}
 
-	@DeleteMapping("/delete/{tableName}/{name}")
+	@DeleteMapping("/{tableName}")
 	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> delete(
-			@PathVariable String tableName, 
-			@PathVariable String name) {
+			@PathVariable String tableName) {
 		log.debug("Schema Delete");
-		SolrSchemaResponseDTO solrSchemaResponseDTO = deleteSolrSchema.delete(tableName, name);
+		SolrSchemaResponseDTO solrSchemaResponseDTO = deleteSolrSchema.delete(tableName);
 		if(solrSchemaResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(solrSchemaResponseDTO);
 		else
@@ -73,15 +72,14 @@ public class SolrSchemaResource {
 		
 	}
 
-	@PutMapping("/update/{tableName}/{name}")
+	@PutMapping("/{tableName}")
 	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> update(
-			@PathVariable String tableName, 
-			@PathVariable String name, 
+			@PathVariable String tableName,
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
-		SolrSchemaResponseDTO solrSchemaDTO = updateSolrSchema.update(tableName, name, newSolrSchemaDTO);
+		SolrSchemaResponseDTO solrSchemaDTO = updateSolrSchema.update(tableName, newSolrSchemaDTO);
 		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -89,13 +87,12 @@ public class SolrSchemaResource {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 	}
 
-	@GetMapping("/get/{tableName}/{name}")
+	@GetMapping("/{tableName}")
 	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> get(
-			@PathVariable String tableName, 
-			@PathVariable String name) {
+			@PathVariable String tableName) {
 		log.debug("get solar schema");
-		SolrSchemaResponseDTO solrResponseDTO = getSolarSchema.get(tableName, name);
+		SolrSchemaResponseDTO solrResponseDTO = getSolarSchema.get(tableName);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else

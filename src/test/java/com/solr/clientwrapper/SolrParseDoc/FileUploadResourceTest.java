@@ -12,17 +12,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import com.solr.clientwrapper.domain.service.SolrParseDocSerice;
+import com.solr.clientwrapper.domain.service.SolrFileUploadService;
 import com.solr.clientwrapper.IntegrationTest;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class SolrDocParserResourceTest  {
+class FileUploadResourceTest {
   
 
     
 	  @MockBean
-	SolrParseDocSerice SolrParseDocSerice;
+	  SolrFileUploadService SolrFileUploadService;
     
 
     @Autowired
@@ -35,7 +35,7 @@ class SolrDocParserResourceTest  {
 		
 		String text = "Text to be uploaded.";
 		MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", text.getBytes());
-		restAMockMvc.perform(MockMvcRequestBuilders.multipart("/ingest/upload").file(file).characterEncoding("UTF-8"))
+		restAMockMvc.perform(MockMvcRequestBuilders.multipart("/api/file-upload").file(file).characterEncoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 
 	}
