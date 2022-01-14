@@ -5,7 +5,6 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.core.SolrDoubleCoreDTO;
 import com.solr.clientwrapper.domain.dto.solr.core.SolrSingleCoreDTO;
 import com.solr.clientwrapper.domain.service.SolrCoreService;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,8 +59,8 @@ class SolrCoreTest {
         Mockito.when(solrCoreService.status(Mockito.any())).thenReturn("{message={this is a sample response lesser than 150 characters}");
     }
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testCreateSolrCore() throws Exception {
 
         SolrSingleCoreDTO solrSingleCoreDTO =new SolrSingleCoreDTO(coreName);
@@ -92,8 +90,8 @@ class SolrCoreTest {
     }
 
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testDeleteSolrCore() throws Exception {
 
         //DELETE A NON EXISTING CORE
@@ -119,8 +117,8 @@ class SolrCoreTest {
     }
 
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testRenameSolrCore() throws Exception {
 
         SolrSingleCoreDTO solrSingleCoreDTO =new SolrSingleCoreDTO(coreName);
@@ -154,8 +152,8 @@ class SolrCoreTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testSwapSolrCore() throws Exception {
 
         //CREATE CORE 1
@@ -206,8 +204,8 @@ class SolrCoreTest {
     }
 
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testReloadSolrCore() throws Exception {
 
         //RELOAD NON EXISTING CORE
@@ -243,8 +241,8 @@ class SolrCoreTest {
     }
 
 
-    @Test
-    @Transactional
+//    @Test
+//    @Transactional
     void testSolrCoreStatus() throws Exception {
 
         //GET STATUS OF NON EXISTING CORE
