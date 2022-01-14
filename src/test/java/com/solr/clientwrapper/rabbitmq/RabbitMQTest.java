@@ -30,7 +30,7 @@ public class RabbitMQTest {
 	RabbitMQSenderService rabbitMQSenderService;
 
 	@Autowired
-	RabbitMQReceiverService rabbitMQReciverService;
+	RabbitMQReceiverService rabbitMQReceiverService;
 
 	private final String payload = "String";
 
@@ -46,9 +46,9 @@ public class RabbitMQTest {
 	@Test
 	public void MessageRecive() {
 
-		rabbitMQReciverService.listener(payload);
-		Assertions.assertNotEquals("strings", rabbitMQReciverService.message());
-		Assertions.assertEquals("String", rabbitMQReciverService.message());
+		rabbitMQReceiverService.listener(payload);
+		Assertions.assertNotEquals("strings", rabbitMQReceiverService.message());
+		Assertions.assertEquals("String", rabbitMQReceiverService.message());
 	}
 
 	@Test
