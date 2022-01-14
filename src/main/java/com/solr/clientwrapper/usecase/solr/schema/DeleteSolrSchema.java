@@ -19,9 +19,9 @@ public class DeleteSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public SolrSchemaResponseDTO delete(String tableName, String name) {
+	public SolrSchemaResponseDTO delete(String tableName) {
 		log.debug("Calling delete schema field Port");
-		return solrSchemaServicePort.delete(tableName, name);
+		return solrSchemaServicePort.delete(tableName);
 	}
 
 }

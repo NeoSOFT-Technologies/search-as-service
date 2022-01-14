@@ -201,14 +201,6 @@ repositories {
 
 dependencies {
 
-// https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
-implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: '2.8.0'
-// https://mvnrepository.com/artifact/net.mguenther.kafka/kafka-junit
-implementation group: 'net.mguenther.kafka', name: 'kafka-junit', version: '2.8.0'
-
-// https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka-test
-testImplementation group: 'org.springframework.kafka', name: 'spring-kafka-test', version: '2.8.0'
-
 	implementation group: 'org.json', name: 'json', version: '20200518'   
 
      implementation "org.json:json:20171018"
@@ -305,6 +297,9 @@ testImplementation group: 'org.springframework.kafka', name: 'spring-kafka-test'
     implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.5.0'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.5.4'
+    // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
+    implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+
 
 }
 

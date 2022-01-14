@@ -1,5 +1,6 @@
 package com.solr.clientwrapper.rest;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/ingection")
+
+
 public class DataIngectionResource {
 
 	private final Logger log = LoggerFactory.getLogger(DataIngectionResource.class);

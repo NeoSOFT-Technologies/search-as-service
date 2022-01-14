@@ -20,9 +20,9 @@ public class GetSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 
-	public SolrSchemaResponseDTO get(String tableName, String name) {
+	public SolrSchemaResponseDTO get(String tableName) {
 		log.debug("get Schema");
-		return solrSchemaServicePort.get(tableName, name);
+		return solrSchemaServicePort.get(tableName);
 	}
 
 }

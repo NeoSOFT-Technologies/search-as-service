@@ -4,8 +4,8 @@ import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
-import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
 import com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
 import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -37,40 +37,27 @@ import java.util.Map;
 @SuppressWarnings({"deprecation", "unused"})
 public class SolrSchemaService implements SolrSchemaServicePort {
 
-	
 	private final Logger log = LoggerFactory.getLogger(SolrSchemaService.class);
 	
 	@Value("techproducts")
-	private static String test1;
-	private static String defaultcollection = "techproducts";
-	private static String defaultSolrCloudCollection = "gettingstarted1";
+	private static String TEST1;
+	private static String DEFAULT_COLLECTION = "techproducts";
+	private static String DEFAULT_SOLR_CLOUD_COLLECTION = "gettingstarted1";
 	@Value("solr.client.url.static")
-	private static String test2;
-	private static String urlString = "http://localhost:8985/solr/";
+	private static String TEST2;
+	private static String URL_STRING = "http://localhost:8985/solr/";
 	@Value("solr.client.url.cloud")
-	private static String test3;
-	private static String urlStringSolrCloud = "http://localhost:8983/solr/";
+	private static String TEST3;
+	private static String URL_STRING_SOLR_CLOUD = "http://localhost:8983/solr/";
 	
-	String responseHeader="Response header : {}";
-	
-	private String temp ="The collection- {} is Not Found in the Solr Cloud";
-	
-	private String responseclass="Response class : {}";
-	private String filtered="filtered";
-	private String multiValued="multiValued";
-	private String required="required";
-	private String sorted="sorted";
-	private String validated="validated";
-	private String stored = "stored";
-
 	// call for solr client
 	@Autowired
 	SolrSchemaAPIAdapter solrSchemaAPIAdapter = new SolrSchemaAPIAdapter();
-	
+
 	@Override
 	public String getSolrClient(String tableName) {
-		SolrClient solr = solrSchemaAPIAdapter.getSolrClient(urlString, tableName);
-		CloudSolrClient solrCloud = solrSchemaAPIAdapter.getCloudSolrClient(urlStringSolrCloud, tableName);
+		SolrClient solr = solrSchemaAPIAdapter.getSolrClient(URL_STRING, tableName);
+		CloudSolrClient solrCloud = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solrCloud.setDefaultCollection(tableName);
 		log.debug("@Solr client : {}", solr);
 		log.debug("@Solr cloud client : {}", solrCloud);
@@ -78,10 +65,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaResponseDTO get(String tableName, String name) {
-		log.debug("Get Solr Schema: {}", name);
+	public SolrSchemaResponseDTO get(String tableName) {
+//		log.debug("Get Solr Schema: {}", name);
 
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(urlStringSolrCloud, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -97,12 +84,12 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			
 			// explore response content
 			log.debug("\nSchema Response : {}", schemaResponse);
-			log.debug(responseHeader, schemaResponse.getResponseHeader());
-			log.debug(responseclass, schemaResponse.getResponseHeader().getClass());
+			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
+			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
 			
 			SchemaRepresentation schemaRepresentation = schemaResponse.getSchemaRepresentation();
 			schemaName = schemaRepresentation.getName();
-			name = schemaName;
+//			name = schemaName;
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
 			SolrFieldDTO[] solrSchemaFieldDTOs = new SolrFieldDTO[numOfFields];
@@ -138,7 +125,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			solrSchemaResponseDTO.setTableName(tableName);
 			solrSchemaResponseDTO.setAttributes(solrSchemaFieldDTOs);
 			solrSchemaResponseDTO.setStatusCode(200);
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException e) {
+			solrSchemaResponseDTO.setStatusCode(400);
+			log.debug(e.toString());
+		} catch (IOException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
 			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
@@ -155,14 +145,13 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 	
 	@Override
-	public SolrSchemaResponseDTO update(String tableName, 
-								String name, 
+	public SolrSchemaResponseDTO update(String tableName,
 								SolrSchemaDTO newSolrSchemaDTO) {
-		log.debug("Update Solr Schema: {}", name);
+//		log.debug("Update Solr Schema: {}", name);
 		log.debug("Target Schema: {}", newSolrSchemaDTO);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(urlStringSolrCloud, tableName);
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SolrSchemaResponseDTO solrSchemaResponseDTOBefore = new SolrSchemaResponseDTO();
@@ -176,10 +165,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
-			solrSchemaResponseDTOBefore = get(tableName, schemaName);
+			solrSchemaResponseDTOBefore = get(tableName);
 			// explore response content
-			log.debug(responseHeader, schemaResponse.getResponseHeader());
-			log.debug(responseclass, schemaResponse.getResponseHeader().getClass());
+			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
+			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
 			
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
@@ -190,8 +179,8 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			List<Map<String, Object>> targetSchemafields = parseSchemaFieldDtosToListOfMaps(newSolrSchemaDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
-			if(validationEntry.containsKey(validated)) {
-				Object validatedFields = validationEntry.get(validated);
+			if(validationEntry.containsKey("validated")) {
+				Object validatedFields = validationEntry.get("validated");
 				if(validatedFields.equals(false))
 					throw new SolrSchemaValidationException("Target Schema Fields validation falied!");
 			}
@@ -200,7 +189,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			
 			// Update Schema Logic
 			UpdateResponse updateFieldsResponse = new UpdateResponse();
-			NamedList<Object> schemaResponseUpdateFields = new NamedList<>();
+			NamedList<Object> schemaResponseUpdateFields = new NamedList<Object>();
 			payloadOperation = "SchemaRequest.ReplaceField";
 			int updatedFields = 0;
 			for(Map<String, Object> currField: targetSchemafields) {
@@ -221,7 +210,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			for(Object field: schemaResponseUpdateFields) {
 				log.debug("### Updated Field Response : {}", field);
 			}
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException e) {
+			solrSchemaResponseDTOAfter.setStatusCode(400);
+			log.debug(e.toString());
+		} catch (IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.debug(e.toString());
 		} catch (NullPointerException e) {
@@ -235,40 +227,46 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			log.error(temp, tableName);
+			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} catch (SolrSchemaValidationException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("Error Message: {}", e.getMessage());
 			log.debug(e.toString());
 		}
-		solrSchemaResponseDTOAfter = get(tableName, schemaName);
+		solrSchemaResponseDTOAfter = get(tableName);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after CREATE: {}", tableName, solrSchemaResponseDTOAfter);
 		return solrSchemaResponseDTOAfter;
 	}
 	
 	@Override
-	public SolrSchemaResponseDTO create(String tableName, String name, SolrSchemaDTO newSolrSchemaDTO) {
+	public SolrSchemaResponseDTO create(String tableName, 
+								String name, 
+								SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Create Solr Schema: {}", name);
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(urlStringSolrCloud, tableName);
+
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
+		
 		SolrSchemaResponseDTO solrSchemaResponseDTOBefore = new SolrSchemaResponseDTO();
 		SolrSchemaResponseDTO solrSchemaResponseDTOAfter = new SolrSchemaResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
+			// logic
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
 			solrSchemaResponseDTOBefore.setStatusCode(200);
+			
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-			solrSchemaResponseDTOBefore = get(tableName, "default-config");
+			solrSchemaResponseDTOBefore = get(tableName);
 			// explore response content
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
-			log.debug(responseclass, schemaResponse.getResponseHeader().getClass());
+			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
 			log.debug("\nDefault Schema fields : {}", schemaFields);
 			
 			// Add new fields present in the Target Schema to the given collection schema
@@ -303,10 +301,14 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 				Map<String, Object> newField = new HashMap<>();
 				newField.put("name", fieldDto.getName());
 				newField.put("type", SolrFieldType.fromEnumToString(fieldDto.getType()));
-				newField.put(required, fieldDto.isRequired());
-				newField.put(sorted, fieldDto.isStorable());
-				newField.put(multiValued, fieldDto.isMultiValue());
-				
+				newField.put("required", fieldDto.isRequired());
+				newField.put("stored", fieldDto.isStorable());
+				newField.put("multiValued", fieldDto.isMultiValue());
+				/*
+				 * newField.put("default", fieldDto.getDefault_()); 
+				 * newField.put("filtered", fieldDto.isFilterable()); 
+				 * newField.put("sorted", fieldDto.isSortable());
+				 */
 
 				SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 				addFieldResponse = addFieldRequest.process(solr);
@@ -330,15 +332,15 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} 
-		solrSchemaResponseDTOAfter = get(tableName, name);
+		solrSchemaResponseDTOAfter = get(tableName);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after CREATE: {}", tableName, solrSchemaResponseDTOAfter);
 		return solrSchemaResponseDTOAfter;
 	}
 
 	@Override
-	public SolrSchemaResponseDTO delete(String tableName, String name) {
-		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(urlStringSolrCloud, tableName);
+	public SolrSchemaResponseDTO delete(String tableName) {
+		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -355,12 +357,12 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
-			solrSchemaResponseDTOBefore = get(tableName, schemaName);
+			solrSchemaResponseDTOBefore = get(tableName);
 			// API purpose
 			log.debug("Delete fields of Schema - {} in the the collection - {}", schemaName, tableName);
 			// explore response content
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
-			log.debug(responseclass, schemaResponse.getResponseHeader().getClass());
+			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
 			log.debug("\nRetrieved Schema fields : {}", schemaFields);
 			
 			// ####### Delete Schema Fields logic #######
@@ -368,7 +370,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			 * Delete all the fields of current Schema in the given collection
 			 */
 			UpdateResponse deleteFieldResponse = new UpdateResponse();
-			NamedList<Object> schemaResponseDeleteFields = new NamedList<>();
+			NamedList<Object> schemaResponseDeleteFields = new NamedList<Object>();
 			payloadOperation = "SchemaRequest.DeleteField";
 			for (Map<String, Object> currField : schemaFields) {
 				errorCausingField = (String) currField.get("name");
@@ -404,7 +406,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} 
-		solrSchemaResponseDTOAfter = get(tableName, schemaName);
+		solrSchemaResponseDTOAfter = get(tableName);
 		// Compare Pre-and-Post DELETE Operation
 		log.debug("Schema for collection- {}, before DELETE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after DELETE: {}", tableName, solrSchemaResponseDTOAfter);
@@ -416,7 +418,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		log.debug("get schema field types.");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		SolrClient solr = new HttpSolrClient.Builder(urlString+solrSchemaDTO.getTableName()).build();
+		SolrClient solr = new HttpSolrClient.Builder(URL_STRING+solrSchemaDTO.getTableName()).build();
 		List<FieldTypeDefinition> schemaFieldTypes = null;
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
@@ -428,9 +430,11 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			for(int i=0; i<numOfFieldTypes; i++) {
 				log.debug("Field Types : {}", schemaFieldTypes.get(i).getAttributes());
 			}
-		} catch (SolrServerException | IOException e) {
+		} catch (SolrServerException e) {
 			log.debug(e.toString());
-		} 
+		} catch (IOException e) {
+			log.debug(e.toString());
+		}
 		return schemaFieldTypes;
 	}
 	
@@ -460,21 +464,21 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
-		if(!solrFieldDTO.isRequired() && solrFieldDTO.isRequired()) {
+		if(solrFieldDTO.isRequired() != true && solrFieldDTO.isRequired() != false) {
 			fieldAttributesValidated = false;
-			invalidAttribute = required;
-		} else if(!solrFieldDTO.isFilterable() && solrFieldDTO.isFilterable()) {
+			invalidAttribute = "required";
+		} else if(solrFieldDTO.isFilterable() != true && solrFieldDTO.isFilterable() != false) {
 			fieldAttributesValidated = false;
-			invalidAttribute = filtered;
-		} else if(!solrFieldDTO.isMultiValue() && solrFieldDTO.isMultiValue()) {
+			invalidAttribute = "filtered";
+		} else if(solrFieldDTO.isMultiValue() != true && solrFieldDTO.isMultiValue() != false) {
 			fieldAttributesValidated = false;
 			invalidAttribute = "multValued";
-		} else if(!solrFieldDTO.isStorable() && solrFieldDTO.isStorable()) {
+		} else if(solrFieldDTO.isStorable() != true && solrFieldDTO.isStorable() != false) {
 			fieldAttributesValidated = false;
-			invalidAttribute = stored;
-		} else if(!solrFieldDTO.isSortable() && solrFieldDTO.isSortable()) {
+			invalidAttribute = "stored";
+		} else if(solrFieldDTO.isSortable() != true && solrFieldDTO.isSortable() != false) {
 			fieldAttributesValidated = false;
-			invalidAttribute = sorted;
+			invalidAttribute = "sorted";
 		}
 		if(!fieldAttributesValidated)
 			log.debug("Invalid entry for field attribute: \"{}\"", invalidAttribute);
@@ -484,18 +488,18 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 
 	@Override
 	public void setFieldsAsPerTheSchema(SolrFieldDTO solrFieldDTO, Map<String, Object> schemaField) {
-		if(schemaField.containsKey(filtered))
-			solrFieldDTO.setFilterable((boolean)schemaField.get(filtered));
-		if(schemaField.containsKey(multiValued))
-			solrFieldDTO.setMultiValue((boolean)schemaField.get(multiValued));
+		if(schemaField.containsKey("filtered"))
+			solrFieldDTO.setFilterable((boolean)schemaField.get("filtered"));
+		if(schemaField.containsKey("multiValued"))
+			solrFieldDTO.setMultiValue((boolean)schemaField.get("multiValued"));;
 		if(schemaField.containsKey("default"))
-			solrFieldDTO.setDefault_((String)schemaField.get("default"));
-		if(schemaField.containsKey(required))
-			solrFieldDTO.setRequired((boolean)schemaField.get(required));
-		if(schemaField.containsKey(sorted))
-			solrFieldDTO.setSortable((boolean)schemaField.get(sorted));
-		if(schemaField.containsKey(stored))
-			solrFieldDTO.setStorable((boolean)schemaField.get(stored));
+			solrFieldDTO.setDefault_((String)schemaField.get("default"));;
+		if(schemaField.containsKey("required"))
+			solrFieldDTO.setRequired((boolean)schemaField.get("required"));;
+		if(schemaField.containsKey("sorted"))
+			solrFieldDTO.setSortable((boolean)schemaField.get("sorted"));;
+		if(schemaField.containsKey("stored"))
+			solrFieldDTO.setStorable((boolean)schemaField.get("stored"));;
 	}
 
 	@Override
@@ -513,19 +517,20 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
 		SolrFieldDTO[] schemaFields = solrSchemaDTO.getAttributes();
 		
-		Map<String, Object> fieldDtoMap = new HashMap<>();
+		Map<String, Object> fieldDtoMap = new HashMap<String, Object>();
 		for(SolrFieldDTO fieldDto: schemaFields) {
 			log.debug("Validate SolrFieldDTO before parsing it- {}", fieldDto);
 			if(!validateSchemaField(fieldDto)) {
 				fieldDtoMap = new HashMap<>();
-				fieldDtoMap.put(validated, false);
+				fieldDtoMap.put("validated", false);
 				return schemaFieldsList;
 			}
 			fieldDtoMap.put("name", fieldDto.getName());
 			fieldDtoMap.put("type", SolrFieldType.fromEnumToString(fieldDto.getType()));
-			fieldDtoMap.put(stored, fieldDto.isStorable());
-			fieldDtoMap.put(multiValued, fieldDto.isMultiValue());
-			fieldDtoMap.put(required, fieldDto.isRequired());
+			fieldDtoMap.put("stored", fieldDto.isStorable());
+			fieldDtoMap.put("multiValued", fieldDto.isMultiValue());
+			fieldDtoMap.put("required", fieldDto.isRequired());
+			/* fieldDtoMap.put("default", fieldDto.getDefault_()); */
 			schemaFieldsList.add(fieldDtoMap);
 		}
 		return schemaFieldsList;

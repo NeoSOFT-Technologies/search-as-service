@@ -1,6 +1,5 @@
 package com.solr.clientwrapper.rest;
 
-
 import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -9,6 +8,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCapacityPlanDTO;
@@ -36,5 +36,4 @@ public class TestingController {
         return null;
 
     }
-
 }
