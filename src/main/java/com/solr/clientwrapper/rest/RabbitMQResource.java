@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/RabbitMQ")
+@RequestMapping("/rabbit-mq")
 public class RabbitMQResource {
 
 	private final RabbitMQSenderService rabbitMQSenderService;
@@ -27,7 +27,7 @@ public class RabbitMQResource {
 
 	private final Logger log = LoggerFactory.getLogger(RabbitMQResource.class);
 
-	@PostMapping("/MQ/{RabbitMQ}")
+	@PostMapping("/mq/{rabbit-mq}")
 	@Operation(summary = "/Add-To-RabbitMQ", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<String> sendData(@RequestBody String payload) {
 

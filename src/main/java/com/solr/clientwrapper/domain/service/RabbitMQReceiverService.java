@@ -11,11 +11,11 @@ import com.solr.clientwrapper.config.RabbitMQConfiguration;
 import com.solr.clientwrapper.domain.port.api.RabbitMQRecieverServicePort;
 
 @Service
-public class RabbitMQReciverService implements RabbitMQRecieverServicePort {
+public class RabbitMQReceiverService implements RabbitMQRecieverServicePort {
 
 	private String message = null;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQReciverService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQReceiverService.class);
 
 	@Autowired
 	RabbitTemplate rabbitTemplate;

@@ -11,7 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import com.solr.clientwrapper.IntegrationTest;
 import com.solr.clientwrapper.config.RabbitMQConfiguration;
-import com.solr.clientwrapper.domain.service.RabbitMQReciverService;
+import com.solr.clientwrapper.domain.service.RabbitMQReceiverService;
 import com.solr.clientwrapper.domain.service.RabbitMQSenderService;
 
 @IntegrationTest
@@ -30,12 +30,12 @@ public class RabbitMQTest {
 	RabbitMQSenderService rabbitMQSenderService;
 
 	@Autowired
-	RabbitMQReciverService rabbitMQReciverService;
+	RabbitMQReceiverService rabbitMQReciverService;
 
 	private final String payload = "String";
 
 	@Test
-	public void testSendMassagess() {
+	public void testSendMessage() {
 
 		rabbitMQSenderService.Sender(payload);
 		Assertions.assertEquals("String", rabbitMQSenderService.message());
@@ -44,7 +44,7 @@ public class RabbitMQTest {
 	}
 
 	@Test
-	public void MassagessRecive() {
+	public void MessageRecive() {
 
 		rabbitMQReciverService.listener(payload);
 		Assertions.assertNotEquals("strings", rabbitMQReciverService.message());
