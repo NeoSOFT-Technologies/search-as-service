@@ -5,7 +5,6 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrCreateCollectionDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrDeleteCollectionDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
-import com.solr.clientwrapper.domain.dto.solr.collection.SolrRenameCollectionDTO;
 import com.solr.clientwrapper.domain.service.SolrCollectionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -52,7 +51,7 @@ class SolrCollectionTest {
 
         Mockito.when(solrCollectionService.create(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
-        Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        //Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(solrResponseDTOisCollectionExists);
 
@@ -73,7 +72,7 @@ class SolrCollectionTest {
 
         Mockito.when(solrCollectionService.create(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
-        Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        //Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         //Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(false);
     }
@@ -143,43 +142,43 @@ class SolrCollectionTest {
     }
 
 
-    @Test
-    @Transactional
-    void testRenameSolrCollection() throws Exception {
-
-        SolrCreateCollectionDTO solrCreateCollectionDTO=new SolrCreateCollectionDTO(tableName,"B");
-
-        //CREATE COLLECTION
-        setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrCreateCollectionDTO)))
-                .andExpect(status().isOk());
-
-        //RENAME THE COLLECTION
-        setMockitoSuccessResponseForService();
-        SolrRenameCollectionDTO solrRenameCollectionDTO=new SolrRenameCollectionDTO(tableName, tableName +"2");
-        restAMockMvc.perform(MockMvcRequestBuilders.put(solrCollectionEndpoint +"/rename")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrRenameCollectionDTO)))
-                .andExpect(status().isOk());
-
-        //TRY TO DELETE USING THE OLD COLLECTION NAME
-        setMockitoBadResponseForService();
-        SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO(tableName);
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
-                .andExpect(status().isBadRequest());
-
-        //TRY TO DELETE USING THE NEW COLLECTION NAME
-        setMockitoSuccessResponseForService();
-        solrDeleteCollectionDTO =new SolrDeleteCollectionDTO(tableName +"2");
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    @Transactional
+//    void testRenameSolrCollection() throws Exception {
+//
+//        SolrCreateCollectionDTO solrCreateCollectionDTO=new SolrCreateCollectionDTO(tableName,"B");
+//
+//        //CREATE COLLECTION
+//        setMockitoSuccessResponseForService();
+//        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(TestUtil.convertObjectToJsonBytes(solrCreateCollectionDTO)))
+//                .andExpect(status().isOk());
+//
+//        //RENAME THE COLLECTION
+//        setMockitoSuccessResponseForService();
+//        SolrRenameCollectionDTO solrRenameCollectionDTO=new SolrRenameCollectionDTO(tableName, tableName +"2");
+//        restAMockMvc.perform(MockMvcRequestBuilders.put(solrCollectionEndpoint +"/rename")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(TestUtil.convertObjectToJsonBytes(solrRenameCollectionDTO)))
+//                .andExpect(status().isOk());
+//
+//        //TRY TO DELETE USING THE OLD COLLECTION NAME
+//        setMockitoBadResponseForService();
+//        SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO(tableName);
+//        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
+//                .andExpect(status().isBadRequest());
+//
+//        //TRY TO DELETE USING THE NEW COLLECTION NAME
+//        setMockitoSuccessResponseForService();
+//        solrDeleteCollectionDTO =new SolrDeleteCollectionDTO(tableName +"2");
+//        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
+//                .andExpect(status().isOk());
+//    }
 
 
     @Test

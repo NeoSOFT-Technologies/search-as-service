@@ -105,26 +105,27 @@ public class SolrCollectionService implements SolrCollectionServicePort {
         return solrResponseDTO;
     }
 
-    @Override
-    public SolrResponseDTO rename(String collectionName, String collectionNewName) {
-        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
-
-        CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(collectionName,collectionNewName);
-
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
-
-        try {
-            CollectionAdminResponse response = request.process(solrClient);
-            solrResponseDTO.setStatusCode(200);
-            solrResponseDTO.setMessage("Successfully renamed Solr Collection: "+collectionName+" to "+collectionNewName);
-        } catch (Exception e) {
-            log.error(e.toString());
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to rename Solr Collection: "+collectionName+". Exception.");
-        }
-
-        return solrResponseDTO;
-    }
+//    @Override
+//    public SolrResponseDTO rename(String collectionName, String collectionNewName) {
+//        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
+//
+//        CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(collectionName,collectionNewName);
+//        request.setFollowAliases(true);
+//
+//        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+//
+//        try {
+//            CollectionAdminResponse response = request.process(solrClient);
+//            solrResponseDTO.setStatusCode(200);
+//            solrResponseDTO.setMessage("Successfully renamed Solr Collection: "+collectionName+" to "+collectionNewName);
+//        } catch (Exception e) {
+//            log.error(e.toString());
+//            solrResponseDTO.setStatusCode(400);
+//            solrResponseDTO.setMessage("Unable to rename Solr Collection: "+collectionName+". Exception.");
+//        }
+//
+//        return solrResponseDTO;
+//    }
 
 
     @Override
