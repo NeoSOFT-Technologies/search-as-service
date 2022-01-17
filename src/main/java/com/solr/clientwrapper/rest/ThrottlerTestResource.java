@@ -1,6 +1,8 @@
 package com.solr.clientwrapper.rest;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,7 @@ public class ThrottlerTestResource {
 
     @GetMapping("/health")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
+    @Operation(summary = "/ Health rate limiter.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<String> checkHealth() {
         String response = restTemplate.getForObject(baseAppUrl+"/management/actuator/health", String.class);
         logger.info("{} Health Call processing finished = {}", LocalTime.now(), Thread.currentThread().getName());
@@ -64,6 +67,7 @@ public class ThrottlerTestResource {
 
     @GetMapping("/test")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
+    @Operation(summary = "/ Applying rate limiter sample web app.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<String> demoRateLimiterThrottler() {    	
     	String response = null;
     	try {
@@ -81,6 +85,7 @@ public class ThrottlerTestResource {
     
     @GetMapping("/collections")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "solrCollectionsRateLimiter")
+    @Operation(summary = "/Applying rate limiter on Tables.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<String> throttleCollectionResource() {
         String response = restTemplate.getForObject(
         		baseAppUrl+"/searchservice/table/collections", String.class);
@@ -92,6 +97,7 @@ public class ThrottlerTestResource {
     
     ////////// Testing Max Request Size Limiter /////////////
     @GetMapping("/testMRS")
+    @Operation(summary = "/ Applying max request size throttling  on data injection.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> demoMRSThrottler(@RequestParam String data) {
     	/*
     	 * MRS stands for- Max RequestBody Size
