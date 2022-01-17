@@ -35,7 +35,7 @@ public class TableResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "/Gets all  the capacity plans.")
+    @Operation(summary = "/Get all  the capacity plans.")
     public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() {
 
         log.debug("Get capacity plans");
@@ -95,7 +95,7 @@ public class TableResource {
     }
 
     @GetMapping
-    @Operation(summary = "/ Gets all the tables and it will return statusCode, message and all the collections.", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ Get all the tables and it will return statusCode, message and all the collections.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrGetCollectionsResponseDTO> collections() {
 
         log.debug("Get all collections");
