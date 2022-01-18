@@ -7,7 +7,6 @@ import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
 import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrAPIAdapter;
 import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
