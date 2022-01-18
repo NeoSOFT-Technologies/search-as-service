@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class SolrSchemaResponseDTO {
-
+	//random
 	private String tableName;
 	private String name;
 	private SolrFieldDTO[] attributes;
