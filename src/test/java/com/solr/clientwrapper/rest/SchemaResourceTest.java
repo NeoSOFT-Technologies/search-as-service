@@ -132,7 +132,7 @@ class SchemaResourceTest {
 
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "/create")
+		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 
