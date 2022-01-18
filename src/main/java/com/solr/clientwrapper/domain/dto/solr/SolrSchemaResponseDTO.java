@@ -25,5 +25,6 @@ public class SolrSchemaResponseDTO {
 		this.name = name;
 		this.attributes = attributes;
 	}
-	
+
+
 }
