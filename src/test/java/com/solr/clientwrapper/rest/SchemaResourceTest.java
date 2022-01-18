@@ -1,12 +1,9 @@
 package com.solr.clientwrapper.rest;
 
-import com.solr.clientwrapper.IntegrationTest;
-import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
-import com.solr.clientwrapper.domain.service.SolrSchemaService;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
-import com.solr.clientwrapper.solrwrapper.TestUtil;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.solr.clientwrapper.IntegrationTest;
+import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
+import com.solr.clientwrapper.domain.service.SolrSchemaService;
+import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -72,7 +73,7 @@ class SchemaResourceTest {
 	public void setMockitoSucccessResponseForService() {
 		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(tableName, name, attributes);
 		solrResponseDTO.setStatusCode(200);
-		Mockito.when(solrSchemaService.create(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
+		Mockito.when(solrSchemaService.create(Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.delete(Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.update(Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.get(Mockito.any())).thenReturn(solrResponseDTO);
@@ -81,7 +82,7 @@ class SchemaResourceTest {
 	public void setMockitoBadResponseForService() {
 		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(tableName, name, attributes);
 		solrResponseDTO.setStatusCode(400);
-		Mockito.when(solrSchemaService.create(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
+		Mockito.when(solrSchemaService.create(Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.delete(Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.update(Mockito.any(), Mockito.any())).thenReturn(solrResponseDTO);
 		Mockito.when(solrSchemaService.get(Mockito.any())).thenReturn(solrResponseDTO);
@@ -95,7 +96,7 @@ class SchemaResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint )
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 
@@ -104,7 +105,7 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint )
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		//.andExpect(content().json(expectedCreateResponse400))
 		.andExpect(status().isBadRequest());
@@ -131,7 +132,7 @@ class SchemaResourceTest {
 
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint)
+		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 
@@ -149,7 +150,7 @@ class SchemaResourceTest {
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint )
+		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 
@@ -189,7 +190,7 @@ class SchemaResourceTest {
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint)
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 
@@ -204,7 +205,7 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.delete(solrendpoint + "/" + tableName )
+				.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 	}
