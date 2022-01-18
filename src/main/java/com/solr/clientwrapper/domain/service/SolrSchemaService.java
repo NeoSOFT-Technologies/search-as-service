@@ -422,13 +422,13 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		if(schemaField.containsKey(MULTIVALUED))
 			solrFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
 		if(schemaField.containsKey(DEFAULT))
-			solrFieldDTO.setDefault_((String)schemaField.get(DEFAULT));;
+			solrFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
 		if(schemaField.containsKey(REQUIRED))
 			solrFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
 		if(schemaField.containsKey(SORTED))
-			solrFieldDTO.setSortable((boolean)schemaField.get(SORTED));;
+			solrFieldDTO.setSortable((boolean)schemaField.get(SORTED));
 		if(schemaField.containsKey(STORED))
-			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));;
+			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
 	}
 
 	@Override
