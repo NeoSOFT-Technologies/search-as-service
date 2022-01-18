@@ -51,7 +51,6 @@ public class SchemaResource {
 		SolrSchemaResponseDTO solrResponseDTO = 
 				createSolrSchema.create(
 						newSolrSchemaDTO.getTableName(), 
-						newSolrSchemaDTO.getName(), 
 						newSolrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);

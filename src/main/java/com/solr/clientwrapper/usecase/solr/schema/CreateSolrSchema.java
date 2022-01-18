@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
@@ -22,8 +21,8 @@ public class CreateSolrSchema {
 		this.solrSchemaServicePort = solrSchemaServicePort;
 	}
 	
-	public SolrSchemaResponseDTO create(String tableName,String name, SolrSchemaDTO newSolrSchemaDTO) {
+	public SolrSchemaResponseDTO create(String tableName, SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("create Schema");
-		return solrSchemaServicePort.create(tableName, name, newSolrSchemaDTO);
+		return solrSchemaServicePort.create(tableName, newSolrSchemaDTO);
 	}
 }
