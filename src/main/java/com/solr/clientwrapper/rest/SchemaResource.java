@@ -43,7 +43,7 @@ public class SchemaResource {
 	}			
 
 	@PostMapping
-	@Operation(summary = "/create-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "/ Associate  a new schema by passing tableName, name and attributes it will return created  schema.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> create(
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr Schema Create");
@@ -60,7 +60,7 @@ public class SchemaResource {
 	}
 
 	@DeleteMapping("/{tableName}")
-	@Operation(summary = "/delete-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "/ Remove the schema by passing TableName and it will return deleted schema and statusCode. ", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> delete(
 			@PathVariable String tableName) {
 		log.debug("Schema Delete");
@@ -73,7 +73,7 @@ public class SchemaResource {
 	}
 
 	@PutMapping("/{tableName}")
-	@Operation(summary = "/update-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "/ Update schema by passing TableName.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> update(
 			@PathVariable String tableName,
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
@@ -88,7 +88,7 @@ public class SchemaResource {
 	}
 
 	@GetMapping("/{tableName}")
-	@Operation(summary = "/get-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "/ Get schema by passing TableName.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<SolrSchemaResponseDTO> get(
 			@PathVariable String tableName) {
 		log.debug("get solar schema");

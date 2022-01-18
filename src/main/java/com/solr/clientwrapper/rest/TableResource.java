@@ -35,7 +35,7 @@ public class TableResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "/capacity-plans")
+    @Operation(summary = "/Get all  the capacity plans.")
     public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() {
 
         log.debug("Get capacity plans");
@@ -47,7 +47,7 @@ public class TableResource {
     }
 
     @PostMapping
-    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ Associate the Table by passing collectionName and capacity plan and return message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrCreateCollectionDTO solrCreateCollectionDTO) {
 
         log.debug("Solr Collection create");
@@ -63,7 +63,7 @@ public class TableResource {
     }
 
     @DeleteMapping("/{tableName}")
-    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ Remove the table by passing tablename and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> delete(@PathVariable String tableName) {
 
         log.debug("Solr Collection delete");
@@ -77,6 +77,7 @@ public class TableResource {
         }
 
     }
+
 
 //    @PutMapping("/rename")
 //    @Operation(summary = "/rename-table", security = @SecurityRequirement(name = "bearerAuth"))
@@ -94,8 +95,9 @@ public class TableResource {
 //
 //    }
 
+
     @GetMapping
-    @Operation(summary = "/all-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ Get all the tables and it will return statusCode, message and all the collections.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrGetCollectionsResponseDTO> collections() {
 
         log.debug("Get all collections");
@@ -111,7 +113,7 @@ public class TableResource {
     }
 
     @GetMapping("/isTableExists/{tableName}")
-    @Operation(summary = "", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ For check table is exists by passing collectionName and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> isCollectionExits(@PathVariable String tableName) {
 
         log.debug("isCollectionExits");
