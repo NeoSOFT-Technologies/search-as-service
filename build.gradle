@@ -201,6 +201,15 @@ repositories {
 
 dependencies {
 
+implementation "org.springframework.boot:spring-boot-starter-amqp"
+
+// https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit-test
+testImplementation group: 'org.springframework.amqp', name: 'spring-rabbit-test', version: '1.6.0.RELEASE'
+
+
+
+
+
 	implementation group: 'org.json', name: 'json', version: '20200518'   
 
      implementation "org.json:json:20171018"
