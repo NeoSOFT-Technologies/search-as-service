@@ -142,8 +142,7 @@ liquibase {
             driver "com.mysql.cj.jdbc.Driver"
             url "jdbc:mysql://localhost:3306/basicSample"
             username "root"
-            password "Ravikiran@123"
-
+            password "admin"
 
             changeLogFile "src/main/resources/config/liquibase/master.xml"
             defaultSchemaName "basicSample"
@@ -154,7 +153,9 @@ liquibase {
             driver "com.mysql.cj.jdbc.Driver"
             url "jdbc:mysql://localhost:3306/basicSample"
             username "root"
-            password "Ravikiran@123"
+
+            password "admin"
+
 
             changeLogFile project.ext.diffChangelogFile
             referenceUrl "hibernate:spring:com.solr.clientwrapper.domain?dialect=org.hibernate.dialect.MySQL8Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
@@ -225,12 +226,12 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "javax.cache:cache-api"
     implementation "org.hibernate:hibernate-core"
     implementation "com.zaxxer:HikariCP"
     implementation "org.apache.commons:commons-lang3"
     implementation "javax.transaction:javax.transaction-api"
-    implementation "org.ehcache:ehcache"
+    implementation group: 'javax.cache', name: 'cache-api', version: '1.1.1'
+    implementation group: 'org.ehcache', name: 'ehcache', version: '3.8.1'
     implementation "org.hibernate:hibernate-jcache"
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate.validator:hibernate-validator"

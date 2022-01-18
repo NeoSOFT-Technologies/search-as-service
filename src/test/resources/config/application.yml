@@ -41,7 +41,7 @@ spring:
     properties:
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
-      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
       hibernate.hbm2ddl.auto: validate
@@ -116,6 +116,9 @@ user-registration:
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr
 
+base-solr-url-8984: http://localhost:8984/solr
+
+
 # Throttler configurations
 base-app-url: http://localhost:8080
 throttler-test-app-url: http://localhost:8081
@@ -142,3 +145,4 @@ throttle-service:
   solr:
     data-injection: solrDataInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
+

@@ -76,9 +76,15 @@ spring:
     name: basicSample
     data:
     solr:
+
+      host: http://localhost:8984/solr/
+      repositories:
+      enabled: false
+
       host: http://localhost:8983/solr/
       repositories:
         enabled: false
+
   profiles:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by gradle when building the JAR file
@@ -106,12 +112,18 @@ spring:
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
+      
+      
       # modify batch size as necessary
       hibernate.jdbc.batch_size: 25
       hibernate.order_inserts: true
       hibernate.order_updates: true
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
+      
+      
+ 
+      
     hibernate:
       ddl-auto: none
       naming:
@@ -144,7 +156,6 @@ server:
       cookie:
         http-only: true
         
- 
 
 # Properties to be exposed on the /info management endpoint
 info:
@@ -198,6 +209,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
+
 # application:
 # There is an application.yml in test module also
 #
@@ -207,6 +219,7 @@ user-registration:
 
 #Solr Configurations
 base-solr-url: http://localhost:8983/solr
+base-solr-url-8984: http://localhost:8984/solr
 
 capacity-plan:
   plans:

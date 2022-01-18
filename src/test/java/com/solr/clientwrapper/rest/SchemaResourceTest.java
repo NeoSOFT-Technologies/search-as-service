@@ -1,12 +1,10 @@
 package com.solr.clientwrapper.rest;
 
-import com.solr.clientwrapper.IntegrationTest;
-import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
-import com.solr.clientwrapper.domain.service.SolrSchemaService;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
-import com.solr.clientwrapper.solrwrapper.TestUtil;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.solr.clientwrapper.IntegrationTest;
+import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
+import com.solr.clientwrapper.domain.service.SolrSchemaService;
+import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -48,7 +53,7 @@ class SchemaResourceTest {
 		      +"\"statusCode\": 200\n"
 		      +"}";
 	String expectedCreateResponse400 = "{\n"
-			  +"\"tableName\": \"gettingstarted1\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
