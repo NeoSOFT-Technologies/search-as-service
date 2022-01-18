@@ -1,6 +1,10 @@
 package com.solr.clientwrapper.rest;
 
 import com.solr.clientwrapper.domain.port.api.SolrFileUploadServicePort;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,7 @@ public class FileUploadResource {
 	SolrFileUploadServicePort solrFileUploadServicePort;
 	
 	@RequestMapping(value = "/file-upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "/ For file upload we have to select a file from drive and it will return a string.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
 		log.debug("Multipart File Upload ");

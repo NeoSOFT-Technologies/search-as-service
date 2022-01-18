@@ -26,7 +26,7 @@ public class InputDocumentResource {
     }
 
     @PostMapping("/documents/{tableName}")
-    @Operation(summary = "/add-documents", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> documents(@PathVariable String tableName, @RequestBody String payload, @RequestParam boolean isNRT) {
 
         log.debug("Solr documents add");
