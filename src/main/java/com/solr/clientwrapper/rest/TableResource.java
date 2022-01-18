@@ -20,16 +20,16 @@ public class TableResource {
     private final GetCapacityPlans getCapacityPlans;
     private final CreateSolrCollection createSolrCollection;
     private final DeleteSolrCollection deleteSolrCollection;
-    private final RenameSolrCollection renameSolrCollection;
+    //private final RenameSolrCollection renameSolrCollection;
     private final GetSolrCollections getSolrCollections;
     private final GetIsCollectionExists getIsCollectionExists;
 
 
-    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, RenameSolrCollection renameSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists) {
+    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists) {
         this.createSolrCollection = createSolrCollection;
         this.getCapacityPlans = getCapacityPlans;
         this.deleteSolrCollection = deleteSolrCollection;
-        this.renameSolrCollection = renameSolrCollection;
+        //this.renameSolrCollection = renameSolrCollection;
         this.getSolrCollections = getSolrCollections;
         this.getIsCollectionExists = getIsCollectionExists;
     }
@@ -78,21 +78,23 @@ public class TableResource {
 
     }
 
-    @PutMapping("/rename")
-    @Operation(summary = "/ Rename a table by passing collectionName and collectionNewName and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) {
 
-        log.debug("Solr Collection rename");
+//    @PutMapping("/rename")
+//    @Operation(summary = "/rename-table", security = @SecurityRequirement(name = "bearerAuth"))
+//    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) {
+//
+//        log.debug("Solr Collection rename");
+//
+//        SolrResponseDTO solrResponseDTO=renameSolrCollection.rename(solrRenameCollectionDTO.getCollectionName(),solrRenameCollectionDTO.getCollectionNewName());
+//
+//        if(solrResponseDTO.getStatusCode()==200){
+//            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+//        }else{
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+//        }
+//
+//    }
 
-        SolrResponseDTO solrResponseDTO=renameSolrCollection.rename(solrRenameCollectionDTO.getCollectionName(),solrRenameCollectionDTO.getCollectionNewName());
-
-        if(solrResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
-        }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
-        }
-
-    }
 
     @GetMapping
     @Operation(summary = "/ Get all the tables and it will return statusCode, message and all the collections.", security = @SecurityRequirement(name = "bearerAuth"))

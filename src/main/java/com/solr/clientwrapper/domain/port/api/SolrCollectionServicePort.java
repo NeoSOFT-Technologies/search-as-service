@@ -10,7 +10,7 @@ public interface SolrCollectionServicePort {
 
     SolrResponseDTO delete(String collectionName);
 
-    SolrResponseDTO rename(String collectionName, String collectionNewName);
+    //SolrResponseDTO rename(String collectionName, String collectionNewName);
 
     SolrGetCollectionsResponseDTO getCollections();
 
