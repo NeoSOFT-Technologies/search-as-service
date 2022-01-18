@@ -54,7 +54,7 @@ class SolrCollectionTest {
 
         Mockito.when(solrCollectionService.create(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
-        Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        //Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(solrResponseDTOisCollectionExists);
 
@@ -75,7 +75,7 @@ class SolrCollectionTest {
 
         Mockito.when(solrCollectionService.create(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
-        Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
+        //Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         //Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(false);
     }
