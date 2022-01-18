@@ -49,17 +49,9 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String FILTERED = "filtered";
 	
-	// call for solr client
+	// Add bean for solr client API adapter
 	@Autowired
-	SolrAPIAdapter solrAPIAdapter = new SolrAPIAdapter();
-
-	@Override
-	public String getSolrClient(String tableName) {
-		SolrClient solr = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
-
-		log.debug("@Solr client : {}", solr);
-		return "Solr Clients are successfully retrieved.";
-	}
+	SolrAPIAdapter solrAPIAdapter;
 
 	@Override
 	public SolrSchemaResponseDTO get(String tableName) {

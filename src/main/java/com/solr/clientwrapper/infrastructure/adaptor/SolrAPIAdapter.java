@@ -9,9 +9,7 @@ import com.solr.clientwrapper.domain.port.spi.SolrAPIPort;
 
 @Service
 public class SolrAPIAdapter implements SolrAPIPort {
-
 	private final Logger log = LoggerFactory.getLogger(SolrAPIAdapter.class);
-
 
 	@Override
 	public HttpSolrClient getSolrClient(String urlString) {

@@ -25,7 +25,6 @@ public interface SolrSchemaServicePort {
 	List<FieldTypeDefinition> getSchemaFieldTypes(SolrSchemaDTO solrSchemaDTO);
 	boolean validateSchemaField(SolrFieldDTO solrFieldDTO);
 	boolean validateSchemaFieldBooleanAttributes(SolrFieldDTO solrFieldDTO);
-	String getSolrClient(String tableName);
 
 	/* 
 	 * Logical operations in service methods 
