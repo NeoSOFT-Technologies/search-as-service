@@ -28,7 +28,7 @@ import com.solr.clientwrapper.solrwrapper.TestUtil;
 @WithMockUser
 class SchemaResourceTest {
 
-	String solrendpoint = "/schema";
+	String solrendpoint = "/api/schema";
 	String tableName = "gettingstarted1";
 	String name = "default-config";
 	SolrFieldDTO solr = new SolrFieldDTO("testField6", SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
@@ -96,7 +96,7 @@ class SchemaResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/create")
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 
@@ -105,7 +105,7 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/create")
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		//.andExpect(content().json(expectedCreateResponse400))
 		.andExpect(status().isBadRequest());
@@ -115,7 +115,7 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+				.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 	}
@@ -126,7 +126,7 @@ class SchemaResourceTest {
 		// DELETE A NON EXISTING SCHEMA
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isBadRequest());
 
@@ -137,7 +137,7 @@ class SchemaResourceTest {
 				.andExpect(status().isOk());
 
 		// DELETE THE CREATED SCHEMA
-		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 
@@ -150,19 +150,19 @@ class SchemaResourceTest {
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "/create")
+		restAMockMvc.perform(MockMvcRequestBuilders.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 
 		// update Schema
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.put(solrendpoint + "/update/" + tableName + "/" + name)
+		restAMockMvc.perform(MockMvcRequestBuilders.put(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO))).andExpect(status().isOk());
 
 		// DELETE THE CREATED SCHEMA
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isOk());
 	}
@@ -173,7 +173,7 @@ class SchemaResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(solrendpoint + "/get/" + tableName + "/" + name)
+				.get(solrendpoint + "/" + tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		//.andExpect(content().json(expectedGetResponse))
 		.andExpect(status().isOk());
@@ -181,7 +181,7 @@ class SchemaResourceTest {
 		setMockitoBadResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(solrendpoint + "/get/" + tableName + "/" + name)
+				.get(solrendpoint + "/" + tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isBadRequest());
 
@@ -190,14 +190,14 @@ class SchemaResourceTest {
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/create")
+				.post(solrendpoint + "")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 
 		// GET CREATED SCHEMA
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(solrendpoint + "/get/" + tableName + "/" + name)
+				.get(solrendpoint + "/" + tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk());
 
@@ -205,7 +205,7 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+				.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		.andExpect(status().isOk());
 	}
