@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/searchservice/table")
-public class SolrCollectionResource {
+@RequestMapping("/api/table")
+public class TableResource {
 
-    private final Logger log = LoggerFactory.getLogger(SolrCollectionResource.class);
+    private final Logger log = LoggerFactory.getLogger(TableResource.class);
 
     private final GetCapacityPlans getCapacityPlans;
     private final CreateSolrCollection createSolrCollection;
@@ -25,7 +25,7 @@ public class SolrCollectionResource {
     private final GetIsCollectionExists getIsCollectionExists;
 
 
-    public SolrCollectionResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, RenameSolrCollection renameSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists) {
+    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, RenameSolrCollection renameSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists) {
         this.createSolrCollection = createSolrCollection;
         this.getCapacityPlans = getCapacityPlans;
         this.deleteSolrCollection = deleteSolrCollection;
@@ -35,7 +35,7 @@ public class SolrCollectionResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "/capacity-plans", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/capacity-plans")
     public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() {
 
         log.debug("Get capacity plans");
@@ -46,8 +46,8 @@ public class SolrCollectionResource {
 
     }
 
-    @PostMapping("/create")
-    @Operation(summary = "/create-collection", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping
+    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrCreateCollectionDTO solrCreateCollectionDTO) {
 
         log.debug("Solr Collection create");
@@ -62,13 +62,13 @@ public class SolrCollectionResource {
 
     }
 
-    @DeleteMapping("/delete")
-    @Operation(summary = "/delete-collection", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@RequestBody SolrDeleteCollectionDTO solrDeleteCollectionDTO) {
+    @DeleteMapping("/{tableName}")
+    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<SolrResponseDTO> delete(@PathVariable String tableName) {
 
         log.debug("Solr Collection delete");
 
-        SolrResponseDTO solrResponseDTO=deleteSolrCollection.delete(solrDeleteCollectionDTO.getCollectionName());
+        SolrResponseDTO solrResponseDTO=deleteSolrCollection.delete(tableName);
 
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -79,7 +79,7 @@ public class SolrCollectionResource {
     }
 
     @PutMapping("/rename")
-    @Operation(summary = "/rename-collection", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/rename-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) {
 
         log.debug("Solr Collection rename");
@@ -94,8 +94,8 @@ public class SolrCollectionResource {
 
     }
 
-    @GetMapping("/collections")
-    @Operation(summary = "/all-collections", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping
+    @Operation(summary = "/all-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<SolrGetCollectionsResponseDTO> collections() {
 
         log.debug("Get all collections");
@@ -110,18 +110,18 @@ public class SolrCollectionResource {
 
     }
 
-    @GetMapping("/isCollectionExists/{collectionName}")
-    @Operation(summary = "/isCollectionExists", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Boolean> isCollectionExits(@PathVariable String collectionName) {
+    @GetMapping("/isTableExists/{tableName}")
+    @Operation(summary = "", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<SolrResponseDTO> isCollectionExits(@PathVariable String tableName) {
 
         log.debug("isCollectionExits");
 
-        Boolean isCollectionExists=getIsCollectionExists.isCollectionExists(collectionName);
+        SolrResponseDTO solrResponseDTO=getIsCollectionExists.isCollectionExists(tableName);
 
-        if(Boolean.TRUE.equals(isCollectionExists)){
-            return ResponseEntity.status(HttpStatus.OK).body(isCollectionExists);
+        if(solrResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isCollectionExists);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
         }
 
     }

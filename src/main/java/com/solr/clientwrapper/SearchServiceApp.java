@@ -33,9 +33,9 @@ import tech.jhipster.config.JHipsterConstants;
 //@ComponentScan({"com.solr.clientwrapper.rest"})
 //@EntityScan("com.solr.clientwrapper.infrastructure.entity")
 @EnableSolrRepositories("com.solr.clientwrapper.infrastructure.repository")
-@EnableCaching
-public class BasicSampleApp {
-	
+
+public class SearchServiceApp {
+
 	// Creating ModelMapper Bean for DTO Mapping
 	//////////// ########### /////////////
 	@Bean
@@ -44,11 +44,11 @@ public class BasicSampleApp {
 	}
 	////////////########### /////////////
 
-    private static final Logger log = LoggerFactory.getLogger(BasicSampleApp.class);
+    private static final Logger log = LoggerFactory.getLogger(SearchServiceApp.class);
 
     private final Environment env;
 
-    public BasicSampleApp(Environment env) {
+    public SearchServiceApp(Environment env) {
         this.env = env;
     }
 
@@ -86,7 +86,7 @@ public class BasicSampleApp {
      * @param args the command line arguments.
      */
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(BasicSampleApp.class);
+        SpringApplication app = new SpringApplication(SearchServiceApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         

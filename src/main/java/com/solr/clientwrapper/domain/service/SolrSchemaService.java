@@ -1,11 +1,12 @@
 package com.solr.clientwrapper.domain.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
+import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
+import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
+import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -25,13 +26,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
-import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrSchemaServicePort;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
-import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
-import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -66,8 +65,8 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	}
 
 	@Override
-	public SolrSchemaResponseDTO get(String tableName, String name) {
-		log.debug("Get Solr Schema: {}", name);
+	public SolrSchemaResponseDTO get(String tableName) {
+//		log.debug("Get Solr Schema: {}", name);
 
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
@@ -90,7 +89,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			
 			SchemaRepresentation schemaRepresentation = schemaResponse.getSchemaRepresentation();
 			schemaName = schemaRepresentation.getName();
-			name = schemaName;
+//			name = schemaName;
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
 			SolrFieldDTO[] solrSchemaFieldDTOs = new SolrFieldDTO[numOfFields];
@@ -128,28 +127,27 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			solrSchemaResponseDTO.setStatusCode(200);
 		} catch (SolrServerException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. "
 					+ "Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTO.setStatusCode(400);
 			log.error("The collection - {} is Not Found in the Solr Cloud!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		return solrSchemaResponseDTO;
 	}
 	
 	@Override
-	public SolrSchemaResponseDTO update(String tableName, 
-								String name, 
+	public SolrSchemaResponseDTO update(String tableName,
 								SolrSchemaDTO newSolrSchemaDTO) {
-		log.debug("Update Solr Schema: {}", name);
+//		log.debug("Update Solr Schema: {}", name);
 		log.debug("Target Schema: {}", newSolrSchemaDTO);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -167,7 +165,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
-			solrSchemaResponseDTOBefore = get(tableName, schemaName);
+			solrSchemaResponseDTOBefore = get(tableName);
 			// explore response content
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
 			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
@@ -214,29 +212,29 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (NullPointerException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("Null value detected!", e);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. "
 					+ "Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrSchemaValidationException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("Error Message: {}", e.getMessage());
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
-		solrSchemaResponseDTOAfter = get(tableName, schemaName);
+		solrSchemaResponseDTOAfter = get(tableName);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after CREATE: {}", tableName, solrSchemaResponseDTOAfter);
 		return solrSchemaResponseDTOAfter;
@@ -265,7 +263,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-			solrSchemaResponseDTOBefore = get(tableName, "default-config");
+			solrSchemaResponseDTOBefore = get(tableName);
 			// explore response content
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
 			log.debug("Response class : {}", schemaResponse.getResponseHeader().getClass());
@@ -324,24 +322,24 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} 
-		solrSchemaResponseDTOAfter = get(tableName, name);
+		solrSchemaResponseDTOAfter = get(tableName);
 		log.debug("Schema for collection- {}, before CREATE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after CREATE: {}", tableName, solrSchemaResponseDTOAfter);
 		return solrSchemaResponseDTOAfter;
 	}
 
 	@Override
-	public SolrSchemaResponseDTO delete(String tableName, String name) {
+	public SolrSchemaResponseDTO delete(String tableName) {
 		CloudSolrClient solr = solrSchemaAPIAdapter.getCloudSolrClient(URL_STRING_SOLR_CLOUD, tableName);
 		solr.setDefaultCollection(tableName);
 		
@@ -359,7 +357,7 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
-			solrSchemaResponseDTOBefore = get(tableName, schemaName);
+			solrSchemaResponseDTOBefore = get(tableName);
 			// API purpose
 			log.debug("Delete fields of Schema - {} in the the collection - {}", schemaName, tableName);
 			// explore response content
@@ -398,17 +396,17 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (RemoteExecutionException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("There's been an error in executing {} operation via schema API. Perhaps the target field- {} isn't present.", payloadOperation, errorCausingField);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (SolrException e) {
 			solrSchemaResponseDTOAfter.setStatusCode(400);
 			log.error("The collection- {} is Not Found in the Solr Cloud. So schema fields can't be found/deleted!", tableName);
-			e.printStackTrace();
+			log.debug(e.toString());
 		} 
-		solrSchemaResponseDTOAfter = get(tableName, schemaName);
+		solrSchemaResponseDTOAfter = get(tableName);
 		// Compare Pre-and-Post DELETE Operation
 		log.debug("Schema for collection- {}, before DELETE: {}", tableName, solrSchemaResponseDTOBefore);
 		log.debug("Schema for collection- {}, after DELETE: {}", tableName, solrSchemaResponseDTOAfter);
@@ -433,9 +431,9 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 				log.debug("Field Types : {}", schemaFieldTypes.get(i).getAttributes());
 			}
 		} catch (SolrServerException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		return schemaFieldTypes;
 	}

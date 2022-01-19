@@ -1,9 +1,13 @@
 buildscript {
     repositories {
         gradlePluginPortal()
+        
+             maven {
+     	 url "https://plugins.gradle.org/m2/"
+    }
     }
     dependencies {
-    
+    classpath "com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.0-rc1"
     }
 }
 
@@ -15,7 +19,7 @@ plugins {
     id "jacoco"
     id "org.springframework.boot"
     id "com.google.cloud.tools.jib"
-    //id "com.gorylenko.gradle-git-properties"
+    id "com.gorylenko.gradle-git-properties"
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
@@ -35,6 +39,7 @@ apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 //jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 apply plugin: "eclipse"
+apply plugin: "com.gorylenko.gradle-git-properties"
 
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
     apply from: "gradle/profile_prod.gradle"
@@ -139,6 +144,7 @@ liquibase {
             username "root"
             password "root"
 
+
             changeLogFile "src/main/resources/config/liquibase/master.xml"
             defaultSchemaName "basicSample"
             logLevel "debug"
@@ -161,10 +167,10 @@ liquibase {
     runList = project.ext.runList
 }
 
-//gitProperties {
-//    failOnNoGitDirectory = false
-//    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
-//}
+gitProperties {
+    failOnNoGitDirectory = false
+    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
+}
 
 checkstyle {
     toolVersion "${checkstyleVersion}"
@@ -194,6 +200,13 @@ repositories {
 }
 
 dependencies {
+
+	implementation group: 'org.json', name: 'json', version: '20200518'   
+
+     implementation "org.json:json:20171018"
+
+     implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
     // import JHipster dependencies BOM
     if (!project.hasProperty("gae")) {
         implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
@@ -212,12 +225,12 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "javax.cache:cache-api"
     implementation "org.hibernate:hibernate-core"
     implementation "com.zaxxer:HikariCP"
     implementation "org.apache.commons:commons-lang3"
     implementation "javax.transaction:javax.transaction-api"
-    implementation group: 'javax.cache', name: 'cache-api', version: '1.1.1'
-    implementation group: 'org.ehcache', name: 'ehcache', version: '3.8.1'
+    implementation "org.ehcache:ehcache"
     implementation "org.hibernate:hibernate-jcache"
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate.validator:hibernate-validator"
@@ -277,8 +290,17 @@ dependencies {
 	 testCompileOnly 'org.projectlombok:lombok:1.18.22'
 	 testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-
     implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
+
+    ///// Rate Limitter dependency /////
+    // https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot2
+    implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.5.0'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.5.4'
+    // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
+    implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+
+
 }
 
 if (project.hasProperty("gae")) {

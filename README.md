@@ -1,4 +1,4 @@
-# SpringBoot Rest API Boilerplate
+# Search As A Service
 
 
 ## Development

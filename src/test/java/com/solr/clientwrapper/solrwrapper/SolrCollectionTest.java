@@ -25,9 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser
 class SolrCollectionTest {
 
-    String solrCollectionEndpoint ="/searchservice/table";
+    String solrCollectionEndpoint ="/api/table";
 
-    String collectionName ="automatedTestCollection";
+    String tableName ="automatedTestCollection";
 
 
     @Autowired
@@ -38,9 +38,13 @@ class SolrCollectionTest {
 
 
     public void setMockitoSuccessResponseForService() {
-        SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+        SolrResponseDTO solrResponseDTO = new SolrResponseDTO(tableName);
         solrResponseDTO.setStatusCode(200);
         solrResponseDTO.setMessage("Testing");
+
+        SolrResponseDTO solrResponseDTOisCollectionExists = new SolrResponseDTO(tableName);
+        solrResponseDTOisCollectionExists.setStatusCode(200);
+        solrResponseDTOisCollectionExists.setMessage("true");
 
         SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO=new SolrGetCollectionsResponseDTO();
         solrGetCollectionsResponseDTO.setStatusCode(200);
@@ -50,14 +54,18 @@ class SolrCollectionTest {
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
-        Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(true);
+        Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(solrResponseDTOisCollectionExists);
 
     }
 
     public void setMockitoBadResponseForService() {
-        SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+        SolrResponseDTO solrResponseDTO = new SolrResponseDTO(tableName);
         solrResponseDTO.setStatusCode(400);
         solrResponseDTO.setMessage("Testing");
+
+        SolrResponseDTO solrResponseDTOisCollectionExists = new SolrResponseDTO(tableName);
+        solrResponseDTOisCollectionExists.setStatusCode(400);
+        solrResponseDTOisCollectionExists.setMessage("Error!");
 
         SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO=new SolrGetCollectionsResponseDTO();
         solrGetCollectionsResponseDTO.setStatusCode(400);
@@ -67,18 +75,18 @@ class SolrCollectionTest {
         Mockito.when(solrCollectionService.delete(Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
-        Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(false);
+        //Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(false);
     }
 
     @Test
     @Transactional
     void testCreateSolrCollection() throws Exception {
 
-        SolrCreateCollectionDTO solrCreateCollectionDTO =new SolrCreateCollectionDTO(collectionName,"B");
+        SolrCreateCollectionDTO solrCreateCollectionDTO =new SolrCreateCollectionDTO(tableName,"B");
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint +"/create")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrCreateCollectionDTO)))
                 .andExpect(status().isOk());
@@ -86,17 +94,17 @@ class SolrCollectionTest {
 
         //CREATE COLLECTION WITH SAME NAME AND TEST
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint +"/create")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrCreateCollectionDTO)))
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
         SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO();
-        solrDeleteCollectionDTO.setCollectionName(collectionName);
+        solrDeleteCollectionDTO.setCollectionName(tableName);
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/delete")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isOk());
@@ -109,10 +117,10 @@ class SolrCollectionTest {
 
         //DELETE A NON EXISTING COLLECTION
         SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO();
-        solrDeleteCollectionDTO.setCollectionName(collectionName);
+        solrDeleteCollectionDTO.setCollectionName(tableName);
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/delete")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isBadRequest());
@@ -120,7 +128,7 @@ class SolrCollectionTest {
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint +"/create")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isOk());
@@ -128,7 +136,7 @@ class SolrCollectionTest {
 
         //DELETE THE CREATED COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/delete")
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isOk());
@@ -139,18 +147,18 @@ class SolrCollectionTest {
     @Transactional
     void testRenameSolrCollection() throws Exception {
 
-        SolrCreateCollectionDTO solrCreateCollectionDTO=new SolrCreateCollectionDTO(collectionName,"B");
+        SolrCreateCollectionDTO solrCreateCollectionDTO=new SolrCreateCollectionDTO(tableName,"B");
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint +"/create")
+        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrCreateCollectionDTO)))
                 .andExpect(status().isOk());
 
         //RENAME THE COLLECTION
         setMockitoSuccessResponseForService();
-        SolrRenameCollectionDTO solrRenameCollectionDTO=new SolrRenameCollectionDTO(collectionName,collectionName+"2");
+        SolrRenameCollectionDTO solrRenameCollectionDTO=new SolrRenameCollectionDTO(tableName, tableName +"2");
         restAMockMvc.perform(MockMvcRequestBuilders.put(solrCollectionEndpoint +"/rename")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrRenameCollectionDTO)))
@@ -158,16 +166,16 @@ class SolrCollectionTest {
 
         //TRY TO DELETE USING THE OLD COLLECTION NAME
         setMockitoBadResponseForService();
-        SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO(collectionName);
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/delete")
+        SolrDeleteCollectionDTO solrDeleteCollectionDTO=new SolrDeleteCollectionDTO(tableName);
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isBadRequest());
 
         //TRY TO DELETE USING THE NEW COLLECTION NAME
         setMockitoSuccessResponseForService();
-        solrDeleteCollectionDTO =new SolrDeleteCollectionDTO(collectionName +"2");
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/delete")
+        solrDeleteCollectionDTO =new SolrDeleteCollectionDTO(tableName +"2");
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(solrDeleteCollectionDTO)))
                 .andExpect(status().isOk());
@@ -179,12 +187,12 @@ class SolrCollectionTest {
     void testGetSolrCollections() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/collections")
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/collections")
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
@@ -196,14 +204,14 @@ class SolrCollectionTest {
     void testIsCollectionExists() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isCollectionExists/"+collectionName)
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isTableExists/"+ tableName)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isCollectionExists/"+collectionName)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+//        setMockitoBadResponseForService();
+//        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isCollectionExists/"+collectionName)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
 
     }
 
