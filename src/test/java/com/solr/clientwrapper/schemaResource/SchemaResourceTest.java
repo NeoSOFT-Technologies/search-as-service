@@ -1,4 +1,4 @@
-package com.solr.clientwrapper.rest;
+package com.solr.clientwrapper.schemaResource;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
