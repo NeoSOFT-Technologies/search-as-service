@@ -52,7 +52,7 @@ public class SolrInMemeoryCacheService implements SolrInMemoryCacheServicePort {
 //	private static String TEST3;
 //	private static String URL_STRING_SOLR_CLOUD = "http://localhost:8984/solr/";
 	
-	@Value("${base-solr-url-8984}")
+	@Value("${base-solr-url}")
 	String URL_STRING;
 	
 //	@Value("${base-solr-url-8984}")
