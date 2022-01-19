@@ -1,5 +1,7 @@
 package com.solr.clientwrapper.rest.vm;
 
+import java.util.Objects;
+
 import javax.validation.constraints.Size;
 
 import com.solr.clientwrapper.domain.dto.AdminUserDTO;
@@ -28,9 +30,25 @@ public class ManagedUserVM extends AdminUserDTO {
         this.password = password;
     }
 
-    // prettier-ignore
- //   @Override
-//    public String toString() {
-//        return "ManagedUserVM{" + super.toString() + "} ";
-//    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(password);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ManagedUserVM other = (ManagedUserVM) obj;
+		return Objects.equals(password, other.password);
+	}
+
+
 }

@@ -1,4 +1,4 @@
-package com.solr.clientwrapper.infrastructure.Enum;
+package com.solr.clientwrapper.infrastructure.solrenum;
 
 import org.apache.commons.lang3.StringUtils;
 

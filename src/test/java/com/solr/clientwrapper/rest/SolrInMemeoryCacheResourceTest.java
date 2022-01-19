@@ -20,7 +20,7 @@ import com.solr.clientwrapper.domain.dto.solr.SolrDocumentDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrDocumentResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.service.SolrInMemeoryCacheService;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType;
 import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest

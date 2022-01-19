@@ -14,13 +14,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.solr.clientwrapper.IntegrationTest;
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.service.SolrSchemaService;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest
@@ -32,7 +30,7 @@ class SchemaResourceTest {
 	String tableName = "gettingstarted1";
 
 	String name = "default-config";
-	SolrFieldDTO solr = new SolrFieldDTO("testField6", SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	SolrFieldDTO solr = new SolrFieldDTO("testField6", com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	SolrFieldDTO[] attributes = { solr };
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"

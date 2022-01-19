@@ -29,7 +29,7 @@ import com.solr.clientwrapper.domain.dto.solr.SolrDocumentDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrDocumentResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.port.api.SolrInMemoryCacheServicePort;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType;
 import com.solr.clientwrapper.infrastructure.adaptor.SolrSchemaAPIAdapter;
 import com.solr.clientwrapper.rest.errors.SolrSchemaValidationException;
 

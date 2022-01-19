@@ -17,11 +17,8 @@ public class CreateUser {
         this.userServicePort = userServicePort;
     }
 
-    // actions
+
     public User createUser(AdminUserDTO userDTO) {
-    	
-    	// testing
-//    	System.out.println("adminuserDto: "+userDTO);
     	
         return userServicePort.createUser(userDTO);
     }

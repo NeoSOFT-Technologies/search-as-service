@@ -62,19 +62,16 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
         CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName, selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
-
-
         request.setMaxShardsPerNode(selectedCapacityPlan.getShards()*selectedCapacityPlan.getReplicas());
 
+        String constantstring="Exception";
         try {
-            CollectionAdminResponse response = request.process(solrClient);
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully created Solr Collection: "+collectionName);
         } catch (Exception e) {
             log.error(e.toString());
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to create Solr Collection: "+collectionName+". Exception.");
+            solrResponseDTO.setMessage("Unable to create Solr Collection: "+collectionName+constantstring);
         }
 
         return solrResponseDTO;
@@ -84,16 +81,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
     public SolrResponseDTO delete(String collectionName) {
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
-
-        CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(collectionName);
-        CollectionAdminRequest.DeleteAlias deleteAliasRequest=CollectionAdminRequest.deleteAlias(collectionName);
-
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
-
         try {
-            CollectionAdminResponse response = request.process(solrClient);
-            CollectionAdminResponse deleteAliasResponse = deleteAliasRequest.process(solrClient);
-
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully deleted Solr Collection: "+collectionName);
         } catch (Exception e) {
@@ -109,12 +97,7 @@ public class SolrCollectionService implements SolrCollectionServicePort {
     public SolrResponseDTO rename(String collectionName, String collectionNewName) {
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
 
-        CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(collectionName,collectionNewName);
-
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
-
         try {
-            CollectionAdminResponse response = request.process(solrClient);
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully renamed Solr Collection: "+collectionName+" to "+collectionNewName);
         } catch (Exception e) {
