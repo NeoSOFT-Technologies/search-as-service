@@ -21,89 +21,77 @@ import java.util.List;
 @Transactional
 public class SolrCollectionService implements SolrCollectionServicePort {
 
-    private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
+	private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
 
-    //http://localhost:8983/solr
-    ///
-    @Value("${base-solr-url}")
-    private String baseSolrUrl;
+	// http://localhost:8983/solr
+	///
+	@Value("${base-solr-url}")
+	private String baseSolrUrl;
 
-    @Autowired
-    CapacityPlanProperties capacityPlanProperties;
+	@Autowired
+	CapacityPlanProperties capacityPlanProperties;
 
-    @Override
-    public SolrGetCapacityPlanDTO capacityPlans() {
-        List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
+	@Override
+	public SolrGetCapacityPlanDTO capacityPlans() {
+		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 
-        return new SolrGetCapacityPlanDTO(capacityPlans);
-    }
+		return new SolrGetCapacityPlanDTO(capacityPlans);
+	}
 
+	@Override
+	public SolrResponseDTO create(String collectionName, String sku) {
 
-    @Override
-    public SolrResponseDTO create(String collectionName, String sku) {
+		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
 
-        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
+		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
+		CapacityPlanProperties.Plan selectedCapacityPlan = null;
 
-        List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-        CapacityPlanProperties.Plan selectedCapacityPlan=null;
+		for (CapacityPlanProperties.Plan capacityPlan : capacityPlans) {
+			if (capacityPlan.getSku().equals(sku)) {
+				selectedCapacityPlan = capacityPlan;
+			}
+		}
 
-        for (CapacityPlanProperties.Plan capacityPlan : capacityPlans) {
-            if(capacityPlan.getSku().equals(sku)){
-                selectedCapacityPlan=capacityPlan;
-            }
-        }
+		if (selectedCapacityPlan == null) {
+			// INVALD SKU
+			solrResponseDTO.setStatusCode(400);
+			solrResponseDTO.setMessage("Invalid SKU: " + sku);
+			return solrResponseDTO;
+		}
 
-        if(selectedCapacityPlan==null){
-            //INVALD SKU
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Invalid SKU: "+sku);
-            return solrResponseDTO;
-        }
+		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName,
+				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 
-        CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName, selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
+		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+		String constantstring = "Exception";
+		try {
+			solrResponseDTO.setStatusCode(200);
+			solrResponseDTO.setMessage("Successfully created Solr Collection: " + collectionName);
+		} catch (Exception e) {
+			log.error(e.toString());
+			solrResponseDTO.setStatusCode(400);
+			solrResponseDTO.setMessage("Unable to create Solr Collection: " + collectionName + constantstring);
+		}
 
+		return solrResponseDTO;
+	}
 
-        request.setMaxShardsPerNode(selectedCapacityPlan.getShards()*selectedCapacityPlan.getReplicas());
+	@Override
+	public SolrResponseDTO delete(String collectionName) {
 
-        try {
-            CollectionAdminResponse response = request.process(solrClient);
-            solrResponseDTO.setStatusCode(200);
-            solrResponseDTO.setMessage("Successfully created Solr Collection: "+collectionName);
-        } catch (Exception e) {
-            log.error(e.toString());
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to create Solr Collection: "+collectionName+". Exception.");
-        }
+		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+		try {
+			solrResponseDTO.setStatusCode(200);
+			solrResponseDTO.setMessage("Successfully deleted Solr Collection: " + collectionName);
+		} catch (Exception e) {
+			log.error(e.toString());
+			solrResponseDTO.setStatusCode(400);
+			solrResponseDTO.setMessage("Unable to delete Solr Collection: " + collectionName + ". Exception.");
+		}
 
-        return solrResponseDTO;
-    }
-
-    @Override
-    public SolrResponseDTO delete(String collectionName) {
-
-        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
-
-        CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(collectionName);
-        CollectionAdminRequest.DeleteAlias deleteAliasRequest=CollectionAdminRequest.deleteAlias(collectionName);
-
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
-
-        try {
-            CollectionAdminResponse response = request.process(solrClient);
-            CollectionAdminResponse deleteAliasResponse = deleteAliasRequest.process(solrClient);
-
-            solrResponseDTO.setStatusCode(200);
-            solrResponseDTO.setMessage("Successfully deleted Solr Collection: "+collectionName);
-        } catch (Exception e) {
-            log.error(e.toString());
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to delete Solr Collection: "+collectionName+". Exception.");
-        }
-
-        return solrResponseDTO;
-    }
+		return solrResponseDTO;
+	}
 
 //    @Override
 //    public SolrResponseDTO rename(String collectionName, String collectionNewName) {
@@ -126,66 +114,64 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 //
 //        return solrResponseDTO;
 //    }
+	@Override
+	public SolrGetCollectionsResponseDTO getCollections() {
 
+		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
+		HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
 
-    @Override
-    public SolrGetCollectionsResponseDTO getCollections() {
+		SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO = new SolrGetCollectionsResponseDTO();
 
-        CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+		try {
+			CollectionAdminResponse response = request.process(solrClient);
 
-        SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO=new SolrGetCollectionsResponseDTO();
+			solrGetCollectionsResponseDTO.setCollections((List<String>) response.getResponse().get("collections"));
+			solrGetCollectionsResponseDTO.setStatusCode(200);
+			solrGetCollectionsResponseDTO.setMessage("Successfully retrieved all Solr Collections");
 
-        try {
-            CollectionAdminResponse response = request.process(solrClient);
+		} catch (Exception e) {
+			log.error(e.toString());
 
-            solrGetCollectionsResponseDTO.setCollections((List<String>) response.getResponse().get("collections"));
-            solrGetCollectionsResponseDTO.setStatusCode(200);
-            solrGetCollectionsResponseDTO.setMessage("Successfully retrieved all Solr Collections");
+			solrGetCollectionsResponseDTO.setCollections(null);
+			solrGetCollectionsResponseDTO.setStatusCode(400);
+			solrGetCollectionsResponseDTO.setMessage("Unable to retrieve all Solr Collections");
+		}
 
-        } catch (Exception e) {
-            log.error(e.toString());
+		return solrGetCollectionsResponseDTO;
 
-            solrGetCollectionsResponseDTO.setCollections(null);
-            solrGetCollectionsResponseDTO.setStatusCode(400);
-            solrGetCollectionsResponseDTO.setMessage("Unable to retrieve all Solr Collections");
-        }
+	}
 
-        return solrGetCollectionsResponseDTO;
+	@Override
+	public SolrResponseDTO isCollectionExists(String collectionName) {
 
-    }
+		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
 
-    @Override
-    public SolrResponseDTO isCollectionExists(String collectionName) {
+		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
+		HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
 
-        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
+		try {
+			CollectionAdminResponse response = request.process(solrClient);
 
-        CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+			List<String> allCollections = (List<String>) response.getResponse().get("collections");
 
-        try {
-            CollectionAdminResponse response = request.process(solrClient);
+			if (allCollections.contains(collectionName)) {
+				solrResponseDTO.setStatusCode(200);
+				solrResponseDTO.setMessage("true");
+			} else {
+				solrResponseDTO.setStatusCode(200);
+				solrResponseDTO.setMessage("false");
+			}
 
-            List<String> allCollections=(List<String>) response.getResponse().get("collections");
+		} catch (Exception e) {
+			log.error(e.toString());
 
-            if(allCollections.contains(collectionName)){
-                solrResponseDTO.setStatusCode(200);
-                solrResponseDTO.setMessage("true");
-            }else{
-                solrResponseDTO.setStatusCode(200);
-                solrResponseDTO.setMessage("false");
-            }
+			solrResponseDTO.setStatusCode(400);
+			solrResponseDTO.setMessage("Error!");
 
-        } catch (Exception e) {
-            log.error(e.toString());
+		}
 
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Error!");
+		return solrResponseDTO;
 
-        }
-
-        return solrResponseDTO;
-
-    }
+	}
 
 }

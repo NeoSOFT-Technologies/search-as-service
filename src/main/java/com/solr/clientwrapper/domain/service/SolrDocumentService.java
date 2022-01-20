@@ -1,9 +1,7 @@
 package com.solr.clientwrapper.domain.service;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrDocumentServicePort;
-import com.solr.clientwrapper.domain.utils.DocumentParserUtil;
-import com.solr.clientwrapper.domain.utils.UploadDocumentSolrUtil;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrDocumentServicePort;
+import com.solr.clientwrapper.domain.utils.DocumentParserUtil;
+import com.solr.clientwrapper.domain.utils.UploadDocumentSolrUtil;
 
 @Service
 @Transactional

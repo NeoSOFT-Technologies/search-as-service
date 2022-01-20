@@ -1,7 +1,7 @@
 package com.solr.clientwrapper.rest;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.usecase.solr.document.CreateSolrDocument;
+import com.solr.clientwrapper.usecase.solr.document.CreateSolrDocuments;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -19,9 +19,9 @@ public class InputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
 
-    CreateSolrDocument createSolrDocument;
+    CreateSolrDocuments createSolrDocument;
 
-    public InputDocumentResource(CreateSolrDocument createSolrDocument) {
+    public InputDocumentResource(CreateSolrDocuments createSolrDocument) {
         this.createSolrDocument=createSolrDocument;
     }
 

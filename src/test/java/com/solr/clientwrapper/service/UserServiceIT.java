@@ -1,16 +1,12 @@
 package com.solr.clientwrapper.service;
 
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-
-import com.solr.clientwrapper.IntegrationTest;
-import com.solr.clientwrapper.infrastructure.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,10 +15,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.solr.clientwrapper.IntegrationTest;
 import com.solr.clientwrapper.domain.service.UserService;
 import com.solr.clientwrapper.infrastructure.entity.User;
-
+import com.solr.clientwrapper.infrastructure.repository.UserRepository;
 import tech.jhipster.security.RandomUtil;
 
 /**

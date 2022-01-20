@@ -1,7 +1,5 @@
 package com.solr.clientwrapper.domain.service;
 
-import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
@@ -10,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
+import com.solr.clientwrapper.domain.port.api.SolrCoreServicePort;
 
 @Service
 @Transactional
@@ -20,6 +21,8 @@ public class SolrCoreService implements SolrCoreServicePort {
     //http://localhost:8983/solr
     @Value("${base-solr-url}")
     private String baseSolrUrl;
+    
+    String constantstring="Exception";
 
     @Override
     public SolrResponseDTO create(String coreName) {
@@ -33,10 +36,8 @@ public class SolrCoreService implements SolrCoreServicePort {
         request.setDataDir("data");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+        
         try {
-            CoreAdminResponse coreAdminResponse =request.process(solrClient);
-
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully created Solr Core: "+coreName);
 
@@ -44,7 +45,7 @@ public class SolrCoreService implements SolrCoreServicePort {
             log.error(e.toString());
 
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to create Solr Core: "+coreName+". Exception.");
+            solrResponseDTO.setMessage("Unable to create Solr Core: "+coreName+constantstring);
 
         }
 
@@ -57,10 +58,8 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("rename");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+        
         try {
-            CoreAdminResponse coreAdminResponse=CoreAdminRequest.renameCore(coreName,newName,solrClient);
-
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully renamed Solr Core: "+coreName+" to "+newName);
 
@@ -68,7 +67,7 @@ public class SolrCoreService implements SolrCoreServicePort {
             log.error(e.toString());
 
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to rename Solr Core: "+coreName+" to "+newName+". Exception.");
+            solrResponseDTO.setMessage("Unable to rename Solr Core: "+coreName+" to "+newName+constantstring);
 
         }
 
@@ -99,7 +98,7 @@ public class SolrCoreService implements SolrCoreServicePort {
             log.error(e.toString());
 
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to delete Solr Core: "+coreName+". Exception.");
+            solrResponseDTO.setMessage("Unable to delete Solr Core: "+coreName+constantstring);
 
         }
 
@@ -124,7 +123,7 @@ public class SolrCoreService implements SolrCoreServicePort {
             log.error(e.toString());
 
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to swap Solr Core: "+coreOne+" to "+coreTwo+". Exception.");
+            solrResponseDTO.setMessage("Unable to swap Solr Core: "+coreOne+" to "+coreTwo+constantstring);
 
         }
 
@@ -137,10 +136,7 @@ public class SolrCoreService implements SolrCoreServicePort {
         log.debug("reload");
 
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(coreName);
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
         try {
-            CoreAdminResponse coreAdminResponse=CoreAdminRequest.reloadCore(coreName,solrClient);
-
             solrResponseDTO.setStatusCode(200);
             solrResponseDTO.setMessage("Successfully reloaded Solr Core: "+coreName);
 
@@ -148,7 +144,7 @@ public class SolrCoreService implements SolrCoreServicePort {
             log.error(e.toString());
 
             solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Unable to reload Solr Core: "+coreName+". Exception.");
+            solrResponseDTO.setMessage("Unable to reload Solr Core: "+coreName+constantstring);
 
         }
 
