@@ -1,7 +1,9 @@
 package com.solr.clientwrapper.rest;
 
 import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
-import com.solr.clientwrapper.domain.dto.solr.collection.*;
+import com.solr.clientwrapper.domain.dto.solr.collection.SolrCreateCollectionDTO;
+import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCapacityPlanDTO;
+import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
 import com.solr.clientwrapper.usecase.solr.collection.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -10,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/table")
@@ -23,15 +27,17 @@ public class TableResource {
     //private final RenameSolrCollection renameSolrCollection;
     private final GetSolrCollections getSolrCollections;
     private final GetIsCollectionExists getIsCollectionExists;
+    private final GetCollectionDetails getCollectionDetails;
 
 
-    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists) {
+    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists, GetCollectionDetails getCollectionDetails) {
         this.createSolrCollection = createSolrCollection;
         this.getCapacityPlans = getCapacityPlans;
         this.deleteSolrCollection = deleteSolrCollection;
         //this.renameSolrCollection = renameSolrCollection;
         this.getSolrCollections = getSolrCollections;
         this.getIsCollectionExists = getIsCollectionExists;
+        this.getCollectionDetails=getCollectionDetails;
     }
 
     @GetMapping("/capacity-plans")
@@ -124,6 +130,22 @@ public class TableResource {
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
+    }
+
+    @GetMapping("/details/{tableName}")
+    @Operation(summary = "/ Get the table details like Shards, Nodes & Replication Factor.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map> getCollectionDetails(@PathVariable String tableName) {
+
+        log.debug("getCollectionDetails");
+
+        Map responseMap=getCollectionDetails.getCollectionDetails(tableName);
+
+        if(!responseMap.containsKey("Error")){
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
         }
 
     }

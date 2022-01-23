@@ -4,6 +4,8 @@ import com.solr.clientwrapper.domain.dto.solr.SolrResponseDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCapacityPlanDTO;
 import com.solr.clientwrapper.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
 
+import java.util.Map;
+
 public interface SolrCollectionServicePort {
 
     SolrResponseDTO create(String collectionName, String sku);
@@ -17,5 +19,7 @@ public interface SolrCollectionServicePort {
     SolrGetCapacityPlanDTO capacityPlans();
 
     SolrResponseDTO isCollectionExists(String collectionName);
+
+    Map getCollectionDetails(String collectionName);
 
 }

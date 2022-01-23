@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -185,6 +187,40 @@ public class SolrCollectionService implements SolrCollectionServicePort {
         }
 
         return solrResponseDTO;
+
+    }
+
+    @Override
+    public Map getCollectionDetails(String collectionName) {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
+
+        Map finalResponseMap= new HashMap();
+
+        CollectionAdminRequest.ClusterStatus clusterStatus=new CollectionAdminRequest.ClusterStatus();
+
+        CollectionAdminResponse response=null;
+
+        try {
+            response = clusterStatus.process(solrClient);
+        } catch (Exception e) {
+            log.error(e.toString());
+            finalResponseMap.put("Error","Error connecting to cluster.");
+            return finalResponseMap;
+        }
+
+        Map responseAsMap = response.getResponse().asMap(20);
+        Map clusterResponse=(Map)responseAsMap.get("cluster");
+        Map collections=(Map) clusterResponse.get("collections");
+
+        if(collections.containsKey(collectionName)){
+            finalResponseMap=(Map) collections.get(collectionName);
+        }else{
+            finalResponseMap.put("Error","Invalid table name.");
+            return finalResponseMap;
+        }
+
+        return finalResponseMap;
 
     }
 

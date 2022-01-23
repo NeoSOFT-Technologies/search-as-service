@@ -17,6 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
@@ -55,6 +58,9 @@ class SolrCollectionTest {
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(solrResponseDTOisCollectionExists);
 
+        Map finalResponseMap= new HashMap();
+        finalResponseMap.put("Random message","Data is returned");
+        Mockito.when(solrCollectionService.getCollectionDetails(Mockito.any())).thenReturn(finalResponseMap);
     }
 
     public void setMockitoBadResponseForService() {
@@ -75,6 +81,10 @@ class SolrCollectionTest {
         //Mockito.when(solrCollectionService.rename(Mockito.any(),Mockito.any())).thenReturn(solrResponseDTO);
         Mockito.when(solrCollectionService.getCollections()).thenReturn(solrGetCollectionsResponseDTO);
         //Mockito.when(solrCollectionService.isCollectionExists(Mockito.any())).thenReturn(false);
+
+        Map finalResponseMap= new HashMap();
+        finalResponseMap.put("Error","Error connecting to cluster.");
+        Mockito.when(solrCollectionService.getCollectionDetails(Mockito.any())).thenReturn(finalResponseMap);
     }
 
     @Test
@@ -226,6 +236,21 @@ class SolrCollectionTest {
     }
 
 
+    @Test
+    @Transactional
+    void testGetCollectionDetails() throws Exception {
+
+        setMockitoSuccessResponseForService();
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint+"/details/testTable" )
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        setMockitoBadResponseForService();
+        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint+"/details/testTable")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+    }
 
 
 }
