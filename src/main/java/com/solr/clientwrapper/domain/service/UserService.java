@@ -101,9 +101,7 @@ public class UserService implements UserServicePort {
             }
         });
 
-        return userPersistencePort.save(userDTO, password);
-
-       
+        return userPersistencePort.save(userDTO, password);  
     }
 
     @Override

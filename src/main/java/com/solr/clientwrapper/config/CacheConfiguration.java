@@ -2,7 +2,8 @@ package com.solr.clientwrapper.config;
 
 import java.time.Duration;
 
-import com.solr.clientwrapper.infrastructure.repository.UserRepository;
+import javax.cache.CacheManager;
+
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -15,11 +16,13 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.solr.clientwrapper.infrastructure.entity.Authority;
 import com.solr.clientwrapper.infrastructure.entity.User;
+import com.solr.clientwrapper.infrastructure.repository.UserRepository;
 
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.config.cache.PrefixedKeyGenerator;
@@ -31,7 +34,7 @@ public class CacheConfiguration {
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
     private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
-
+    
     public CacheConfiguration(JHipsterProperties jHipsterProperties) {
         JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
 
@@ -43,21 +46,40 @@ public class CacheConfiguration {
                     .build()
             );
     }
+    
 
     @Bean
     public HibernatePropertiesCustomizer hibernatePropertiesCustomizer(javax.cache.CacheManager cacheManager) {
         return hibernateProperties -> hibernateProperties.put(ConfigSettings.CACHE_MANAGER, cacheManager);
     }
 
+//    @Bean
+//    public CacheManager cacheManager() {
+//        return new EhCacheCacheManager(cacheMangerFactory().getObject());
+//    }
+//    
+//    @Bean
+//    public EhCacheManagerFactoryBean cacheMangerFactory() {
+//        EhCacheManagerFactoryBean bean = new EhCacheManagerFactoryBean();
+//        bean.setConfigLocation(new ClassPathResource("ehcaches.xml"));
+//        bean.setShared(true);
+//        return bean;
+//    }
+    
+    
+    
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cm -> {
+            createCache(cm, "solrcache");
+
             createCache(cm, UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, UserRepository.USERS_BY_EMAIL_CACHE);
             createCache(cm, User.class.getName());
             createCache(cm, Authority.class.getName());
             createCache(cm, User.class.getName() + ".authorities");
             createCache(cm, Authority.class.getName());
+            //createCacheForSolr(cm,SolrInMemeoryCacheService.SOLR_CACHE);
             // jhipster-needle-ehcache-add-entry
         };
     }
@@ -70,6 +92,8 @@ public class CacheConfiguration {
             cm.createCache(cacheName, jcacheConfiguration);
         }
     }
+    
+    
 
     @Autowired(required = false)
     public void setGitProperties(GitProperties gitProperties) {

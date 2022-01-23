@@ -112,7 +112,7 @@ public class UserJPAAdaptor implements UserPersistencPort {
         if (userDTO.getEmail() != null) {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
         }
-        if(setActivationKey) {
+        if(Boolean.TRUE.equals(setActivationKey)) {
             // new user is not active
             newUser.setActivated(false);
             // new user gets registration key

@@ -1,20 +1,14 @@
 package com.solr.clientwrapper.rest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-
-import com.solr.clientwrapper.domain.service.DataIngectionService;
 
 import com.solr.clientwrapper.IntegrationTest;
+import com.solr.clientwrapper.domain.service.DataIngectionService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -43,7 +37,7 @@ class DataIngectionResourceTest {
 			+ "  }\r\n" + "]\r\n" + "  }\r\n" + "]\r\n" + "}";
 
 	@Test
-	public void parseSolrSchemaArray() throws JSONException {
+	void parseSolrSchemaArray() throws JSONException {
 		System.out.println("data" + data);
 		final String data1 = dataIngectionService.parseSolrSchemaArray("docparse", data);
 		System.out.println("data1" + data1);
@@ -52,7 +46,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaArrayfalse() throws JSONException {
+	void parseSolrSchemaArrayfalse() throws JSONException {
 		System.out.println("data2" + data);
 		final String data1 = dataIngectionService.parseSolrSchemaArray("docparse", data);
 		System.out.println("data3" + data1);
@@ -61,7 +55,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaBatch() throws JSONException {
+	void parseSolrSchemaBatch() throws JSONException {
 
 		System.out.println("data11" + data);
 		final String data11 = dataIngectionService.parseSolrSchemaBatch("docparse", batchdata);
@@ -71,7 +65,7 @@ class DataIngectionResourceTest {
 	}
 
 	@Test
-	public void parseSolrSchemaBatchfalse() throws JSONException {
+	void parseSolrSchemaBatchfalse() throws JSONException {
 		System.out.println("data2" + batchdata);
 		final String data1 = dataIngectionService.parseSolrSchemaBatch("docparse", batchdata);
 		System.out.println("data3" + data1);

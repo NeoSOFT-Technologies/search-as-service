@@ -1,6 +1,6 @@
 package com.solr.clientwrapper.domain.dto.solr;
 
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
+import com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

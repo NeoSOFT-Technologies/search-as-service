@@ -20,21 +20,21 @@ import com.solr.clientwrapper.domain.dto.solr.SolrFieldDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaDTO;
 import com.solr.clientwrapper.domain.dto.solr.SolrSchemaResponseDTO;
 import com.solr.clientwrapper.domain.service.SolrSchemaService;
-import com.solr.clientwrapper.infrastructure.Enum.SolrFieldType;
 import com.solr.clientwrapper.solrwrapper.TestUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class SchemaResourceTest {
-
+public class SchemaResourceTest {
+	
 	String solrendpoint = "/api/schema";
 	String tableName = "gettingstarted1";
+
 	String name = "default-config";
-	SolrFieldDTO solr = new SolrFieldDTO("testField6", SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	SolrFieldDTO solr = new SolrFieldDTO("testField6", com.solr.clientwrapper.infrastructure.solrenum.SolrFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	SolrFieldDTO[] attributes = { solr };
 	String expectedGetResponse = "{\n"
-			  +"\"tableName\": \"gettingstarted1\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
@@ -49,7 +49,7 @@ class SchemaResourceTest {
 		      +"\"statusCode\": 200\n"
 		      +"}";
 	String expectedCreateResponse400 = "{\n"
-			  +"\"tableName\": \"gettingstarted1\",\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
 			  +"\"attributes\": [{\n"
 		      +"\"name\": \"testField6\",\n"
@@ -105,7 +105,9 @@ class SchemaResourceTest {
 		solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "")
+
+		//.andExpect(content().json(expectedCreateResponse400));
+				.post(solrendpoint )
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 		//.andExpect(content().json(expectedCreateResponse400))
 		.andExpect(status().isBadRequest());
@@ -126,9 +128,13 @@ class SchemaResourceTest {
 		// DELETE A NON EXISTING SCHEMA
 		SolrSchemaDTO solrSchemaDTO = new SolrSchemaDTO(tableName, name, attributes);
 		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/delete/" + tableName + "/" + name)
+				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)));
+
 		restAMockMvc.perform(MockMvcRequestBuilders.delete(solrendpoint + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(solrSchemaDTO)))
 				.andExpect(status().isBadRequest());
+
 
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();
@@ -184,6 +190,7 @@ class SchemaResourceTest {
 				.get(solrendpoint + "/" + tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isBadRequest());
+
 
 		// CREATE SCHEMA
 		setMockitoSucccessResponseForService();

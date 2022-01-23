@@ -9,13 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class CreateSolrDocument {
+public class CreateSolrDocuments {
 
-    private final Logger log = LoggerFactory.getLogger(CreateSolrDocument.class);
+    private final Logger log = LoggerFactory.getLogger(CreateSolrDocuments.class);
 
     private final SolrDocumentServicePort solrDocumentServicePort;
 
-    public CreateSolrDocument(SolrDocumentServicePort solrDocumentServicePort) {
+    public CreateSolrDocuments(SolrDocumentServicePort solrDocumentServicePort) {
         this.solrDocumentServicePort = solrDocumentServicePort;
     }
 
