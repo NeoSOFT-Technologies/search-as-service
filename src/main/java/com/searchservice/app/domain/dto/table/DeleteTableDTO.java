@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.dto.solr.collection;
+package com.searchservice.app.domain.dto.table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,15 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SolrCreateCollectionDTO {
+public class DeleteTableDTO {
 
     private String collectionName;
-    private String sku;
 
-    public SolrCreateCollectionDTO(String collectionName, String sku) {
+    public DeleteTableDTO(String collectionName) {
         this.collectionName = collectionName;
-        this.sku = sku;
     }
-
 
 }

@@ -1,11 +1,10 @@
 package com.searchservice.app.rest;
 
-
-import com.searchservice.app.domain.dto.solr.SolrResponseDTO;
-import com.searchservice.app.domain.dto.solr.collection.SolrCreateCollectionDTO;
-import com.searchservice.app.domain.dto.solr.collection.SolrGetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
-import com.searchservice.app.usecase.collection.*;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.table.CreateTableDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
+import com.searchservice.app.domain.port.api.TableServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -22,65 +21,53 @@ public class TableResource {
 
     private final Logger log = LoggerFactory.getLogger(TableResource.class);
 
-    private final GetCapacityPlans getCapacityPlans;
-    private final CreateSolrCollection createSolrCollection;
-    private final DeleteSolrCollection deleteSolrCollection;
-    //private final RenameSolrCollection renameSolrCollection;
-    private final GetSolrCollections getSolrCollections;
-    private final GetIsCollectionExists getIsCollectionExists;
-    private final GetCollectionDetails getCollectionDetails;
+    private final TableServicePort tableServicePort;
 
-
-    public TableResource(CreateSolrCollection createSolrCollection, GetCapacityPlans getCapacityPlans, DeleteSolrCollection deleteSolrCollection, GetSolrCollections getSolrCollections, GetIsCollectionExists getIsCollectionExists, GetCollectionDetails getCollectionDetails) {
-        this.createSolrCollection = createSolrCollection;
-        this.getCapacityPlans = getCapacityPlans;
-        this.deleteSolrCollection = deleteSolrCollection;
-        //this.renameSolrCollection = renameSolrCollection;
-        this.getSolrCollections = getSolrCollections;
-        this.getIsCollectionExists = getIsCollectionExists;
-        this.getCollectionDetails=getCollectionDetails;
+    public TableResource(TableServicePort tableServicePort) {
+        this.tableServicePort = tableServicePort;
     }
+
 
     @GetMapping("/capacity-plans")
     @Operation(summary = "/Get all  the capacity plans.")
-    public ResponseEntity<SolrGetCapacityPlanDTO> capacityPlans() {
+    public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
 
         log.debug("Get capacity plans");
 
-        SolrGetCapacityPlanDTO solrGetCapacityPlanDTO=getCapacityPlans.capacityPlans();
+        GetCapacityPlanDTO getCapacityPlanDTO= tableServicePort.capacityPlans();
 
-        return ResponseEntity.status(HttpStatus.OK).body(solrGetCapacityPlanDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
 
     }
 
     @PostMapping
     @Operation(summary = "/ Associate the Table by passing collectionName and capacity plan and return message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> create(@RequestBody SolrCreateCollectionDTO solrCreateCollectionDTO) {
+    public ResponseEntity<ResponseDTO> create(@RequestBody CreateTableDTO createTableDTO) {
 
         log.debug("Solr Collection create");
 
-        SolrResponseDTO solrResponseDTO=createSolrCollection.create(solrCreateCollectionDTO.getCollectionName(), solrCreateCollectionDTO.getSku());
+        ResponseDTO responseDTO = tableServicePort.create(createTableDTO.getCollectionName(), createTableDTO.getSku());
 
-        if(solrResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        if(responseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
         }
 
     }
 
     @DeleteMapping("/{tableName}")
     @Operation(summary = "/ Remove the table by passing tablename and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> delete(@PathVariable String tableName) {
+    public ResponseEntity<ResponseDTO> delete(@PathVariable String tableName) {
 
         log.debug("Solr Collection delete");
 
-        SolrResponseDTO solrResponseDTO=deleteSolrCollection.delete(tableName);
+        ResponseDTO responseDTO = tableServicePort.delete(tableName);
 
-        if(solrResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        if(responseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
         }
 
     }
@@ -88,11 +75,11 @@ public class TableResource {
 
 //    @PutMapping("/rename")
 //    @Operation(summary = "/rename-table", security = @SecurityRequirement(name = "bearerAuth"))
-//    public ResponseEntity<SolrResponseDTO> rename(@RequestBody SolrRenameCollectionDTO solrRenameCollectionDTO) {
+//    public ResponseEntity<ResponseDTO> rename(@RequestBody RenameTableDTO solrRenameCollectionDTO) {
 //
 //        log.debug("Solr Collection rename");
 //
-//        SolrResponseDTO solrResponseDTO=renameSolrCollection.rename(solrRenameCollectionDTO.getCollectionName(),solrRenameCollectionDTO.getCollectionNewName());
+//        ResponseDTO solrResponseDTO=renameSolrCollection.rename(solrRenameCollectionDTO.getCollectionName(),solrRenameCollectionDTO.getCollectionNewName());
 //
 //        if(solrResponseDTO.getStatusCode()==200){
 //            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -105,32 +92,32 @@ public class TableResource {
 
     @GetMapping
     @Operation(summary = "/ Get all the tables and it will return statusCode, message and all the collections.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrGetCollectionsResponseDTO> collections() {
+    public ResponseEntity<GetTablesResponseDTO> collections() {
 
         log.debug("Get all collections");
 
-        SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO=getSolrCollections.getCollections();
+        GetTablesResponseDTO getTablesResponseDTO= tableServicePort.getCollections();
 
-        if(solrGetCollectionsResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrGetCollectionsResponseDTO);
+        if(getTablesResponseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(getTablesResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrGetCollectionsResponseDTO);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getTablesResponseDTO);
         }
 
     }
 
     @GetMapping("/isTableExists/{tableName}")
     @Operation(summary = "/ For check table is exists by passing collectionName and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<SolrResponseDTO> isCollectionExits(@PathVariable String tableName) {
+    public ResponseEntity<ResponseDTO> isCollectionExits(@PathVariable String tableName) {
 
         log.debug("isCollectionExits");
 
-        SolrResponseDTO solrResponseDTO=getIsCollectionExists.isCollectionExists(tableName);
+        ResponseDTO responseDTO = tableServicePort.isCollectionExists(tableName);
 
-        if(solrResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        if(responseDTO.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
         }
 
     }
@@ -141,7 +128,7 @@ public class TableResource {
 
         log.debug("getCollectionDetails");
 
-        Map responseMap=getCollectionDetails.getCollectionDetails(tableName);
+        Map responseMap= tableServicePort.getCollectionDetails(tableName);
 
         if(!responseMap.containsKey("Error")){
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);

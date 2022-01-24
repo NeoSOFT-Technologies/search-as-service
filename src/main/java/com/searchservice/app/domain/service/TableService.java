@@ -1,10 +1,10 @@
 package com.searchservice.app.domain.service;
 
 import com.searchservice.app.config.CapacityPlanProperties;
-import com.searchservice.app.domain.dto.solr.SolrResponseDTO;
-import com.searchservice.app.domain.dto.solr.collection.SolrGetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.solr.collection.SolrGetCollectionsResponseDTO;
-import com.solr.clientwrapper.domain.port.api.SolrCollectionServicePort;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
+import com.searchservice.app.domain.port.api.TableServicePort;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -21,12 +21,11 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class SolrCollectionService implements SolrCollectionServicePort {
+public class TableService implements TableServicePort {
 
-	private final Logger log = LoggerFactory.getLogger(SolrCollectionService.class);
+	private final Logger log = LoggerFactory.getLogger(TableService.class);
 
 	// http://localhost:8983/solr
-	///
 	@Value("${base-solr-url}")
 	private String baseSolrUrl;
 
@@ -34,16 +33,16 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 	CapacityPlanProperties capacityPlanProperties;
 
 	@Override
-	public SolrGetCapacityPlanDTO capacityPlans() {
+	public GetCapacityPlanDTO capacityPlans() {
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 
-		return new SolrGetCapacityPlanDTO(capacityPlans);
+		return new GetCapacityPlanDTO(capacityPlans);
 	}
 
 	@Override
-	public SolrResponseDTO create(String collectionName, String sku) {
+	public ResponseDTO create(String collectionName, String sku) {
 
-		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 		CapacityPlanProperties.Plan selectedCapacityPlan = null;
@@ -56,9 +55,9 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			solrResponseDTO.setStatusCode(400);
-			solrResponseDTO.setMessage("Invalid SKU: " + sku);
-			return solrResponseDTO;
+			responseDTO.setStatusCode(400);
+			responseDTO.setMessage("Invalid SKU: " + sku);
+			return responseDTO;
 		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName,
@@ -71,21 +70,21 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 		String constantstring = "Exception";
 		try {
 			CollectionAdminResponse response = request.process(solrClient);
-			solrResponseDTO.setStatusCode(200);
-			solrResponseDTO.setMessage("Successfully created Solr Collection: " + collectionName);
+			responseDTO.setStatusCode(200);
+			responseDTO.setMessage("Successfully created Solr Collection: " + collectionName);
 		} catch (Exception e) {
 			log.error(e.toString());
-			solrResponseDTO.setStatusCode(400);
-			solrResponseDTO.setMessage("Unable to create Solr Collection: " + collectionName + constantstring);
+			responseDTO.setStatusCode(400);
+			responseDTO.setMessage("Unable to create Solr Collection: " + collectionName + constantstring);
 		}
 
-		return solrResponseDTO;
+		return responseDTO;
 	}
 
 	@Override
-	public SolrResponseDTO delete(String collectionName) {
+	public ResponseDTO delete(String collectionName) {
 
-		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(collectionName);
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest=CollectionAdminRequest.deleteAlias(collectionName);
@@ -96,20 +95,20 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 			CollectionAdminResponse response = request.process(solrClient);
 			CollectionAdminResponse deleteAliasResponse = deleteAliasRequest.process(solrClient);
 
-			solrResponseDTO.setStatusCode(200);
-			solrResponseDTO.setMessage("Successfully deleted Solr Collection: " + collectionName);
+			responseDTO.setStatusCode(200);
+			responseDTO.setMessage("Successfully deleted Solr Collection: " + collectionName);
 		} catch (Exception e) {
 			log.error(e.toString());
-			solrResponseDTO.setStatusCode(400);
-			solrResponseDTO.setMessage("Unable to delete Solr Collection: " + collectionName + ". Exception.");
+			responseDTO.setStatusCode(400);
+			responseDTO.setMessage("Unable to delete Solr Collection: " + collectionName + ". Exception.");
 		}
 
-		return solrResponseDTO;
+		return responseDTO;
 	}
 
 //    @Override
-//    public SolrResponseDTO rename(String collectionName, String collectionNewName) {
-//        SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
+//    public ResponseDTO rename(String collectionName, String collectionNewName) {
+//        ResponseDTO solrResponseDTO=new ResponseDTO(collectionName);
 //
 //        CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(collectionName,collectionNewName);
 //        request.setFollowAliases(true);
@@ -129,12 +128,12 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 //        return solrResponseDTO;
 //    }
 	@Override
-	public SolrGetCollectionsResponseDTO getCollections() {
+	public GetTablesResponseDTO getCollections() {
 
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
 
-		SolrGetCollectionsResponseDTO solrGetCollectionsResponseDTO = new SolrGetCollectionsResponseDTO();
+		GetTablesResponseDTO solrGetCollectionsResponseDTO = new GetTablesResponseDTO();
 
 		try {
 			CollectionAdminResponse response = request.process(solrClient);
@@ -156,9 +155,9 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 	}
 
 	@Override
-	public SolrResponseDTO isCollectionExists(String collectionName) {
+	public ResponseDTO isCollectionExists(String collectionName) {
 
-		SolrResponseDTO solrResponseDTO = new SolrResponseDTO(collectionName);
+		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		HttpSolrClient solrClient = new HttpSolrClient.Builder(baseSolrUrl).build();
@@ -169,22 +168,22 @@ public class SolrCollectionService implements SolrCollectionServicePort {
 			List<String> allCollections = (List<String>) response.getResponse().get("collections");
 
 			if (allCollections.contains(collectionName)) {
-				solrResponseDTO.setStatusCode(200);
-				solrResponseDTO.setMessage("true");
+				responseDTO.setStatusCode(200);
+				responseDTO.setMessage("true");
 			} else {
-				solrResponseDTO.setStatusCode(200);
-				solrResponseDTO.setMessage("false");
+				responseDTO.setStatusCode(200);
+				responseDTO.setMessage("false");
 			}
 
 		} catch (Exception e) {
 			log.error(e.toString());
 
-			solrResponseDTO.setStatusCode(400);
-			solrResponseDTO.setMessage("Error!");
+			responseDTO.setStatusCode(400);
+			responseDTO.setMessage("Error!");
 
 		}
 
-		return solrResponseDTO;
+		return responseDTO;
 
 	}
 

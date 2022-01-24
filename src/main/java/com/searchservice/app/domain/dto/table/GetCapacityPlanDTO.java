@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.dto.solr.collection;
+package com.searchservice.app.domain.dto.table;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import lombok.Data;
@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SolrGetCapacityPlanDTO {
+public class GetCapacityPlanDTO {
 
     private List<CapacityPlanProperties.Plan> plans;
 
-    public SolrGetCapacityPlanDTO(List<CapacityPlanProperties.Plan> plans) {
+    public GetCapacityPlanDTO(List<CapacityPlanProperties.Plan> plans) {
         this.plans = plans;
     }
 
