@@ -20,10 +20,21 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	//Swagger UI
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.10'
+
+	//SolrJ
+	implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
+
+	//Lombok
+	compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+	testCompileOnly 'org.projectlombok:lombok:1.18.22'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
 }
 
 tasks.named('test') {

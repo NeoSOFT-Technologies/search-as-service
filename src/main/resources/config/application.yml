@@ -1,0 +1,97 @@
+
+spring:
+  application:
+    name: basicSample
+    data:
+    solr:
+      host: http://localhost:8983/solr/
+      repositories:
+        enabled: false
+
+  profiles:
+    active: dev
+    group:
+      dev:
+        - dev
+
+server:
+  port: 8080
+
+#================================================================
+#Swagger
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+  documentation:
+    auto-startup: false
+#================================================================
+
+
+#================================================================
+#Solr Configurations
+base-solr-url: http://localhost:8983/solr
+#================================================================
+
+
+#================================================================
+#Capacity Plans
+capacity-plan:
+  plans:
+    - sku: B
+      name: Basic
+      replicas: 1
+      shards: 1
+      storage: 2
+
+    - sku: S1
+      name: Standard
+      replicas: 2
+      shards: 2
+      storage: 32
+
+    - sku: S2
+      name: Standard
+      replicas: 2
+      shards: 3
+      storage: 32
+
+    - sku: S3
+      name: Standard
+      replicas: 3
+      shards: 7
+      Storage: 32
+
+    - sku: P
+      name: Premium
+      replicas: 3
+      shards: 5
+      storage: 2
+#================================================================
+
+
+#================================================================
+# Throttler configurations
+base-app-url: http://localhost:8080
+throttler-test-app-url: http://localhost:8081
+resilience4j.ratelimiter:
+  instances:
+    solrDataInjectionRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 4s
+      timeoutDuration: 1s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+    defaultRateLimitThrottler:
+      limitForPeriod: 3
+      limitRefreshPeriod: 5s
+      timeoutDuration: 1s
+      eventConsumerBufferSize: 100
+      registerHealthIndicator: true
+resilience4j:
+  maxRequestSize:
+    maxAllowedRequestSize: 10kB
+throttle-service:
+  solr:
+    data-injection: solrDataInjectionRateLimitThrottler
+  test: defaultRateLimitThrottler
+#================================================================
