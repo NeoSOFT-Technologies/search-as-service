@@ -2,7 +2,7 @@ package com.searchservice.app.rest;
 
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.port.api.SolrDocumentServicePort;
+import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -20,10 +20,10 @@ public class InputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
 
-    public final SolrDocumentServicePort solrDocumentServicePort;
+    public final InputDocumentServicePort inputDocumentServicePort;
 
-    public InputDocumentResource(SolrDocumentServicePort solrDocumentServicePort) {
-        this.solrDocumentServicePort = solrDocumentServicePort;
+    public InputDocumentResource(InputDocumentServicePort inputDocumentServicePort) {
+        this.inputDocumentServicePort = inputDocumentServicePort;
     }
 
     @PostMapping("/documents/{tableName}")
@@ -33,7 +33,7 @@ public class InputDocumentResource {
         log.debug("Solr documents add");
 
         Instant start = Instant.now();
-        ResponseDTO solrResponseDTO=solrDocumentServicePort.addDocuments(tableName, payload, isNRT);
+        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload, isNRT);
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";

@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class DeleteTableDTO {
 
-    private String collectionName;
+    private String tableName;
 
-    public DeleteTableDTO(String collectionName) {
-        this.collectionName = collectionName;
+    public DeleteTableDTO(String tableName) {
+        this.tableName = tableName;
     }
 
 }

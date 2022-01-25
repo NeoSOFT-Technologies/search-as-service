@@ -2,7 +2,7 @@ package com.searchservice.app.domain.service;
 
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.port.api.SolrCoreServicePort;
+import com.searchservice.app.domain.port.api.CoreServicePort;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
@@ -14,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class SolrCoreService implements SolrCoreServicePort {
+public class CoreService implements CoreServicePort {
 
-    private final Logger log = LoggerFactory.getLogger(SolrCoreService.class);
+    private final Logger log = LoggerFactory.getLogger(CoreService.class);
 
     //http://localhost:8983/solr
     @Value("${base-solr-url}")

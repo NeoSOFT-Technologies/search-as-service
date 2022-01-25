@@ -2,7 +2,7 @@ package com.searchservice.app.domain.port.api;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
 
-public interface SolrCoreServicePort {
+public interface CoreServicePort {
 
     ResponseDTO create(String coreName);
 

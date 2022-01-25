@@ -1,6 +1,6 @@
 package com.searchservice.app.infrastructure.adaptor;
 
-import com.searchservice.app.domain.port.spi.SolrSchemaAPIPort;
+import com.searchservice.app.domain.port.spi.SchemaAPIPort;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SolrSchemaAPIAdapter implements SolrSchemaAPIPort {
+public class SchemaAPIAdapter implements SchemaAPIPort {
 
-	private final Logger log = LoggerFactory.getLogger(SolrSchemaAPIAdapter.class);
+	private final Logger log = LoggerFactory.getLogger(SchemaAPIAdapter.class);
 
 	@Override
 	public SolrClient getSolrClient(String urlString, String tableName) {

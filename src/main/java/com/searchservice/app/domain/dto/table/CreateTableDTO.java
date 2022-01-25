@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class CreateTableDTO {
 
-    private String collectionName;
+    private String tableName;
     private String sku;
 
-    public CreateTableDTO(String collectionName, String sku) {
-        this.collectionName = collectionName;
+    public CreateTableDTO(String tableName, String sku) {
+        this.tableName = tableName;
         this.sku = sku;
     }
 

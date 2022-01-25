@@ -46,7 +46,7 @@ public class TableResource {
 
         log.debug("Solr Collection create");
 
-        ResponseDTO responseDTO = tableServicePort.create(createTableDTO.getCollectionName(), createTableDTO.getSku());
+        ResponseDTO responseDTO = tableServicePort.create(createTableDTO.getTableName(), createTableDTO.getSku());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);

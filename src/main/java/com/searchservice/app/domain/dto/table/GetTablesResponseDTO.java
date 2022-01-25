@@ -13,6 +13,6 @@ public class GetTablesResponseDTO {
 
     private int statusCode;
     private String message;
-    private List<String> collections;
+    private List<String> tables;
 
 }

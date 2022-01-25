@@ -2,9 +2,9 @@ package com.searchservice.app.rest;
 
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.core.SolrDoubleCoreDTO;
-import com.searchservice.app.domain.dto.core.SolrSingleCoreDTO;
-import com.searchservice.app.domain.port.api.SolrCoreServicePort;
+import com.searchservice.app.domain.dto.core.DoubleCoreDTO;
+import com.searchservice.app.domain.dto.core.SingleCoreDTO;
+import com.searchservice.app.domain.port.api.CoreServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 //@RestController
 @RequestMapping("/solr-core")
-public class SolrCoreResource {
+public class CoreResource {
 
-    private final Logger log = LoggerFactory.getLogger(SolrCoreResource.class);
+    private final Logger log = LoggerFactory.getLogger(CoreResource.class);
 
-    private final SolrCoreServicePort solrCoreServicePort;
+    private final CoreServicePort coreServicePort;
 
-    public SolrCoreResource(SolrCoreServicePort solrCoreServicePort) {
-        this.solrCoreServicePort = solrCoreServicePort;
+    public CoreResource(CoreServicePort coreServicePort) {
+        this.coreServicePort = coreServicePort;
     }
 
 
@@ -32,7 +32,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core status");
 
-        String responseString=solrCoreServicePort.status(name);
+        String responseString= coreServicePort.status(name);
 
         if(responseString.length()>=150){
             //CORE EXISTS
@@ -45,11 +45,11 @@ public class SolrCoreResource {
 
     @PostMapping("/create")
     @Operation(summary = "/create-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> create(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
+    public ResponseEntity<ResponseDTO> create(@RequestBody SingleCoreDTO singleCoreDTO)  {
 
         log.debug("Solr Core create");
 
-        ResponseDTO responseDTO=solrCoreServicePort.create(solrSingleCoreDTO.getCoreName());
+        ResponseDTO responseDTO= coreServicePort.create(singleCoreDTO.getCoreName());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -61,11 +61,11 @@ public class SolrCoreResource {
 
     @PutMapping("/rename")
     @Operation(summary = "/rename-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> rename(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO)  {
+    public ResponseEntity<ResponseDTO> rename(@RequestBody DoubleCoreDTO doubleCoreDTO)  {
 
         log.debug("Solr Core rename");
 
-        ResponseDTO responseDTO= solrCoreServicePort.rename(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
+        ResponseDTO responseDTO= coreServicePort.rename(doubleCoreDTO.getCoreOne(), doubleCoreDTO.getCoreTwo());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -81,7 +81,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core delete");
 
-        ResponseDTO responseDTO=solrCoreServicePort.delete(coreName);
+        ResponseDTO responseDTO= coreServicePort.delete(coreName);
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -93,11 +93,11 @@ public class SolrCoreResource {
 
     @PutMapping("/swap")
     @Operation(summary = "/swap-cores", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> swap(@RequestBody SolrDoubleCoreDTO solrDoubleCoreDTO)  {
+    public ResponseEntity<ResponseDTO> swap(@RequestBody DoubleCoreDTO doubleCoreDTO)  {
 
         log.debug("Solr Core swap");
 
-        ResponseDTO responseDTO= solrCoreServicePort.swap(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
+        ResponseDTO responseDTO= coreServicePort.swap(doubleCoreDTO.getCoreOne(), doubleCoreDTO.getCoreTwo());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -109,11 +109,11 @@ public class SolrCoreResource {
 
     @PostMapping("/reload")
     @Operation(summary = "/reload-core", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> reload(@RequestBody SolrSingleCoreDTO solrSingleCoreDTO)  {
+    public ResponseEntity<ResponseDTO> reload(@RequestBody SingleCoreDTO singleCoreDTO)  {
 
         log.debug("Solr Core reload");
 
-        ResponseDTO responseDTO= solrCoreServicePort.reload(solrSingleCoreDTO.getCoreName());
+        ResponseDTO responseDTO= coreServicePort.reload(singleCoreDTO.getCoreName());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);

@@ -138,14 +138,14 @@ public class TableService implements TableServicePort {
 		try {
 			CollectionAdminResponse response = request.process(solrClient);
 
-			solrGetCollectionsResponseDTO.setCollections((List<String>) response.getResponse().get("collections"));
+			solrGetCollectionsResponseDTO.setTables((List<String>) response.getResponse().get("collections"));
 			solrGetCollectionsResponseDTO.setStatusCode(200);
 			solrGetCollectionsResponseDTO.setMessage("Successfully retrieved all Solr Collections");
 
 		} catch (Exception e) {
 			log.error(e.toString());
 
-			solrGetCollectionsResponseDTO.setCollections(null);
+			solrGetCollectionsResponseDTO.setTables(null);
 			solrGetCollectionsResponseDTO.setStatusCode(400);
 			solrGetCollectionsResponseDTO.setMessage("Unable to retrieve all Solr Collections");
 		}

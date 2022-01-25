@@ -2,7 +2,7 @@ package com.searchservice.app.infrastructure.solrenum;
 
 import org.apache.commons.lang3.StringUtils;
 
-public enum SolrFieldType {
+public enum SchemaFieldType {
 	_nest_path_,
 	 ancestor_path,
 	 binary,
@@ -26,7 +26,7 @@ public enum SolrFieldType {
             return false;
         }
 
-        for(SolrFieldType item : SolrFieldType.values()) {
+        for(SchemaFieldType item : SchemaFieldType.values()) {
             if(name.equals(fromEnumToString(item))) {
                 return true;
             }
@@ -34,7 +34,7 @@ public enum SolrFieldType {
         return false;
     }
 	
-	public static SolrFieldType fromObject(String fieldType) {
+	public static SchemaFieldType fromObject(String fieldType) {
 		if(fieldType.equals("string")) {
 			return string;
 		}
@@ -63,7 +63,7 @@ public enum SolrFieldType {
 		else
 			return null;
 	}
-	public static String fromEnumToString(SolrFieldType fieldType) {
+	public static String fromEnumToString(SchemaFieldType fieldType) {
 		if(fieldType.equals(string)) {
 			return "string";
 		}

@@ -1,6 +1,6 @@
 package com.searchservice.app.rest;
 
-import com.searchservice.app.domain.port.api.SolrFileUploadServicePort;
+import com.searchservice.app.domain.port.api.FileUploadServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -25,14 +25,14 @@ public class FileUploadResource {
 	private final Logger log = LoggerFactory.getLogger(FileUploadResource.class);
 
 	@Autowired
-	SolrFileUploadServicePort solrFileUploadServicePort;
+    FileUploadServicePort fileUploadServicePort;
 	
 	@RequestMapping(value = "/file-upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "/ For file upload we have to select a file from drive and it will return a string.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
 		log.debug("Multipart File Upload ");
-		solrFileUploadServicePort.multipartUploader(file);
+		fileUploadServicePort.multipartUploader(file);
 		if (!file.isEmpty()) {
 			// File is EXISTS
 			return ResponseEntity.status(HttpStatus.OK).body("File Upload Successfully");

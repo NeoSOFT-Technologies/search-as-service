@@ -9,15 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class SolrSchemaDTO {
+public class SchemaDTO {
 
 	String tableName;
 	String name;
-	SolrFieldDTO[] attributes;
+	FieldDTO[] attributes;
 
-	public SolrSchemaDTO(SolrSchemaDTO solrSchemaDTO) {
-		this.tableName = solrSchemaDTO.getTableName();
-		this.name = solrSchemaDTO.getName();
-		this.attributes=solrSchemaDTO.getAttributes();
+	public SchemaDTO(SchemaDTO schemaDTO) {
+		this.tableName = schemaDTO.getTableName();
+		this.name = schemaDTO.getName();
+		this.attributes= schemaDTO.getAttributes();
 	}
 }

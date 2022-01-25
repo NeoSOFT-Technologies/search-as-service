@@ -9,9 +9,9 @@ import java.io.IOException;
 
 
 @Data
-public class UploadDocumentSolrUtil {
+public class UploadDocumentUtil {
 
-    private final Logger log = LoggerFactory.getLogger(UploadDocumentSolrUtil.class);
+    private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
     private String baseSolrUrl;
     private String collectionName;

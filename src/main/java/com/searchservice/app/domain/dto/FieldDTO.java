@@ -1,6 +1,6 @@
 package com.searchservice.app.domain.dto;
 
-import com.searchservice.app.infrastructure.solrenum.SolrFieldType;
+import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class SolrFieldDTO {
+public class FieldDTO {
 
 	String name;
-	SolrFieldType type;
+	SchemaFieldType type;
 	String default_;
 	boolean isRequired;
 	boolean isFilterable;

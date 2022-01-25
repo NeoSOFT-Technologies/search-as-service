@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class RenameTableDTO {
 
-    private String collectionName;
-    private String collectionNewName;
+    private String tableName;
+    private String tableNewName;
 
-    public RenameTableDTO(String collectionName, String collectionNewName) {
-        this.collectionName = collectionName;
-        this.collectionNewName = collectionNewName;
+    public RenameTableDTO(String tableName, String tableNewName) {
+        this.tableName = tableName;
+        this.tableNewName = tableNewName;
     }
 
 }

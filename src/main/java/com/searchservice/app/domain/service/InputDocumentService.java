@@ -2,9 +2,9 @@ package com.searchservice.app.domain.service;
 
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.port.api.SolrDocumentServicePort;
+import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.utils.DocumentParserUtil;
-import com.searchservice.app.domain.utils.UploadDocumentSolrUtil;
+import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,14 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class SolrDocumentService implements SolrDocumentServicePort {
+public class InputDocumentService implements InputDocumentServicePort {
 
 
 	
    @Value("${base-solr-url}")
     private String baseSolrUrl;
 
-    private final Logger log = LoggerFactory.getLogger(SolrDocumentService.class);
+    private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 
     @Override
     public ResponseDTO addDocuments(String collectionName, String payload, boolean isNRT) {
@@ -70,14 +70,14 @@ public class SolrDocumentService implements SolrDocumentServicePort {
 
         //CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE STRUCTURALLY CORRECT
 
-        UploadDocumentSolrUtil uploadDocumentSolrUtil=new UploadDocumentSolrUtil();
+        UploadDocumentUtil uploadDocumentUtil =new UploadDocumentUtil();
 
-        uploadDocumentSolrUtil.setBaseSolrUrl(baseSolrUrl);
-        uploadDocumentSolrUtil.setCollectionName(collectionName);
-        uploadDocumentSolrUtil.setContent(payload);
-        uploadDocumentSolrUtil.setCommit(isNRT);
+        uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
+        uploadDocumentUtil.setCollectionName(collectionName);
+        uploadDocumentUtil.setContent(payload);
+        uploadDocumentUtil.setCommit(isNRT);
 
-        UploadDocumentSolrUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentSolrUtil.commit();
+        UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
         if(response.isDocumentUploaded()){
             responseDTO.setMessage("Successfully Added!");
