@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 public class CoreService implements CoreServicePort {
 
     private final Logger log = LoggerFactory.getLogger(CoreService.class);

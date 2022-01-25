@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "jacoco"
 }
 
 group = 'com.searchservice'
@@ -18,7 +19,40 @@ repositories {
 	mavenCentral()
 }
 
+//===============TO RUN JUINT TESTCASES====================
+task integrationTest(type: Test) {
+	useJUnitPlatform()
+	description = "Execute integration tests."
+	group = "verification"
+	include "**/*IT*", "**/*IntTest*"
+	testLogging {
+		events 'FAILED', 'SKIPPED'
+	}
+	jvmArgs += '-Djava.security.egd=file:/dev/./urandom -Xmx256m'
+	if (project.hasProperty('testcontainers')) {
+		environment 'spring.profiles.active', 'testcontainers'
+	}
+
+	// uncomment if the tests reports are not generated
+	// see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
+	// ignoreFailures true
+	reports.html.enabled = false
+}
+
+check.dependsOn integrationTest
+task testReport(type: TestReport) {
+	destinationDir = file("$buildDir/reports/tests")
+	reportOn test
+}
+
+task integrationTestReport(type: TestReport) {
+	destinationDir = file("$buildDir/reports/tests")
+	reportOn integrationTest
+}
+//==========================================================
+
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -49,6 +83,7 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.5.4'
 	// https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
 	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+	
 }
 
 tasks.named('test') {

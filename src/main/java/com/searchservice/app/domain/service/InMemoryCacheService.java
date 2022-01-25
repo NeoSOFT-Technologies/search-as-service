@@ -35,8 +35,6 @@ import java.util.Map;
 
 @SuppressWarnings("deprecation")
 @Service
-@Transactional
-
 public class InMemoryCacheService implements InMemoryCacheServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(InMemoryCacheService.class);

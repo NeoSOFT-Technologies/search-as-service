@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 @Service
-@Transactional
 public class DataIngectionService implements DataIngectionServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(DataIngectionService.class);

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class SchemaService implements SchemaServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(SchemaService.class);

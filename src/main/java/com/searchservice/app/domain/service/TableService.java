@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class TableService implements TableServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(TableService.class);
