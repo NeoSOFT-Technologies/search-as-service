@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.dto;
+package com.searchservice.app.domain.dto.schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

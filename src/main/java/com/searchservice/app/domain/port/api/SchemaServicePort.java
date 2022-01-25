@@ -1,9 +1,9 @@
 package com.searchservice.app.domain.port.api;
 
 
-import com.searchservice.app.domain.dto.FieldDTO;
-import com.searchservice.app.domain.dto.SchemaDTO;
-import com.searchservice.app.domain.dto.SchemaResponseDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.schema.SchemaDTO;
+import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 
 import java.util.List;

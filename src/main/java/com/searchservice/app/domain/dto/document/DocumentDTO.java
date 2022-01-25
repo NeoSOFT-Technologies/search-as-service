@@ -1,5 +1,6 @@
-package com.searchservice.app.domain.dto;
+package com.searchservice.app.domain.dto.document;
 
+import com.searchservice.app.domain.dto.schema.FieldDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.dto;
+package com.searchservice.app.domain.dto.schema;
 
 import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;
 import lombok.AllArgsConstructor;

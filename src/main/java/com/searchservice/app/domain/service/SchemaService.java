@@ -1,9 +1,9 @@
 package com.searchservice.app.domain.service;
 
 
-import com.searchservice.app.domain.dto.FieldDTO;
-import com.searchservice.app.domain.dto.SchemaDTO;
-import com.searchservice.app.domain.dto.SchemaResponseDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.schema.SchemaDTO;
+import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;

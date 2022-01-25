@@ -1,8 +1,8 @@
 package com.searchservice.app.rest;
 
 
-import com.searchservice.app.domain.dto.DocumentDTO;
-import com.searchservice.app.domain.dto.DocumentResponseDTO;
+import com.searchservice.app.domain.dto.document.DocumentDTO;
+import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.port.api.InMemoryCacheServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

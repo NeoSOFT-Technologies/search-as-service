@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.service.throttler;
+package com.searchservice.app.domain.utils;
 
 public class ThrottlerUtils {
 	public static double formatRequestSizeStringToDouble(String size) {

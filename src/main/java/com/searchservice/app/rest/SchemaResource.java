@@ -1,8 +1,8 @@
 package com.searchservice.app.rest;
 
 
-import com.searchservice.app.domain.dto.SchemaDTO;
-import com.searchservice.app.domain.dto.SchemaResponseDTO;
+import com.searchservice.app.domain.dto.schema.SchemaDTO;
+import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
