@@ -3,10 +3,7 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.SolrDocumentDTO;
 import com.searchservice.app.domain.dto.SolrDocumentResponseDTO;
-import com.searchservice.app.usecase.solr.InMemoryCache.CreateSolrDocument;
-import com.searchservice.app.usecase.solr.InMemoryCache.DeleteSolrDocument;
-import com.searchservice.app.usecase.solr.InMemoryCache.GetSolrDocument;
-import com.searchservice.app.usecase.solr.InMemoryCache.UpdateSolrDocument;
+import com.searchservice.app.domain.port.api.SolrInMemoryCacheServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -22,19 +19,12 @@ public class SolrInMemeoryCacheResource {
 
 	private final Logger log = LoggerFactory.getLogger(SolrInMemeoryCacheResource.class);
 
-	private final CreateSolrDocument createSolrDocument;
-	private final DeleteSolrDocument deleteSolrDocument;
-	private final UpdateSolrDocument updateSolrDocument;
-	private final GetSolrDocument getSolrDocument;
-	
-	public SolrInMemeoryCacheResource(CreateSolrDocument createSolrDocument, DeleteSolrDocument deleteSolrDocument,
-			UpdateSolrDocument updateSolrDocument, GetSolrDocument getSolrDocument) {
-		super();
-		this.createSolrDocument = createSolrDocument;
-		this.deleteSolrDocument = deleteSolrDocument;
-		this.updateSolrDocument = updateSolrDocument;
-		this.getSolrDocument = getSolrDocument;
+	public final SolrInMemoryCacheServicePort inMemoryCacheServicePort;
+
+	public SolrInMemeoryCacheResource(SolrInMemoryCacheServicePort inMemoryCacheServicePort) {
+		this.inMemoryCacheServicePort = inMemoryCacheServicePort;
 	}
+
 
 	@PostMapping("/create")
 	@Operation(summary = "/create-doc", security = @SecurityRequirement(name = "bearerAuth"))
@@ -42,8 +32,8 @@ public class SolrInMemeoryCacheResource {
 			@RequestBody SolrDocumentDTO newSolrdocumentDTO) {
 		log.debug("Solr Schema Create");
 		log.debug("Received Schema as in Request Body: {}", newSolrdocumentDTO);
-		SolrDocumentResponseDTO solrResponseDTO = 
-				createSolrDocument.create(
+		SolrDocumentResponseDTO solrResponseDTO =
+				inMemoryCacheServicePort.create(
 						newSolrdocumentDTO.getTableName(), 
 						newSolrdocumentDTO.getName(), 
 						newSolrdocumentDTO);
@@ -59,7 +49,7 @@ public class SolrInMemeoryCacheResource {
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("Schema Delete");
-		SolrDocumentResponseDTO solrDocumentResponseDTO = deleteSolrDocument.delete(tableName, name);
+		SolrDocumentResponseDTO solrDocumentResponseDTO = inMemoryCacheServicePort.delete(tableName, name);
 		if(solrDocumentResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(solrDocumentResponseDTO);
 		else
@@ -76,7 +66,7 @@ public class SolrInMemeoryCacheResource {
 			@RequestBody SolrDocumentDTO newSolrDocumentDTO) {
 		log.debug("Solr doc update");
 		log.debug("Received doc as in Request Body: {}", newSolrDocumentDTO);
-		SolrDocumentResponseDTO solrSchemaDTO = updateSolrDocument.update(tableName, name, newSolrDocumentDTO);
+		SolrDocumentResponseDTO solrSchemaDTO = inMemoryCacheServicePort.update(tableName, name, newSolrDocumentDTO);
 		SolrDocumentResponseDTO solrResponseDTO = new SolrDocumentResponseDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -91,7 +81,7 @@ public class SolrInMemeoryCacheResource {
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("get solar doc");
-		SolrDocumentResponseDTO solrResponseDTO = getSolrDocument.get(tableName, name);
+		SolrDocumentResponseDTO solrResponseDTO = inMemoryCacheServicePort.get(tableName, name);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else

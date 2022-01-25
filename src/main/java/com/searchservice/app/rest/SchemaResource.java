@@ -3,10 +3,7 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.SolrSchemaDTO;
 import com.searchservice.app.domain.dto.SolrSchemaResponseDTO;
-import com.searchservice.app.usecase.solr.schema.CreateSolrSchema;
-import com.searchservice.app.usecase.solr.schema.DeleteSolrSchema;
-import com.searchservice.app.usecase.solr.schema.GetSolrSchema;
-import com.searchservice.app.usecase.solr.schema.UpdateSolrSchema;
+import com.searchservice.app.domain.port.api.SolrSchemaServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -21,18 +18,11 @@ public class SchemaResource {
 
 	private final Logger log = LoggerFactory.getLogger(SchemaResource.class);
 
-	private final CreateSolrSchema createSolrSchema;
-	private final DeleteSolrSchema deleteSolrSchema;
-	private final UpdateSolrSchema updateSolrSchema;
-	private final GetSolrSchema getSolarSchema;
+	public final SolrSchemaServicePort solrSchemaServicePort;
 
-	public SchemaResource(CreateSolrSchema createSolrSchema, DeleteSolrSchema deleteSolrSchema,
-						  UpdateSolrSchema updateSolrSchema, GetSolrSchema getSolarSchema) {
-		this.createSolrSchema = createSolrSchema;
-		this.deleteSolrSchema = deleteSolrSchema;
-		this.updateSolrSchema = updateSolrSchema;
-		this.getSolarSchema = getSolarSchema;
-	}			
+	public SchemaResource(SolrSchemaServicePort solrSchemaServicePort) {
+		this.solrSchemaServicePort = solrSchemaServicePort;
+	}
 
 	@PostMapping
 	@Operation(summary = "/ Associate  a new schema by passing tableName, name and attributes it will return created  schema.", security = @SecurityRequirement(name = "bearerAuth"))
@@ -40,8 +30,8 @@ public class SchemaResource {
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr Schema Create");
 		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
-		SolrSchemaResponseDTO solrResponseDTO = 
-				createSolrSchema.create(
+		SolrSchemaResponseDTO solrResponseDTO =
+				solrSchemaServicePort.create(
 						newSolrSchemaDTO.getTableName(), 
 						newSolrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
@@ -55,7 +45,7 @@ public class SchemaResource {
 	public ResponseEntity<SolrSchemaResponseDTO> delete(
 			@PathVariable String tableName) {
 		log.debug("Schema Delete");
-		SolrSchemaResponseDTO solrSchemaResponseDTO = deleteSolrSchema.delete(tableName);
+		SolrSchemaResponseDTO solrSchemaResponseDTO = solrSchemaServicePort.delete(tableName);
 		if(solrSchemaResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(solrSchemaResponseDTO);
 		else
@@ -70,7 +60,7 @@ public class SchemaResource {
 			@RequestBody SolrSchemaDTO newSolrSchemaDTO) {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newSolrSchemaDTO);
-		SolrSchemaResponseDTO solrSchemaDTO = updateSolrSchema.update(tableName, newSolrSchemaDTO);
+		SolrSchemaResponseDTO solrSchemaDTO = solrSchemaServicePort.update(tableName, newSolrSchemaDTO);
 		SolrSchemaResponseDTO solrResponseDTO = new SolrSchemaResponseDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
@@ -83,7 +73,7 @@ public class SchemaResource {
 	public ResponseEntity<SolrSchemaResponseDTO> get(
 			@PathVariable String tableName) {
 		log.debug("get solar schema");
-		SolrSchemaResponseDTO solrResponseDTO = getSolarSchema.get(tableName);
+		SolrSchemaResponseDTO solrResponseDTO = solrSchemaServicePort.get(tableName);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else

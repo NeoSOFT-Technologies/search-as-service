@@ -4,7 +4,7 @@ package com.searchservice.app.rest;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.core.SolrDoubleCoreDTO;
 import com.searchservice.app.domain.dto.core.SolrSingleCoreDTO;
-import com.searchservice.app.usecase.solr.core.*;
+import com.searchservice.app.domain.port.api.SolrCoreServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -19,22 +19,12 @@ public class SolrCoreResource {
 
     private final Logger log = LoggerFactory.getLogger(SolrCoreResource.class);
 
-    private final CreateSolrCore createSolrCore;
-    private final RenameSolrCore renameSolrCore;
-    private final DeleteSolrCore deleteSolrCore;
-    private final SwapSolrCore swapSolrCore;
-    private final ReloadSolrCore reloadSolrCore;
-    private final StatusSolrCore statusSolrCore;
+    private final SolrCoreServicePort solrCoreServicePort;
 
-    public SolrCoreResource(CreateSolrCore createSolrCore, RenameSolrCore renameSolrCore, DeleteSolrCore deleteSolrCore, SwapSolrCore swapSolrCore, ReloadSolrCore reloadSolrCore, StatusSolrCore statusSolrCore) {
-        this.createSolrCore = createSolrCore;
-        this.renameSolrCore = renameSolrCore;
-        this.deleteSolrCore = deleteSolrCore;
-        this.swapSolrCore=swapSolrCore;
-        this.reloadSolrCore=reloadSolrCore;
-        this.statusSolrCore=statusSolrCore;
-
+    public SolrCoreResource(SolrCoreServicePort solrCoreServicePort) {
+        this.solrCoreServicePort = solrCoreServicePort;
     }
+
 
     @GetMapping("/status/{name}")
     @Operation(summary = "/core-status", security = @SecurityRequirement(name = "bearerAuth"))
@@ -42,7 +32,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core status");
 
-        String responseString=statusSolrCore.status(name);
+        String responseString=solrCoreServicePort.status(name);
 
         if(responseString.length()>=150){
             //CORE EXISTS
@@ -59,7 +49,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core create");
 
-        ResponseDTO responseDTO=createSolrCore.create(solrSingleCoreDTO.getCoreName());
+        ResponseDTO responseDTO=solrCoreServicePort.create(solrSingleCoreDTO.getCoreName());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -75,7 +65,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core rename");
 
-        ResponseDTO responseDTO= renameSolrCore.rename(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
+        ResponseDTO responseDTO= solrCoreServicePort.rename(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -91,7 +81,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core delete");
 
-        ResponseDTO responseDTO=deleteSolrCore.delete(coreName);
+        ResponseDTO responseDTO=solrCoreServicePort.delete(coreName);
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -107,7 +97,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core swap");
 
-        ResponseDTO responseDTO= swapSolrCore.swap(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
+        ResponseDTO responseDTO= solrCoreServicePort.swap(solrDoubleCoreDTO.getCoreOne(), solrDoubleCoreDTO.getCoreTwo());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
@@ -123,7 +113,7 @@ public class SolrCoreResource {
 
         log.debug("Solr Core reload");
 
-        ResponseDTO responseDTO= reloadSolrCore.reload(solrSingleCoreDTO.getCoreName());
+        ResponseDTO responseDTO= solrCoreServicePort.reload(solrSingleCoreDTO.getCoreName());
 
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);

@@ -3,8 +3,7 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
-import com.searchservice.app.usecase.throttler.LimitRateThrottler;
-import com.searchservice.app.usecase.throttler.LimitRequestSizeThrottler;
+import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +50,12 @@ public class ThrottlerTestResource {
 
     @Autowired
     private RestTemplate restTemplate;
-	@Autowired
-    LimitRateThrottler limitRateThrottler;
-	@Autowired
-    LimitRequestSizeThrottler limitRequestSizeThrottler;
+
+    public final ThrottlerServicePort throttlerServicePort;
+
+    public ThrottlerTestResource(ThrottlerServicePort throttlerServicePort) {
+        this.throttlerServicePort = throttlerServicePort;
+    }
 
     @GetMapping("/health")
     @RateLimiter(name=DEFAULT_THROTTLE_SERVICE, fallbackMethod = "rateLimiterFallback")
@@ -104,7 +104,7 @@ public class ThrottlerTestResource {
     	 * MRS stands for- Max RequestBody Size
     	 */
     	ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO
-    		= limitRequestSizeThrottler.dataInjectionRequestSizeLimiter(data);
+    		= throttlerServicePort.dataInjectionRequestSizeLimiter(data);
     	return ResponseEntity.status(HttpStatus.OK).body(throttlerMaxRequestSizeResponseDTO);
     }
     
@@ -121,7 +121,7 @@ public class ThrottlerTestResource {
         logger.info("Max request rate limit is being applied");
 
         // prepare Rate Limiting Response DTO
-        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = limitRateThrottler.dataInjectionRateLimiter();
+        ThrottlerRateLimitResponseDTO rateLimitResponseDTO = throttlerServicePort.dataInjectionRateLimiter();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration()); // retry the request after given timeoutDuration
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
