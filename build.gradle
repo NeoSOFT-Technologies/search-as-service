@@ -61,6 +61,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	annotationProcessor "org.glassfish.jaxb:jaxb-runtime:${jaxbRuntimeVersion}"
 
 	//Swagger UI
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.10'
