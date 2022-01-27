@@ -4,6 +4,7 @@ plugins {
 	id 'java'
 	id "jacoco"
 	id "org.sonarqube"
+	id "com.google.cloud.tools.jib"
 }
 
 group = 'com.searchservice'
