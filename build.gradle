@@ -20,6 +20,10 @@ configurations {
 	}
 }
 
+springBoot {
+	mainClassName = "com.solr.clientwrapper.BasicSampleApp"
+}
+
 repositories {
 	mavenCentral()
 }
