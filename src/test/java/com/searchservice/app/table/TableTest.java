@@ -1,6 +1,8 @@
-package com.searchservice.app;
+package com.searchservice.app.table;
 
 
+import com.searchservice.app.IntegrationTest;
+import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.table.CreateTableDTO;
 import com.searchservice.app.domain.dto.table.DeleteTableDTO;
@@ -23,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @IntegrationTest
 @AutoConfigureMockMvc
-class SolrCollectionTest {
+class TableTest {
 
     String solrCollectionEndpoint ="/api/table";
 
@@ -86,8 +88,7 @@ class SolrCollectionTest {
     }
 
     @Test
-    @Transactional
-    void testCreateSolrCollection() throws Exception {
+    void testCreateTable() throws Exception {
 
         CreateTableDTO createTableDTO =new CreateTableDTO(tableName,"B");
 
@@ -119,8 +120,7 @@ class SolrCollectionTest {
 
 
     @Test
-    @Transactional
-    void testDeleteSolrCollection() throws Exception {
+    void testDeleteTable() throws Exception {
 
         //DELETE A NON EXISTING COLLECTION
         DeleteTableDTO deleteTableDTO=new DeleteTableDTO();
@@ -151,8 +151,7 @@ class SolrCollectionTest {
 
 
 //    @Test
-//    @Transactional
-//    void testRenameSolrCollection() throws Exception {
+//    void testRenameTable() throws Exception {
 //
 //        CreateTableDTO createTableDTO=new CreateTableDTO(tableName,"B");
 //
@@ -190,8 +189,7 @@ class SolrCollectionTest {
 
 
     @Test
-    @Transactional
-    void testGetSolrCollections() throws Exception {
+    void testGetTables() throws Exception {
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint )
@@ -207,8 +205,7 @@ class SolrCollectionTest {
 
 
     @Test
-    @Transactional
-    void testIsCollectionExists() throws Exception {
+    void testIsTableExists() throws Exception {
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isTableExists/"+ tableName)
@@ -224,8 +221,7 @@ class SolrCollectionTest {
 
 
     @Test
-    @Transactional
-    void testCapacityPlans() throws Exception {
+    void testGetCapacityPlans() throws Exception {
 
         restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/capacity-plans")
                         .accept(MediaType.APPLICATION_JSON))
@@ -235,8 +231,7 @@ class SolrCollectionTest {
 
 
     @Test
-    @Transactional
-    void testGetCollectionDetails() throws Exception {
+    void testGetTableDetails() throws Exception {
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint+"/details/testTable" )
