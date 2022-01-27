@@ -1,37 +1,35 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
+# Eclipse Files
+.settings/
 .project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+.classpath
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# Idea Files
+.idea/
+.iml/
 *.iml
 *.ipr
+*.iws
+*.idea
+
+# Package Files #
+*.war
+*.ear
+
+# build dir
+.gradle/
+build/
+target/
+bin/
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
+# Others
+hs_err_pid*
+*.sw?
+.#*
+*#
+*~
+*.sublime-*
+.svn/
+*.jks
+data/

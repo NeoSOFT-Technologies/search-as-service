@@ -10,6 +10,9 @@ group = 'com.searchservice'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+apply from: "gradle/docker.gradle"
+apply from: "gradle/sonar.gradle"
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
