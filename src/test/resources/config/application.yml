@@ -95,3 +95,14 @@ throttle-service:
     data-injection: solrDataInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
 #================================================================
+
+
+#================================================================
+# ConfigSet Configurations
+base-configset: _default
+
+# Solr authentication(basicAuth) credentials
+basic-auth:
+  username: solr
+  password: SolrRocks
+#================================================================
