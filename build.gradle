@@ -9,7 +9,7 @@ plugins {
 
 group = 'com.searchservice'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '1.8'
 
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
@@ -25,6 +25,18 @@ repositories {
 }
 
 //===============TO RUN JUINT TESTCASES====================
+test {
+    useJUnitPlatform()
+    exclude "**/*IT*", "**/*IntTest*"
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
+    jvmArgs += '-Djava.security.egd=file:/dev/./urandom -Xmx256m'
+    // uncomment if the tests reports are not generated
+    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
+    // ignoreFailures true
+    reports.html.enabled = false
+}
 task integrationTest(type: Test) {
 	useJUnitPlatform()
 	description = "Execute integration tests."
@@ -53,6 +65,9 @@ task testReport(type: TestReport) {
 task integrationTestReport(type: TestReport) {
 	destinationDir = file("$buildDir/reports/tests")
 	reportOn integrationTest
+}
+jacocoTestReport {
+    getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/*.exec"))
 }
 //==========================================================
 
