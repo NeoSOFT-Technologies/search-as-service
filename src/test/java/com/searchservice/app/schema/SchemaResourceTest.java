@@ -7,7 +7,8 @@ import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
 import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.service.SchemaService;
-import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;
+import com.searchservice.app.infrastructure.enums.SchemaFieldType;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

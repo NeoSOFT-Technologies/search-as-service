@@ -1,4 +1,6 @@
-package com.searchservice.app.domain.dto.schema;
+package com.searchservice.app.domain.dto;
+
+
 
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class FieldDTO {
+public class SchemaFieldDTO {
 
 	String name;
 	SchemaFieldType type;

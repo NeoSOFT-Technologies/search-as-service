@@ -6,7 +6,7 @@ import com.searchservice.app.domain.dto.schema.SchemaDTO;
 import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
-import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;
+import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 import com.searchservice.app.rest.errors.SchemaValidationException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;

@@ -1,4 +1,4 @@
-package com.searchservice.app.infrastructure.solrenum;
+package com.searchservice.app.infrastructure.enums;
 
 import org.apache.commons.lang3.StringUtils;
 

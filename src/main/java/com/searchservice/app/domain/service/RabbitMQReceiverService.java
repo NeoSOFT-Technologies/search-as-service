@@ -21,7 +21,7 @@ public class RabbitMQReceiverService implements RabbitMQRecieverServicePort {
 	RabbitTemplate rabbitTemplate;
 
 	@Override
-	@RabbitListener(queues = RabbitMQConfiguration.QUEUES)
+	//@RabbitListener(queues = RabbitMQConfiguration.QUEUES)
 	public void listener(String payload) {
 
 		LOGGER.info("Start Recive the Message ");

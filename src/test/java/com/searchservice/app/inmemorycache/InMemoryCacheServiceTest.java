@@ -6,7 +6,8 @@ import com.searchservice.app.domain.dto.document.DocumentDTO;
 import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.service.InMemoryCacheService;
-import com.searchservice.app.infrastructure.solrenum.SchemaFieldType;
+import com.searchservice.app.infrastructure.enums.SchemaFieldType;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
