@@ -24,6 +24,8 @@ repositories {
 	mavenCentral()
 }
 
+apply plugin: "eclipse"
+
 //===============TO RUN JUINT TESTCASES====================
 test {
     useJUnitPlatform()
