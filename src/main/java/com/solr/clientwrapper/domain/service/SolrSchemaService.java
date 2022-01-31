@@ -41,12 +41,12 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 	+ "Perhaps the target field- {} isn't present.";
 	private static final String MULTIVALUED = "multiValued";
-	private static final String SORTED = "sorted";
+	private static final String INDEXED = "indexed";
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
 	private static final String DEFAULT = "default";
 	private static final String VALIDATED = "validated";
-	private static final String FILTERED = "filtered";
+	private static final String DOCVALUES = "docValues";
 	
 	// Add bean for solr client API adapter
 	@Autowired
@@ -245,7 +245,10 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 				newField.put("type", SolrFieldType.fromEnumToString(fieldDto.getType()));
 				newField.put(REQUIRED, fieldDto.isRequired());
 				newField.put(STORED, fieldDto.isStorable());
-				newField.put(MULTIVALUED, fieldDto.isMultiValue());
+				newField.put(MULTIVALUED, fieldDto.isMultiValued());
+				newField.put(DEFAULT, fieldDto.getDefault_());
+				newField.put(DOCVALUES, fieldDto.isDocValues());
+				newField.put(INDEXED, fieldDto.isIndexed());
 
 				SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 				addFieldResponse = addFieldRequest.process(solrClient);
@@ -387,18 +390,18 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 		if(!solrFieldDTO.isRequired() && solrFieldDTO.isRequired()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = REQUIRED;
-		} else if(!solrFieldDTO.isFilterable() && solrFieldDTO.isFilterable()) {
+		} else if(!solrFieldDTO.isDocValues() && solrFieldDTO.isDocValues()) {
 			fieldAttributesValidated = false;
-			invalidAttribute = FILTERED;
-		} else if(!solrFieldDTO.isMultiValue() && solrFieldDTO.isMultiValue()) {
+			invalidAttribute = DOCVALUES;
+		} else if(!solrFieldDTO.isMultiValued() && solrFieldDTO.isMultiValued()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = "multValued";
 		} else if(!solrFieldDTO.isStorable() && solrFieldDTO.isStorable()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = STORED;
-		} else if(!solrFieldDTO.isSortable() && solrFieldDTO.isSortable()) {
+		} else if(!solrFieldDTO.isIndexed() && solrFieldDTO.isIndexed()) {
 			fieldAttributesValidated = false;
-			invalidAttribute = SORTED;
+			invalidAttribute = INDEXED;
 		}
 		if(!fieldAttributesValidated)
 			log.debug("Invalid entry for field attribute: \"{}\"", invalidAttribute);
@@ -408,27 +411,27 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 
 	@Override
 	public void setFieldsAsPerTheSchema(SolrFieldDTO solrFieldDTO, Map<String, Object> schemaField) {
-		if(schemaField.containsKey(FILTERED))
-			solrFieldDTO.setFilterable((boolean)schemaField.get(FILTERED));
+		if(schemaField.containsKey(DOCVALUES))
+			solrFieldDTO.setDocValues((boolean)schemaField.get(DOCVALUES));
 		if(schemaField.containsKey(MULTIVALUED))
-			solrFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
+			solrFieldDTO.setMultiValued((boolean)schemaField.get(MULTIVALUED));
 		if(schemaField.containsKey(DEFAULT))
 			solrFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
 		if(schemaField.containsKey(REQUIRED))
 			solrFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
-		if(schemaField.containsKey(SORTED))
-			solrFieldDTO.setSortable((boolean)schemaField.get(SORTED));
+		if(schemaField.containsKey(INDEXED))
+			solrFieldDTO.setIndexed((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(STORED))
 			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
 	}
 
 	@Override
 	public void setFieldsToDefaults(SolrFieldDTO solrFieldDTO) {
-		solrFieldDTO.setFilterable(false);
-		solrFieldDTO.setMultiValue(false);
+		solrFieldDTO.setDocValues(false);
+		solrFieldDTO.setMultiValued(false);
 		solrFieldDTO.setDefault_("mydefault");
 		solrFieldDTO.setRequired(false);
-		solrFieldDTO.setSortable(false);
+		solrFieldDTO.setIndexed(false);
 		solrFieldDTO.setStorable(true);
 	}
 
@@ -448,8 +451,11 @@ public class SolrSchemaService implements SolrSchemaServicePort {
 			fieldDtoMap.put("name", fieldDto.getName());
 			fieldDtoMap.put("type", SolrFieldType.fromEnumToString(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
-			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
+			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValued());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+			fieldDtoMap.put(DEFAULT, fieldDto.getDefault_());
+			fieldDtoMap.put(DOCVALUES, fieldDto.isDocValues());
+			fieldDtoMap.put(INDEXED, fieldDto.isIndexed());
 			schemaFieldsList.add(fieldDtoMap);
 		}
 		return schemaFieldsList;

@@ -53,12 +53,6 @@ public class SolrCollectionService implements SolrCollectionServicePort {
             }
         }
 
-        if(selectedCapacityPlan==null){
-            //INVALD SKU
-            solrResponseDTO.setStatusCode(400);
-            solrResponseDTO.setMessage("Invalid SKU: "+sku);
-            return solrResponseDTO;
-        }
 
         CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName, selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 

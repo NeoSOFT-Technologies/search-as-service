@@ -17,9 +17,9 @@ public class SolrFieldDTO {
 	SolrFieldType type;
 	String default_;
 	boolean isRequired;
-	boolean isFilterable;
+	boolean isIndexed;
 	boolean isStorable;
-	boolean isMultiValue;
-	boolean isSortable;
+	boolean isMultiValued;
+	boolean isDocValues;
 	
 }

@@ -30,6 +30,7 @@ public class SolrDocumentService implements SolrDocumentServicePort {
         SolrResponseDTO solrResponseDTO=new SolrResponseDTO(collectionName);
 
         Map<String,Map<String, Object>> schemaKeyValuePair= DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,collectionName);
+        System.out.println("DOCumentParsel:"+schemaKeyValuePair);
         if(schemaKeyValuePair == null){
             String message="Unable to get the Schema. Please check the collection name again!";
             log.debug(message);
