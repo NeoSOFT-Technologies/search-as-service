@@ -25,7 +25,6 @@ public interface InMemoryCacheServicePort {
 	List<FieldTypeDefinition> getSchemaFieldTypes(DocumentDTO documentDTO);
 	boolean validateSchemaField(FieldDTO fieldDTO);
 	boolean validateSchemaFieldBooleanAttributes(FieldDTO fieldDTO);
-	String getSolrClient(String tableName);
 
 	/* 
 	 * Logical operations in service methods 

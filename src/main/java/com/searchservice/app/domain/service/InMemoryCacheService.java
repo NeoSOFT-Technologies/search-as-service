@@ -5,12 +5,11 @@ import com.searchservice.app.domain.dto.document.DocumentDTO;
 import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.port.api.InMemoryCacheServicePort;
-import com.searchservice.app.infrastructure.adaptor.SchemaAPIAdapter;
+import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 import com.searchservice.app.rest.errors.SchemaValidationException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient.RemoteExecutionException;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,17 +56,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	
 	// call for solr client
 	@Autowired
-	SchemaAPIAdapter schemaAPIAdapter = new SchemaAPIAdapter();
-
-	@Override
-	public String getSolrClient(String tableName) {
-		SolrClient solr = schemaAPIAdapter.getSolrClient(URL_STRING, tableName);
-		CloudSolrClient solrCloud = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
-		solrCloud.setDefaultCollection(tableName);
-		log.debug("@Solr client : {}", solr);
-		log.debug("@Solr cloud client : {}", solrCloud);
-		return "Solr Clients are successfully retrieved.";
-	}
+	SolrAPIAdapter schemaAPIAdapter = new SolrAPIAdapter();
 
 	
 	@Override
@@ -76,8 +64,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	public DocumentResponseDTO get(String tableName, String name) {
 		log.debug("Get Solr Schema: {}", name);
 
-		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
-		solr.setDefaultCollection(tableName);
+		SolrClient solr = schemaAPIAdapter.getSolrClientWithTable(URL_STRING, tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		DocumentDTO solrSchemaDTO = new DocumentDTO();
@@ -161,8 +148,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 		log.debug("Target Schema: {}", documentDTO);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
-		solr.setDefaultCollection(tableName);
+		SolrClient solr = schemaAPIAdapter.getSolrClientWithTable(URL_STRING, tableName);
 		
 		DocumentResponseDTO solrSchemaResponseDTOBefore = new DocumentResponseDTO();
 		DocumentResponseDTO solrSchemaResponseDTOAfter = new DocumentResponseDTO();
@@ -256,8 +242,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 									  DocumentDTO newDocumentDTO) {
 		log.debug("Create Solr Schema: {}", name);
 
-		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
-		solr.setDefaultCollection(tableName);
+		SolrClient solr = schemaAPIAdapter.getSolrClientWithTable(URL_STRING, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
 		DocumentResponseDTO solrSchemaResponseDTOBefore = new DocumentResponseDTO();
@@ -351,8 +336,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	@Override
 	//@CacheEvict(value="solrcache", key = "#tableName")
 	public DocumentResponseDTO delete(String tableName, String name) {
-		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
-		solr.setDefaultCollection(tableName);
+		SolrClient solr = schemaAPIAdapter.getSolrClientWithTable(URL_STRING, tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
