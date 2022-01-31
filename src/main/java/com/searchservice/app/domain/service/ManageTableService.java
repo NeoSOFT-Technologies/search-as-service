@@ -566,7 +566,6 @@ public class ManageTableService implements ManageTableServicePort {
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		TableSchemaDTO tableSchemaDTO = new TableSchemaDTO();
 		TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
@@ -602,9 +601,6 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 			logger.debug("Total fields stored in attributes array: {}", schemaFieldIdx);
 	
-			tableSchemaDTO.setTableName(tableName);
-			tableSchemaDTO.setSchemaName(schemaRepresentation.getName());
-			tableSchemaDTO.setAttributes(Arrays.asList(solrSchemaFieldDTOs));
 			// prepare response dto
 			tableSchemaResponseDTO.setSchemaName(schemaName);
 			tableSchemaResponseDTO.setTableName(tableName);
