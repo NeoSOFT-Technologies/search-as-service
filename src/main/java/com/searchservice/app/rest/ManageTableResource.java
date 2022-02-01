@@ -67,12 +67,13 @@ public class ManageTableResource {
     }
 
     
-    @GetMapping("/schema/{tableName}")
+    @GetMapping("/schema/{tableName}/{clientID}")
     @Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<TableSchemaResponseDTO> getSchema(
-    		@PathVariable String tableName) {
+    		@PathVariable String tableName,@PathVariable int clientID) {
         log.debug("Get table schema");
 
+        tableName = tableName+"_"+clientID;
         TableSchemaResponseDTO tableSchemaResponseDTO=manageTableServicePort.getTableSchemaIfPresent(tableName);
         
         if(tableSchemaResponseDTO == null)
@@ -85,12 +86,12 @@ public class ManageTableResource {
     }
 	
 	
-    @PostMapping
+    @PostMapping("/{clientID}")
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ApiResponseDTO> createTable(
+    public ResponseEntity<ApiResponseDTO> createTable(@PathVariable int clientID,
     		@RequestBody ManageTableDTO manageTableDTO) {
         log.debug("Create table");
-
+        manageTableDTO.setTableName(manageTableDTO.getTableName()+"_"+clientID);
         ApiResponseDTO apiResponseDTO=manageTableServicePort.createTableIfNotPresent(manageTableDTO);
         if(apiResponseDTO.getResponseStatusCode()==200){
         	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
@@ -102,11 +103,12 @@ public class ManageTableResource {
     }
 
 	
-    @DeleteMapping("/{tableName}")
+    @DeleteMapping("/{tableName}/{clientID}")
     @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ApiResponseDTO> deleteTable(@PathVariable String tableName) {
+    public ResponseEntity<ApiResponseDTO> deleteTable(@PathVariable String tableName, @PathVariable int clientID) {
         log.debug("Delete table");
 
+        tableName = tableName+"_"+clientID;
         ApiResponseDTO apiResponseDTO=manageTableServicePort.deleteTable(tableName);
 
         if(apiResponseDTO.getResponseStatusCode()==200){
@@ -118,13 +120,15 @@ public class ManageTableResource {
     }
     
     
-	@PutMapping("/{tableName}")
+	@PutMapping("/{tableName}/{clientID}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ApiResponseDTO> updateTableSchema(
-			@PathVariable String tableName,
+			@PathVariable String tableName, @PathVariable int clientID,
 			@RequestBody TableSchemaDTO newTableSchemaDTO) {
+		tableName = tableName+"_"+clientID;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
+		newTableSchemaDTO.setTableName(newTableSchemaDTO.getTableName()+"_"+clientID);
 		ApiResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
 		if(apiResponseDTO.getResponseStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);

@@ -26,12 +26,13 @@ public class InputDocumentResource {
         this.inputDocumentServicePort = inputDocumentServicePort;
     }
 
-    @PostMapping("/documents/{tableName}")
+    @PostMapping("/documents/{tableName}/{clientID}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName, @RequestBody String payload, @RequestParam boolean isNRT) {
+    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName,@PathVariable int clientID, @RequestBody String payload, @RequestParam boolean isNRT) {
 
         log.debug("Solr documents add");
 
+        tableName = tableName+"_"+clientID;
         Instant start = Instant.now();
         ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload, isNRT);
         Instant end = Instant.now();
