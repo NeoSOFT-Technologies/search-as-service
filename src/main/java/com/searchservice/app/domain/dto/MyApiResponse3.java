@@ -5,13 +5,15 @@ import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Component
-public class ApiResponseDTOv2 {
-	private int responseStatusCode;
-	private String responseMessage;
+@ToString
+public class MyApiResponse3 {
 	private String responseStatus;
+	private int responseStatusCode;
+	private String responseMessage1;
+	private String responseMessage2;
 }
