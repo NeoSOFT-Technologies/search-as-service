@@ -5,7 +5,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -13,16 +12,15 @@ import com.searchservice.app.rest.errors.ContentNotFoundException;
 
 import static java.lang.Integer.parseInt;
 
-import java.util.Iterator;
 
 @RestControllerAdvice
-public class AdapterAdvice implements ResponseBodyAdvice<Versioned> {
+public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMapper> {
     private static final String PROTOCOL_VERSION_HEADER = "X-Protocol-Version";
 
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
     	for(Class<?> c: ((Class<?>)methodParameter.getGenericParameterType()).getInterfaces()) {
-    		if(c.equals(Versioned.class))
+    		if(c.equals(VersionedObjectMapper.class))
     			return true;
     	}
     	
@@ -30,8 +28,8 @@ public class AdapterAdvice implements ResponseBodyAdvice<Versioned> {
     }
 
     @Override
-    public Versioned beforeBodyWrite(
-            Versioned versioned,
+    public VersionedObjectMapper beforeBodyWrite(
+            VersionedObjectMapper versioned,
             MethodParameter methodParameter,
             MediaType mediaType,
             Class<? extends HttpMessageConverter<?>> aClass,
@@ -39,7 +37,6 @@ public class AdapterAdvice implements ResponseBodyAdvice<Versioned> {
             ServerHttpResponse serverHttpResponse) {
 
         String version = serverHttpRequest.getHeaders().getFirst(PROTOCOL_VERSION_HEADER);
-
         if(version == null) {
         	throw new ContentNotFoundException(
         			404, 
