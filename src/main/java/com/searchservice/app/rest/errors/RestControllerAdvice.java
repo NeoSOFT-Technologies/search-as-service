@@ -45,7 +45,7 @@ public class RestControllerAdvice {
 			Exception exception) {
 		log.error("Uncaught Error Occured:" + exception.getMessage());
 		return frameRestApiException(new RestApiError(
-										HttpStatus.INTERNAL_SERVER_ERROR, 
+										HttpStatus.BAD_REQUEST, 
 										"Something Went Wrong"));
 	}
 	
