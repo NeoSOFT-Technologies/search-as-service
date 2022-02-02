@@ -113,7 +113,8 @@ basic-auth:
 
 base-url:
   api-endpoint:
-    manage-table: /api-versioned/v1/manage/table
+    home: /api-versioned/v2
+    manage-table: /api-versioned/v2/manage/table
 
 # {saas-ms.request-header.api-version}
 saas-ms:

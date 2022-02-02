@@ -22,9 +22,9 @@ import static java.lang.Integer.parseInt;
 @Slf4j
 public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMapper> {
     @Value("${saas-ms.request-header.api-version}")
-	private String SAAS_VERSION_HEADER;
-    @Value("${base-url.api-endpoint.manage-table}")
-    private String BASE_URL_MANAGE_TABLE;
+	private String saasVersionHeader;
+    @Value("${base-url.api-endpoint.home}")
+    private String baseUrlHome;
     
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
@@ -59,12 +59,12 @@ public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMap
 		try {
 			// SET SAAS version in request header
 			String version = StringMatcherRegexUtil
-								.getMatchedSaasVersion(BASE_URL_MANAGE_TABLE).substring(1);
-			request.getHeaders().set(SAAS_VERSION_HEADER, version);
+								.getMatchedSaasVersion(baseUrlHome).substring(1);
+			request.getHeaders().set(saasVersionHeader, version);
 	        if(version == null) {
 	        	throw new ContentNotFoundException(
 	        			404, 
-	        			String.format("'%s' header NOT FOUND.", SAAS_VERSION_HEADER));
+	        			String.format("'%s' header NOT FOUND.", saasVersionHeader));
 	        }
 	        
 	        return body.toVersion(parseInt(version));

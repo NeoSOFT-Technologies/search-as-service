@@ -14,17 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class GetCapacityPlanDTO implements VersionedObjectMapper {
+public class GetCapacityPlanDTOv2 implements VersionedObjectMapper {
 
+	private int statusCode;
+	private String message;
     private List<CapacityPlanProperties.Plan> plans;
+
+    public GetCapacityPlanDTOv2(List<CapacityPlanProperties.Plan> plans) {
+        this.plans = plans;
+    }
 
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
-		if(version >= 2)
-			return new GetCapacityPlanDTOv2(
-					200, 
-					"Operation completed successfully" ,
-					plans).toVersion(version);
 		return this;
 	}
 
