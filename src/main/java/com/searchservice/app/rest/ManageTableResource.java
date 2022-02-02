@@ -88,7 +88,7 @@ public class ManageTableResource {
     @PostMapping
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponseDTO> createTable(
-    		@RequestBody ManageTableDTO manageTableDTO) throws Exception {
+    		@RequestBody ManageTableDTO manageTableDTO) {
         log.debug("Create table");
         ApiResponseDTO apiResponseDTO=manageTableServicePort.createTableIfNotPresent(manageTableDTO);
         if(apiResponseDTO.getResponseStatusCode()==200){

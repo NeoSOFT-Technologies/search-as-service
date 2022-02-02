@@ -39,7 +39,6 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 
@@ -52,7 +51,6 @@ public class SchemaResource {
 		if(schemaResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(schemaResponseDTO);
 		else
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(schemaResponseDTO);
 			throw new SchemaResourceException(schemaResponseDTO.getStatusCode(), schemaResponseDTO.getMessage());
 		
 	}
@@ -69,7 +67,6 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 
@@ -82,7 +79,6 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
 			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 }

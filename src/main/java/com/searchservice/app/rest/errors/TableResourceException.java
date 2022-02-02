@@ -14,9 +14,6 @@ import lombok.NoArgsConstructor;
 @Component
 public class TableResourceException extends RuntimeException{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private int exceptionCode;
 	private String exceptionMessage;

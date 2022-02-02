@@ -44,7 +44,6 @@ public class InputDocumentResource {
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-           // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
         	throw new InputDocumentException(solrResponseDTO.getStatusCode(),solrResponseDTO.getMessage());
         }
 

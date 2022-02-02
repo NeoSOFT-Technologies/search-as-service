@@ -6,7 +6,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -43,7 +42,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaughtException(
 			Exception exception) {
-		log.error("Uncaught Error Occured:" + exception.getMessage());
+		log.error("Uncaught Error Occured:" ,exception.getMessage());
 		return frameRestApiException(new RestApiError(
 										HttpStatus.BAD_REQUEST, 
 										"Something Went Wrong"));

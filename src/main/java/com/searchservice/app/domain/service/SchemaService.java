@@ -39,6 +39,7 @@ public class SchemaService implements SchemaServicePort {
 	@Value("${base-solr-url}")
 	private String solrURL;
 	private static final String SOLR_EXCEPTION_MSG = "The collection - {} is Not Found in the Solr Cloud!";
+	private static final String SCHEMA_FILED_EXCEPTION_MSG = "So schema fields can't be found/deleted! ";
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 	+ "Perhaps the target field- {} isn't present.";
 	private static final String MULTIVALUED = "multiValued";
@@ -195,7 +196,7 @@ public class SchemaService implements SchemaServicePort {
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted! "+tableName);
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG+ SCHEMA_FILED_EXCEPTION_MSG +tableName);
 			log.error(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} catch (SchemaValidationException e) {
@@ -284,7 +285,7 @@ public class SchemaService implements SchemaServicePort {
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted! "+tableName);
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG + SCHEMA_FILED_EXCEPTION_MSG + tableName);
 			log.error(SOLR_EXCEPTION_MSG+" So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} 
@@ -350,7 +351,7 @@ public class SchemaService implements SchemaServicePort {
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted! "+tableName);
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG + SCHEMA_FILED_EXCEPTION_MSG + tableName);
 			log.error(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted!", tableName);
 			log.debug(e.toString());
 		} 
