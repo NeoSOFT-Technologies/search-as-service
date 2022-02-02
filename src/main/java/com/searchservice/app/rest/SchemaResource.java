@@ -4,6 +4,8 @@ package com.searchservice.app.rest;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
 import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
+import com.searchservice.app.rest.errors.SchemaResourceException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -37,7 +39,8 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 
 	@DeleteMapping("/{tableName}")
@@ -49,7 +52,8 @@ public class SchemaResource {
 		if(schemaResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(schemaResponseDTO);
 		else
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(schemaResponseDTO);
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(schemaResponseDTO);
+			throw new SchemaResourceException(schemaResponseDTO.getStatusCode(), schemaResponseDTO.getMessage());
 		
 	}
 
@@ -65,7 +69,8 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 
 	@GetMapping("/{tableName}")
@@ -77,6 +82,7 @@ public class SchemaResource {
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+			throw new SchemaResourceException(solrResponseDTO.getStatusCode(), solrResponseDTO.getMessage());
 	}
 }

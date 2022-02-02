@@ -88,14 +88,14 @@ public class ManageTableResource {
     @PostMapping
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponseDTO> createTable(
-    		@RequestBody ManageTableDTO manageTableDTO) {
+    		@RequestBody ManageTableDTO manageTableDTO) throws Exception {
         log.debug("Create table");
-
         ApiResponseDTO apiResponseDTO=manageTableServicePort.createTableIfNotPresent(manageTableDTO);
         if(apiResponseDTO.getResponseStatusCode()==200){
         	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
             return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-        }else{
+        }
+       else{
         	log.debug("Table could not be created: {}", apiResponseDTO);
             throw new BadRequestOccurredException(400, "REST operation could not be performed");
         }
