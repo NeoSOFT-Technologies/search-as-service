@@ -6,9 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +19,7 @@ import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -108,4 +111,35 @@ public class VersionedManageTableResource {
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
+    
+    
+    @DeleteMapping("/{tableName}")
+    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+    public ApiResponseDTO deleteTable(@PathVariable String tableName) {
+        log.debug("Delete table");
+
+        ApiResponseDTO apiResponseDTO=manageTableServicePort.deleteTable(tableName);
+
+        if(apiResponseDTO.getResponseStatusCode()==200){
+            return apiResponseDTO;
+        }else{
+        	log.debug("Exception occurred: {}", apiResponseDTO);
+            throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+        }
+    }
+    
+    
+	@PutMapping("/{tableName}")
+	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	public ApiResponseDTO updateTableSchema(
+			@PathVariable String tableName,
+			@RequestBody TableSchemaDTO newTableSchemaDTO) {
+		log.debug("Solr schema update");
+		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
+		ApiResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+		if(apiResponseDTO.getResponseStatusCode() == 200)
+			return apiResponseDTO;
+		else
+			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+	}
 }
