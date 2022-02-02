@@ -51,13 +51,13 @@ public class TableService implements TableServicePort {
 				selectedCapacityPlan = capacityPlan;
 			}
 		}
-//
-//		if (selectedCapacityPlan == null) {
-//			// INVALD SKU
-//			responseDTO.setStatusCode(400);
-//			responseDTO.setMessage("Invalid SKU: " + sku);
-//			return responseDTO;
-//		}
+
+		if (selectedCapacityPlan == null) {
+			// INVALD SKU
+			responseDTO.setStatusCode(400);
+			responseDTO.setMessage("Invalid SKU: " + sku);
+			return responseDTO;
+		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(collectionName,
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
