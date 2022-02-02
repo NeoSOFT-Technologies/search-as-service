@@ -12,7 +12,8 @@ import java.io.IOException;
 public abstract class BaseClient {
     private static final String PROTOCOL_VERSION_HEADER = "X-Protocol-Version";
 	private static final ObjectMapper objectMapper = new ObjectMapper()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+			.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
     
     private final int protocolVersion;
     private final OkHttpClient client = new OkHttpClient();
@@ -28,6 +29,9 @@ public abstract class BaseClient {
                 .build();
 
         Response response = client.newCall(request).execute();
+        
+        System.out.println("base client > respEntDTO byteStream :: "
+        		+objectMapper.writeValueAsString(response));
         
         return objectMapper.readValue(response.body().byteStream(), clazz);
     }

@@ -18,7 +18,7 @@ public class Client3 extends BaseClient {
     public void doWork() throws IOException {
     	log.info("Client 3 executing........");
         MyApiResponse3 resp = super.getAs(
-        		"http://localhost:8080/test-versioning/3", 
+        		"http://localhost:8080/test-versioning/response-entity/3", 
         		MyApiResponse3.class);
         log.info("Version {} ApiResponse: {}", 3, resp);
     }

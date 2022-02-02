@@ -1,6 +1,5 @@
 package com.searchservice.app.domain.dto;
 
-import org.springframework.stereotype.Component;
 
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
@@ -9,14 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class MyApiResponseDTOv1 implements VersionedObjectMapper {
 	private String responseStatus;
 	private String responseMessage;
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
-		System.out.println(">>>>>>>>>> v1 <<<<<<<<< :: "+responseMessage);
 		return this;
 	}
 }
