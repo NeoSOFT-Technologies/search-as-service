@@ -4,13 +4,19 @@ package com.searchservice.app.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -82,6 +88,23 @@ public class VersionedManageTableResource {
         if(tableSchemaResponseDTO.getStatusCode()==200){
             return tableSchemaResponseDTO;
         }else{
+            throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+        }
+    }
+
+    
+    @PostMapping
+    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
+    public ApiResponseDTO createTable(
+    		@RequestBody ManageTableDTO manageTableDTO) {
+        log.debug("Create table");
+
+        ApiResponseDTO apiResponseDTO=manageTableServicePort.createTableIfNotPresent(manageTableDTO);
+        if(apiResponseDTO.getResponseStatusCode()==200){
+        	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
+            return apiResponseDTO;
+        }else{
+        	log.debug("Table could not be created: {}", apiResponseDTO);
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }

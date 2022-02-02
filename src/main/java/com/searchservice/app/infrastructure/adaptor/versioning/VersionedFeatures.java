@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.searchservice.app.rest.VersionedManageTableResource;
-import com.searchservice.app.rest.VersioningTestResource;
 
 import lombok.Data;
 
@@ -33,7 +32,6 @@ public class VersionedFeatures {
 	public static List<Class<?>> getAllVersionedResources() {
 		versioned.addAll(
 				Arrays.asList(
-						VersioningTestResource.class, 
 						VersionedManageTableResource.class));
 		
 		return versioned;
