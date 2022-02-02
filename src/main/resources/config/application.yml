@@ -97,6 +97,7 @@ throttle-service:
 #================================================================
 
 
+#================================================================
 # ConfigSet Configurations
 base-configset: _default
 
@@ -104,3 +105,19 @@ base-configset: _default
 basic-auth:
   username: solr
   password: SolrRocks
+#================================================================
+
+
+#================================================================
+#ObjectMapperVersioning configurations
+
+base-url:
+  api-endpoint:
+    manage-table: /api-versioned/v1/manage/table
+
+# {saas-ms.request-header.api-version}
+saas-ms:
+  request-header:
+    api-version: X-Api-Version
+
+#================================================================

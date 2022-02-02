@@ -14,38 +14,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class TableSchemaResponseDTO implements VersionedObjectMapper {
+public class TableSchemaResponseDTOv2 implements VersionedObjectMapper {
 
 	private int statusCode;
 	private String message;
-	private String tableName;
 	private String schemaName;
 	private List<SchemaFieldDTO> attributes;
 	
-	public TableSchemaResponseDTO(TableSchemaResponseDTO schemaResponseDTO) {
+	public TableSchemaResponseDTOv2(TableSchemaResponseDTOv2 schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();
 		this.message=schemaResponseDTO.getMessage();
-		this.tableName = schemaResponseDTO.getTableName();
 		this.schemaName=schemaResponseDTO.getSchemaName();
 		this.attributes=schemaResponseDTO.getAttributes();	
 	}
 	
-	public TableSchemaResponseDTO(String tableName, String schemaName, List<SchemaFieldDTO> attributes) {
-		this.tableName = tableName;
+	public TableSchemaResponseDTOv2(String schemaName, List<SchemaFieldDTO> attributes) {
 		this.schemaName = schemaName;
 		this.attributes = attributes;
 	}
 
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
-		if(version >= 2) {
-			return new TableSchemaResponseDTOv2(
-					statusCode, 
-					message, 
-					schemaName, 
-					attributes).toVersion(version);
-		}
-		
 		return this;
 	}
 }

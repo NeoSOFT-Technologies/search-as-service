@@ -1,20 +1,21 @@
-package com.searchservice.app.domain.dto.table;
+package com.searchservice.app.infrastructure.adaptor.versioning.clients.objectmapper;
 
 import java.util.List;
 
 import com.searchservice.app.domain.dto.SchemaFieldDTO;
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class TableSchemaResponseDTO implements VersionedObjectMapper {
+@ToString
+public class TableSchemaResponse1 {
 
 	private int statusCode;
 	private String message;
@@ -22,7 +23,7 @@ public class TableSchemaResponseDTO implements VersionedObjectMapper {
 	private String schemaName;
 	private List<SchemaFieldDTO> attributes;
 	
-	public TableSchemaResponseDTO(TableSchemaResponseDTO schemaResponseDTO) {
+	public TableSchemaResponse1(TableSchemaResponse1 schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();
 		this.message=schemaResponseDTO.getMessage();
 		this.tableName = schemaResponseDTO.getTableName();
@@ -30,22 +31,9 @@ public class TableSchemaResponseDTO implements VersionedObjectMapper {
 		this.attributes=schemaResponseDTO.getAttributes();	
 	}
 	
-	public TableSchemaResponseDTO(String tableName, String schemaName, List<SchemaFieldDTO> attributes) {
+	public TableSchemaResponse1(String tableName, String schemaName, List<SchemaFieldDTO> attributes) {
 		this.tableName = tableName;
 		this.schemaName = schemaName;
 		this.attributes = attributes;
-	}
-
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		if(version >= 2) {
-			return new TableSchemaResponseDTOv2(
-					statusCode, 
-					message, 
-					schemaName, 
-					attributes).toVersion(version);
-		}
-		
-		return this;
 	}
 }
