@@ -2,7 +2,6 @@ package com.searchservice.app.rest;
 
 
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.port.api.InMemoryCacheServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,11 +27,11 @@ public class InMemoryCacheResource {
 
 	@PostMapping("/create")
 	@Operation(summary = "/create-doc", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<DocumentResponseDTO> create(
+	public ResponseEntity<DocumentDTO> create(
 			@RequestBody DocumentDTO newSolrdocumentDTO) {
 		log.debug("Solr Schema Create");
 		log.debug("Received Schema as in Request Body: {}", newSolrdocumentDTO);
-		DocumentResponseDTO solrResponseDTO =
+		DocumentDTO solrResponseDTO =
 				inMemoryCacheServicePort.create(
 						newSolrdocumentDTO.getTableName(), 
 						newSolrdocumentDTO.getName(), 
@@ -45,11 +44,11 @@ public class InMemoryCacheResource {
 
 	@DeleteMapping("/delete/{tableName}/{name}")
 	@Operation(summary = "/delete-doc", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<DocumentResponseDTO> delete(
+	public ResponseEntity<DocumentDTO> delete(
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("Schema Delete");
-		DocumentResponseDTO documentResponseDTO = inMemoryCacheServicePort.delete(tableName, name);
+		DocumentDTO documentResponseDTO = inMemoryCacheServicePort.delete(tableName, name);
 		if(documentResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(documentResponseDTO);
 		else
@@ -60,14 +59,14 @@ public class InMemoryCacheResource {
 	@PutMapping("/update/{tableName}/{name}")
 	@Operation(summary = "/update-doc", security = @SecurityRequirement(name = "bearerAuth"))
 	//@CachePut(value = "solrcache",key = "#tableName")
-	public ResponseEntity<DocumentResponseDTO> update(
+	public ResponseEntity<DocumentDTO> update(
 			@PathVariable String tableName, 
 			@PathVariable String name, 
 			@RequestBody DocumentDTO newDocumentDTO) {
 		log.debug("Solr doc update");
 		log.debug("Received doc as in Request Body: {}", newDocumentDTO);
-		DocumentResponseDTO solrSchemaDTO = inMemoryCacheServicePort.update(tableName, name, newDocumentDTO);
-		DocumentResponseDTO solrResponseDTO = new DocumentResponseDTO(solrSchemaDTO);
+		DocumentDTO solrSchemaDTO = inMemoryCacheServicePort.update(tableName, name, newDocumentDTO);
+		DocumentDTO solrResponseDTO = new DocumentDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
@@ -77,11 +76,11 @@ public class InMemoryCacheResource {
 	@GetMapping("/get/{tableName}/{name}")
 	@Operation(summary = "/get-doc", security = @SecurityRequirement(name = "bearerAuth"))
 	@Cacheable(value = "solrcache",key = "#tableName")
-	public ResponseEntity<DocumentResponseDTO> get(
+	public ResponseEntity<DocumentDTO> get(
 			@PathVariable String tableName, 
 			@PathVariable String name) {
 		log.debug("get solar doc");
-		DocumentResponseDTO solrResponseDTO = inMemoryCacheServicePort.get(tableName, name);
+		DocumentDTO solrResponseDTO = inMemoryCacheServicePort.get(tableName, name);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else

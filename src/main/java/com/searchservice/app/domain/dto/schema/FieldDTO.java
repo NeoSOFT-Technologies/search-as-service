@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+
+//Merged With SchemaFieldDTO 
 public class FieldDTO {
 
 	String name;

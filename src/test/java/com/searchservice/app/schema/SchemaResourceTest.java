@@ -5,7 +5,6 @@ import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.service.SchemaService;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
@@ -71,7 +70,7 @@ public class SchemaResourceTest {
 	private SchemaService schemaService;
 
 	public void setMockitoSucccessResponseForService() {
-		SchemaResponseDTO schemaResponseDTO = new SchemaResponseDTO(tableName, name, attributes);
+		SchemaDTO schemaResponseDTO = new SchemaDTO(tableName, name, attributes);
 		schemaResponseDTO.setStatusCode(200);
 		Mockito.when(schemaService.create(Mockito.any(), Mockito.any())).thenReturn(schemaResponseDTO);
 		Mockito.when(schemaService.delete(Mockito.any())).thenReturn(schemaResponseDTO);
@@ -80,7 +79,7 @@ public class SchemaResourceTest {
 	}
 
 	public void setMockitoBadResponseForService() {
-		SchemaResponseDTO schemaResponseDTO = new SchemaResponseDTO(tableName, name, attributes);
+		SchemaDTO schemaResponseDTO = new SchemaDTO(tableName, name, attributes);
 		schemaResponseDTO.setStatusCode(400);
 		Mockito.when(schemaService.create(Mockito.any(), Mockito.any())).thenReturn(schemaResponseDTO);
 		Mockito.when(schemaService.delete(Mockito.any())).thenReturn(schemaResponseDTO);

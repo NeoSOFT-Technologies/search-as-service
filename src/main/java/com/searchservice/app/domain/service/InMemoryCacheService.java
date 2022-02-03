@@ -2,7 +2,6 @@ package com.searchservice.app.domain.service;
 
 
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.port.api.InMemoryCacheServicePort;
 import com.searchservice.app.infrastructure.adaptor.SchemaAPIAdapter;
@@ -73,7 +72,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	
 	@Override
 	//@Cacheable(value = "solrcache",key = "#tableName")
-	public DocumentResponseDTO get(String tableName, String name) {
+	public DocumentDTO get(String tableName, String name) {
 		log.debug("Get Solr Schema: {}", name);
 
 		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
@@ -81,15 +80,14 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		DocumentDTO solrSchemaDTO = new DocumentDTO();
-		DocumentResponseDTO solrSchemaResponseDTO = new DocumentResponseDTO();
+		DocumentDTO solrSchemaResponseDTO = new DocumentDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solr);
 			log.debug("Get request has been processed. Setting status code = 200");
-			solrSchemaResponseDTO.setStatusCode(200);
-			
+			solrSchemaResponseDTO.setStatusCode(200);			
 			// explore response content
 			log.debug("\nSchema Response : {}", schemaResponse);
 			log.debug("\nResponse header : {}", schemaResponse.getResponseHeader());
@@ -154,7 +152,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	
 	@Override
 	//@CachePut(value = "solrcache",key = "#tableName")
-	public DocumentResponseDTO update(String tableName,
+	public DocumentDTO update(String tableName,
 									  String name,
 									  DocumentDTO documentDTO) {
 		log.debug("Update Solr Schema: {}", name);
@@ -164,8 +162,8 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		
-		DocumentResponseDTO solrSchemaResponseDTOBefore = new DocumentResponseDTO();
-		DocumentResponseDTO solrSchemaResponseDTOAfter = new DocumentResponseDTO();
+		DocumentDTO solrSchemaResponseDTOBefore = new DocumentDTO();
+		DocumentDTO solrSchemaResponseDTOAfter = new DocumentDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -251,7 +249,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	}
 	
 	@Override
-	public DocumentResponseDTO create(String tableName,
+	public DocumentDTO create(String tableName,
 									  String name,
 									  DocumentDTO newDocumentDTO) {
 		log.debug("Create Solr Schema: {}", name);
@@ -260,8 +258,8 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 		solr.setDefaultCollection(tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		DocumentResponseDTO solrSchemaResponseDTOBefore = new DocumentResponseDTO();
-		DocumentResponseDTO solrSchemaResponseDTOAfter = new DocumentResponseDTO();
+		DocumentDTO solrSchemaResponseDTOBefore = new DocumentDTO();
+		DocumentDTO solrSchemaResponseDTOAfter = new DocumentDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -350,14 +348,14 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 
 	@Override
 	//@CacheEvict(value="solrcache", key = "#tableName")
-	public DocumentResponseDTO delete(String tableName, String name) {
+	public DocumentDTO delete(String tableName, String name) {
 		CloudSolrClient solr = schemaAPIAdapter.getCloudSolrClient(URL_STRING, tableName);
 		solr.setDefaultCollection(tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		DocumentResponseDTO solrSchemaResponseDTOBefore = new DocumentResponseDTO();
-		DocumentResponseDTO solrSchemaResponseDTOAfter = new DocumentResponseDTO();
+		DocumentDTO solrSchemaResponseDTOBefore = new DocumentDTO();
+		DocumentDTO solrSchemaResponseDTOAfter = new DocumentDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";

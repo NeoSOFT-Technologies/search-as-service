@@ -2,7 +2,6 @@ package com.searchservice.app.rest;
 
 
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,11 +25,11 @@ public class SchemaResource {
 
 	@PostMapping
 	@Operation(summary = "/ Associate  a new schema by passing tableName, name and attributes it will return created  schema.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SchemaResponseDTO> create(
+	public ResponseEntity<SchemaDTO> create(
 			@RequestBody SchemaDTO newSchemaDTO) {
 		log.debug("Solr Schema Create");
 		log.debug("Received Schema as in Request Body: {}", newSchemaDTO);
-		SchemaResponseDTO solrResponseDTO =
+		SchemaDTO solrResponseDTO =
 				schemaServicePort.create(
 						newSchemaDTO.getTableName(),
 						newSchemaDTO);
@@ -42,10 +41,10 @@ public class SchemaResource {
 
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "/ Remove the schema by passing TableName and it will return deleted schema and statusCode. ", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SchemaResponseDTO> delete(
+	public ResponseEntity<SchemaDTO> delete(
 			@PathVariable String tableName) {
 		log.debug("Schema Delete");
-		SchemaResponseDTO schemaResponseDTO = schemaServicePort.delete(tableName);
+		SchemaDTO schemaResponseDTO = schemaServicePort.delete(tableName);
 		if(schemaResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.ok().body(schemaResponseDTO);
 		else
@@ -55,13 +54,13 @@ public class SchemaResource {
 
 	@PutMapping("/{tableName}")
 	@Operation(summary = "/ Update schema by passing TableName.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SchemaResponseDTO> update(
+	public ResponseEntity<SchemaDTO> update(
 			@PathVariable String tableName,
 			@RequestBody SchemaDTO newSchemaDTO) {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newSchemaDTO);
-		SchemaResponseDTO solrSchemaDTO = schemaServicePort.update(tableName, newSchemaDTO);
-		SchemaResponseDTO solrResponseDTO = new SchemaResponseDTO(solrSchemaDTO);
+		SchemaDTO solrSchemaDTO = schemaServicePort.update(tableName, newSchemaDTO);
+		SchemaDTO solrResponseDTO = new SchemaDTO(solrSchemaDTO);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else
@@ -70,10 +69,10 @@ public class SchemaResource {
 
 	@GetMapping("/{tableName}")
 	@Operation(summary = "/ Get schema by passing TableName.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<SchemaResponseDTO> get(
+	public ResponseEntity<SchemaDTO> get(
 			@PathVariable String tableName) {
 		log.debug("get solar schema");
-		SchemaResponseDTO solrResponseDTO = schemaServicePort.get(tableName);
+		SchemaDTO solrResponseDTO = schemaServicePort.get(tableName);
 		if(solrResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
 		else

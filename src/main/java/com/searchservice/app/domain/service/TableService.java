@@ -54,8 +54,8 @@ public class TableService implements TableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			responseDTO.setStatusCode(400);
-			responseDTO.setMessage("Invalid SKU: " + sku);
+			responseDTO.setResponseStatusCode(400);
+			responseDTO.setResponseMessage("Invalid SKU: " + sku);
 			return responseDTO;
 		}
 
@@ -69,12 +69,12 @@ public class TableService implements TableServicePort {
 		String constantstring = "Exception";
 		try {
 			CollectionAdminResponse response = request.process(solrClient);
-			responseDTO.setStatusCode(200);
-			responseDTO.setMessage("Successfully created Solr Collection: " + collectionName);
+			responseDTO.setResponseStatusCode(200);
+			responseDTO.setResponseMessage("Successfully created Solr Collection: " + collectionName);
 		} catch (Exception e) {
 			log.error(e.toString());
-			responseDTO.setStatusCode(400);
-			responseDTO.setMessage("Unable to create Solr Collection: " + collectionName + constantstring);
+			responseDTO.setResponseStatusCode(400);
+			responseDTO.setResponseMessage("Unable to create Solr Collection: " + collectionName + constantstring);
 		}
 
 		return responseDTO;
@@ -94,12 +94,12 @@ public class TableService implements TableServicePort {
 			CollectionAdminResponse response = request.process(solrClient);
 			CollectionAdminResponse deleteAliasResponse = deleteAliasRequest.process(solrClient);
 
-			responseDTO.setStatusCode(200);
-			responseDTO.setMessage("Successfully deleted Solr Collection: " + collectionName);
+			responseDTO.setResponseStatusCode(200);
+			responseDTO.setResponseMessage("Successfully deleted Solr Collection: " + collectionName);
 		} catch (Exception e) {
 			log.error(e.toString());
-			responseDTO.setStatusCode(400);
-			responseDTO.setMessage("Unable to delete Solr Collection: " + collectionName + ". Exception.");
+			responseDTO.setResponseStatusCode(400);
+			responseDTO.setResponseMessage("Unable to delete Solr Collection: " + collectionName + ". Exception.");
 		}
 
 		return responseDTO;
@@ -167,18 +167,18 @@ public class TableService implements TableServicePort {
 			List<String> allCollections = (List<String>) response.getResponse().get("collections");
 
 			if (allCollections.contains(collectionName)) {
-				responseDTO.setStatusCode(200);
-				responseDTO.setMessage("true");
+				responseDTO.setResponseStatusCode(200);
+				responseDTO.setResponseMessage("true");
 			} else {
-				responseDTO.setStatusCode(200);
-				responseDTO.setMessage("false");
+				responseDTO.setResponseStatusCode(200);
+				responseDTO.setResponseMessage("false");
 			}
 
 		} catch (Exception e) {
 			log.error(e.toString());
 
-			responseDTO.setStatusCode(400);
-			responseDTO.setMessage("Error!");
+			responseDTO.setResponseStatusCode(400);
+			responseDTO.setResponseMessage("Error!");
 
 		}
 

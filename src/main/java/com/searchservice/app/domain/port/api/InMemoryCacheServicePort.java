@@ -2,7 +2,6 @@ package com.searchservice.app.domain.port.api;
 
 
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 
@@ -14,10 +13,10 @@ public interface InMemoryCacheServicePort {
 	/* 
 	 * CRUD operations on solr schema
 	 */
-	DocumentResponseDTO create(String tableName, String name, DocumentDTO newDocumentDTO);
-	DocumentResponseDTO update(String tableName, String name, DocumentDTO documentDTO);
-	DocumentResponseDTO delete(String tableName, String name);
-	DocumentResponseDTO get(String tableName, String name);
+	DocumentDTO create(String tableName, String name, DocumentDTO newDocumentDTO);
+	DocumentDTO update(String tableName, String name, DocumentDTO documentDTO);
+	DocumentDTO delete(String tableName, String name);
+	DocumentDTO get(String tableName, String name);
 	
 	/*
 	 * Validation of solr schema and External API callings 

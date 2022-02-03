@@ -1,9 +1,9 @@
 package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.CreateTableDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
+import com.searchservice.app.domain.dto.table.TableOperationDTO;
 import com.searchservice.app.domain.port.api.TableServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,13 +42,13 @@ public class TableResource {
 
     @PostMapping
     @Operation(summary = "/ Associate the Table by passing collectionName and capacity plan and return message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> create(@RequestBody CreateTableDTO createTableDTO) {
+    public ResponseEntity<ResponseDTO> create(@RequestBody TableOperationDTO createTableDTO) {
 
         log.debug("Solr Collection create");
 
         ResponseDTO responseDTO = tableServicePort.create(createTableDTO.getTableName(), createTableDTO.getSku());
 
-        if(responseDTO.getStatusCode()==200){
+        if(responseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
@@ -64,7 +64,7 @@ public class TableResource {
 
         ResponseDTO responseDTO = tableServicePort.delete(tableName);
 
-        if(responseDTO.getStatusCode()==200){
+        if(responseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
@@ -114,7 +114,7 @@ public class TableResource {
 
         ResponseDTO responseDTO = tableServicePort.isCollectionExists(tableName);
 
-        if(responseDTO.getStatusCode()==200){
+        if(responseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);

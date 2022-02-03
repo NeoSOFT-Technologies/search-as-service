@@ -3,7 +3,6 @@ package com.searchservice.app.domain.port.api;
 
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 
 import java.util.List;
@@ -14,10 +13,10 @@ public interface SchemaServicePort {
 	/* 
 	 * CRUD operations on solr schema
 	 */
-	SchemaResponseDTO create(String tableName, SchemaDTO newSchemaDTO);
-	SchemaResponseDTO update(String tableName, SchemaDTO schemaDTO);
-	SchemaResponseDTO delete(String tableName);
-	SchemaResponseDTO get(String tableName);
+	SchemaDTO create(String tableName, SchemaDTO newSchemaDTO);
+	SchemaDTO update(String tableName, SchemaDTO schemaDTO);
+	SchemaDTO delete(String tableName);
+	SchemaDTO get(String tableName);
 	
 	/*
 	 * Validation of solr schema and External API callings 

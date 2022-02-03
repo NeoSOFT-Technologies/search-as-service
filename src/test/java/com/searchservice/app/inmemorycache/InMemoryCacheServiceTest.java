@@ -3,7 +3,6 @@ package com.searchservice.app.inmemorycache;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.service.InMemoryCacheService;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
@@ -34,11 +33,11 @@ public class InMemoryCacheServiceTest {
 	@Test
 	void testCreateSchemaService() throws IOException, Exception {
 		
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name, attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name, attributes);
 		
 		DocumentDTO solrDocumentDTO = new DocumentDTO(tableName, name, attributes);
 		when(inMemoryCacheService.create(tableName, name, solrDocumentDTO)).thenReturn(solrDocumentResponseDTO);
-		DocumentResponseDTO createsolr = inMemoryCacheService.create(tableName, name, solrDocumentDTO);
+		DocumentDTO createsolr = inMemoryCacheService.create(tableName, name, solrDocumentDTO);
 		assertThat(createsolr).isNotNull();
 		
 	}
@@ -46,11 +45,11 @@ public class InMemoryCacheServiceTest {
 	@Test
 	void testUpdateSchemaService() throws IOException, Exception {
 		
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name, attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name, attributes);
 		
 		DocumentDTO solrDocumentDTO = new DocumentDTO(tableName, name, attributes);
 		when(inMemoryCacheService.update(tableName, name, solrDocumentDTO)).thenReturn(solrDocumentResponseDTO);
-		DocumentResponseDTO updatesolr = inMemoryCacheService.update(tableName, name, solrDocumentDTO);
+		DocumentDTO updatesolr = inMemoryCacheService.update(tableName, name, solrDocumentDTO);
 		assertThat(updatesolr).isNotNull();
 		
 	}
@@ -58,9 +57,9 @@ public class InMemoryCacheServiceTest {
 	@Test
 	void testDeleteSchemaService() throws IOException, Exception {
 		
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name, attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name, attributes);
 		when(inMemoryCacheService.delete(tableName, name)).thenReturn(solrDocumentResponseDTO);
-		DocumentResponseDTO deletesolr = inMemoryCacheService.delete(tableName, name);
+		DocumentDTO deletesolr = inMemoryCacheService.delete(tableName, name);
 		assertThat(deletesolr).isNotNull();
 		
 	}
@@ -68,9 +67,9 @@ public class InMemoryCacheServiceTest {
 	@Test
 	void testGetSchemaService() throws IOException, Exception {
 		
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name, attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name, attributes);
 		when(inMemoryCacheService.get(tableName, name)).thenReturn(solrDocumentResponseDTO);
-		DocumentResponseDTO getsolr = inMemoryCacheService.get(tableName, name);
+		DocumentDTO getsolr = inMemoryCacheService.get(tableName, name);
 		assertThat(getsolr).isNotNull();
 		
 	}

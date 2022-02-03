@@ -3,7 +3,6 @@ package com.searchservice.app.domain.service;
 
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
@@ -66,14 +65,14 @@ public class SchemaService implements SchemaServicePort {
 	SolrAPIAdapter solrAPIAdapter;
 
 	@Override
-	public SchemaResponseDTO get(String tableName) {
+	public SchemaDTO get(String tableName) {
 		log.debug("Get Solr Schema");
 
 		HttpSolrClient solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		SchemaDTO schemaDTO = new SchemaDTO();
-		SchemaResponseDTO schemaResponseDTO = new SchemaResponseDTO();
+		SchemaDTO schemaResponseDTO = new SchemaDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
@@ -129,15 +128,15 @@ public class SchemaService implements SchemaServicePort {
 	}
 	
 	@Override
-	public SchemaResponseDTO update(String tableName,
+	public SchemaDTO update(String tableName,
 									SchemaDTO newSchemaDTO) {
 		log.debug("Update Solr Schema");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		
-		SchemaResponseDTO schemaResponseDTOBefore = new SchemaResponseDTO();
-		SchemaResponseDTO schemaResponseDTOAfter = new SchemaResponseDTO();
+		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
+		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
@@ -203,15 +202,15 @@ public class SchemaService implements SchemaServicePort {
 	}
 	
 	@Override
-	public SchemaResponseDTO create(String tableName,
+	public SchemaDTO create(String tableName,
 									SchemaDTO newSchemaDTO) {
 		log.debug("Create Solr Schema");
 
 		HttpSolrClient solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		SchemaResponseDTO schemaResponseDTOBefore = new SchemaResponseDTO();
-		SchemaResponseDTO schemaResponseDTOAfter = new SchemaResponseDTO();
+		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
+		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -284,13 +283,13 @@ public class SchemaService implements SchemaServicePort {
 	}
 
 	@Override
-	public SchemaResponseDTO delete(String tableName) {
+	public SchemaDTO delete(String tableName) {
 		
 		HttpSolrClient solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);	
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		SchemaResponseDTO schemaResponseDTOBefore = new SchemaResponseDTO();
-		SchemaResponseDTO schemaResponseDTOAfter = new SchemaResponseDTO();
+		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
+		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";

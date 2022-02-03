@@ -1,8 +1,7 @@
 package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
-
-import com.searchservice.app.domain.dto.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,16 +17,16 @@ public class ManageTableDTO {
 	private String tableName;
 	private String sku;
 	private String schemaName;
-	private List<SchemaFieldDTO> attributes;
+	private List<FieldDTO> attributes;
 	
 	public ManageTableDTO(ManageTableDTO manageTableDTO) {
 		this.tableName = manageTableDTO.getTableName();
 		this.sku = manageTableDTO.getSku();
 		this.schemaName=manageTableDTO.getSchemaName();
-		this.attributes=manageTableDTO.getAttributes();	
+		this.attributes=manageTableDTO.getAttributes();
 	}
 	
-	public ManageTableDTO(String tableName, String schemaName, List<SchemaFieldDTO> attributes) {
+	public ManageTableDTO(String tableName, String schemaName, List<FieldDTO> attributes) {
 		this.tableName = tableName;
 		this.schemaName = schemaName;
 		this.attributes = attributes;

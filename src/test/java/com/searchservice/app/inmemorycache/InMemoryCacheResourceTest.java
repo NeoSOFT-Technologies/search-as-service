@@ -4,11 +4,9 @@ package com.searchservice.app.inmemorycache;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
 import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.service.InMemoryCacheService;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +69,7 @@ class InMemoryCacheResourceTest {
 
 	public void setMockitoSucccessResponseForService() {
 		
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name,attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name,attributes);
 		solrDocumentResponseDTO.setStatusCode(200);
 		Mockito.when(inMemoryCacheService.create(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
 		Mockito.when(inMemoryCacheService.update(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
@@ -81,7 +79,7 @@ class InMemoryCacheResourceTest {
 	}
 
 	public void setMockitoBadResponseForService() {
-		DocumentResponseDTO solrDocumentResponseDTO = new DocumentResponseDTO(tableName,name,attributes);
+		DocumentDTO solrDocumentResponseDTO = new DocumentDTO(tableName,name,attributes);
 		solrDocumentResponseDTO.setStatusCode(400);
 		Mockito.when(inMemoryCacheService.create(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);
 		Mockito.when(inMemoryCacheService.update(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(solrDocumentResponseDTO);

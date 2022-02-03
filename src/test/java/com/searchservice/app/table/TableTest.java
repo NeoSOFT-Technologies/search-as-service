@@ -4,9 +4,8 @@ package com.searchservice.app.table;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.CreateTableDTO;
-import com.searchservice.app.domain.dto.table.DeleteTableDTO;
 import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
+import com.searchservice.app.domain.dto.table.TableOperationDTO;
 import com.searchservice.app.domain.service.TableService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,12 +40,12 @@ class TableTest {
 
     public void setMockitoSuccessResponseForService() {
         ResponseDTO responseDTO = new ResponseDTO(tableName);
-        responseDTO.setStatusCode(200);
-        responseDTO.setMessage("Testing");
+        responseDTO.setResponseStatusCode(200);
+        responseDTO.setResponseMessage("Testing");
 
         ResponseDTO responseDTOisCollectionExists = new ResponseDTO(tableName);
-        responseDTOisCollectionExists.setStatusCode(200);
-        responseDTOisCollectionExists.setMessage("true");
+        responseDTOisCollectionExists.setResponseStatusCode(200);
+        responseDTOisCollectionExists.setResponseMessage("true");
 
         GetTablesResponseDTO getTablesResponseDTO=new GetTablesResponseDTO();
         getTablesResponseDTO.setStatusCode(200);
@@ -65,12 +64,12 @@ class TableTest {
 
     public void setMockitoBadResponseForService() {
         ResponseDTO responseDTO = new ResponseDTO(tableName);
-        responseDTO.setStatusCode(400);
-        responseDTO.setMessage("Testing");
+        responseDTO.setResponseStatusCode(400);
+        responseDTO.setResponseMessage("Testing");
 
         ResponseDTO responseDTOisCollectionExists = new ResponseDTO(tableName);
-        responseDTOisCollectionExists.setStatusCode(400);
-        responseDTOisCollectionExists.setMessage("Error!");
+        responseDTOisCollectionExists.setResponseStatusCode(400);
+        responseDTOisCollectionExists.setResponseMessage("Error!");
 
         GetTablesResponseDTO getTablesResponseDTO=new GetTablesResponseDTO();
         getTablesResponseDTO.setStatusCode(400);
@@ -90,7 +89,7 @@ class TableTest {
     @Test
     void testCreateTable() throws Exception {
 
-        CreateTableDTO createTableDTO =new CreateTableDTO(tableName,"B");
+        TableOperationDTO createTableDTO =new TableOperationDTO(tableName,"B");
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
@@ -108,7 +107,7 @@ class TableTest {
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
-        DeleteTableDTO deleteTableDTO=new DeleteTableDTO();
+        TableOperationDTO deleteTableDTO=new TableOperationDTO();
         deleteTableDTO.setTableName(tableName);
 
         setMockitoSuccessResponseForService();
@@ -123,7 +122,7 @@ class TableTest {
     void testDeleteTable() throws Exception {
 
         //DELETE A NON EXISTING COLLECTION
-        DeleteTableDTO deleteTableDTO=new DeleteTableDTO();
+        TableOperationDTO deleteTableDTO=new TableOperationDTO();
         deleteTableDTO.setTableName(tableName);
 
         setMockitoBadResponseForService();
