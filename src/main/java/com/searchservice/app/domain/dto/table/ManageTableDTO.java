@@ -2,8 +2,6 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
-import com.searchservice.app.domain.dto.SchemaFieldDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

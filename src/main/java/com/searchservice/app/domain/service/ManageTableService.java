@@ -29,11 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
-import com.searchservice.app.domain.dto.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
@@ -398,8 +397,8 @@ public class ManageTableService implements ManageTableServicePort {
 		SchemaRequest schemaRequest = new SchemaRequest();
 		TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO();
 		
-		SchemaResponseDTO schemaResponseDTOBefore = new SchemaResponseDTO();
-		SchemaResponseDTO schemaResponseDTOAfter = new SchemaResponseDTO();
+		TableSchemaResponseDTO schemaResponseDTOBefore = new TableSchemaResponseDTO();
+		TableSchemaResponseDTO schemaResponseDTOAfter = new TableSchemaResponseDTO();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -487,8 +486,8 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient solrClientUpdate = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		ApiResponseDTO apiResponseDTO = new ApiResponseDTO();
 		
-		SchemaResponseDTO schemaResponseDTOBefore = new SchemaResponseDTO();
-		SchemaResponseDTO schemaResponseDTOAfter = new SchemaResponseDTO();
+		TableSchemaResponseDTO schemaResponseDTOBefore = new TableSchemaResponseDTO();
+		TableSchemaResponseDTO schemaResponseDTOAfter = new TableSchemaResponseDTO();
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {

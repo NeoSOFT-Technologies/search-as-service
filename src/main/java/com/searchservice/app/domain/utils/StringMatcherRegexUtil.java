@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedFeatures;
+import com.searchservice.app.infrastructure.adaptor.versioning.MapperVersioningUtil;
 
 public class StringMatcherRegexUtil {
 	
 	private StringMatcherRegexUtil() {}
 	
 	public static String getMatchedSaasVersion(String targetString) {
-		List<String> availableVersions = VersionedFeatures.getAllAvailableSaasVersions();
+		List<String> availableVersions = MapperVersioningUtil.getAllAvailableSaasVersions();
         StringBuilder versionsString = new StringBuilder();
         for(String ver: availableVersions)
         	versionsString.append(", "+ver);

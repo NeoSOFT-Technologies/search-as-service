@@ -1,6 +1,8 @@
 package com.searchservice.app.domain.dto.document;
 
-import com.searchservice.app.domain.dto.schema.FieldDTO;
+
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +16,7 @@ public class DocumentDTO {
 
 	String tableName;
 	String name;
-	FieldDTO[] attributes;
+	SchemaFieldDTO[] attributes;
 
 	public DocumentDTO(DocumentDTO documentDTO) {
 		this.tableName = documentDTO.getTableName();

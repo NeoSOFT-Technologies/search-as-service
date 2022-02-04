@@ -7,12 +7,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.searchservice.app.rest.VersionedManageTableResource;
+import com.searchservice.app.rest.VersionedRabbitMQResource;
 
 import lombok.Data;
 
 @Data
-public class VersionedFeatures {
-	private VersionedFeatures() {}
+public class MapperVersioningUtil {
+	private MapperVersioningUtil() {}
 	
 	// All available SAAS versions
 	private static List<String> availableVersions = new ArrayList<>(
@@ -32,7 +33,8 @@ public class VersionedFeatures {
 	public static List<Class<?>> getAllVersionedResources() {
 		versioned.addAll(
 				Arrays.asList(
-						VersionedManageTableResource.class));
+						VersionedManageTableResource.class, 
+						VersionedRabbitMQResource.class));
 		
 		return versioned;
 	}

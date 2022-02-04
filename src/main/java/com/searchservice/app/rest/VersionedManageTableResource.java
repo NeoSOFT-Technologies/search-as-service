@@ -4,8 +4,6 @@ package com.searchservice.app.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
+import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
@@ -40,8 +39,8 @@ public class VersionedManageTableResource {
     @Value("${saas-ms.request-header.api-version}")
 	private static String saasVersionHeader;
     
-    private static final String BAD_REQUEST_MSG = "Bad Request call made. Unable to perform the request";
-    private static final String DEFAULT_EXCEPTION_MSG = "REST call could not be performed";
+    private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
+    private static final String DEFAULT_EXCEPTION_MSG = ResponseMessages.DEFAULT_EXCEPTION_MSG;
     
     private ManageTableServicePort manageTableServicePort;
 	public VersionedManageTableResource(ManageTableServicePort manageTableServicePort) {

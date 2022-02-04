@@ -30,7 +30,7 @@ public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMap
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
     	
     	Class<?> resourceClass = methodParameter.getContainingClass();
-    	boolean isResourceVersioned = VersionedFeatures.getAllVersionedResources()
+    	boolean isResourceVersioned = MapperVersioningUtil.getAllVersionedResources()
     			.stream()
     			.anyMatch(c -> c.equals(resourceClass));
     	log.info("ReturnType containing class: "+methodParameter.getContainingClass());

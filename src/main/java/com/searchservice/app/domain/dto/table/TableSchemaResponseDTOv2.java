@@ -2,7 +2,6 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
-import com.searchservice.app.domain.dto.SchemaFieldDTO;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
