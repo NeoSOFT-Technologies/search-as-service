@@ -621,10 +621,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public Map getTableDetails(String tableName) {
+	public Map<Object, Object> getTableDetails(String tableName) {
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
 
-        Map finalResponseMap= new HashMap();
+        Map<Object, Object> finalResponseMap= new HashMap<>();
 
         CollectionAdminRequest.ClusterStatus clusterStatus=new CollectionAdminRequest.ClusterStatus();
 
@@ -638,12 +638,12 @@ public class ManageTableService implements ManageTableServicePort {
             return finalResponseMap;
         }
 
-        Map responseAsMap = response.getResponse().asMap(20);
-        Map clusterResponse=(Map)responseAsMap.get("cluster");
-        Map collections=(Map) clusterResponse.get("collections");
+        Map<Object, Object> responseAsMap = response.getResponse().asMap(20);
+        Map<Object, Object> clusterResponse=(Map<Object, Object>)responseAsMap.get("cluster");
+        Map<Object, Object> collections=(Map<Object, Object>) clusterResponse.get("collections");
 
         if(collections.containsKey(tableName)){
-            finalResponseMap=(Map) collections.get(tableName);
+            finalResponseMap=(Map<Object, Object>) collections.get(tableName);
         }else{
             finalResponseMap.put("Error","Invalid table name.");
             return finalResponseMap;

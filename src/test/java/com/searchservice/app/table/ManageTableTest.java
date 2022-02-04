@@ -7,7 +7,6 @@ import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.table.CreateTableDTO;
-import com.searchservice.app.domain.dto.table.DeleteTableDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
@@ -182,8 +181,7 @@ class ManageTableTest {
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
-        DeleteTableDTO deleteTableDTO=new DeleteTableDTO();
-        deleteTableDTO.setTableName(tableName);
+        ApiResponseDTO deleteTableDTO=new ApiResponseDTO();
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)
