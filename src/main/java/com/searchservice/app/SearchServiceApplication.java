@@ -1,9 +1,13 @@
 package com.searchservice.app;
 
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+
+import com.searchservice.app.domain.service.JwtTokenFilterService;
 
 @SpringBootApplication(scanBasePackages={"com.searchservice.app"})
 public class SearchServiceApplication {
@@ -17,4 +21,18 @@ public class SearchServiceApplication {
 		return new RestTemplate();
 	}
 
+// For Keycloak @START
+	@Bean
+    public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
+	
+//	@Bean
+//	public FilterRegistrationBean<JwtTokenFilterService> jwtTokenFilter() {
+//	    FilterRegistrationBean<JwtTokenFilterService> registrationBean = new FilterRegistrationBean<>();
+//	    registrationBean.setFilter(new JwtTokenFilterService());
+//	    registrationBean.addUrlPatterns("/cacheschema/*","/api/*","/rabbit-mq/*","/throttle/*");
+//	    return registrationBean;
+//	}
+// For Keycloak @END
 }
