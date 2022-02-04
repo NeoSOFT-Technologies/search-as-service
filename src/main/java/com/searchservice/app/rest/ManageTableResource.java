@@ -30,103 +30,101 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/v1/manage/table")
 public class ManageTableResource {
 
-    private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
+	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
-    private static final String BAD_REQUEST_MSG = "REST call could not be performed";
-    private static final String DEFAULT_EXCEPTION_MSG = "REST call could not be performed";
-    
-    private ManageTableServicePort manageTableServicePort;
+	private static final String BAD_REQUEST_MSG = "REST call could not be performed";
+	private static final String DEFAULT_EXCEPTION_MSG = "REST call could not be performed";
+
+	private ManageTableServicePort manageTableServicePort;
+
 	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 	}
 
-
 	@GetMapping("/capacity-plans")
-    @Operation(summary = "/get-capacity-plans")
-    public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
-        log.debug("Get capacity plans");
-        GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
-        return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
-    }
-	
-	
-    @GetMapping
-    @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<GetListItemsResponseDTO> getTables() {
-        log.debug("Get all tables");
+	@Operation(summary = "/get-capacity-plans")
+	public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
+		log.debug("Get capacity plans");
+		GetCapacityPlanDTO getCapacityPlanDTO = manageTableServicePort.capacityPlans();
+		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
+	}
 
-        GetListItemsResponseDTO getListItemsResponseDTO=manageTableServicePort.getTables();
-        
-        if(getListItemsResponseDTO == null)
-        	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
-        if(getListItemsResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
-        }else{
-            throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
-        }
-    }
+	@GetMapping
+	@Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<GetListItemsResponseDTO> getTables() {
+		log.debug("Get all tables");
 
-    
-    @GetMapping("/schema/{tableName}")
-    @Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<TableSchemaResponseDTO> getSchema(
-    		@PathVariable String tableName) {
-        log.debug("Get table schema");
+		GetListItemsResponseDTO getListItemsResponseDTO = manageTableServicePort.getTables();
 
-        TableSchemaResponseDTO tableSchemaResponseDTO=manageTableServicePort.getTableSchemaIfPresent(tableName);
-        
-        if(tableSchemaResponseDTO == null)
-        	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
-        if(tableSchemaResponseDTO.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(tableSchemaResponseDTO);
-        }else{
-            throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
-        }
-    }
-	
-	
-    @PostMapping
-    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ApiResponseDTO> createTable(
-    		@RequestBody ManageTableDTO manageTableDTO) {
-        log.debug("Create table");
-        ApiResponseDTO apiResponseDTO=manageTableServicePort.createTableIfNotPresent(manageTableDTO);
-        if(apiResponseDTO.getResponseStatusCode()==200){
-        	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-        }
-       else{
-        	log.debug("Table could not be created: {}", apiResponseDTO);
-            throw new BadRequestOccurredException(400, "REST operation could not be performed");
-        }
-    }
+		if (getListItemsResponseDTO == null)
+			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
+		if (getListItemsResponseDTO.getStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
+		} else {
+			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+		}
+	}
 
-	
-    @DeleteMapping("/{tableName}")
-    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ApiResponseDTO> deleteTable(@PathVariable String tableName) {
-        log.debug("Delete table");
+	@GetMapping("/schema/{clientid}/{tableName}")
+	@Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<TableSchemaResponseDTO> getSchema(@PathVariable String tableName,
+			@PathVariable int clientid) {
+		log.debug("Get table schema");
 
-        ApiResponseDTO apiResponseDTO=manageTableServicePort.deleteTable(tableName);
+		tableName = tableName + "_" + clientid;
+		TableSchemaResponseDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
 
-        if(apiResponseDTO.getResponseStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-        }else{
-        	log.debug("Exception occurred: {}", apiResponseDTO);
-            throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
-        }
-    }
-    
-    
-	@PutMapping("/{tableName}")
+		if (tableSchemaResponseDTO == null)
+			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
+		if (tableSchemaResponseDTO.getStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(tableSchemaResponseDTO);
+		} else {
+			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+		}
+	}
+
+	@PostMapping("/{clientid}")
+	@Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ApiResponseDTO> createTable(@PathVariable int clientid,
+			@RequestBody ManageTableDTO manageTableDTO) {
+		log.debug("Create table");
+		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
+		ApiResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
+		if (apiResponseDTO.getResponseStatusCode() == 200) {
+			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
+			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		} else {
+			log.debug("Table could not be created: {}", apiResponseDTO);
+			throw new BadRequestOccurredException(400, "REST operation could not be performed");
+		}
+	}
+
+	@DeleteMapping("/{clientid}/{tableName}")
+	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ApiResponseDTO> deleteTable(@PathVariable String tableName, @PathVariable int clientid) {
+		log.debug("Delete table");
+
+		tableName = tableName + "_" + clientid;
+		ApiResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName);
+
+		if (apiResponseDTO.getResponseStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		} else {
+			log.debug("Exception occurred: {}", apiResponseDTO);
+			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+		}
+	}
+
+	@PutMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ApiResponseDTO> updateTableSchema(
-			@PathVariable String tableName,
+	public ResponseEntity<ApiResponseDTO> updateTableSchema(@PathVariable String tableName, @PathVariable int clientid,
 			@RequestBody TableSchemaDTO newTableSchemaDTO) {
+		tableName = tableName + "_" + clientid;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
+		newTableSchemaDTO.setTableName(newTableSchemaDTO.getTableName() + "_" + clientid);
 		ApiResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
-		if(apiResponseDTO.getResponseStatusCode() == 200)
+		if (apiResponseDTO.getResponseStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		else
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
