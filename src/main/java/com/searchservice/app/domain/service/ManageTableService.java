@@ -25,16 +25,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.searchservice.app.config.CapacityPlanProperties;
-import com.searchservice.app.domain.dto.ApiResponseDTO;
-import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
+
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.schema.SchemaDTO;
+
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.TableSchemaParser;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
@@ -103,8 +103,8 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public ApiResponseDTO isTablePresent(String tableName) {
-		ApiResponseDTO apiResponseDTO=new ApiResponseDTO();
+	public ResponseDTO isTablePresent(String tableName) {
+		ResponseDTO apiResponseDTO=new ResponseDTO();
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         try {
@@ -127,7 +127,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	@Override
-	public TableSchemaResponseDTO getTableSchemaIfPresent(String tableName) {
+	public TableSchemaDTO getTableSchemaIfPresent(String tableName) {
 		if(!isTableExists(tableName))
 			throw new BadRequestOccurredException(400, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
@@ -136,42 +136,42 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	@Override
-	public GetListItemsResponseDTO getTables() {
+	public ResponseDTO getTables() {
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
 
-        GetListItemsResponseDTO getListItemsResponseDTO=new GetListItemsResponseDTO();
+        ResponseDTO getListItemsResponseDTO=new ResponseDTO();
         try {
             CollectionAdminResponse response = request.process(solrClient);
 
             getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
-            getListItemsResponseDTO.setStatusCode(200);
-            getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+            getListItemsResponseDTO.setResponseStatusCode(200);
+            getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
 
         } catch (Exception e) {
             logger.error(e.toString());
-            getListItemsResponseDTO.setStatusCode(400);
-            getListItemsResponseDTO.setMessage("Unable to retrieve tables");
+            getListItemsResponseDTO.setResponseStatusCode(400);
+            getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
         }
         return getListItemsResponseDTO;
 	}
 	
 
 	@Override
-	public GetListItemsResponseDTO getConfigSets() {
+	public ResponseDTO getConfigSets() {
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
 		
-		GetListItemsResponseDTO getListItemsResponseDTO = new GetListItemsResponseDTO();
+		ResponseDTO getListItemsResponseDTO = new ResponseDTO();
 		try {
 			ConfigSetAdminResponse configSetResponse = configSetRequest.process(solrClient);
 			NamedList<Object> configResponseObjects = configSetResponse.getResponse();
 			getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
-			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all config sets");
+			getListItemsResponseDTO.setResponseStatusCode(200);
+			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all config sets");
 		} catch(Exception e) {
-			getListItemsResponseDTO.setStatusCode(400);
-			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
+			getListItemsResponseDTO.setResponseStatusCode(400);
+			getListItemsResponseDTO.setResponseMessage("Configsets could not be retrieved. Error occured");
 			logger.error("Error caused while retrieving configsets. Exception: ", e);
 		}
 		return getListItemsResponseDTO;
@@ -179,10 +179,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO createConfigSet(ConfigSetDTO configSetDTO) {
+	public ResponseDTO createConfigSet(ConfigSetDTO configSetDTO) {
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.Create configSetRequest = new ConfigSetAdminRequest.Create();	
-		ApiResponseDTO apiResponseDTO = new ApiResponseDTO();
+		ResponseDTO apiResponseDTO = new ResponseDTO();
 		
 		configSetRequest.setBaseConfigSetName(configSetDTO.getBaseConfigSetName());
 		configSetRequest.setConfigSetName(configSetDTO.getConfigSetName());
@@ -195,7 +195,7 @@ public class ManageTableService implements ManageTableServicePort {
 			 */
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.process(solrClient);
-			apiResponseDTO = new ApiResponseDTO(
+			apiResponseDTO = new ResponseDTO(
 					200, 
 					"ConfigSet is created successfully");
 		} catch(Exception e) {
@@ -208,7 +208,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO) {		
+	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO) {		
 		if(isTableExists(manageTableDTO.getTableName()))
 			throw new BadRequestOccurredException(400, 
 					manageTableDTO.getTableName()+" table already exists");
@@ -222,14 +222,14 @@ public class ManageTableService implements ManageTableServicePort {
 			createConfigSet(configSetDTO);
 		}
 		// Configset is present, proceed
-		ApiResponseDTO apiResponseDTO = createTable(manageTableDTO);
+		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
 		if(apiResponseDTO.getResponseStatusCode()==200) {
 			// Add schemaAttributes
 			TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
 					manageTableDTO.getTableName(), 
 					manageTableDTO.getSchemaName(), 
 					manageTableDTO.getAttributes());
-			TableSchemaResponseDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+			TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
 			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
 		}
@@ -238,17 +238,17 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO deleteConfigSet(String configSetName) {
+	public ResponseDTO deleteConfigSet(String configSetName) {
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
 		
-		ApiResponseDTO apiResponseDTO = new ApiResponseDTO();
+		ResponseDTO apiResponseDTO = new ResponseDTO();
 		configSetRequest.setMethod(METHOD.DELETE);
 		configSetRequest.setConfigSetName(configSetName);
 		try {
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.process(solrClient);
-			apiResponseDTO = new ApiResponseDTO(
+			apiResponseDTO = new ResponseDTO(
 					200, 
 					"ConfigSet got deleted successfully");
 		} catch (Exception e) {
@@ -261,7 +261,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO deleteTable(String tableName) {
+	public ResponseDTO deleteTable(String tableName) {
 		if(!isTableExists(tableName))
 			throw new ContentNotFoundException(404, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
@@ -271,7 +271,7 @@ public class ManageTableService implements ManageTableServicePort {
         CollectionAdminRequest.DeleteAlias deleteAliasRequest=CollectionAdminRequest.deleteAlias(tableName);
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         
-        ApiResponseDTO apiResponseDTO=new ApiResponseDTO();
+        ResponseDTO apiResponseDTO=new ResponseDTO();
         try {
         	request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
         	deleteAliasRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
@@ -296,17 +296,17 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
+	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
 		return updateSchemaAttributes(tableSchemaDTO);
 	}
 
 
 	@Override
-	public ApiResponseDTO addAliasTable(String tableOriginalName, String tableAlias) {
+	public ResponseDTO addAliasTable(String tableOriginalName, String tableAlias) {
         CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName,tableAlias);
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         
-        ApiResponseDTO apiResponseDTO=new ApiResponseDTO();
+        ResponseDTO apiResponseDTO=new ResponseDTO();
         try {
         	request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
             request.process(solrClient);
@@ -324,7 +324,7 @@ public class ManageTableService implements ManageTableServicePort {
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
 	@Override
 	public boolean isConfigSetExists(String configSetName) {
-		GetListItemsResponseDTO configSets = getConfigSets();
+		ResponseDTO configSets = getConfigSets();
 		if(configSetName != null)
 			return configSets.getItems().contains(configSetName);
 		else
@@ -348,9 +348,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO createTable(ManageTableDTO manageTableDTO) {
+	public ResponseDTO createTable(ManageTableDTO manageTableDTO) {
 		logger.info("creating table..");
-        ApiResponseDTO apiResponseDTO=new ApiResponseDTO();
+        ResponseDTO apiResponseDTO=new ResponseDTO();
 
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
         CapacityPlanProperties.Plan selectedCapacityPlan=null;
@@ -391,15 +391,16 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public TableSchemaResponseDTO addSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
+	public TableSchemaDTO addSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
 		logger.debug("Add schema attributes");
 
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
-		TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO();
-		
-		TableSchemaResponseDTO schemaResponseDTOBefore = new TableSchemaResponseDTO();
-		TableSchemaResponseDTO schemaResponseDTOAfter = new TableSchemaResponseDTO();
+		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
+
+		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
+		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
+
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -414,15 +415,15 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 	
 			// Add new fields present in the Target Schema to the given collection schema
-			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
-			SchemaFieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new SchemaFieldDTO[0]);
+			List<FieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
+			FieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new FieldDTO[0]);
 			logger.debug("\nTarget Schema fields : {}", (Object[]) newSolrFieldDTOs);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			for(SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
+			for(FieldDTO fieldDto : newSolrFieldDTOs) {
 				boolean isPresent = false;
 				for(Map<String, Object> field: schemaFields) {
 					if(field.containsKey(fieldDto.getName())) {
@@ -436,7 +437,7 @@ public class ManageTableService implements ManageTableServicePort {
 			if(!newFieldFound) {
 				schemaResponseDTOAfter.setStatusCode(400);
 			}
-			for(SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
+			for(FieldDTO fieldDto : newSolrFieldDTOs) {
 				if(!TableSchemaParser.validateSchemaField(fieldDto)) {
 					logger.debug("Validate SolrFieldDTO before updating the current schema- {}", schemaName);
 					schemaResponseDTOAfter.setStatusCode(400);
@@ -480,15 +481,16 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public ApiResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
+	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
 		logger.debug("Update Solr Schema");
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient solrClientUpdate = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
-		ApiResponseDTO apiResponseDTO = new ApiResponseDTO();
-		
-		TableSchemaResponseDTO schemaResponseDTOBefore = new TableSchemaResponseDTO();
-		TableSchemaResponseDTO schemaResponseDTOAfter = new TableSchemaResponseDTO();
+		ResponseDTO apiResponseDTO = new ResponseDTO();
+
+		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
+		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
+
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
@@ -501,7 +503,7 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.debug("Total number of fields: {}", numOfFields);
 			
 			// Get all fields from incoming(from req Body) schemaDTO
-			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+			FieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new FieldDTO[0]);
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
@@ -560,13 +562,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public TableSchemaResponseDTO getTableSchema(String tableName) {
+	public TableSchemaDTO getTableSchema(String tableName) {
 		logger.debug("Getting table schema");
 
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO();
+		TableSchemaDTO tableSchemaDTO = new TableSchemaDTO();
+		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
+
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
@@ -579,14 +583,14 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaName = schemaRepresentation.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
+			FieldDTO[] solrSchemaFieldDTOs = new FieldDTO[numOfFields];
 			logger.debug("Total number of fields: {}", numOfFields);
 			
 			int schemaFieldIdx = 0;
 			for(Map<String, Object> f: schemaFields) {
 				
 				// Prepare the SolrFieldDTO
-				SchemaFieldDTO solrFieldDTO = new SchemaFieldDTO();
+				FieldDTO solrFieldDTO = new FieldDTO();
 				solrFieldDTO.setName((String)f.get("name"));
 				
 				// Parse Field Type Object(String) to Enum

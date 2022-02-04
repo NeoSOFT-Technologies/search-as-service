@@ -6,7 +6,7 @@ import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.ApiResponseDTO;
 import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.CreateTableDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
@@ -42,9 +42,9 @@ class ManageTableTest {
     String tableName ="automatedTestCollection";
 
 	String schemaName = "default-config";
-	SchemaFieldDTO solr = new SchemaFieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	FieldDTO solr = new FieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	//SchemaFieldDTO[] attributes = { solr };
-	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
+	List<FieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
@@ -84,22 +84,22 @@ class ManageTableTest {
 
 
     public void setMockitoSuccessResponseForService() {
-        ApiResponseDTO responseDTO = new ApiResponseDTO();
+        ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setResponseStatusCode(200);
         responseDTO.setResponseMessage("Testing");
 
-        ApiResponseDTO responseDTOisCollectionExists = new ApiResponseDTO();
+        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
         responseDTOisCollectionExists.setResponseStatusCode(200);
         responseDTOisCollectionExists.setResponseMessage("true");
-        
-        TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
-        		tableName, schemaName, attributes);
+//        
+//        TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
+//        		tableName, schemaName, attributes);
 
-        GetListItemsResponseDTO getTablesResponseDTO=new GetListItemsResponseDTO();
-        getTablesResponseDTO.setStatusCode(200);
-        getTablesResponseDTO.setMessage("Testing");
+        ResponseDTO getTablesResponseDTO=new ResponseDTO();
+        getTablesResponseDTO.setResponseStatusCode(200);
+        getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO(
+        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
         		200, 
         		"Schema couldn't be fetched. Error!", 
         		"", 
@@ -122,24 +122,21 @@ class ManageTableTest {
     }
 
     public void setMockitoBadResponseForService() {
-        ApiResponseDTO responseDTO = new ApiResponseDTO();
+    	ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setResponseStatusCode(400);
         responseDTO.setResponseMessage("Testing");
 
-        ApiResponseDTO responseDTOisCollectionExists = new ApiResponseDTO();
+        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
         responseDTOisCollectionExists.setResponseStatusCode(400);
         responseDTOisCollectionExists.setResponseMessage("Error!");
 
-        GetListItemsResponseDTO getTablesResponseDTO=new GetListItemsResponseDTO();
-        getTablesResponseDTO.setStatusCode(400);
-        getTablesResponseDTO.setMessage("Testing");
+        ResponseDTO getTablesResponseDTO=new ResponseDTO();
+        getTablesResponseDTO.setResponseStatusCode(400);
+        getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaResponseDTO tableSchemaResponseDTO = new TableSchemaResponseDTO(
+        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
         		400, 
-        		"Retrieved table schema", 
-        		"", 
-        		"", 
-        		null);
+        		"Retrieved table schema");
         
         GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
 

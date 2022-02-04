@@ -8,7 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
@@ -26,10 +26,10 @@ public class TableSchemaParser {
 	
 	public static List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		SchemaFieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+		FieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new FieldDTO[0]);
 		
 		Map<String, Object> fieldDtoMap = new HashMap<>();
-		for(SchemaFieldDTO fieldDto: schemaFields) {
+		for(FieldDTO fieldDto: schemaFields) {
 			logger.debug("Validate SolrFieldDTO before parsing it");
 			if(!validateSchemaField(fieldDto)) {
 				fieldDtoMap = new HashMap<>();
@@ -47,7 +47,7 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static boolean validateSchemaField(SchemaFieldDTO solrFieldDTO) {
+	public static boolean validateSchemaField(FieldDTO solrFieldDTO) {
 		logger.debug("Validate schema field: {}", solrFieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
@@ -67,7 +67,7 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO solrFieldDTO) {
+	public static boolean validateSchemaFieldBooleanAttributes(FieldDTO solrFieldDTO) {
 		logger.debug("Validate schema field boolean attributes: {}", solrFieldDTO);
 		
 		boolean fieldAttributesValidated = true;
@@ -95,7 +95,7 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static void setFieldsToDefaults(SchemaFieldDTO solrFieldDTO) {
+	public static void setFieldsToDefaults(FieldDTO solrFieldDTO) {
 		solrFieldDTO.setFilterable(false);
 		solrFieldDTO.setMultiValue(false);
 		solrFieldDTO.setDefault_("mydefault");
@@ -105,7 +105,7 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static void setFieldsAsPerTheSchema(SchemaFieldDTO solrFieldDTO, Map<String, Object> schemaField) {
+	public static void setFieldsAsPerTheSchema(FieldDTO solrFieldDTO, Map<String, Object> schemaField) {
 		if(schemaField.containsKey(FILTERED))
 			solrFieldDTO.setFilterable((boolean)schemaField.get(FILTERED));
 		if(schemaField.containsKey(MULTIVALUED))

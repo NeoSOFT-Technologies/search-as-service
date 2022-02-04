@@ -32,8 +32,8 @@ public class InputDocumentService implements InputDocumentServicePort {
         if(schemaKeyValuePair == null){
             String message="Unable to get the Schema. Please check the collection name again!";
             log.debug(message);
-            responseDTO.setMessage(message);
-            responseDTO.setStatusCode(400);
+            responseDTO.setResponseMessage(message);
+            responseDTO.setResponseStatusCode(400);
             return responseDTO;
         }
 
@@ -58,8 +58,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 
                 String message="Invalid input JSON array of document.";
                 log.debug(message);
-                responseDTO.setMessage(message);
-                responseDTO.setStatusCode(400);
+                responseDTO.setResponseMessage(message);
+                responseDTO.setResponseStatusCode(400);
                 return responseDTO;
 
             }
@@ -78,11 +78,11 @@ public class InputDocumentService implements InputDocumentServicePort {
         UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
         if(response.isDocumentUploaded()){
-            responseDTO.setMessage("Successfully Added!");
-            responseDTO.setStatusCode(200);
+            responseDTO.setResponseMessage("Successfully Added!");
+            responseDTO.setResponseStatusCode(200);
         }else{
-            responseDTO.setMessage(response.getMessage());
-            responseDTO.setStatusCode(400);
+            responseDTO.setResponseMessage(response.getMessage());
+            responseDTO.setResponseStatusCode(400);
         }
 
         return responseDTO;

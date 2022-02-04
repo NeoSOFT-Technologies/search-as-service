@@ -39,7 +39,7 @@ public class VersionedInputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
        log.debug(result);
 
-        if(solrResponseDTO.getStatusCode()==200){
+        if(solrResponseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
