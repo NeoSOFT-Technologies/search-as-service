@@ -3,6 +3,8 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.rest.errors.InputDocumentException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -43,7 +45,7 @@ public class InputDocumentResource {
         if(solrResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        	throw new InputDocumentException(solrResponseDTO.getStatusCode(),solrResponseDTO.getMessage());
         }
 
     }

@@ -37,6 +37,7 @@ public class SchemaService implements SchemaServicePort {
 	@Value("${base-solr-url}")
 	private String solrURL;
 	private static final String SOLR_EXCEPTION_MSG = "The collection - {} is Not Found in the Solr Cloud!";
+	private static final String SCHEMA_FILED_EXCEPTION_MSG = "So schema fields can't be found/deleted! ";
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
 	private static final String MULTIVALUED = "multiValued";
@@ -115,10 +116,12 @@ public class SchemaService implements SchemaServicePort {
 			schemaResponseDTO.setStatusCode(200);
 		} catch (SolrServerException | IOException e) {
 			schemaResponseDTO.setStatusCode(400);
+			schemaResponseDTO.setMessage(SOLR_SCHEMA_EXCEPTION_MSG +" "+payloadOperation+" "+errorCausingField);
 			log.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTO.setStatusCode(400);
+			schemaResponseDTO.setMessage(SOLR_EXCEPTION_MSG+" "+ tableName);
 			log.error(SOLR_EXCEPTION_MSG, tableName);
 			log.debug(e.toString());
 		}
@@ -179,18 +182,24 @@ public class SchemaService implements SchemaServicePort {
 
 		} catch (SolrServerException | IOException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
+			schemaResponseDTOAfter.setMessage(SOLR_SCHEMA_EXCEPTION_MSG +" "+payloadOperation+" "+errorCausingField);
 			log.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			log.debug(e.toString());
 		} catch (NullPointerException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
+			schemaResponseDTOAfter.setMessage("Null Value Detected!");
 			log.error("Null value detected!", e);
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			log.error(SOLR_EXCEPTION_MSG + "So schema fields can't be found/deleted!", tableName);
+
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG+ SCHEMA_FILED_EXCEPTION_MSG +tableName);
+			log.error(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted!", tableName);
+
 			log.debug(e.toString());
 		} catch (SchemaValidationException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
+			schemaResponseDTOAfter.setMessage("Error Message: {} "+e.getMessage());
 			log.error("Error Message: {}", e.getMessage());
 			log.debug(e.toString());
 		}
@@ -245,6 +254,7 @@ public class SchemaService implements SchemaServicePort {
 				if (!validateSchemaField(fieldDto)) {
 					log.debug("Validate FieldDTO before updating the current schema- {}", schemaName);
 					schemaResponseDTOAfter.setStatusCode(400);
+					schemaResponseDTOAfter.setMessage("Validation for FieldDTO Failed");
 					break;
 				}
 			
@@ -274,11 +284,15 @@ public class SchemaService implements SchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
+			schemaResponseDTOAfter.setMessage(SOLR_SCHEMA_EXCEPTION_MSG +" "+payloadOperation+" "+errorCausingField);
 			log.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			log.error(SOLR_EXCEPTION_MSG + " So schema fields can't be found/deleted!", tableName);
+
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG + SCHEMA_FILED_EXCEPTION_MSG + tableName);
+			log.error(SOLR_EXCEPTION_MSG+" So schema fields can't be found/deleted!", tableName);
+
 			log.debug(e.toString());
 		}
 		schemaResponseDTOAfter = get(tableName);
@@ -339,11 +353,15 @@ public class SchemaService implements SchemaServicePort {
 			}
 		} catch (SolrServerException | IOException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
+			schemaResponseDTOAfter.setMessage(SOLR_SCHEMA_EXCEPTION_MSG +" "+payloadOperation+" "+errorCausingField);
 			log.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			log.debug(e.toString());
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			log.error(SOLR_EXCEPTION_MSG + "So schema fields can't be found/deleted!", tableName);
+
+			schemaResponseDTOAfter.setMessage(SOLR_EXCEPTION_MSG + SCHEMA_FILED_EXCEPTION_MSG + tableName);
+			log.error(SOLR_EXCEPTION_MSG+"So schema fields can't be found/deleted!", tableName);
+
 			log.debug(e.toString());
 		}
 		schemaResponseDTOAfter = get(tableName);
