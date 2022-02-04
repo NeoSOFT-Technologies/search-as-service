@@ -1,5 +1,7 @@
 package com.searchservice.app.rest;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -46,10 +48,12 @@ public class ManageTableResource {
     public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
         log.debug("Get capacity plans");
         GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
-        if(getCapacityPlanDTO.getPlans() != null)
-        	return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
-        else
-        	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
+        return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
+
+//        if(getCapacityPlanDTO.getPlans() != null)
+//        	return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
+//        else
+//        	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
     }
 	
 	
@@ -67,6 +71,23 @@ public class ManageTableResource {
         }else{
             throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
         }
+    }
+    
+    
+    @GetMapping("/details/{tableName}")
+    @Operation(summary = "/ Get the table details like Shards, Nodes & Replication Factor.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map> getTableDetails(@PathVariable String tableName) {
+
+        log.debug("getCollectionDetails");
+
+        Map responseMap= manageTableServicePort.getTableDetails(tableName);
+
+        if(!responseMap.containsKey("Error")){
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
+        }
+
     }
 
     

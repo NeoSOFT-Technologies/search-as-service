@@ -95,10 +95,11 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public GetCapacityPlanDTO capacityPlans() {
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-        if(capacityPlans != null)
-        	return new GetCapacityPlanDTO(capacityPlans);
-        else
-        	throw new NullPointerOccurredException(404, "No capacity plans found. Null returned");
+        return new GetCapacityPlanDTO(capacityPlans);
+//        if(capacityPlans != null)
+//        	return new GetCapacityPlanDTO(capacityPlans);
+//        else
+//        	throw new NullPointerOccurredException(404, "No capacity plans found. Null returned");
 	}
 
 	@Override
@@ -616,5 +617,38 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.debug(e.toString());
 		}
 		return tableSchemaResponseDTO;
+	}
+
+
+	@Override
+	public Map getTableDetails(String tableName) {
+        solrClient = solrAPIAdapter.getSolrClient(solrURL);
+
+        Map finalResponseMap= new HashMap();
+
+        CollectionAdminRequest.ClusterStatus clusterStatus=new CollectionAdminRequest.ClusterStatus();
+
+        CollectionAdminResponse response=null;
+
+        try {
+            response = clusterStatus.process(solrClient);
+        } catch (Exception e) {
+            logger.error(e.toString());
+            finalResponseMap.put("Error","Error connecting to cluster.");
+            return finalResponseMap;
+        }
+
+        Map responseAsMap = response.getResponse().asMap(20);
+        Map clusterResponse=(Map)responseAsMap.get("cluster");
+        Map collections=(Map) clusterResponse.get("collections");
+
+        if(collections.containsKey(tableName)){
+            finalResponseMap=(Map) collections.get(tableName);
+        }else{
+            finalResponseMap.put("Error","Invalid table name.");
+            return finalResponseMap;
+        }
+
+        return finalResponseMap;
 	}
 }

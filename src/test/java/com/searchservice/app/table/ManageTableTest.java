@@ -8,9 +8,15 @@ import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.table.CreateTableDTO;
 import com.searchservice.app.domain.dto.table.DeleteTableDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.ManageTableDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.service.ManageTableService;
+import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +27,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,10 +39,43 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ManageTableTest {
 
-    String solrCollectionEndpoint ="/api/table";
-
+    String manageTableEndpoint ="/api/v2/manage/table";
     String tableName ="automatedTestCollection";
 
+	String schemaName = "default-config";
+	SchemaFieldDTO solr = new SchemaFieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	//SchemaFieldDTO[] attributes = { solr };
+	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
+	String expectedGetResponse = "{\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
+			  +"\"name\": \"default-config\",\n"
+			  +"\"attributes\": [{\n"
+		      +"\"name\": \"testField6\",\n"
+		      +"\"type\": \"_nest_path_\",\n"
+		      +"\"default_\": \"mydefault\",\n"
+		      +"\"storable\": false,\n"
+		      +"\"filterable\": true,"
+		      +"\"required\": true,"
+		      +"\"sortable\": true,\n"
+		      +"\"multiValue\": true,\n"
+		      +"}],\n"
+		      +"\"statusCode\": 200\n"
+		      +"}";
+	String expectedCreateResponse400 = "{\n"
+			  +"\"tableName\": \"gettingstarted3\",\n"
+			  +"\"name\": \"default-config\",\n"
+			  +"\"attributes\": [{\n"
+		      +"\"name\": \"testField6\",\n"
+		      +"\"type\": \"_nest_path_\",\n"
+		      +"\"default_\": \"mydefault\",\n"
+		      +"\"storable\": false,\n"
+		      +"\"filterable\": true,"
+		      +"\"required\": true,"
+		      +"\"sortable\": true,\n"
+		      +"\"multiValue\": true,\n"
+		      +"}],\n"
+		      +"\"statusCode\": 400\n"
+		      +"}";
 
     @Autowired
     private MockMvc restAMockMvc;
@@ -50,6 +92,9 @@ class ManageTableTest {
         ApiResponseDTO responseDTOisCollectionExists = new ApiResponseDTO();
         responseDTOisCollectionExists.setResponseStatusCode(200);
         responseDTOisCollectionExists.setResponseMessage("true");
+        
+        TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
+        		tableName, schemaName, attributes);
 
         GetListItemsResponseDTO getTablesResponseDTO=new GetListItemsResponseDTO();
         getTablesResponseDTO.setStatusCode(200);
@@ -60,13 +105,21 @@ class ManageTableTest {
         		"Schema couldn't be fetched. Error!", 
         		"", 
         		"", 
-        		null); 
+        		null);
+        
+        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+        
+        Map finalResponseMap= new HashMap();
+        finalResponseMap.put("Random message","Data is returned");
+        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
     }
 
     public void setMockitoBadResponseForService() {
@@ -87,23 +140,35 @@ class ManageTableTest {
         		"Retrieved table schema", 
         		"", 
         		"", 
-        		null); 
+        		null);
+        
+        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+        
+        Map finalResponseMap= new HashMap();
+        finalResponseMap.put("Error","Error connecting to cluster.");
+        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
     }
 
     @Test
     void testCreateTable() throws Exception {
 
-        CreateTableDTO createTableDTO =new CreateTableDTO(tableName,"B");
+        ManageTableDTO createTableDTO =new ManageTableDTO(
+        		tableName, 
+        		"B", 
+        		"default-schema", 
+        		attributes);
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
+        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
                 .andExpect(status().isOk());
@@ -111,7 +176,7 @@ class ManageTableTest {
 
         //CREATE COLLECTION WITH SAME NAME AND TEST
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
+        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
                 .andExpect(status().isBadRequest());
@@ -121,7 +186,7 @@ class ManageTableTest {
         deleteTableDTO.setTableName(tableName);
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
                 .andExpect(status().isOk());
@@ -132,99 +197,66 @@ class ManageTableTest {
     void testDeleteTable() throws Exception {
 
         //DELETE A NON EXISTING COLLECTION
-        DeleteTableDTO deleteTableDTO=new DeleteTableDTO();
-        deleteTableDTO.setTableName(tableName);
+        ApiResponseDTO deleteTableResponseDTO=new ApiResponseDTO();
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isBadRequest());
 
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint )
+        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint )
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
 
 
         //DELETE THE CREATED COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
     }
+    
+    
+	@Test
+	void testUpdateTableSchema() throws Exception {
 
+		// Update Schema
+		setMockitoSuccessResponseForService();
+		TableSchemaDTO schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		restAMockMvc.perform(MockMvcRequestBuilders.put(manageTableEndpoint + "/" + tableName)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
+		.andExpect(status().isOk());
+		
+		// Update Schema for non-existing table
+		setMockitoBadResponseForService();
+		schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		restAMockMvc.perform(MockMvcRequestBuilders.put(manageTableEndpoint + "/" + tableName)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
+		.andExpect(status().isBadRequest());
 
-//    @Test
-//    void testRenameTable() throws Exception {
-//
-//        CreateTableDTO createTableDTO=new CreateTableDTO(tableName,"B");
-//
-//        //CREATE COLLECTION
-//        setMockitoSuccessResponseForService();
-//        restAMockMvc.perform(MockMvcRequestBuilders.post(solrCollectionEndpoint)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
-//                .andExpect(status().isOk());
-//
-//        //RENAME THE COLLECTION
-//        setMockitoSuccessResponseForService();
-//        SolrRenameCollectionDTO solrRenameCollectionDTO=new SolrRenameCollectionDTO(tableName, tableName +"2");
-//        restAMockMvc.perform(MockMvcRequestBuilders.put(solrCollectionEndpoint +"/rename")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(TestUtil.convertObjectToJsonBytes(solrRenameCollectionDTO)))
-//                .andExpect(status().isOk());
-//
-//        //TRY TO DELETE USING THE OLD COLLECTION NAME
-//        setMockitoBadResponseForService();
-//        DeleteTableDTO deleteTableDTO=new DeleteTableDTO(tableName);
-//        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
-//                .andExpect(status().isBadRequest());
-//
-//        //TRY TO DELETE USING THE NEW COLLECTION NAME
-//        setMockitoSuccessResponseForService();
-//        deleteTableDTO =new DeleteTableDTO(tableName +"2");
-//        restAMockMvc.perform(MockMvcRequestBuilders.delete(solrCollectionEndpoint +"/"+ tableName)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
-//                .andExpect(status().isOk());
-//    }
+	}
 
 
     @Test
     void testGetTables() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint )
+        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint)
+        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-
-    }
-
-
-    @Test
-    void testIsTableExists() throws Exception {
-
-        setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isTableExists/"+ tableName)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-//        setMockitoBadResponseForService();
-//        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/isCollectionExists/"+collectionName)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
 
     }
 
@@ -232,9 +264,9 @@ class ManageTableTest {
     @Test
     void testGetCapacityPlans() throws Exception {
 
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint +"/capacity-plans")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint +"/capacity-plans")
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
 
     }
 
@@ -243,16 +275,34 @@ class ManageTableTest {
     void testGetTableDetails() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint+"/details/testTable" )
+        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint+"/details/testTable" )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(solrCollectionEndpoint+"/details/testTable")
+        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint+"/details/testTable")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
     }
-
+    
+    
+	@Test
+	void testGetSchema() throws Exception {
+		setMockitoSuccessResponseForService();;
+		restAMockMvc.perform(
+				MockMvcRequestBuilders
+				.get(manageTableEndpoint + "/schema/" + tableName)
+				.accept(MediaType.APPLICATION_JSON))
+		//.andExpect(content().json(expectedGetResponse))
+		.andExpect(status().isOk());
+		
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(
+				MockMvcRequestBuilders
+				.get(manageTableEndpoint + "/schema/" + tableName)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isBadRequest());
+	}
 
 }

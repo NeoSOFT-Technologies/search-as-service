@@ -1,5 +1,7 @@
 package com.searchservice.app.domain.port.api;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.ApiResponseDTO;
@@ -20,6 +22,7 @@ public interface ManageTableServicePort {
 	GetListItemsResponseDTO getTables();
 	GetListItemsResponseDTO getConfigSets();
 	TableSchemaResponseDTO getTableSchemaIfPresent(String tableName);
+	Map getTableDetails(String tableName);
 	// CREATE requests
 	ApiResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
 	ApiResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
