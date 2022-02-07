@@ -2,7 +2,7 @@ package com.searchservice.app.domain.port.api;
 
 
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 
 import java.util.List;
@@ -22,14 +22,14 @@ public interface InMemoryCacheServicePort {
 	 * Validation of solr schema and External API callings 
 	 */
 	List<FieldTypeDefinition> getSchemaFieldTypes(DocumentDTO documentDTO);
-	boolean validateSchemaField(FieldDTO fieldDTO);
-	boolean validateSchemaFieldBooleanAttributes(FieldDTO fieldDTO);
+	boolean validateSchemaField(SchemaFieldDTO fieldDTO);
+	boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO fieldDTO);
 
 	/* 
 	 * Logical operations in service methods 
 	 */
-	void setFieldsAsPerTheSchema(FieldDTO fieldDTO, Map<String, Object> schemaField);
-	void setFieldsToDefaults(FieldDTO fieldDTO);
+	void setFieldsAsPerTheSchema(SchemaFieldDTO fieldDTO, Map<String, Object> schemaField);
+	void setFieldsToDefaults(SchemaFieldDTO fieldDTO);
 	List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(DocumentDTO documentDTO);
 
 }

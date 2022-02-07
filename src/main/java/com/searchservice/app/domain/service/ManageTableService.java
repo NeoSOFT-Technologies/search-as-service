@@ -28,8 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
-import com.searchservice.app.domain.dto.schema.SchemaDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
@@ -398,8 +397,8 @@ public class ManageTableService implements ManageTableServicePort {
 		SchemaRequest schemaRequest = new SchemaRequest();
 		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
 
-		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
-		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
+		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
+		TableSchemaDTO schemaResponseDTOAfter = new TableSchemaDTO();
 
 		String schemaName = "";
 		String errorCausingField = null;
@@ -415,15 +414,15 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 	
 			// Add new fields present in the Target Schema to the given collection schema
-			List<FieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
-			FieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new FieldDTO[0]);
+			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
+			SchemaFieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new SchemaFieldDTO[0]);
 			logger.debug("\nTarget Schema fields : {}", (Object[]) newSolrFieldDTOs);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			for(FieldDTO fieldDto : newSolrFieldDTOs) {
+			for(SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
 				boolean isPresent = false;
 				for(Map<String, Object> field: schemaFields) {
 					if(field.containsKey(fieldDto.getName())) {
@@ -437,7 +436,7 @@ public class ManageTableService implements ManageTableServicePort {
 			if(!newFieldFound) {
 				schemaResponseDTOAfter.setStatusCode(400);
 			}
-			for(FieldDTO fieldDto : newSolrFieldDTOs) {
+			for(SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
 				if(!TableSchemaParser.validateSchemaField(fieldDto)) {
 					logger.debug("Validate SolrFieldDTO before updating the current schema- {}", schemaName);
 					schemaResponseDTOAfter.setStatusCode(400);
@@ -488,8 +487,8 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient solrClientUpdate = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		ResponseDTO apiResponseDTO = new ResponseDTO();
 
-		SchemaDTO schemaResponseDTOBefore = new SchemaDTO();
-		SchemaDTO schemaResponseDTOAfter = new SchemaDTO();
+		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
+		TableSchemaDTO schemaResponseDTOAfter = new TableSchemaDTO();
 
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -503,7 +502,7 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.debug("Total number of fields: {}", numOfFields);
 			
 			// Get all fields from incoming(from req Body) schemaDTO
-			FieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new FieldDTO[0]);
+			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
@@ -568,7 +567,6 @@ public class ManageTableService implements ManageTableServicePort {
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
-		TableSchemaDTO tableSchemaDTO = new TableSchemaDTO();
 		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
 
 		String schemaName = "";
@@ -583,14 +581,14 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaName = schemaRepresentation.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			FieldDTO[] solrSchemaFieldDTOs = new FieldDTO[numOfFields];
+			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
 			logger.debug("Total number of fields: {}", numOfFields);
 			
 			int schemaFieldIdx = 0;
 			for(Map<String, Object> f: schemaFields) {
 				
 				// Prepare the SolrFieldDTO
-				FieldDTO solrFieldDTO = new FieldDTO();
+				SchemaFieldDTO solrFieldDTO = new SchemaFieldDTO();
 				solrFieldDTO.setName((String)f.get("name"));
 				
 				// Parse Field Type Object(String) to Enum

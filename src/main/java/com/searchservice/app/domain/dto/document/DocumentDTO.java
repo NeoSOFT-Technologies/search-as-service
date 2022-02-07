@@ -2,7 +2,7 @@ package com.searchservice.app.domain.dto.document;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class DocumentDTO {
 
 	String tableName;
 	String name;
-	FieldDTO[] attributes;
+	SchemaFieldDTO[] attributes;
 	int statusCode;
 
 
@@ -31,7 +31,7 @@ public class DocumentDTO {
 		this.statusCode = documentDTO.getStatusCode();
 	}
 	
-	public DocumentDTO(String tableName, String name, FieldDTO[] attributes) {
+	public DocumentDTO(String tableName, String name, SchemaFieldDTO[] attributes) {
 		this.tableName = tableName;
 		this.name = name;
 		this.attributes = attributes;

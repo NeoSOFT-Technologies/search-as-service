@@ -1,7 +1,5 @@
 package com.searchservice.app.domain.dto.table;
 
-
-
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
 import lombok.AllArgsConstructor;
@@ -13,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+
+//Merged With SchemaFieldDTO 
 public class SchemaFieldDTO {
 
 	String name;

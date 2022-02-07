@@ -3,19 +3,14 @@ package com.searchservice.app.table;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ApiResponseDTO;
-import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
 import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,9 +36,9 @@ class ManageTableTest {
     String tableName ="automatedTestCollection";
 
 	String schemaName = "default-config";
-	FieldDTO solr = new FieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	SchemaFieldDTO solr = new SchemaFieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
 	//SchemaFieldDTO[] attributes = { solr };
-	List<FieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
+	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
@@ -178,7 +172,7 @@ class ManageTableTest {
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
-        ApiResponseDTO deleteTableDTO=new ApiResponseDTO();
+        ResponseDTO deleteTableDTO=new ResponseDTO();
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)
@@ -192,7 +186,7 @@ class ManageTableTest {
     void testDeleteTable() throws Exception {
 
         //DELETE A NON EXISTING COLLECTION
-        ApiResponseDTO deleteTableResponseDTO=new ApiResponseDTO();
+        ResponseDTO deleteTableResponseDTO=new ResponseDTO();
 
         setMockitoBadResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ tableName)

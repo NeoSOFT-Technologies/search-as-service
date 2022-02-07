@@ -2,7 +2,7 @@ package com.searchservice.app.domain.service;
 
 
 import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.port.api.InMemoryCacheServicePort;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
@@ -87,7 +87,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 			name = schemaName;
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			FieldDTO[] solrSchemaFieldDTOs = new FieldDTO[numOfFields];
+			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
 			log.debug("Total number of fields: {}", numOfFields);
 			
 			int schemaFieldIdx = 0;
@@ -95,7 +95,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 				log.debug("\nField Object: {}", f);
 				
 				// Prepare the FieldDTO
-				FieldDTO fieldDTO = new FieldDTO();
+				SchemaFieldDTO fieldDTO = new SchemaFieldDTO();
 				fieldDTO.setName((String)f.get("name"));
 				
 				// Parse Field Type Object(String) to Enum
@@ -171,7 +171,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 			log.debug("Total number of fields: {}", numOfFields);
 			
 			// Get all fields from incoming(from req Body) schemaDTO
-			FieldDTO[] newSchemaFields = documentDTO.getAttributes();
+			SchemaFieldDTO[] newSchemaFields = documentDTO.getAttributes();
 			List<Map<String, Object>> targetSchemafields = parseSchemaFieldDtosToListOfMaps(documentDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
@@ -265,14 +265,14 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 			log.debug("\nDefault Schema fields : {}", schemaFields);
 			
 			// Add new fields present in the Target Schema to the given collection schema
-			FieldDTO[] newFieldDTOS = newDocumentDTO.getAttributes();
+			SchemaFieldDTO[] newFieldDTOS = newDocumentDTO.getAttributes();
 			log.debug("\nTarget Schema fields : {}", (Object[]) newFieldDTOS);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse = new UpdateResponse();
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			for(FieldDTO fieldDto : newFieldDTOS) {
+			for(SchemaFieldDTO fieldDto : newFieldDTOS) {
 				boolean isPresent = false;
 				for(Map<String, Object> field: schemaFields) {
 					if(field.containsKey(fieldDto.getName())) {
@@ -286,7 +286,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 			if(!newFieldFound) {
 				solrSchemaResponseDTOAfter.setStatusCode(400);
 			}
-			for(FieldDTO fieldDto : newFieldDTOS) {
+			for(SchemaFieldDTO fieldDto : newFieldDTOS) {
 				if(!validateSchemaField(fieldDto)) {
 					log.debug("Validate FieldDTO before updating the current schema- {}", schemaName);
 					solrSchemaResponseDTOAfter.setStatusCode(400);
@@ -434,7 +434,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	}
 	
 	@Override
-	public boolean validateSchemaField(FieldDTO fieldDTO) {
+	public boolean validateSchemaField(SchemaFieldDTO fieldDTO) {
 		log.debug("Validate schema field: {}", fieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = fieldDTO.getName();
@@ -454,7 +454,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	}
 
 	@Override
-	public boolean validateSchemaFieldBooleanAttributes(FieldDTO fieldDTO) {
+	public boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO fieldDTO) {
 		log.debug("Validate schema field boolean attributes: {}", fieldDTO);
 		
 		boolean fieldAttributesValidated = true;
@@ -482,7 +482,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	}
 
 	@Override
-	public void setFieldsAsPerTheSchema(FieldDTO fieldDTO, Map<String, Object> schemaField) {
+	public void setFieldsAsPerTheSchema(SchemaFieldDTO fieldDTO, Map<String, Object> schemaField) {
 		if(schemaField.containsKey("filtered"))
 			fieldDTO.setFilterable((boolean)schemaField.get("filtered"));
 		if(schemaField.containsKey("multiValued"))
@@ -498,7 +498,7 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	}
 
 	@Override
-	public void setFieldsToDefaults(FieldDTO fieldDTO) {
+	public void setFieldsToDefaults(SchemaFieldDTO fieldDTO) {
 		fieldDTO.setFilterable(false);
 		fieldDTO.setMultiValue(false);
 		fieldDTO.setDefault_("mydefault");
@@ -510,10 +510,10 @@ public class InMemoryCacheService implements InMemoryCacheServicePort {
 	@Override
 	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(DocumentDTO documentDTO) {
 		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		FieldDTO[] schemaFields = documentDTO.getAttributes();
+		SchemaFieldDTO[] schemaFields = documentDTO.getAttributes();
 		
 		Map<String, Object> fieldDtoMap = new HashMap<String, Object>();
-		for(FieldDTO fieldDto: schemaFields) {
+		for(SchemaFieldDTO fieldDto: schemaFields) {
 			log.debug("Validate FieldDTO before parsing it- {}", fieldDto);
 			if(!validateSchemaField(fieldDto)) {
 				fieldDtoMap = new HashMap<>();
