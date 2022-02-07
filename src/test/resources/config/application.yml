@@ -113,8 +113,8 @@ basic-auth:
 
 base-url:
   api-endpoint:
-    home: /api-versioned/v1
-    manage-table: /api-versioned/v1/manage/table
+    home: /api-versioned/v2
+    manage-table: /api-versioned/v2/manage/table
     rabbit-mq: /api/v2/rabbit-mq
     versioned-rabbit-mq: /api-versioned/v2/rabbit-mq
     
