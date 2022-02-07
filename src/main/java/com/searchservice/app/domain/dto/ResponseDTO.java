@@ -3,6 +3,7 @@ package com.searchservice.app.domain.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseDTO {
+public class ResponseDTO implements VersionedObjectMapper {
 
     private int responseStatusCode;
     private String name;
@@ -29,4 +30,9 @@ public class ResponseDTO {
     	this.responseStatusCode = responseStatusCode;
     	this.responseMessage = responseMessage;
     }
+    
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
+	}
 }

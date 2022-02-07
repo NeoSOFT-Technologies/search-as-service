@@ -1,5 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
+import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 
 //Merged With SchemaFieldDTO 
-public class SchemaFieldDTO {
+public class SchemaFieldDTO implements VersionedObjectMapper {
 
 	String name;
 	SchemaFieldType type;
@@ -24,4 +25,8 @@ public class SchemaFieldDTO {
 	boolean isMultiValue;
 	boolean isSortable;
 	
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
+	}
 }

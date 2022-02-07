@@ -2,6 +2,8 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
+import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ManageTableDTO {
+public class ManageTableDTO implements VersionedObjectMapper {
 
 	private String tableName;
 	private String sku;
@@ -32,5 +34,10 @@ public class ManageTableDTO {
 		this.sku = sku;
 		this.schemaName = schemaName;
 		this.attributes = attributes2;
+	}
+	
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
 	}
 }

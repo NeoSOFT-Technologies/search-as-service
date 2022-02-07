@@ -3,6 +3,7 @@ package com.searchservice.app.domain.dto.document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DocumentDTO {
+public class DocumentDTO implements VersionedObjectMapper {
 
 	String tableName;
 	String name;
@@ -35,5 +36,10 @@ public class DocumentDTO {
 		this.tableName = tableName;
 		this.name = name;
 		this.attributes = attributes;
+	}
+	
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
 	}
 }

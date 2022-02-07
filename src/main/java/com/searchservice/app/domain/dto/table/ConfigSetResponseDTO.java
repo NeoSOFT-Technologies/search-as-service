@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
-public class ConfigSetResponseDTO {
+public class ConfigSetResponseDTO implements VersionedObjectMapper {
 
     private int statusCode;
     private String message;
@@ -20,5 +22,10 @@ public class ConfigSetResponseDTO {
     public ConfigSetResponseDTO(int statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
+	}
+    
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
 	}
 }
