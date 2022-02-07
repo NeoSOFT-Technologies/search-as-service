@@ -40,6 +40,7 @@ class InputDocumentResourceTest {
 	int statusCode;
 	String name;
 	String message;
+	int clientid;
 	String tableName = "book";
 	String expectedGetResponse = "{\r\n" + "  \"statusCode\": 200,\r\n" + "  \"name\": \"book\",\r\n"
 			+ "  \"message\": \"Successfully Added!\"\r\n" + "}";
@@ -76,7 +77,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders 
-				.post(solrendpoint + "/ingest-nrt/"+tableName)
+				.post(solrendpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
 		.andExpect(status().isOk());
 		 
@@ -89,7 +90,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/ingest/"+tableName)
+				.post(solrendpoint + "/ingest/"+ clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
 		.andExpect(status().isOk());
 		 
