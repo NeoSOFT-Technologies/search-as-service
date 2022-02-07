@@ -113,10 +113,9 @@ basic-auth:
 
 base-url:
   api-endpoint:
-    home: /api-versioned/v2
+    home: /api/v1
+    versioned-home: /api-versioned/v2
     manage-table: /api-versioned/v2/manage/table
-    rabbit-mq: /api/v2/rabbit-mq
-    versioned-rabbit-mq: /api-versioned/v2/rabbit-mq
     
 # {saas-ms.request-header.api-version}
 saas-ms:

@@ -17,7 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${base-url.api-endpoint.home}")
 public class InputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
@@ -30,7 +30,7 @@ public class InputDocumentResource {
 
 
 
-    @PostMapping("/v1/ingest-nrt/{clientid}/{tableName}")
+    @PostMapping("/ingest-nrt/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload){
 
@@ -52,7 +52,7 @@ public class InputDocumentResource {
     }
     
 
-	@PostMapping("/v1/ingest/{clientid}/{tableName}")
+	@PostMapping("/ingest/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
 
     public ResponseEntity<ResponseDTO> document(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload) {

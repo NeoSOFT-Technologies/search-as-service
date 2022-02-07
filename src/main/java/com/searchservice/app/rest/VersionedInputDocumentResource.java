@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api-versioned")
+@RequestMapping("${base-url.api-endpoint.versioned-home}")
 public class VersionedInputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(VersionedInputDocumentResource.class);
@@ -28,7 +28,7 @@ public class VersionedInputDocumentResource {
 
 
 
-    @PostMapping("/v1/ingest-nrt/{clientid}/{tableName}")
+    @PostMapping("/ingest-nrt/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseDTO documents(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload){
 
@@ -46,7 +46,7 @@ public class VersionedInputDocumentResource {
     }
     
 
-	@PostMapping("/v1/ingest/{clientid}/{tableName}")
+	@PostMapping("/ingest/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
 
     public ResponseDTO document(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload) {

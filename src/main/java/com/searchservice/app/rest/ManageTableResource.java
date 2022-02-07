@@ -26,7 +26,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/api/v2/manage/table")
+//@RequestMapping("/api/v2/manage/table")
+@RequestMapping("${base-url.api-endpoint.home}"+"/manage/table")
 public class ManageTableResource {
 
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
