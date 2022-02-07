@@ -5,6 +5,8 @@ import com.searchservice.app.domain.dto.table.CreateTableDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
 import com.searchservice.app.domain.port.api.TableServicePort;
+import com.searchservice.app.rest.errors.TableResourceException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ public class TableResource {
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
+        	throw new TableResourceException(responseDTO.getStatusCode(), responseDTO.getMessage());
         }
 
     }
@@ -67,7 +69,8 @@ public class TableResource {
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
+            //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
+        	throw new TableResourceException(responseDTO.getStatusCode(), responseDTO.getMessage());
         }
 
     }
@@ -101,7 +104,7 @@ public class TableResource {
         if(getTablesResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(getTablesResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getTablesResponseDTO);
+        	throw new TableResourceException(getTablesResponseDTO.getStatusCode(), getTablesResponseDTO.getMessage());
         }
 
     }
@@ -117,7 +120,7 @@ public class TableResource {
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO);
+        	throw new TableResourceException(responseDTO.getStatusCode(), responseDTO.getMessage());
         }
 
     }
@@ -133,7 +136,7 @@ public class TableResource {
         if(!responseMap.containsKey("Error")){
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
+        	throw new TableResourceException(400, responseMap.get("Erorr").toString());
         }
 
     }

@@ -1,10 +1,9 @@
 package com.searchservice.app.domain.service;
 
-import com.searchservice.app.config.CapacityPlanProperties;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
-import com.searchservice.app.domain.port.api.TableServicePort;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -13,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.searchservice.app.config.CapacityPlanProperties;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.GetTablesResponseDTO;
+import com.searchservice.app.domain.port.api.TableServicePort;
 
 @Service
 public class TableService implements TableServicePort {
