@@ -28,12 +28,14 @@ public class VersionedInputDocumentResource {
 
     @PostMapping("/documents/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName, @RequestBody String payload, @RequestParam boolean isNRT) {
+    public ResponseEntity<ResponseDTO> documents(
+    		@PathVariable String tableName, 
+    		@RequestBody String payload) {
 
         log.debug("Solr documents add");
 
         Instant start = Instant.now();
-        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload, isNRT);
+        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload);
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";

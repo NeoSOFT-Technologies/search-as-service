@@ -28,15 +28,41 @@ public class InputDocumentResource {
         this.inputDocumentServicePort = inputDocumentServicePort;
     }
 
-    @PostMapping("/documents/{clientid}/{tableName}")
+
+
+    @PostMapping("/v1/ingest-nrt/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload, @RequestParam boolean isNRT) {
+    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload){
+
+        log.debug("Solr documents add");
+        tableName = tableName+"_"+clientid;
+        Instant start = Instant.now();
+        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload);
+        Instant end = Instant.now();      
+        Duration timeElapsed = Duration.between(start, end);
+        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
+       log.debug(result);
+
+        if(solrResponseDTO.getResponseStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        }
+
+    }
+    
+
+	@PostMapping("/v1/ingest/{clientid}/{tableName}")
+    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+
+    public ResponseEntity<ResponseDTO> document(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload) {
+      
 
         log.debug("Solr documents add");
 
         tableName = tableName+"_"+clientid;
         Instant start = Instant.now();
-        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload, isNRT);
+        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocument(tableName, payload);
         Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
@@ -47,7 +73,6 @@ public class InputDocumentResource {
         }else{
         	throw new InputDocumentException(solrResponseDTO.getResponseStatusCode(),solrResponseDTO.getResponseMessage());
         }
-
     }
 
 

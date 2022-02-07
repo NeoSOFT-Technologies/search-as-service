@@ -1,6 +1,5 @@
 package com.searchservice.app.domain.service;
 
-
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.utils.DocumentParserUtil;
@@ -16,73 +15,124 @@ import java.util.Map;
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
 
-   @Value("${base-solr-url}")
-    private String baseSolrUrl;
+	@Value("${base-solr-url}")
+	private String baseSolrUrl;
 
-    private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
+	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 
-    @Override
-    public ResponseDTO addDocuments(String collectionName, String payload, boolean isNRT) {
+	private ResponseDTO extracted(ResponseDTO responseDTO, Exception e, Exception e1) {
+		log.error("Exception: ", e);
+		log.error("Exception: ", e1);
 
-        ResponseDTO responseDTO=new ResponseDTO(collectionName);
+		String message = "Invalid input JSON array of document.";
+		log.debug(message);
+		responseDTO.setResponseMessage(message);
+		responseDTO.setResponseStatusCode(400);
+		return responseDTO;
+	}
 
-        Map<String,Map<String, Object>> schemaKeyValuePair= DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,collectionName);
-        if(schemaKeyValuePair == null){
-            String message="Unable to get the Schema. Please check the collection name again!";
-            log.debug(message);
-            responseDTO.setResponseMessage(message);
-            responseDTO.setResponseStatusCode(400);
-            return responseDTO;
-        }
+	private void extracted(ResponseDTO responseDTO, UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
+		if (response.isDocumentUploaded()) {
+			responseDTO.setResponseMessage("Successfully Added!");
+			responseDTO.setResponseStatusCode(200);
+		} else {
+			responseDTO.setResponseMessage(response.getMessage());
+			responseDTO.setResponseStatusCode(400);
+		}
+	}
+	
+	private UploadDocumentUtil extracted(String collectionName, String payload) {
+		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
-        JSONArray payloadJSONArray=null;
-        try {
-            payloadJSONArray = new JSONArray(payload);
-        }catch (Exception e){
+		uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
+		uploadDocumentUtil.setCollectionName(collectionName);
+		uploadDocumentUtil.setContent(payload);
+		return uploadDocumentUtil;
+	}
 
-            //TRY BY REMOVING THE QUOTES FROM THE STRING
-            try{
+	@Override
+	public ResponseDTO addDocuments(String collectionName, String payload) {
 
-                payload=payload.substring(1, payload.length() - 1);
-                payloadJSONArray = new JSONArray(payload);
+		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
-            }catch (Exception e1){
+		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
+				collectionName);
 
-                log.debug(e.toString());
-                log.debug(e1.toString());
+		if (schemaKeyValuePair == (null)) {
+			String message = "Unable to get the Schema. Please check the collection name again!";
+			log.debug(message);
+			responseDTO.setResponseMessage(message);
+			responseDTO.setResponseStatusCode(400);
+			return responseDTO;
+		}
 
-                String message="Invalid input JSON array of document.";
-                log.debug(message);
-                responseDTO.setResponseMessage(message);
-                responseDTO.setResponseStatusCode(400);
-                return responseDTO;
+		JSONArray payloadJSONArray = null;
+		try {
+			payloadJSONArray = new JSONArray(payload);
 
-            }
-        }
+		} catch (Exception e) {
 
+			// TRY BY REMOVING THE QUOTES FROM THE STRING
+			try {
+				payload = payload.substring(1, payload.length() - 1);
+				payloadJSONArray = new JSONArray(payload);
 
-        //CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE STRUCTURALLY CORRECT
+			} catch (Exception e1) {
+				return extracted(responseDTO, e, e1);
+			}
+		}
 
-        UploadDocumentUtil uploadDocumentUtil =new UploadDocumentUtil();
+		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
+		// STRUCTURALLY CORRECT
 
-        uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
-        uploadDocumentUtil.setCollectionName(collectionName);
-        uploadDocumentUtil.setContent(payload);
-        uploadDocumentUtil.setCommit(isNRT);
+		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
 
-        UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
+		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
-        if(response.isDocumentUploaded()){
-            responseDTO.setResponseMessage("Successfully Added!");
-            responseDTO.setResponseStatusCode(200);
-        }else{
-            responseDTO.setResponseMessage(response.getMessage());
-            responseDTO.setResponseStatusCode(400);
-        }
+		extracted(responseDTO, response);
+		return responseDTO;
 
-        return responseDTO;
+	}
 
-    }
+	@Override
+	public ResponseDTO addDocument(String collectionName, String payload) {
+		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
+		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
+				collectionName);
+		if (schemaKeyValuePair == null) {
+			String message = "Unable to get the Schema. Please check the collection name again!";
+			log.debug(message);
+			responseDTO.setResponseMessage(message);
+			responseDTO.setResponseStatusCode(400);
+			return responseDTO;
+		}
+
+		JSONArray payloadJSONArray = null;
+		try {
+			payloadJSONArray = new JSONArray(payload);
+		} catch (Exception e) {
+
+			// TRY BY REMOVING THE QUOTES FROM THE STRING
+			try {
+				payload = payload.substring(1, payload.length() - 1);
+				payloadJSONArray = new JSONArray(payload);
+
+			} catch (Exception e1) {
+				return extracted(responseDTO, e, e1);
+			}
+
+		}               
+		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
+		// STRUCTURALLY CORRECT
+		
+		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
+
+		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
+
+		extracted(responseDTO, response);
+
+		return responseDTO;
+	}
 
 }
