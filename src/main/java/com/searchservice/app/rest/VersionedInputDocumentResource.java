@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api-versioned")
 public class VersionedInputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(VersionedInputDocumentResource.class);

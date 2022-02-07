@@ -30,16 +30,16 @@ public class ResponseDTO implements VersionedObjectMapper {
     	this.responseStatusCode = responseStatusCode;
     	this.responseMessage = responseMessage;
     }
-    
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
 
 	public ResponseDTO(int statusCode, String name, String message) {
-		super();
 		this.responseStatusCode = statusCode;
 		this.name = name;
 		this.responseMessage = message;
 	}
+	
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
+	}
+	
 }
