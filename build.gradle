@@ -13,6 +13,7 @@ sourceCompatibility = '1.8'
 
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
+apply plugin: "eclipse"
 
 configurations {
 	compileOnly {
@@ -23,8 +24,6 @@ configurations {
 repositories {
 	mavenCentral()
 }
-
-apply plugin: "eclipse"
 
 //===============TO RUN JUINT TESTCASES====================
 test {
