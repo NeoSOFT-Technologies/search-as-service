@@ -198,8 +198,9 @@ public class DocumentParserUtil {
         SchemaResponse schemaResponse = null;
         try {
             schemaResponse = schemaRequest.process(solrClient);
-        } catch (Exception e) {
-            log.error(e.toString());
+        } catch (Exception e) {        	
+            log.error(e.toString());          
+            return null;
          
         }
 

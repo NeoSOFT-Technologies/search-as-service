@@ -16,4 +16,11 @@ public class ResponseDTO {
     public ResponseDTO(String name) {
         this.name = name;
     }
+
+	public ResponseDTO(int statusCode, String name, String message) {
+		super();
+		this.statusCode = statusCode;
+		this.name = name;
+		this.message = message;
+	}
 }

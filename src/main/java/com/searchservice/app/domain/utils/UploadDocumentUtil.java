@@ -7,67 +7,84 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-
 @Data
 public class UploadDocumentUtil {
 
-    private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
+	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
-    private String baseSolrUrl;
-    private String collectionName;
-    private String content;//"[{'name': 'karthik1'},{'name': 'karthik2'}]"
-    private boolean isCommit=false;
+	private String baseSolrUrl;
+	private String collectionName;
+	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
+	public UploadDocumentSolrUtilRespnse commit() {
+		
+		OkHttpClient client = new OkHttpClient();
+		MediaType mediaType = MediaType.parse("application/json");
+		RequestBody body = RequestBody.create(mediaType, content);
 
-    public UploadDocumentSolrUtilRespnse commit(){
+		String url = baseSolrUrl + "/" + collectionName + "/update?";
+		url += "commit=true";
+		log.debug("COMMIT");
+	
+		Request request = new Request.Builder().url(url).method("POST", body)
+				.addHeader("Content-Type", "application/json").build();
 
-        OkHttpClient client = new OkHttpClient();
+		try {
+			// Response response =
+			client.newCall(request).execute();
 
-        MediaType mediaType = MediaType.parse("application/json");
+			return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
 
-        RequestBody body = RequestBody.create(mediaType, content);
+		} catch (IOException e) {
+			log.error(e.toString());
 
-        String url=baseSolrUrl+"/"+collectionName+"/update?";
-        if(isCommit){
-            url+="commit=true";
-            log.debug("COMMIT");
-        }else{
-            url+="softCommit=true";
-            log.debug("SOFT COMMIT");
-        }
+			return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded! IOException.");
 
-        Request request = new Request.Builder()
-                .url(url)
-                .method("POST", body)
-                .addHeader("Content-Type", "application/json")
-                .build();
+		}
 
-        try {
-            //Response response =
-                    client.newCall(request).execute();
+	}
 
-            return new UploadDocumentSolrUtilRespnse(true,"Document Added Successfully!");
+	public UploadDocumentSolrUtilRespnse softcommit() {
 
-        } catch (IOException e) {
-            log.error(e.toString());
+		OkHttpClient client = new OkHttpClient();
 
-            return new UploadDocumentSolrUtilRespnse(false,"Document not uploaded! IOException.");
+		MediaType mediaType = MediaType.parse("application/json");
 
-        }
+		RequestBody body = RequestBody.create(mediaType, content);
 
-    }
+		String url = baseSolrUrl + "/" + collectionName + "/update?";
 
+		url += "softCommit=true";
 
-    @Data
-    public static class UploadDocumentSolrUtilRespnse {
-        boolean isDocumentUploaded;
-        String message;
-        public UploadDocumentSolrUtilRespnse(boolean isDocumentUploaded, String message) {
-            this.isDocumentUploaded = isDocumentUploaded;
-            this.message = message;
-        }
-    }
+		log.debug("SOFT COMMIT");
 
+		Request request = new Request.Builder().url(url).method("POST", body)
+				.addHeader("Content-Type", "application/json").build();
 
+		try {
+			// Response response =
+			client.newCall(request).execute();
+
+			return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
+
+		} catch (IOException e) {
+			log.error(e.toString());
+
+			return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded! IOException.");
+
+		}
+
+	}
+
+	@Data
+	public static class UploadDocumentSolrUtilRespnse {
+		boolean isDocumentUploaded;
+		String message;
+
+		public UploadDocumentSolrUtilRespnse(boolean isDocumentUploaded, String message) {
+			this.isDocumentUploaded = isDocumentUploaded;
+			this.message = message;
+		}
+	}
 
 }
