@@ -1,5 +1,7 @@
 package com.searchservice.app.rest;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,13 +14,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.searchservice.app.domain.dto.ApiResponseDTO;
-import com.searchservice.app.domain.dto.GetListItemsResponseDTO;
+import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
@@ -27,7 +26,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/api/v1/manage/table")
+@RequestMapping("/api/v2/manage/table")
 public class ManageTableResource {
 
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
@@ -42,37 +41,59 @@ public class ManageTableResource {
 	}
 
 	@GetMapping("/capacity-plans")
-	@Operation(summary = "/get-capacity-plans")
-	public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
-		log.debug("Get capacity plans");
-		GetCapacityPlanDTO getCapacityPlanDTO = manageTableServicePort.capacityPlans();
-		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
-	}
+    @Operation(summary = "/get-capacity-plans")
+    public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
+        log.debug("Get capacity plans");
+        GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
+        return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
 
-	@GetMapping
-	@Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<GetListItemsResponseDTO> getTables() {
-		log.debug("Get all tables");
+//        if(getCapacityPlanDTO.getPlans() != null)
+//        	return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
+//        else
+//        	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
+    }
+	
+	
+    @GetMapping
+    @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ResponseDTO> getTables() {
+        log.debug("Get all tables");
 
-		GetListItemsResponseDTO getListItemsResponseDTO = manageTableServicePort.getTables();
+       ResponseDTO getListItemsResponseDTO=manageTableServicePort.getTables();
+        
+        if(getListItemsResponseDTO == null)
+        	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
+        if(getListItemsResponseDTO.getResponseStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
+        }else{
+            throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+        }
+    }
+    
+    
+    @GetMapping("/details/{tableName}")
+    @Operation(summary = "/ Get the table details like Shards, Nodes & Replication Factor.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map> getTableDetails(@PathVariable String tableName) {
 
-		if (getListItemsResponseDTO == null)
-			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
-		if (getListItemsResponseDTO.getStatusCode() == 200) {
-			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
-		} else {
-			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
-		}
-	}
+        log.debug("getCollectionDetails");
 
+        Map responseMap= manageTableServicePort.getTableDetails(tableName);
+
+        if(!responseMap.containsKey("Error")){
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
+        }
+
+    }
+	
 	@GetMapping("/schema/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<TableSchemaResponseDTO> getSchema(@PathVariable String tableName,
-			@PathVariable int clientid) {
+	public ResponseEntity<TableSchemaDTO> getSchema(@PathVariable String tableName, @PathVariable int clientid) {
 		log.debug("Get table schema");
 
 		tableName = tableName + "_" + clientid;
-		TableSchemaResponseDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+		TableSchemaDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
 
 		if (tableSchemaResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
@@ -83,13 +104,14 @@ public class ManageTableResource {
 		}
 	}
 
+
 	@PostMapping("/{clientid}")
 	@Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ApiResponseDTO> createTable(@PathVariable int clientid,
+	public ResponseEntity<ResponseDTO> createTable(@PathVariable int clientid,
 			@RequestBody ManageTableDTO manageTableDTO) {
 		log.debug("Create table");
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
-		ApiResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
+		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -101,11 +123,13 @@ public class ManageTableResource {
 
 	@DeleteMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ApiResponseDTO> deleteTable(@PathVariable String tableName, @PathVariable int clientid) {
+	public ResponseEntity<ResponseDTO> deleteTable(
+			@PathVariable String tableName, 
+			@PathVariable int clientid) {
 		log.debug("Delete table");
 
 		tableName = tableName + "_" + clientid;
-		ApiResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName);
+		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName);
 
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -117,13 +141,17 @@ public class ManageTableResource {
 
 	@PutMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ApiResponseDTO> updateTableSchema(@PathVariable String tableName, @PathVariable int clientid,
+	public ResponseEntity<ResponseDTO> updateTableSchema(
+			@PathVariable String tableName, 
+			@PathVariable int clientid,
 			@RequestBody TableSchemaDTO newTableSchemaDTO) {
 		tableName = tableName + "_" + clientid;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
+
 		newTableSchemaDTO.setTableName(newTableSchemaDTO.getTableName() + "_" + clientid);
-		ApiResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+	
 		if (apiResponseDTO.getResponseStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		else

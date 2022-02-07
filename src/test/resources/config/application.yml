@@ -106,3 +106,21 @@ basic-auth:
   username: solr
   password: SolrRocks
 #================================================================
+
+
+#================================================================
+#ObjectMapperVersioning configurations
+
+base-url:
+  api-endpoint:
+    home: /api-versioned/v2
+    manage-table: /api-versioned/v2/manage/table
+    rabbit-mq: /api/v2/rabbit-mq
+    versioned-rabbit-mq: /api-versioned/v2/rabbit-mq
+    
+# {saas-ms.request-header.api-version}
+saas-ms:
+  request-header:
+    api-version: X-Api-Version
+
+#================================================================

@@ -24,7 +24,7 @@ public class DocumentParserUtil {
     private static boolean isNumeric(String string) {
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
 
-        log.debug(String.format("Parsing string: \"%s\"", string));
+        log.debug("Parsing string: {}", string);
 
         if(string == null || string.equals("")) {
             log.debug("String cannot be parsed, it is null or empty.");
@@ -44,13 +44,15 @@ public class DocumentParserUtil {
 
         String objectAsString=object.toString();
 
-        log.debug(String.format("isBoolean Check: %s , Object as String: %s ", object, objectAsString));
+        log.debug("isBoolean Check: {} , Object as String: {}", object, objectAsString);
 
-        if(object.getClass().equals(Boolean.class) || objectAsString.equals("true") || objectAsString.equals("True") || objectAsString.equals("false") || objectAsString.equals("False") || (isNumeric(objectAsString) && (Integer.parseInt(objectAsString)==1 || Integer.parseInt(objectAsString)==0))){
-            return true;
-        }
+        return (object.getClass().equals(Boolean.class)
+        		|| objectAsString.equals("true")
+        		|| objectAsString.equals("True")
+        		|| objectAsString.equals("false")
+        		|| objectAsString.equals("False")
+        		|| (isNumeric(objectAsString) && (Integer.parseInt(objectAsString)==1 || Integer.parseInt(objectAsString)==0)));
 
-        return false;
 
     }
 

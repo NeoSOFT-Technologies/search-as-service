@@ -21,23 +21,23 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 
 	private ResponseDTO extracted(ResponseDTO responseDTO, Exception e, Exception e1) {
-		log.debug(e.toString());
-		log.debug(e1.toString());
+		log.error("Exception: ", e);
+		log.error("Exception: ", e1);
 
 		String message = "Invalid input JSON array of document.";
 		log.debug(message);
-		responseDTO.setMessage(message);
-		responseDTO.setStatusCode(400);
+		responseDTO.setResponseMessage(message);
+		responseDTO.setResponseStatusCode(400);
 		return responseDTO;
 	}
 
 	private void extracted(ResponseDTO responseDTO, UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
-			responseDTO.setMessage("Successfully Added!");
-			responseDTO.setStatusCode(200);
+			responseDTO.setResponseMessage("Successfully Added!");
+			responseDTO.setResponseStatusCode(200);
 		} else {
-			responseDTO.setMessage(response.getMessage());
-			responseDTO.setStatusCode(400);
+			responseDTO.setResponseMessage(response.getMessage());
+			responseDTO.setResponseStatusCode(400);
 		}
 	}
 	
@@ -61,8 +61,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		if (schemaKeyValuePair == (null)) {
 			String message = "Unable to get the Schema. Please check the collection name again!";
 			log.debug(message);
-			responseDTO.setMessage(message);
-			responseDTO.setStatusCode(400);
+			responseDTO.setResponseMessage(message);
+			responseDTO.setResponseStatusCode(400);
 			return responseDTO;
 		}
 
@@ -103,8 +103,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		if (schemaKeyValuePair == null) {
 			String message = "Unable to get the Schema. Please check the collection name again!";
 			log.debug(message);
-			responseDTO.setMessage(message);
-			responseDTO.setStatusCode(400);
+			responseDTO.setResponseMessage(message);
+			responseDTO.setResponseStatusCode(400);
 			return responseDTO;
 		}
 
@@ -134,7 +134,5 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		return responseDTO;
 	}
-
-
 
 }

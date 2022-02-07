@@ -6,8 +6,6 @@ import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.document.DocumentDTO;
 import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
-import com.searchservice.app.domain.service.InMemoryCacheService;
 import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.infrastructure.enums.SchemaFieldType;
@@ -58,7 +56,7 @@ class InputDocumentResourceTest {
 
 	public void setMockitoSucccessResponseForService() {
 		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
-		responseDTO.setStatusCode(200);
+		responseDTO.setResponseStatusCode(200);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
 
@@ -66,7 +64,7 @@ class InputDocumentResourceTest {
 
 	public void setMockitoBadResponseForService() {
 		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
-		responseDTO.setStatusCode(400);
+		responseDTO.setResponseStatusCode(400);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}

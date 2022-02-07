@@ -1,7 +1,9 @@
 package com.searchservice.app.domain.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -15,5 +17,6 @@ public class TypeCastingUtil {
 				resultList.add(String.class.cast(o));
 		}
 		return resultList;
-	}
+	}	
+
 }

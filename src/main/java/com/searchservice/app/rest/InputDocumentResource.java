@@ -43,7 +43,7 @@ public class InputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
        log.debug(result);
 
-        if(solrResponseDTO.getStatusCode()==200){
+        if(solrResponseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
@@ -68,10 +68,10 @@ public class InputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
        log.debug(result);
 
-        if(solrResponseDTO.getStatusCode()==200){
+        if(solrResponseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-        	throw new InputDocumentException(solrResponseDTO.getStatusCode(),solrResponseDTO.getMessage());
+        	throw new InputDocumentException(solrResponseDTO.getResponseStatusCode(),solrResponseDTO.getResponseMessage());
         }
     }
 
