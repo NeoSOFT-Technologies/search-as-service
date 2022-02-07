@@ -2,6 +2,7 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
@@ -21,6 +22,7 @@ public class TableSchemaDTO implements VersionedObjectMapper {
 
     int statusCode;
 	String message;
+	@JsonIgnore
 	String tableName;
 	String schemaName;
 	List<SchemaFieldDTO> attributes;

@@ -13,10 +13,10 @@ sourceCompatibility = '1.8'
 
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
-apply plugin: "eclipse"
 
 // gradle clean
 apply plugin: "eclipse"
+apply plugin: 'java'
 
 configurations {
 	compileOnly {

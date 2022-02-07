@@ -3,6 +3,8 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.rest.errors.InputDocumentException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -26,12 +28,13 @@ public class InputDocumentResource {
         this.inputDocumentServicePort = inputDocumentServicePort;
     }
 
-    @PostMapping("/documents/{tableName}")
+    @PostMapping("/documents/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName, @RequestBody String payload, @RequestParam boolean isNRT) {
+    public ResponseEntity<ResponseDTO> documents(@PathVariable String tableName,@PathVariable int clientid, @RequestBody String payload, @RequestParam boolean isNRT) {
 
         log.debug("Solr documents add");
 
+        tableName = tableName+"_"+clientid;
         Instant start = Instant.now();
         ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocuments(tableName, payload, isNRT);
         Instant end = Instant.now();
@@ -42,7 +45,7 @@ public class InputDocumentResource {
         if(solrResponseDTO.getResponseStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+        	throw new InputDocumentException(solrResponseDTO.getResponseStatusCode(),solrResponseDTO.getResponseMessage());
         }
 
     }

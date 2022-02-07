@@ -64,7 +64,6 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
 	private static final String VALIDATED = "validated";
-	
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 	
 	@Value("${base-solr-url}")
@@ -76,7 +75,6 @@ public class ManageTableService implements ManageTableServicePort {
 	// ConfigSet
 	@Value("${base-configset}")
 	private String baseConfigSet;
-	
 	
     @Autowired
     CapacityPlanProperties capacityPlanProperties;
@@ -231,6 +229,7 @@ public class ManageTableService implements ManageTableServicePort {
 			TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
 			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
+			
 		}
 		return apiResponseDTO;
 	}
@@ -332,7 +331,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 
 	@Override
-	public boolean isTableExists(String tableName) {
+	public boolean isTableExists(String tableName){
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         try {
