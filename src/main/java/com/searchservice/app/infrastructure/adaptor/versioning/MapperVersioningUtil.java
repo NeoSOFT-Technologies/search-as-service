@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.searchservice.app.rest.VersionedManageTableResource;
-import com.searchservice.app.rest.VersionedRabbitMQResource;
 
 import lombok.Data;
 
@@ -33,8 +32,7 @@ public class MapperVersioningUtil {
 	public static List<Class<?>> getAllVersionedResources() {
 		versioned.addAll(
 				Arrays.asList(
-						VersionedManageTableResource.class, 
-						VersionedRabbitMQResource.class));
+						VersionedManageTableResource.class));
 		
 		return versioned;
 	}

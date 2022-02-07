@@ -16,8 +16,6 @@ import java.util.Map;
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
 
-
-	
    @Value("${base-solr-url}")
     private String baseSolrUrl;
 
@@ -36,9 +34,6 @@ public class InputDocumentService implements InputDocumentServicePort {
             responseDTO.setResponseStatusCode(400);
             return responseDTO;
         }
-
-
-
 
         JSONArray payloadJSONArray=null;
         try {
