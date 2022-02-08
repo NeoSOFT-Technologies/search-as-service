@@ -17,17 +17,17 @@ public interface ManageTableServicePort {
 	 * CRUD operations for managing tables
 	 */
 	// GET request
-	GetListItemsResponseDTO getTables();
+	GetListItemsResponseDTO getTables(String correlationid,String ipaddress);
 	GetListItemsResponseDTO getConfigSets();
-	TableSchemaResponseDTO getTableSchemaIfPresent(String tableName);
+	TableSchemaResponseDTO getTableSchemaIfPresent(String tableName,String correlationid,String ipaddress);
 	// CREATE requests
 	ApiResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
-	ApiResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
+	ApiResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO,String correlationid,String ipaddress);
 	// DELETE requests
 	ApiResponseDTO deleteConfigSet(String configSetName);
-	ApiResponseDTO deleteTable(String tableName);
+	ApiResponseDTO deleteTable(String tableName,String correlationid, String ipaddress);
 	// UPDATE requests
-	ApiResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO);
+	ApiResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO,String correlationid, String ipaddress);
 	ApiResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
 	// Auxiliary Services
     GetCapacityPlanDTO capacityPlans();
