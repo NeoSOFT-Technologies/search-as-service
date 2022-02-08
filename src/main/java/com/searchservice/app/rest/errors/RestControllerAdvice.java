@@ -42,7 +42,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaughtException(
 			Exception exception) {
-		log.error("Uncaught Error Occured:" ,exception.getMessage());
+		log.error("Uncaught Error Occured: {}" ,exception.getMessage());
 		return frameRestApiException(new RestApiError(
 										HttpStatus.BAD_REQUEST, 
 										"Something Went Wrong"));
