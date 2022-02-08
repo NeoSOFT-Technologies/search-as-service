@@ -2,6 +2,7 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class ManageTableDTO implements VersionedObjectMapper {
 	private String sku;
 	private String schemaName;
 	private List<SchemaFieldDTO> attributes;
+	@JsonIgnore
 	private String tableNewName;
 	
 	public ManageTableDTO(ManageTableDTO manageTableDTO) {

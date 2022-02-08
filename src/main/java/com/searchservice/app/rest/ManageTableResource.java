@@ -18,7 +18,9 @@ import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.port.api.CollectionDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.service.CollectionDeleteService;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 
@@ -29,6 +31,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/v2/manage/table")
 public class ManageTableResource {
 
+	
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
 	private static final String BAD_REQUEST_MSG = "REST call could not be performed";
@@ -36,8 +39,11 @@ public class ManageTableResource {
 
 	private ManageTableServicePort manageTableServicePort;
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
+	private CollectionDeleteServicePort collectionDeleteServicePort;
+
+	public ManageTableResource(ManageTableServicePort manageTableServicePort,CollectionDeleteServicePort collectionDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.collectionDeleteServicePort=collectionDeleteServicePort;
 	}
 
 	@GetMapping("/capacity-plans")
@@ -132,6 +138,7 @@ public class ManageTableResource {
 		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName);
 
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
+			collectionDeleteServicePort.insertCollectionDeleteRecord(clientid, tableName);
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
 			log.debug("Exception occurred: {}", apiResponseDTO);
