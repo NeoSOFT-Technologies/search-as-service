@@ -1,10 +1,15 @@
 package com.searchservice.app.domain.service;
 
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -23,11 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.logger.CorrelationID;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
@@ -82,6 +89,18 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SolrAPIAdapter solrAPIAdapter;
 	HttpSolrClient solrClient;
+	
+	CorrelationID correlationID = new CorrelationID();
+
+	@Autowired
+	HttpServletRequest request;
+
+	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+
+	private String servicename = "Manage_Table_Service";
+
+	private String username = "Username";
+	
 	public ManageTableService(String solrUrl, SolrAPIAdapter solrAPIAdapter, HttpSolrClient solrClient) {
 		this.solrURL = solrUrl;
 		this.solrAPIAdapter = solrAPIAdapter;
@@ -91,16 +110,33 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public GetCapacityPlanDTO capacityPlans() {
+		logger.debug("capacity Plans");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
+        logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+        
         return new GetCapacityPlanDTO(capacityPlans);
-//        if(capacityPlans != null)
-//        	return new GetCapacityPlanDTO(capacityPlans);
-//        else
-//        	throw new NullPointerOccurredException(404, "No capacity plans found. Null returned");
+
 	}
 
 	@Override
 	public ResponseDTO isTablePresent(String tableName) {
+		logger.debug(" Is Table Present");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		ResponseDTO apiResponseDTO=new ResponseDTO();
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = new HttpSolrClient.Builder(solrURL).build();
@@ -110,33 +146,52 @@ public class ManageTableService implements ManageTableServicePort {
             if(allCollections.contains(tableName)){
                 apiResponseDTO.setResponseStatusCode(200);
                 apiResponseDTO.setResponseMessage("true");
+                logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+                
             }else{
                 apiResponseDTO.setResponseStatusCode(400);
                 apiResponseDTO.setResponseMessage("false");
+                logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+                
             }
         } catch (Exception e) {
             logger.error(e.toString());
             apiResponseDTO.setResponseStatusCode(400);
             apiResponseDTO.setResponseMessage("Error!");
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }
+        
         return apiResponseDTO;
 	}
 
 	
 	@Override
-	public TableSchemaDTO getTableSchemaIfPresent(String tableName) {
+	public TableSchemaDTO getTableSchemaIfPresent(String tableName,String correlationid, String ipaddress) {
+		logger.debug("Get Table Schema If Present");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		if(!isTableExists(tableName))
 			throw new BadRequestOccurredException(400, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
+		logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+        
 		return getTableSchema(tableName);
 	}
 
 	
 	@Override
-	public ResponseDTO getTables() {
+	public ResponseDTO getTables(String correlationid, String ipaddress) {
+		logger.debug("get Tables");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
-
+        
         ResponseDTO getListItemsResponseDTO=new ResponseDTO();
         try {
             CollectionAdminResponse response = request.process(solrClient);
@@ -144,11 +199,15 @@ public class ManageTableService implements ManageTableServicePort {
             getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
             getListItemsResponseDTO.setResponseStatusCode(200);
             getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 
         } catch (Exception e) {
             logger.error(e.toString());
             getListItemsResponseDTO.setResponseStatusCode(400);
             getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }
         return getListItemsResponseDTO;
 	}
@@ -156,6 +215,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public ResponseDTO getConfigSets() {
+		logger.debug("get Config Sets");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
 		
@@ -166,10 +234,14 @@ public class ManageTableService implements ManageTableServicePort {
 			getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
 			getListItemsResponseDTO.setResponseStatusCode(200);
 			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all config sets");
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		} catch(Exception e) {
 			getListItemsResponseDTO.setResponseStatusCode(400);
 			getListItemsResponseDTO.setResponseMessage("Configsets could not be retrieved. Error occured");
 			logger.error("Error caused while retrieving configsets. Exception: ", e);
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		}
 		return getListItemsResponseDTO;
 	}
@@ -177,6 +249,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public ResponseDTO createConfigSet(ConfigSetDTO configSetDTO) {
+		logger.debug("create Config Set");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.Create configSetRequest = new ConfigSetAdminRequest.Create();	
 		ResponseDTO apiResponseDTO = new ResponseDTO();
@@ -192,20 +273,27 @@ public class ManageTableService implements ManageTableServicePort {
 			 */
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.process(solrClient);
-			apiResponseDTO = new ResponseDTO(
-					200, 
-					"ConfigSet is created successfully");
+			apiResponseDTO = new ResponseDTO(200, "ConfigSet is created successfully");
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		} catch(Exception e) {
 			apiResponseDTO.setResponseMessage("ConfigSet could not be created");
 			apiResponseDTO.setResponseStatusCode(400);
 			logger.error("Error caused while creating ConfigSet. Exception: ", e);
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		}
 		return apiResponseDTO;
 	}
 
 
 	@Override
-	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO) {		
+	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO,String correlationid, String ipaddress) {	
+		logger.debug("create Table If Not Present");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		if(isTableExists(manageTableDTO.getTableName()))
 			throw new BadRequestOccurredException(400, 
 					manageTableDTO.getTableName()+" table already exists");
@@ -231,12 +319,23 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
 			
 		}
+		logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+        
 		return apiResponseDTO;
 	}
 
 
 	@Override
 	public ResponseDTO deleteConfigSet(String configSetName) {
+		logger.debug("delete Config Set");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		solrClient = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
 		
@@ -246,20 +345,28 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.process(solrClient);
-			apiResponseDTO = new ResponseDTO(
-					200, 
-					"ConfigSet got deleted successfully");
+			apiResponseDTO = new ResponseDTO(200,"ConfigSet got deleted successfully");
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		} catch (Exception e) {
 			apiResponseDTO.setResponseMessage("ConfigSet could not be deleted");
 			apiResponseDTO.setResponseStatusCode(401);
 			logger.error("Error occured while deleting Config set. Exception: ", e);
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+	        
 		}
 		return apiResponseDTO;
 	}
 
 
 	@Override
-	public ResponseDTO deleteTable(String tableName) {
+	public ResponseDTO deleteTable(String tableName,String correlationid, String ipaddress) {
+		logger.debug("delete Table");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		if(!isTableExists(tableName))
 			throw new ContentNotFoundException(404, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
@@ -278,29 +385,43 @@ public class ManageTableService implements ManageTableServicePort {
 
             apiResponseDTO.setResponseStatusCode(200);
             apiResponseDTO.setResponseMessage("Table: "+tableName+", is successfully deleted");
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         } catch (Exception e) {
             logger.error("Exception occurred: ", e);
             apiResponseDTO.setResponseStatusCode(400);
             apiResponseDTO.setResponseMessage("Unable to delete table: "+tableName);
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }
         
-        // Delete configSet attached to the table
-		/*
-		 * String configSetName = ""; if(apiResponseDTO.getResponseStatusCode()==200)
-		 * apiResponseDTO = deleteConfigSet(configSetName);
-		 */
         return apiResponseDTO;
 	}
 
 
 	@Override
-	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
+	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO,String correlationid, String ipaddress) {
+		logger.debug("update Table Schema");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+        
 		return updateSchemaAttributes(tableSchemaDTO);
 	}
 
 
 	@Override
 	public ResponseDTO addAliasTable(String tableOriginalName, String tableAlias) {
+		logger.debug("add Alias Table");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName,tableAlias);
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         
@@ -310,10 +431,14 @@ public class ManageTableService implements ManageTableServicePort {
             request.process(solrClient);
             apiResponseDTO.setResponseStatusCode(200);
             apiResponseDTO.setResponseMessage("Successfully renamed Solr Collection: "+tableOriginalName+" to "+tableAlias);
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         } catch (Exception e) {
             logger.error(e.toString());
             apiResponseDTO.setResponseStatusCode(400);
             apiResponseDTO.setResponseMessage("Unable to rename Solr Collection: "+tableOriginalName+". Exception.");
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }
         return apiResponseDTO;
 	}
@@ -322,6 +447,7 @@ public class ManageTableService implements ManageTableServicePort {
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
 	@Override
 	public boolean isConfigSetExists(String configSetName) {
+		
 		ResponseDTO configSets = getConfigSets();
 		if(configSetName != null)
 			return configSets.getItems().contains(configSetName);
@@ -332,14 +458,27 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public boolean isTableExists(String tableName){
+		logger.debug("is Table Exists");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         try {
             CollectionAdminResponse response = request.process(solrClient);
             List<String> allTables=TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
             return allTables.contains(tableName);
         } catch (Exception e) {
             logger.error(e.toString());
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
             throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
         }
 	}
@@ -348,6 +487,14 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public ResponseDTO createTable(ManageTableDTO manageTableDTO) {
 		logger.info("creating table..");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         ResponseDTO apiResponseDTO=new ResponseDTO();
 
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
@@ -378,11 +525,15 @@ public class ManageTableService implements ManageTableServicePort {
         	request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
             request.process(solrClient);
             apiResponseDTO.setResponseStatusCode(200);
-            apiResponseDTO.setResponseMessage("Successfully created table: "+manageTableDTO.getTableName());;
+            apiResponseDTO.setResponseMessage("Successfully created table: "+manageTableDTO.getTableName());
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         } catch (Exception e) {
             logger.error(e.toString());
             apiResponseDTO.setResponseStatusCode(400);
             apiResponseDTO.setResponseMessage("Unable to create table: "+manageTableDTO.getTableName()+". Exception.");
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }
         return apiResponseDTO;
 	}
@@ -391,6 +542,14 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchemaDTO addSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
 		logger.debug("Add schema attributes");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -458,21 +617,28 @@ public class ManageTableService implements ManageTableServicePort {
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is created successfully");
 			logger.debug("Logging newly added fields' responses--");
+			
 			for(Object field: schemaResponseAddFields) {
 				logger.debug("### Added Field Response : {}", field);
 			}
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} catch (SolrServerException | IOException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.debug(e.toString());
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} catch (SolrException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
 			logger.error(SOLR_EXCEPTION_MSG+" So schema fields can't be found/deleted!", newTableSchemaDTO.getTableName());
 			logger.debug(e.toString());
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} 
 		return tableSchemaResponseDTO;
 	}
@@ -481,6 +647,13 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
 		logger.debug("Update Solr Schema");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient solrClientUpdate = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
@@ -531,6 +704,8 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 			apiResponseDTO.setResponseStatusCode(200);
 			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 			// Compare required Vs Updated Fields
 			logger.debug("Total field updates required in the current schema: {}", totalUpdatesRequired);
 			logger.debug("Total fields updated in the current schema: {}", updatedFields);
@@ -549,6 +724,8 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setResponseMessage("Schema could not be updated");
 			logger.error(SOLR_EXCEPTION_MSG+" So schema fields can't be found/deleted!", newTableSchemaDTO.getTableName());
 			logger.debug(e.toString());
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} catch (SolrSchemaValidationException e) {
 			apiResponseDTO.setResponseStatusCode(400);
 			apiResponseDTO.setResponseMessage("Schema could not be updated");
@@ -562,7 +739,14 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchemaDTO getTableSchema(String tableName) {
 		logger.debug("Getting table schema");
-
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String correlationid = correlationID.generateUniqueCorrelationId();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
+		String ipaddress = request.getRemoteAddr();
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
 		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		
@@ -608,21 +792,34 @@ public class ManageTableService implements ManageTableServicePort {
 			tableSchemaResponseDTO.setAttributes(Arrays.asList(solrSchemaFieldDTOs));
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
+			logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.debug(e.toString());
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			logger.error(SOLR_EXCEPTION_MSG, tableName);
 			logger.debug(e.toString());
+			logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
 		}
 		return tableSchemaResponseDTO;
 	}
 
 
 	@Override
-	public Map<Object, Object> getTableDetails(String tableName) {
+	public Map<Object, Object> getTableDetails(String tableName,String correlationid, String ipaddress) {
+		
+		logger.debug("get Table Details");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		
+		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
 
         Map<Object, Object> finalResponseMap= new HashMap<>();
@@ -645,8 +842,12 @@ public class ManageTableService implements ManageTableServicePort {
 
         if(collections.containsKey(tableName)){
             finalResponseMap=(Map<Object, Object>) collections.get(tableName);
+            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
         }else{
             finalResponseMap.put("Error","Invalid table name.");
+            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+            
             return finalResponseMap;
         }
 

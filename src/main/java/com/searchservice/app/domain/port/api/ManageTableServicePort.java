@@ -18,19 +18,19 @@ public interface ManageTableServicePort {
 	 */
 	
 	// GET request
-	ResponseDTO getTables();
+	ResponseDTO getTables(String correlationid, String ipaddress);
 	ResponseDTO getConfigSets();
-	TableSchemaDTO getTableSchemaIfPresent(String tableName);
-	Map getTableDetails(String tableName);
+	TableSchemaDTO getTableSchemaIfPresent(String tableName, String correlationid, String ipaddress);
+	Map getTableDetails(String tableName, String correlationid, String ipaddress);
 
 	// CREATE requests
 	ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
-	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
+	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO, String correlationid, String ipaddress);
 	// DELETE requests
 	ResponseDTO deleteConfigSet(String configSetName);
-	ResponseDTO deleteTable(String tableName);
+	ResponseDTO deleteTable(String tableName, String correlationid, String ipaddress);
 	// UPDATE requests
-	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO);
+	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO, String correlationid, String ipaddress);
 	ResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
 	// Auxiliary Services
     GetCapacityPlanDTO capacityPlans();

@@ -57,16 +57,16 @@ class InputDocumentResourceTest {
 	public void setMockitoSucccessResponseForService() {
 		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
 		responseDTO.setResponseStatusCode(200);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.any(),Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 
 	}
 
 	public void setMockitoBadResponseForService() {
 		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
 		responseDTO.setResponseStatusCode(400);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
 	@Test
