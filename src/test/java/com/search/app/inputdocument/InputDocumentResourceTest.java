@@ -9,6 +9,7 @@ import com.searchservice.app.domain.service.InputDocumentService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -21,7 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class InputDocumentResourceTest {
 
-	String solrendpoint = "/api/v1";
+	//String apiEndpoint = "/api/v1";
+    @Value("${base-url.api-endpoint.home}")
+	private String apiEndpoint;
 	int statusCode;
 	String name;
 	String message;
@@ -62,7 +65,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders 
-				.post(solrendpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
+				.post(apiEndpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
 		).andExpect(status().isOk());
@@ -74,7 +77,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/ingest/"+ clientid + "/" + tableName)
+				.post(apiEndpoint + "/ingest/"+ clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
 		).andExpect(status().isOk());

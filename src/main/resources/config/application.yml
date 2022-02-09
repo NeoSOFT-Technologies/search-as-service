@@ -73,6 +73,9 @@ capacity-plan:
 # Throttler configurations
 base-app-url: http://localhost:8080
 throttler:
+  maxRequestSizeLimiter:
+    maxAllowedRequestSizeNRT: 10kB
+    maxAllowedRequestSizeBatch: 100kB
   test-app-url: http://localhost:2020
 resilience4j.ratelimiter:
   instances:
@@ -88,10 +91,7 @@ resilience4j.ratelimiter:
       timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
-resilience4j:
-  maxRequestSize:
-    maxAllowedRequestSizeNRT: 10kB
-    maxAllowedRequestSizeBatch: 100kB
+
 throttle-service:
   solr:
     data-injection: documentInjectionRateLimitThrottler

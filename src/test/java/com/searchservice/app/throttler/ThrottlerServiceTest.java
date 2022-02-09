@@ -27,9 +27,9 @@ import static org.mockito.Mockito.when;
 //@ActiveProfiles("test")
 @TestPropertySource(
         properties = {
-                "resilience4j.maxRequestSize.maxAllowedRequestSize: 0.06kB",
-                "resilience4j.maxRequestSize.maxAllowedRequestSize202: 10kB",
-                "resilience4j.maxRequestSize.maxAllowedRequestSize405: -1kB"
+                "throttler.maxRequestSizeLimiter.maxAllowedRequestSize: 0.06kB",
+                "throttler.maxRequestSizeLimiter.maxAllowedRequestSize202: 10kB",
+                "throttler.maxRequestSizeLimiter.maxAllowedRequestSize405: -1kB"
         }
 )
 class ThrottlerServiceTest {
@@ -53,11 +53,11 @@ class ThrottlerServiceTest {
     private ThrottlerResponseDTO rateLimitResponseDTO;
     
     // Max request size limiter configuration values
-    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSize202}")
+    @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSize202}")
     String maxAllowedRequestSize202;
-    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSize405}")
+    @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSize405}")
     String maxAllowedRequestSize405;
-    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSize}")
+    @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSize}")
     String maxAllowedRequestSize;
     private String stringWithinMaxSizeLimit = "IAmIronMan";
     private String stringNotWithinMaxSizeLimit = "IAmNotIronMan";

@@ -22,9 +22,9 @@ public class ThrottlerService implements ThrottlerServicePort {
     String requestRetryWindow;
     
     // Max request size configuration values
-    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSizeNRT}")
+    @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSizeNRT}")
     String maxAllowedRequestSizeNRT;
-    @Value("${resilience4j.maxRequestSize.maxAllowedRequestSizeBatch}")
+    @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSizeBatch}")
     String maxAllowedRequestSizeBatch;
     
 	@Override

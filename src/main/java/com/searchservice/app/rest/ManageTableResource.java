@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
@@ -31,8 +32,7 @@ public class ManageTableResource {
 
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
-	private static final String BAD_REQUEST_MSG = "REST call could not be performed";
-	private static final String DEFAULT_EXCEPTION_MSG = "REST call could not be performed";
+	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 
 	private ManageTableServicePort manageTableServicePort;
 
