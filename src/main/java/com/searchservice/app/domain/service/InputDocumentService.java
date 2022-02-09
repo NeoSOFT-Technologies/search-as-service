@@ -21,8 +21,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 
 	private ThrottlerResponseDTO extracted(ThrottlerResponseDTO responseDTO, Exception e, Exception e1) {
-		log.error("Exception: ", e);
-		log.error("Exception: ", e1);
+		log.error("Exception: {} Exception: {}", e, e1);
 
 		String message = "Invalid input JSON array of document.";
 		log.debug(message);
