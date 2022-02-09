@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.utils.DocumentParserUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
@@ -21,24 +21,24 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 
-	private ResponseDTO extracted(ResponseDTO responseDTO, Exception e, Exception e1) {
-		log.error("Exception: ", e);
-		log.error("Exception: ", e1);
+	private ThrottlerResponseDTO extracted(ThrottlerResponseDTO responseDTO, Exception e, Exception e1) {
+		log.error("Exception: {} Exception: {}", e, e1);
 
 		String message = "Invalid input JSON array of document.";
 		log.debug(message);
 		responseDTO.setResponseMessage(message);
-		responseDTO.setResponseStatusCode(400);
+		responseDTO.setStatusCode(400);
 		return responseDTO;
 	}
 
-	private void extracted(ResponseDTO responseDTO, UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
+	private void extracted(ThrottlerResponseDTO responseDTO,
+			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
 			responseDTO.setResponseMessage("Successfully Added!");
-			responseDTO.setResponseStatusCode(200);
+			responseDTO.setStatusCode(200);
 		} else {
 			responseDTO.setResponseMessage(response.getMessage());
-			responseDTO.setResponseStatusCode(400);
+			responseDTO.setStatusCode(400);
 		}
 	}
 
@@ -52,9 +52,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ResponseDTO addDocuments(String collectionName, String payload) {
+	public ThrottlerResponseDTO addDocuments(String collectionName, String payload) {
 
-		ResponseDTO responseDTO = new ResponseDTO(collectionName);
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
 		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
 				collectionName);
@@ -63,7 +63,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 			String message = "Unable to get the Schema. Please check the collection name again!";
 			log.debug(message);
 			responseDTO.setResponseMessage(message);
-			responseDTO.setResponseStatusCode(400);
+			responseDTO.setStatusCode(400);
 			return responseDTO;
 		}
 
@@ -96,8 +96,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ResponseDTO addDocument(String collectionName, String payload) {
-		ResponseDTO responseDTO = new ResponseDTO(collectionName);
+	public ThrottlerResponseDTO addDocument(String collectionName, String payload) {
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
 		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
 				collectionName);
@@ -105,7 +105,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 			String message = "Unable to get the Schema. Please check the collection name again!";
 			log.debug(message);
 			responseDTO.setResponseMessage(message);
-			responseDTO.setResponseStatusCode(400);
+			responseDTO.setStatusCode(400);
 			return responseDTO;
 		}
 

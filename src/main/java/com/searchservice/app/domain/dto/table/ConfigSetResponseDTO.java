@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigSetResponseDTO implements VersionedObjectMapper {
 
     private int statusCode;

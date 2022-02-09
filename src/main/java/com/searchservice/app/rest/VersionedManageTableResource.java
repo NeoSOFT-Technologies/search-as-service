@@ -27,13 +27,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 
 @RestController
-@RequestMapping("${base-url.api-endpoint.manage-table}")
+@RequestMapping("${base-url.api-endpoint.versioned-home}"+"/manage/table")
 public class VersionedManageTableResource {
 
     private final Logger log = LoggerFactory.getLogger(VersionedManageTableResource.class);
 
-    @Value("${base-url.api-endpoint.manage-table}")
-    private String baseUrlManageTable;
     @Value("${saas-ms.request-header.api-version}")
 	private static String saasVersionHeader;
     

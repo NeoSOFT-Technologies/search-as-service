@@ -92,10 +92,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public GetCapacityPlanDTO capacityPlans() {
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 		return new GetCapacityPlanDTO(capacityPlans);
-//        if(capacityPlans != null)
-//        	return new GetCapacityPlanDTO(capacityPlans);
-//        else
-//        	throw new NullPointerOccurredException(404, "No capacity plans found. Null returned");
+
 	}
 
 	@Override
