@@ -111,8 +111,7 @@ basic-auth:
 
 
 #================================================================
-#ObjectMapperVersioning configurations
-
+#API endpoints & ObjectMapperVersioning configurations
 base-url:
   api-endpoint:
     home: /api/v1

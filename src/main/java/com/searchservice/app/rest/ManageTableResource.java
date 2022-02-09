@@ -46,11 +46,6 @@ public class ManageTableResource {
         log.debug("Get capacity plans");
         GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
         return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
-
-//        if(getCapacityPlanDTO.getPlans() != null)
-//        	return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
-//        else
-//        	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
     }
 	
 	

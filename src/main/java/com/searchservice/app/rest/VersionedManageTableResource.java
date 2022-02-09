@@ -32,8 +32,6 @@ public class VersionedManageTableResource {
 
     private final Logger log = LoggerFactory.getLogger(VersionedManageTableResource.class);
 
-    @Value("${base-url.api-endpoint.manage-table}")
-    private String baseUrlManageTable;
     @Value("${saas-ms.request-header.api-version}")
 	private static String saasVersionHeader;
     
