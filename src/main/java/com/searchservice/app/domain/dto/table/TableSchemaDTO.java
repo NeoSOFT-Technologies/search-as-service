@@ -11,18 +11,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-//TableSchemaDTO
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TableSchemaDTO implements VersionedObjectMapper {
 
     int statusCode;
 	String message;
-	@JsonIgnore
 	String tableName;
 	String schemaName;
 	List<SchemaFieldDTO> attributes;
@@ -50,10 +47,11 @@ public class TableSchemaDTO implements VersionedObjectMapper {
 	public VersionedObjectMapper toVersion(int version) {
 		if(version >= 2) {
 			return new TableSchemaDTOv2(
-					statusCode, 
+//					statusCode, 
 					message, 
-					schemaName, 
-					attributes).toVersion(version);
+					"NoooTHinggggg"
+//					attributes, 
+					).toVersion(version);
 		}
 		
 		return this;

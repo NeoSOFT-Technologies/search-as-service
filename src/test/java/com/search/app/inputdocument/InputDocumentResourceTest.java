@@ -3,38 +3,28 @@ package com.search.app.inputdocument;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.document.DocumentDTO;
-import com.searchservice.app.domain.dto.document.DocumentResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.service.InputDocumentService;
-import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
 @AutoConfigureMockMvc
 class InputDocumentResourceTest {
 
-	String solrendpoint = "/api/v1";
+	//String apiEndpoint = "/api/v1";
+    @Value("${base-url.api-endpoint.home}")
+	private String apiEndpoint;
 	int statusCode;
 	String name;
 	String message;
@@ -55,43 +45,41 @@ class InputDocumentResourceTest {
 	InputDocumentService inputDocumentService;
 
 	public void setMockitoSucccessResponseForService() {
-		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
-		responseDTO.setResponseStatusCode(200);
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		responseDTO.setStatusCode(200);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-
 	}
 
 	public void setMockitoBadResponseForService() {
-		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);
-		responseDTO.setResponseStatusCode(400);
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
+
 	@Test
 	void testinputdocs() throws Exception {	
-		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);	
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders 
-				.post(solrendpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-		.andExpect(status().isOk());
-		 
-
+				.post(apiEndpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
+		).andExpect(status().isOk());
 	}
 	
 	@Test
 	void testinputdoc() throws Exception {	
-		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);	
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.post(solrendpoint + "/ingest/"+ clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-		.andExpect(status().isOk());
-		 
-
+				.post(apiEndpoint + "/ingest/"+ clientid + "/" + tableName)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
+		).andExpect(status().isOk());
 	}
 }

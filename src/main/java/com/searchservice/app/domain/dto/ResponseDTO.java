@@ -8,12 +8,10 @@ import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMa
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-//ApiResponseDTO
-//GetListItemsResponseDTO
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseDTO implements VersionedObjectMapper {
 
@@ -30,16 +28,16 @@ public class ResponseDTO implements VersionedObjectMapper {
     	this.responseStatusCode = responseStatusCode;
     	this.responseMessage = responseMessage;
     }
-    
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
 
 	public ResponseDTO(int statusCode, String name, String message) {
-		super();
 		this.responseStatusCode = statusCode;
 		this.name = name;
 		this.responseMessage = message;
 	}
+	
+	@Override
+	public VersionedObjectMapper toVersion(int version) {
+		return this;
+	}
+	
 }
