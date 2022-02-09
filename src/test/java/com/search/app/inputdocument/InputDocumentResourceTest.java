@@ -3,7 +3,6 @@ package com.search.app.inputdocument;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.service.InputDocumentService;
 
@@ -43,43 +42,41 @@ class InputDocumentResourceTest {
 	InputDocumentService inputDocumentService;
 
 	public void setMockitoSucccessResponseForService() {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		responseDTO.setStatusCode(200);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-
 	}
 
 	public void setMockitoBadResponseForService() {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
+
 	@Test
 	void testinputdocs() throws Exception {	
-		ResponseDTO responseDTO = new ResponseDTO(statusCode, name, message);	
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders 
 				.post(solrendpoint + "/ingest-nrt/"+ clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-		.andExpect(status().isOk());
-		 
-
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
+		).andExpect(status().isOk());
 	}
 	
 	@Test
 	void testinputdoc() throws Exception {	
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();	
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
 				.post(solrendpoint + "/ingest/"+ clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-		.andExpect(status().isOk());
-		 
-
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(responseDTO))
+		).andExpect(status().isOk());
 	}
 }

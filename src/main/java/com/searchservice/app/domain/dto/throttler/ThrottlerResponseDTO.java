@@ -27,6 +27,11 @@ public class ThrottlerResponseDTO implements VersionedObjectMapper {
 	private String incomingRequestSize;
 	private String apiResponseData;
 	
+	public ThrottlerResponseDTO(int statusCode, String responseMessage) {
+		this.statusCode = statusCode;
+		this.responseMessage = responseMessage;
+	}
+	
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
 		return this;
