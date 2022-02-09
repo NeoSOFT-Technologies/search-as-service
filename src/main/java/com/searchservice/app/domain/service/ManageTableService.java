@@ -37,10 +37,10 @@ import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaResponseDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.TableSchemaParser;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
@@ -82,7 +82,12 @@ public class ManageTableService implements ManageTableServicePort {
 	
     @Autowired
     CapacityPlanProperties capacityPlanProperties;
+    
+    @Autowired
+    SchemaFieldType schemaFieldType;
 	
+    @Autowired
+    TableSchemaParser tableSchemaParser;
 	@Autowired
 	SolrAPIAdapter solrAPIAdapter;
 	HttpSolrClient solrClient;
@@ -445,7 +450,7 @@ public class ManageTableService implements ManageTableServicePort {
 				errorCausingField = fieldDto.getName();
 				Map<String, Object> newField = new HashMap<>();
 				newField.put("name", fieldDto.getName());
-				newField.put("type", SchemaFieldType.fromEnumToString(fieldDto.getType()));
+				newField.put("type", schemaFieldType.fromObject(fieldDto.getType()));
 				newField.put(REQUIRED, fieldDto.isRequired());
 				newField.put(STORED, fieldDto.isStorable());
 				newField.put(MULTIVALUED, fieldDto.isMultiValue());
@@ -502,7 +507,7 @@ public class ManageTableService implements ManageTableServicePort {
 			
 			// Get all fields from incoming(from req Body) schemaDTO
 			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
-			List<Map<String, Object>> targetSchemafields = TableSchemaParser.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
+			List<Map<String, Object>> targetSchemafields =tableSchemaParser.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if(validationEntry.containsKey(VALIDATED)) {
@@ -592,7 +597,7 @@ public class ManageTableService implements ManageTableServicePort {
 				
 				// Parse Field Type Object(String) to Enum
 				String fieldTypeObj = (String) f.get("type");				
-				SchemaFieldType solrFieldType = SchemaFieldType.fromObject(fieldTypeObj);
+				String solrFieldType = schemaFieldType.toSchemaFieldType(fieldTypeObj);
 				
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParser.setFieldsToDefaults(solrFieldDTO);

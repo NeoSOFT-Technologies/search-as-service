@@ -25,8 +25,8 @@ import com.searchservice.app.domain.dto.schema.FieldDTO;
 import com.searchservice.app.domain.dto.schema.SchemaDTO;
 import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
 import com.searchservice.app.domain.port.api.SchemaServicePort;
+import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 import com.searchservice.app.rest.errors.SchemaValidationException;
 
 @Service
@@ -62,6 +62,9 @@ public class SchemaService implements SchemaServicePort {
 	@Autowired
 	SolrAPIAdapter solrAPIAdapter;
 
+	@Autowired
+	SchemaFieldType schemaFieldType;
+
 	@Override
 	public SchemaResponseDTO get(String tableName) {
 		log.debug("Get Solr Schema");
@@ -93,11 +96,10 @@ public class SchemaService implements SchemaServicePort {
 				FieldDTO fieldDTO = new FieldDTO();
 				fieldDTO.setName((String) f.get("name"));
 
-				// Parse Field Type Object(String) to Enum
 				String fieldTypeObj = (String) f.get("type");
-				SchemaFieldType schemaFieldType = SchemaFieldType.fromObject(fieldTypeObj);
+				String schemafieldtype = schemaFieldType.toSchemaFieldType(fieldTypeObj);
 
-				fieldDTO.setType(schemaFieldType);
+				fieldDTO.setType(schemafieldtype);
 				setFieldsToDefaults(fieldDTO);
 				setFieldsAsPerTheSchema(fieldDTO, f);
 				solrSchemaFieldDTOs[schemaFieldIdx] = fieldDTO;
@@ -146,9 +148,11 @@ public class SchemaService implements SchemaServicePort {
 
 			// Get all fields from incoming(from req Body) schemaDTO
 			FieldDTO[] newSchemaFields = newSchemaDTO.getAttributes();
+			
 			List<Map<String, Object>> targetSchemafields = parseSchemaFieldDtosToListOfMaps(newSchemaDTO);
 			// Validate Solr Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
+			
 			if (validationEntry.containsKey(VALIDATED)) {
 				Object validatedFields = validationEntry.get(VALIDATED);
 				if (validatedFields.equals(false))
@@ -164,6 +168,7 @@ public class SchemaService implements SchemaServicePort {
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
+				
 				// Pass all fieldAttributes to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClient);
@@ -247,15 +252,15 @@ public class SchemaService implements SchemaServicePort {
 					schemaResponseDTOAfter.setStatusCode(400);
 					break;
 				}
-			
-				if(fieldDto.isSortable()) {
+
+				if (fieldDto.isSortable()) {
 					fieldDto.setMultiValue(false); // For SortOnField UseCase MultiValue must be False
-				
+
 				}
 				errorCausingField = fieldDto.getName();
 				Map<String, Object> newField = new HashMap<>();
 				newField.put("name", fieldDto.getName());
-				newField.put("type", SchemaFieldType.fromEnumToString(fieldDto.getType()));
+				newField.put("type", schemaFieldType.fromObject(fieldDto.getType()));
 				newField.put(REQUIRED, fieldDto.isRequired());
 				newField.put(STORED, fieldDto.isStorable());
 				newField.put(MULTIVALUED, fieldDto.isMultiValue());
@@ -379,12 +384,12 @@ public class SchemaService implements SchemaServicePort {
 		log.debug("Validate schema field: {}", fieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = fieldDTO.getName();
-		SchemaFieldType fieldType = fieldDTO.getType();
+		String fieldType = fieldDTO.getType();
 
 		if (fieldName.length() < 1) {
 			fieldValidated = false;
 			log.debug("Invalid schema field name received: {}", fieldName);
-		} else if (fieldType == null || !SchemaFieldType.doesExist(SchemaFieldType.fromEnumToString(fieldType))) {
+		} else if (fieldType == null) {
 			fieldValidated = false;
 			log.debug("Invalid/Empty schema field type received: {}", fieldType);
 		} else if (!validateSchemaFieldBooleanAttributes(fieldDTO)) {
@@ -462,7 +467,7 @@ public class SchemaService implements SchemaServicePort {
 				return schemaFieldsList;
 			}
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromEnumToString(fieldDto.getType()));
+			fieldDtoMap.put("type", schemaFieldType.fromObject(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());

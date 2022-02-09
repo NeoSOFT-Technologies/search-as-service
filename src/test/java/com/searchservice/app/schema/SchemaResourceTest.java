@@ -1,13 +1,9 @@
 package com.searchservice.app.schema;
 
 
-import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.schema.FieldDTO;
-import com.searchservice.app.domain.dto.schema.SchemaDTO;
-import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
-import com.searchservice.app.domain.service.SchemaService;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,11 +13,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.searchservice.app.IntegrationTest;
+import com.searchservice.app.TestUtil;
+import com.searchservice.app.domain.dto.schema.FieldDTO;
+import com.searchservice.app.domain.dto.schema.SchemaDTO;
+import com.searchservice.app.domain.dto.schema.SchemaResponseDTO;
+import com.searchservice.app.domain.service.SchemaService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -31,7 +29,7 @@ public class SchemaResourceTest {
 	String tableName = "gettingstarted1";
 
 	String name = "default-config";
-	FieldDTO solr = new FieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	FieldDTO solr = new FieldDTO("testField6", "string", "mydefault", true, true, false, true, true);
 	FieldDTO[] attributes = { solr };
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"

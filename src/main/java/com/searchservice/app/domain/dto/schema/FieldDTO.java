@@ -1,6 +1,6 @@
 package com.searchservice.app.domain.dto.schema;
 
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
+import com.searchservice.app.domain.utils.SchemaFieldType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class FieldDTO {
 
 	String name;
-	SchemaFieldType type;
+	String type;
 	String default_;
 	boolean isRequired;
 	boolean isFilterable;
