@@ -144,7 +144,7 @@ public class ManageTableResource {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
-		newTableSchemaDTO.setTableName(newTableSchemaDTO.getTableName() + "_" + clientid);
+		newTableSchemaDTO.setTableName(tableName);
 		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
 	
 		if (apiResponseDTO.getResponseStatusCode() == 200)

@@ -2,7 +2,6 @@ package com.searchservice.app.domain.dto.table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class SchemaFieldDTO implements VersionedObjectMapper {
 
 	String name;
-	SchemaFieldType type;
+	String type;
 	String default_;
 	boolean isRequired;
 	boolean isFilterable;
