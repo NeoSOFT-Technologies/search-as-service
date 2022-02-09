@@ -52,8 +52,8 @@ public class SchemaFieldType {
 			return "float";
 		case "pdouble":
 			return "double";
-		case "text_general":
-			return "text";
+		case "pdate" :
+			return "Date";
 		default:
 			return "string";
 
