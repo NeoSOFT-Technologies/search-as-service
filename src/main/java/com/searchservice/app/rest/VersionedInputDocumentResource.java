@@ -14,8 +14,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -85,11 +83,12 @@ public class VersionedInputDocumentResource {
 						    		@PathVariable int clientid, 
 						    		@RequestBody String payload) {
 
-        log.debug("Solr documents add");
+        log.info("Solr documents add");
 
         // Apply RequestSizeLimiting Throttler on payload before service the request
     	ThrottlerResponseDTO documentInjectionThrottlerResponse
     		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, false);
+    	
         if(documentInjectionThrottlerResponse.getStatusCode() == 406)
         	return documentInjectionThrottlerResponse;
     	
@@ -105,7 +104,7 @@ public class VersionedInputDocumentResource {
 
         documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
         documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
-      
+        
         if(documentInjectionThrottlerResponse.getStatusCode()==200){
             return documentInjectionThrottlerResponse;
         }else{
@@ -115,7 +114,7 @@ public class VersionedInputDocumentResource {
 	
 	
     // Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponseDTO> documentInjectionRateLimiterFallback(
+	public ThrottlerResponseDTO documentInjectionRateLimiterFallback(
 			String tableName, 
 			int clientid, 
 			String payload, 
@@ -127,8 +126,7 @@ public class VersionedInputDocumentResource {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration());
 		//retry the request after given timeoutDuration
-		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).headers(responseHeaders) // attach retry-info header
-				.body(rateLimitResponseDTO);
+		return rateLimitResponseDTO;
 	}
 
 }
