@@ -76,7 +76,7 @@ throttler:
   test-app-url: http://localhost:2020
 resilience4j.ratelimiter:
   instances:
-    solrDataInjectionRateLimitThrottler:
+    documentInjectionRateLimitThrottler:
       limitForPeriod: 2
       limitRefreshPeriod: 10s
       timeoutDuration: 0s
@@ -90,10 +90,11 @@ resilience4j.ratelimiter:
       registerHealthIndicator: true
 resilience4j:
   maxRequestSize:
-    maxAllowedRequestSize: 10kB
+    maxAllowedRequestSizeNRT: 10kB
+    maxAllowedRequestSizeBatch: 100kB
 throttle-service:
   solr:
-    data-injection: solrDataInjectionRateLimitThrottler
+    data-injection: documentInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
 #================================================================
 

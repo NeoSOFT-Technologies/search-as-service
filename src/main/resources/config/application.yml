@@ -90,11 +90,11 @@ resilience4j.ratelimiter:
       registerHealthIndicator: true
 resilience4j:
   maxRequestSize:
-    maxAllowedRequestSizeNRT: 0.10kB
+    maxAllowedRequestSizeNRT: 10kB
     maxAllowedRequestSizeBatch: 100kB
 throttle-service:
   solr:
-    data-injection: solrDataInjectionRateLimitThrottler
+    data-injection: documentInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
 #================================================================
 

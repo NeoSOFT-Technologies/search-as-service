@@ -38,10 +38,6 @@ public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMap
     			isResourceVersioned);
     	
     	if(isResourceVersioned) {
-    		log.info("Checking if Versioned interface is implemented........");
-    		log.info("methodParameter >>>>>>>>>>> :: {}", 
-    				(Class<?>)methodParameter
-	        			.getGenericParameterType());
         	for(Class<?> c: ((Class<?>)methodParameter
         			.getGenericParameterType())
         			.getInterfaces()) {

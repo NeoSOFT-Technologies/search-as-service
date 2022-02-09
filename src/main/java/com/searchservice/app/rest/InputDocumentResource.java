@@ -1,12 +1,9 @@
 package com.searchservice.app.rest;
 
 
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
-import com.searchservice.app.rest.errors.InputDocumentException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -28,7 +25,7 @@ public class InputDocumentResource {
 
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
 
-    private static final String DATA_INJECTION_THROTTLER_SERVICE = "solrDataInjectionRateLimitThrottler";
+    private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
     public final InputDocumentServicePort inputDocumentServicePort;
     public final ThrottlerServicePort throttlerServicePort;
@@ -40,10 +37,10 @@ public class InputDocumentResource {
     }
 
 
-    @RateLimiter(name=DATA_INJECTION_THROTTLER_SERVICE, fallbackMethod = "dataInjectionRateLimiterFallback")
+    @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
     @PostMapping("/ingest-nrt/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Object> documents(
+    public ResponseEntity<ThrottlerResponseDTO> documents(
 							    		@PathVariable String tableName, 
 							    		@PathVariable int clientid, 
 							    		@RequestBody String payload){
@@ -51,35 +48,38 @@ public class InputDocumentResource {
         log.debug("Solr documents add");
         
         // Apply RequestSizeLimiting Throttler on payload before service the request
-    	ThrottlerResponseDTO throttlerMaxRequestSizeResponse
+    	ThrottlerResponseDTO documentInjectionThrottlerResponse
     		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
-        if(throttlerMaxRequestSizeResponse.getStatusCode() == 406)
+        if(documentInjectionThrottlerResponse.getStatusCode() == 406)
         	return ResponseEntity
         			.status(HttpStatus.NOT_ACCEPTABLE)
-        			.body(throttlerMaxRequestSizeResponse);
+        			.body(documentInjectionThrottlerResponse);
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         
         tableName = tableName+"_"+clientid;
         Instant start = Instant.now();
-        ResponseDTO solrResponseDTO = inputDocumentServicePort.addDocuments(tableName, payload);
-        Instant end = Instant.now();      
+        ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
+        Instant end = Instant.now();
         Duration timeElapsed = Duration.between(start, end);
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
         log.info(result);
 
-        if(solrResponseDTO.getResponseStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
+        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+      
+        if(documentInjectionThrottlerResponse.getStatusCode()==200){
+            return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(solrResponseDTO);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
         }
     }
     
 
-    @RateLimiter(name=DATA_INJECTION_THROTTLER_SERVICE, fallbackMethod = "dataInjectionRateLimiterFallback")
+    @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{clientid}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Object> document(
+    public ResponseEntity<ThrottlerResponseDTO> document(
 							    		@PathVariable String tableName, 
 							    		@PathVariable int clientid, 
 							    		@RequestBody String payload) {
@@ -87,33 +87,37 @@ public class InputDocumentResource {
         log.debug("Solr document add");
 
         // Apply RequestSizeLimiting Throttler on payload before service the request
-    	ThrottlerResponseDTO throttlerMaxRequestSizeResponse
-			= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
-	    if(throttlerMaxRequestSizeResponse.getStatusCode() == 406)
-	    	return ResponseEntity
-	    			.status(HttpStatus.NOT_ACCEPTABLE)
-	    			.body(throttlerMaxRequestSizeResponse);
-	    
-	    // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-	    
-        tableName = tableName+"_"+clientid;
-        Instant start = Instant.now();
-        ResponseDTO solrResponseDTO= inputDocumentServicePort.addDocument(tableName, payload);
-        Instant end = Instant.now();
-        Duration timeElapsed = Duration.between(start, end);
-        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
-        log.info(result);
+		ThrottlerResponseDTO documentInjectionThrottlerResponse = throttlerServicePort
+				.documentInjectionRequestSizeLimiter(payload, false);
+		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
-        if(solrResponseDTO.getResponseStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(solrResponseDTO);
-        }else{
-        	throw new InputDocumentException(solrResponseDTO.getResponseStatusCode(),solrResponseDTO.getResponseMessage());
-        }
+		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
+
+		tableName = tableName + "_" + clientid;
+		Instant start = Instant.now();
+		ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload);
+		Instant end = Instant.now();
+		Duration timeElapsed = Duration.between(start, end);
+		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
+		log.info(result);
+
+		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+
+		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+		}
     }
 
 
     // Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponseDTO> dataInjectionRateLimiterFallback(
+	public ResponseEntity<ThrottlerResponseDTO> documentInjectionRateLimiterFallback(
+			String tableName, 
+			int clientid, 
+			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
@@ -122,23 +126,9 @@ public class InputDocumentResource {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration());
 		//retry the request after given timeoutDuration
+		
 		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).headers(responseHeaders) // attach retry-info header
 				.body(rateLimitResponseDTO);
 	}
-
-    @GetMapping("/testMRS")
-    @Operation(summary = "/ Applying max request size throttling  on data injection.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Object> demoMRSThrottler(@RequestParam String data) {
-    	/*
-    	 * MRS stands for- Max RequestBody Size
-    	 */
-    	ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO
-    		= throttlerServicePort.documentInjectionRequestSizeLimiter(data, true);
-    	if(throttlerMaxRequestSizeResponseDTO.getStatusCode() == 406)
-    		return ResponseEntity
-    				.status(HttpStatus.OK)
-    				.body(new TableSchemaDTO(1000, "Testing version Mapper with Object!"));
-    	return ResponseEntity.status(HttpStatus.OK).body(throttlerMaxRequestSizeResponseDTO);
-    }
 	
 }
