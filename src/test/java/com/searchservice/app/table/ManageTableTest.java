@@ -1,15 +1,13 @@
 package com.searchservice.app.table;
 
 
-import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.service.ManageTableService;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,13 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.searchservice.app.IntegrationTest;
+import com.searchservice.app.TestUtil;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.ManageTableDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.service.ManageTableService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -37,7 +36,7 @@ class ManageTableTest {
     int clientId = 101;
 
 	String schemaName = "default-config";
-	SchemaFieldDTO solr = new SchemaFieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	SchemaFieldDTO solr = new SchemaFieldDTO("testField6","string", "mydefault", true, true, false, true, true);
 	//SchemaFieldDTO[] attributes = { solr };
 	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"

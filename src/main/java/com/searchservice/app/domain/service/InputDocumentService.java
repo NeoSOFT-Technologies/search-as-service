@@ -1,16 +1,17 @@
 package com.searchservice.app.domain.service;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
-import com.searchservice.app.domain.utils.UploadDocumentUtil;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.utils.DocumentParserUtil;
+import com.searchservice.app.domain.utils.UploadDocumentUtil;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -40,7 +41,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 			responseDTO.setResponseStatusCode(400);
 		}
 	}
-	
+
 	private UploadDocumentUtil extracted(String collectionName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
@@ -122,10 +123,10 @@ public class InputDocumentService implements InputDocumentServicePort {
 				return extracted(responseDTO, e, e1);
 			}
 
-		}               
+		}
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
-		
+
 		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
 
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();

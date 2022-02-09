@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
 
 public class TableSchemaParser {
 	private static final Logger logger = LoggerFactory.getLogger(TableSchemaParser.class);
 	private TableSchemaParser() {}
+
 	
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -24,7 +24,7 @@ public class TableSchemaParser {
 	private static final String DEFAULT = "default";
 	private static final String SORTED = "sorted";
 	
-	public static List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
+	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
 		SchemaFieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
 		
@@ -37,7 +37,7 @@ public class TableSchemaParser {
 				return schemaFieldsList;
 			}
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromEnumToString(fieldDto.getType()));
+			fieldDtoMap.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
@@ -51,12 +51,12 @@ public class TableSchemaParser {
 		logger.debug("Validate schema field: {}", solrFieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
-		SchemaFieldType fieldType = solrFieldDTO.getType();
+		String fieldType = solrFieldDTO.getType();
 		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
 			logger.debug("Invalid schema field name received: {}", fieldName);
-		} else if(fieldType == null || !SchemaFieldType.doesExist(SchemaFieldType.fromEnumToString(fieldType))) {
+		} else if(fieldType == null) {
 			fieldValidated = false;
 			logger.debug("Invalid/Empty schema field type received: {}", fieldType);
 		} else if(!validateSchemaFieldBooleanAttributes(solrFieldDTO)) {
