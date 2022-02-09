@@ -28,7 +28,7 @@ logging:
     
    pattern:
     console: '%d{"yyyy/MM/dd HH:mm:ss,SSS", UTC} [%thread] %-5level %-50logger{40} : %msg%n'
-    rolling-file-name: logs/dailylogs-%d{yyyy-MM-dd}.%i.log
+    #rolling-file-name: logs/dailylogs-%d{yyyy-MM-dd}.%i.log
    level:
     ROOT: DEBUG
     org.springframework.web: "debug"

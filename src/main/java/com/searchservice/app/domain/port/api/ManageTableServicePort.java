@@ -33,7 +33,7 @@ public interface ManageTableServicePort {
 	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO, String correlationid, String ipaddress);
 	ResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
 	// Auxiliary Services
-    GetCapacityPlanDTO capacityPlans();
+    GetCapacityPlanDTO capacityPlans(String correlationid, String ipaddress);
     ResponseDTO isTablePresent(String tableName);
     
     /*

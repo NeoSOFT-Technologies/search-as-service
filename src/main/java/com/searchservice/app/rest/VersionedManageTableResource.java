@@ -69,9 +69,9 @@ public class VersionedManageTableResource {
 	
 	@GetMapping("/capacity-plans")
     @Operation(summary = "/get-capacity-plans")
-    public GetCapacityPlanDTO capacityPlans() {
+    public GetCapacityPlanDTO capacityPlans(String correlationid, String ipaddress ) {
         log.debug("Get capacity plans");
-        GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
+        GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans(correlationid,ipaddress);
         if(getCapacityPlanDTO.getPlans() != null)
         	return getCapacityPlanDTO;
         else

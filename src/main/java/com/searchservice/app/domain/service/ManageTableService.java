@@ -109,19 +109,19 @@ public class ManageTableService implements ManageTableServicePort {
 	
 
 	@Override
-	public GetCapacityPlanDTO capacityPlans() {
+	public GetCapacityPlanDTO capacityPlans(String correlationid, String ipaddress) {
 		logger.debug("capacity Plans");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
-		String ipaddress = request.getRemoteAddr();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
-		
+		logger.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationid, ipaddress,
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-        logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+        logger.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
         return new GetCapacityPlanDTO(capacityPlans);
 
 	}
@@ -169,15 +169,19 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchemaDTO getTableSchemaIfPresent(String tableName,String correlationid, String ipaddress) {
 		logger.debug("Get Table Schema If Present");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
-		
+		logger.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		if(!isTableExists(tableName))
 			throw new BadRequestOccurredException(400, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
-		logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+		logger.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		return getTableSchema(tableName);
 	}
 
@@ -185,10 +189,11 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public ResponseDTO getTables(String correlationid, String ipaddress) {
 		logger.debug("get Tables");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		logger.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
-		
+		logger.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username,correlationid ,ipaddress,
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
         
@@ -199,15 +204,21 @@ public class ManageTableService implements ManageTableServicePort {
             getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
             getListItemsResponseDTO.setResponseStatusCode(200);
             getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
-            logger.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-            
+            logger.debug(
+    				"--------Succesfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+    				servicename, username, correlationID.generateUniqueCorrelationId(),ipaddress,
+    				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+    				new Throwable().getStackTrace()[0].getMethodName());
 
         } catch (Exception e) {
             logger.error(e.toString());
             getListItemsResponseDTO.setResponseStatusCode(400);
             getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
-            logger.info("-----------Failed response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-            
+            logger.debug(
+    				"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+    				servicename, username, correlationID.generateUniqueCorrelationId(), ipaddress,
+    				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+    				new Throwable().getStackTrace()[0].getMethodName());
         }
         return getListItemsResponseDTO;
 	}

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.logger.CorrelationID;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
@@ -42,7 +43,10 @@ public class ManageTableResource {
 	private static final String BAD_REQUEST_MSG = "REST call could not be performed";
 	private static final String DEFAULT_EXCEPTION_MSG = "REST call could not be performed";
 
+	
 	CorrelationID correlationID = new CorrelationID();
+	
+	LoggersDTO loggersDTO=new LoggersDTO();
 
 	@Autowired
 	HttpServletRequest request;
@@ -54,6 +58,9 @@ public class ManageTableResource {
 	private String username = "Username";
 
 	private ManageTableServicePort manageTableServicePort;
+	
+	ManageTableResource manageTableResource;
+	
 
 	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
@@ -63,16 +70,17 @@ public class ManageTableResource {
 	@Operation(summary = "/get-capacity-plans")
 	public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
 		log.debug("Get capacity plans");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
-		String ipaddress = request.getRemoteAddr();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
-		GetCapacityPlanDTO getCapacityPlanDTO = manageTableServicePort.capacityPlans();
-		log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-		
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
+		GetCapacityPlanDTO getCapacityPlanDTO = manageTableServicePort.capacityPlans(correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
+		log.debug(
+				"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
 	}
 
@@ -80,25 +88,28 @@ public class ManageTableResource {
 	@Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ResponseDTO> getTables() {
 		log.debug("Get all tables");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid);
-		String ipaddress = request.getRemoteAddr();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
-		
-		ResponseDTO getListItemsResponseDTO = manageTableServicePort.getTables(correlationid,ipaddress);
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
+		ResponseDTO getListItemsResponseDTO = manageTableServicePort.getTables(correlationID.generateUniqueCorrelationId(),request.getRemoteAddr());
 
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
 		}
 	}
@@ -108,22 +119,26 @@ public class ManageTableResource {
 	public ResponseEntity<Map> getTableDetails(@PathVariable String tableName) {
 
 		log.debug("getCollectionDetails");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid); 	
-		String ipaddress=request.getRemoteAddr();
-		String timestamp=utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename,username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-		Map responseMap = manageTableServicePort.getTableDetails(tableName,correlationid,ipaddress);
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
+		Map responseMap = manageTableServicePort.getTableDetails(tableName,correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
 
 		if (!responseMap.containsKey("Error")) {
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(responseMap);
 		} else {
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
 		}
 
@@ -133,26 +148,29 @@ public class ManageTableResource {
 	@Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchemaDTO> getSchema(@PathVariable String tableName, @PathVariable int clientid) {
 		log.debug("Get table schema");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid); 	
-		String ipaddress=request.getRemoteAddr();
-		String timestamp=utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename,username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		tableName = tableName + "_" + clientid;
-		TableSchemaDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,correlationid,ipaddress);
+		TableSchemaDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
 
 		if (tableSchemaResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (tableSchemaResponseDTO.getStatusCode() == 200) {
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(tableSchemaResponseDTO);
 		} else {
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
 		}
 	}
@@ -162,25 +180,28 @@ public class ManageTableResource {
 	public ResponseEntity<ResponseDTO> createTable(@PathVariable int clientid,
 			@RequestBody ManageTableDTO manageTableDTO) {
 		log.debug("Create table");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid); 	
-		String ipaddress=request.getRemoteAddr();
-		String timestamp=utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename,username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
-		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO,correlationid,ipaddress);
+		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO,correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
 			log.debug("Table could not be created: {}", apiResponseDTO);
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			throw new BadRequestOccurredException(400, "REST operation could not be performed");
 		}
 	}
@@ -189,25 +210,28 @@ public class ManageTableResource {
 	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ResponseDTO> deleteTable(@PathVariable String tableName, @PathVariable int clientid) {
 		log.debug("Delete table");
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid); 	
-		String ipaddress=request.getRemoteAddr();
-		String timestamp=utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename,username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		tableName = tableName + "_" + clientid;
-		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName,correlationid,ipaddress);
+		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName,correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
 
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
 			log.debug("Exception occurred: {}", apiResponseDTO);
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}
@@ -219,25 +243,28 @@ public class ManageTableResource {
 		tableName = tableName + "_" + clientid;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String correlationid = correlationID.generateUniqueCorrelationId();
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(CorrelationID.CORRELATION_ID_HEADER_NAME, correlationid); 	
-		String ipaddress=request.getRemoteAddr();
-		String timestamp=utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename,username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        
+		log.debug(
+				"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+				servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+				utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				new Throwable().getStackTrace()[0].getMethodName());
 		newTableSchemaDTO.setTableName(newTableSchemaDTO.getTableName() + "_" + clientid);
-		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,correlationid,ipaddress);
+		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,correlationID.generateUniqueCorrelationId(), request.getRemoteAddr());
 
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			log.info("-----------Successfully Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-			
+			log.debug(
+					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		}
 		else {
-			log.info("-----------Failed Resopnse Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
-        	
+			log.debug(
+					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
+					servicename, username, correlationID.generateUniqueCorrelationId(), request.getRemoteAddr(),
+					utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+					new Throwable().getStackTrace()[0].getMethodName());
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}

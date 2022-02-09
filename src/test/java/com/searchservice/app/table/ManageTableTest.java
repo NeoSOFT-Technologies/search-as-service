@@ -109,7 +109,7 @@ class ManageTableTest {
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables(Mockito.any(),Mockito.any())).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(tableSchemaResponseDTO);
-        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+        Mockito.when(manageTableService.capacityPlans(Mockito.any(),Mockito.any())).thenReturn(capacityPlanResponseDTO);
         
         Map finalResponseMap= new HashMap();
         finalResponseMap.put("Random message","Data is returned");
@@ -141,7 +141,7 @@ class ManageTableTest {
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables(Mockito.any(),Mockito.any())).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(tableSchemaResponseDTO);
-        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+        Mockito.when(manageTableService.capacityPlans(Mockito.any(),Mockito.any())).thenReturn(capacityPlanResponseDTO);
         
         Map finalResponseMap= new HashMap();
         finalResponseMap.put("Error","Error connecting to cluster.");
