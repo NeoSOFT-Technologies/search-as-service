@@ -2,6 +2,7 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +31,11 @@ public class TableSchemaDTOv2 implements VersionedObjectMapper {
 	public TableSchemaDTOv2(String schemaName, List<SchemaFieldDTO> attributes) {
 		this.schemaName = schemaName;
 		this.attributes = attributes;
+	}
+	
+	public TableSchemaDTOv2(String message, String schemaName) {
+		this.message = message;
+		this.schemaName = schemaName;
 	}
 
 	@Override

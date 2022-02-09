@@ -77,15 +77,15 @@ throttler:
 resilience4j.ratelimiter:
   instances:
     solrDataInjectionRateLimitThrottler:
-      limitForPeriod: 3
-      limitRefreshPeriod: 4s
-      timeoutDuration: 1s
+      limitForPeriod: 2
+      limitRefreshPeriod: 10s
+      timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
     defaultRateLimitThrottler:
       limitForPeriod: 3
       limitRefreshPeriod: 5s
-      timeoutDuration: 1s
+      timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
 resilience4j:

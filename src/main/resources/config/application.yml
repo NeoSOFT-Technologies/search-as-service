@@ -76,21 +76,22 @@ throttler:
   test-app-url: http://localhost:2020
 resilience4j.ratelimiter:
   instances:
-    solrDataInjectionRateLimitThrottler:
+    documentInjectionRateLimitThrottler:
       limitForPeriod: 2
       limitRefreshPeriod: 10s
       timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
     defaultRateLimitThrottler:
-      limitForPeriod: 5
-      limitRefreshPeriod: 2s
+      limitForPeriod: 3
+      limitRefreshPeriod: 5s
       timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
 resilience4j:
   maxRequestSize:
-    maxAllowedRequestSize: 10kB
+    maxAllowedRequestSizeNRT: 0.10kB
+    maxAllowedRequestSizeBatch: 100kB
 throttle-service:
   solr:
     data-injection: solrDataInjectionRateLimitThrottler
@@ -114,7 +115,7 @@ basic-auth:
 
 base-url:
   api-endpoint:
-    home: /api/v1
+    home: /api/v2
     versioned-home: /api-versioned/v2
     manage-table: /api-versioned/v2/manage/table
 

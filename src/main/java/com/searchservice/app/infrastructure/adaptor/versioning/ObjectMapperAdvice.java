@@ -33,12 +33,19 @@ public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMap
     	boolean isResourceVersioned = MapperVersioningUtil.getAllVersionedResources()
     			.stream()
     			.anyMatch(c -> c.equals(resourceClass));
-    	log.info("ReturnType containing class: "+methodParameter.getContainingClass());
+    	log.info("ReturnType containing class: {}; isResourceVersioned: {}", 
+    			methodParameter.getContainingClass(), 
+    			isResourceVersioned);
     	
     	if(isResourceVersioned) {
+    		log.info("Checking if Versioned interface is implemented........");
+    		log.info("methodParameter >>>>>>>>>>> :: {}", 
+    				(Class<?>)methodParameter
+	        			.getGenericParameterType());
         	for(Class<?> c: ((Class<?>)methodParameter
         			.getGenericParameterType())
         			.getInterfaces()) {
+        		log.info("ObjectMapper implemented? {}", c.equals(VersionedObjectMapper.class));
         		if(c.equals(VersionedObjectMapper.class))
         			return true;
         	}
@@ -56,6 +63,10 @@ public class ObjectMapperAdvice implements ResponseBodyAdvice<VersionedObjectMap
 			Class<? extends HttpMessageConverter<?>> selectedConverterType, 
 			ServerHttpRequest request,
 			ServerHttpResponse response) {
+		
+		// testing
+		log.info("Inside beforeBodyWrite......");
+		
 		try {
 			// SET SAAS version in request header
 			String version = StringMatcherRegexUtil

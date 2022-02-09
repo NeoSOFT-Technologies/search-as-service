@@ -8,12 +8,10 @@ import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMa
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-//ApiResponseDTO
-//GetListItemsResponseDTO
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseDTO implements VersionedObjectMapper {
 

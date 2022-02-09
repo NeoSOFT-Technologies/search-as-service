@@ -1,5 +1,6 @@
 package com.searchservice.app.domain.utils;
 
+
 public class ThrottlerUtils {
 	public static double formatRequestSizeStringToDouble(String size) {
 		String numericValue = size.substring(0, size.length()-2);
@@ -13,4 +14,5 @@ public class ThrottlerUtils {
 	
 	private ThrottlerUtils() {
 	}
+	
 }
