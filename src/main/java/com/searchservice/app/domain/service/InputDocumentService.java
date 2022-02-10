@@ -2,8 +2,10 @@ package com.searchservice.app.domain.service;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.logger.CorrelationID;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.utils.DocumentParserUtil;
+import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -69,11 +71,16 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ResponseDTO addDocuments(String collectionName, String payload,String correlationid, String ipaddress) {
+	public ResponseDTO addDocuments(String collectionName, String payload,LoggersDTO loggersDTO) {
 		log.debug("get Tables");
+
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+		LoggerUtils.Printlogger(loggersDTO,true,false);
 		
 		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
@@ -89,6 +96,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 
 		JSONArray payloadJSONArray = null;
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		
 		try {
 			payloadJSONArray = new JSONArray(payload);
 
@@ -112,17 +121,23 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
-		log.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+		LoggerUtils.Printlogger(loggersDTO,false,false);
+        
 		return responseDTO;
 
 	}
 
 	@Override
-	public ResponseDTO addDocument(String collectionName, String payload,String correlationid, String ipaddress) {
+	public ResponseDTO addDocument(String collectionName, String payload,LoggersDTO loggersDTO) {
 		log.debug("get Tables");
+
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		log.info("--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",servicename, username, correlationid, ipaddress, timestamp, nameofCurrMethod);
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+		LoggerUtils.Printlogger(loggersDTO,true,false);
 		
 		ResponseDTO responseDTO = new ResponseDTO(collectionName);
 
@@ -137,6 +152,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 
 		JSONArray payloadJSONArray = null;
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		
 		try {
 			payloadJSONArray = new JSONArray(payload);
 		} catch (Exception e) {
@@ -159,7 +176,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
-		log.info("-----------Successfully response Username : {}, Corrlation Id : {}, IP Address : {} , TimeStamp : {},  Method name : {}",username,correlationid,ipaddress,timestamp,nameofCurrMethod);
+		LoggerUtils.Printlogger(loggersDTO,false,false);
+        
 		return responseDTO;
 	}
 

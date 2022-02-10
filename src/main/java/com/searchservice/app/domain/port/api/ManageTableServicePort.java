@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
@@ -18,22 +19,22 @@ public interface ManageTableServicePort {
 	 */
 	
 	// GET request
-	ResponseDTO getTables(String correlationid, String ipaddress);
+	ResponseDTO getTables(LoggersDTO loggersDTO);
 	ResponseDTO getConfigSets();
-	TableSchemaDTO getTableSchemaIfPresent(String tableName, String correlationid, String ipaddress);
-	Map getTableDetails(String tableName, String correlationid, String ipaddress);
+	TableSchemaDTO getTableSchemaIfPresent(String tableName, LoggersDTO loggersDTO);
+	Map getTableDetails(String tableName, LoggersDTO loggersDTO);
 
 	// CREATE requests
 	ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
-	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO, String correlationid, String ipaddress);
+	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO,LoggersDTO loggersDTO);
 	// DELETE requests
 	ResponseDTO deleteConfigSet(String configSetName);
-	ResponseDTO deleteTable(String tableName, String correlationid, String ipaddress);
+	ResponseDTO deleteTable(String tableName,LoggersDTO loggersDTO);
 	// UPDATE requests
-	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO, String correlationid, String ipaddress);
+	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO, LoggersDTO loggersDTO);
 	ResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
 	// Auxiliary Services
-    GetCapacityPlanDTO capacityPlans(String correlationid, String ipaddress);
+    GetCapacityPlanDTO capacityPlans(LoggersDTO loggersDTO);
     ResponseDTO isTablePresent(String tableName);
     
     /*

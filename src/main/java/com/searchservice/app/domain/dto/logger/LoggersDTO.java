@@ -15,18 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoggersDTO {
-	
-	private String nameofCurrMethod;
+	private String servicename;
+	private String username;
 	private String correlationid;
 	private String ipaddress;
 	private String timestamp;
-	
-	CorrelationID correlationID = new CorrelationID();
-
-	@Autowired
-	HttpServletRequest request;
-
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-	
+	private String nameofmethod;
 	
 }
