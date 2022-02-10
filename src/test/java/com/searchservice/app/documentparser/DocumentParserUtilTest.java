@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @IntegrationTest
 @AutoConfigureMockMvc
-public class DocumentParserUtilTest {
+class DocumentParserUtilTest {
 
 
     Map<String, Map<String, Object>> getSchemaKeyValuePair(){
@@ -119,7 +119,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(true);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isTrue();
     }
 
     @Test
@@ -141,7 +141,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -162,7 +162,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -183,7 +183,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -204,7 +204,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -225,7 +225,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -246,7 +246,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -268,7 +268,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
     @Test
@@ -288,7 +288,7 @@ public class DocumentParserUtilTest {
         Map<String, Map<String, Object>> schemaKeyValuePair=getSchemaKeyValuePair();
         DocumentParserUtil.DocumentSatisfiesSchemaResponse documentSatisfiesSchemaResponse=DocumentParserUtil.isDocumentSatisfySchema(schemaKeyValuePair,payloadJSON);
 
-        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isEqualTo(false);
+        assertThat(documentSatisfiesSchemaResponse.isObjectSatisfiesSchema()).isFalse();
     }
 
 }

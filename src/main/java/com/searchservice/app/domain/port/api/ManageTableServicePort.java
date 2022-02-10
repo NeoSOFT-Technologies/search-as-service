@@ -22,7 +22,7 @@ public interface ManageTableServicePort {
 	ResponseDTO getTables(LoggersDTO loggersDTO);
 	ResponseDTO getConfigSets();
 	TableSchemaDTO getTableSchemaIfPresent(String tableName, LoggersDTO loggersDTO);
-	Map getTableDetails(String tableName, LoggersDTO loggersDTO);
+	Map<?, ?> getTableDetails(String tableName, LoggersDTO loggersDTO);
 
 	// CREATE requests
 	ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);

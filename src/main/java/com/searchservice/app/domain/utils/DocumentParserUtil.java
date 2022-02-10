@@ -202,8 +202,6 @@ public class DocumentParserUtil {
             schemaResponse = schemaRequest.process(solrClient);
         } catch (Exception e) {        	
             log.error(e.toString());          
-            return null;
-         
         }
 
         List<Map<String, Object>> schemaResponseFields= null;

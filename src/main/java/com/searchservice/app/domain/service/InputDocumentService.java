@@ -67,7 +67,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
@@ -81,7 +81,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		extracted(responseDTO, response);
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		LoggerUtils.Printlogger(loggersDTO,false,false);
+		LoggerUtils.printlogger(loggersDTO,false,false);
         
 		return responseDTO;
 
@@ -96,7 +96,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
 
@@ -110,7 +110,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		extracted(responseDTO, response);
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
-		LoggerUtils.Printlogger(loggersDTO,false,false);
+		LoggerUtils.printlogger(loggersDTO,false,false);
         
 		return responseDTO;
 	}

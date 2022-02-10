@@ -5,13 +5,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.ResponseMessages;
-import com.searchservice.app.domain.dto.logger.CorrelationID;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
@@ -70,7 +65,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -82,11 +77,11 @@ public class VersionedManageTableResource {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
         if(getCapacityPlanDTO.getPlans() != null) {
-        	LoggerUtils.Printlogger(loggersDTO,false,false);
+        	LoggerUtils.printlogger(loggersDTO,false,false);
         	return getCapacityPlanDTO;
         }
         else {
-        	LoggerUtils.Printlogger(loggersDTO,false,true);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
         	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
         }
     }
@@ -99,7 +94,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -113,10 +108,10 @@ public class VersionedManageTableResource {
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 			return getListItemsResponseDTO;
 		} else {
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}
@@ -131,7 +126,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -145,10 +140,10 @@ public class VersionedManageTableResource {
         if(tableSchemaResponseDTO == null)
         	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
         if(tableSchemaResponseDTO.getStatusCode()==200){
-        	LoggerUtils.Printlogger(loggersDTO,false,false);
+        	LoggerUtils.printlogger(loggersDTO,false,false);
             return tableSchemaResponseDTO;
         }else{
-        	LoggerUtils.Printlogger(loggersDTO,false,true);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
@@ -163,7 +158,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -175,12 +170,12 @@ public class VersionedManageTableResource {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
         if(apiResponseDTO.getResponseStatusCode()==200){
-        	LoggerUtils.Printlogger(loggersDTO,false,false);
+        	LoggerUtils.printlogger(loggersDTO,false,false);
         	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
             return apiResponseDTO;
         }else{
         	log.debug("Table could not be created: {}", apiResponseDTO);
-        	LoggerUtils.Printlogger(loggersDTO,false,true);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
@@ -194,7 +189,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -206,11 +201,11 @@ public class VersionedManageTableResource {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
         if(apiResponseDTO.getResponseStatusCode()==200){
-        	LoggerUtils.Printlogger(loggersDTO,false,false);
+        	LoggerUtils.printlogger(loggersDTO,false,false);
             return apiResponseDTO;
         }else{
         	log.debug("Exception occurred: {}", apiResponseDTO);
-        	LoggerUtils.Printlogger(loggersDTO,false,true);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
@@ -227,7 +222,7 @@ public class VersionedManageTableResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -239,11 +234,11 @@ public class VersionedManageTableResource {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
 		if(apiResponseDTO.getResponseStatusCode() == 200) {
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 			return apiResponseDTO;
 		}
 		else {
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}

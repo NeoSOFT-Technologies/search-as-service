@@ -12,17 +12,17 @@ import com.searchservice.app.domain.dto.logger.CorrelationID;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 
 public class LoggerUtils {
-	private final static Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
-	static CorrelationID correlationID = new CorrelationID();
+	private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
+	static CorrelationID correlationid = new CorrelationID();
 
 	static ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-	public static String correlationId;
-	public static String ipaddress;
+	static String cid;
+	static String ipaddress;
 
-	static InetAddress IP;
-
-	public LoggerUtils() {
-		// TODO Auto-generated constructor stub
+	static InetAddress ip;
+	
+	private LoggerUtils() {
+		
 	}
 
 	public static LoggersDTO getRequestLoggingInfo(String servicename, String username, String nameofmethod,
@@ -30,16 +30,15 @@ public class LoggerUtils {
 
 		LoggersDTO loggersDTO = new LoggersDTO();
 		try {
-			IP = InetAddress.getLocalHost();
+			ip = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Ops!", e);
 		}
 
-		correlationId = correlationID.generateUniqueCorrelationId();
-		ipaddress = IP.getHostAddress();
+		cid = correlationid.generateUniqueCorrelationId();
+		ipaddress = ip.getHostAddress();
 		loggersDTO.setNameofmethod(username);
-		loggersDTO.setCorrelationid(correlationId);
+		loggersDTO.setCorrelationid(cid);
 		loggersDTO.setIpaddress(ipaddress);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setNameofmethod(nameofmethod);
@@ -50,7 +49,7 @@ public class LoggerUtils {
 
 	}
 
-	public static void Printlogger(LoggersDTO loggersDTO, boolean isStart, boolean isFailed) {
+	public static void printlogger(LoggersDTO loggersDTO, boolean isStart, boolean isFailed) {
 		if (isFailed) {
 
 			logger.debug(

@@ -1,37 +1,32 @@
 package com.searchservice.app.rest;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.logger.CorrelationID;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
-import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.rest.errors.InputDocumentException;
-
-import com.searchservice.app.domain.dto.ResponseMessages;
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
-import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.port.api.ThrottlerServicePort;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.searchservice.app.domain.dto.ResponseMessages;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.port.api.ThrottlerServicePort;
+import com.searchservice.app.domain.utils.LoggerUtils;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
+
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.versioned-home}")
@@ -67,7 +62,7 @@ public class VersionedInputDocumentResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.Printlogger(loggersDTO, true, false);
+		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 
@@ -97,10 +92,10 @@ public class VersionedInputDocumentResource {
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
 		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			LoggerUtils.Printlogger(loggersDTO, false, false);
+			LoggerUtils.printlogger(loggersDTO, false, false);
 			return documentInjectionThrottlerResponse;
 		} else {
-			LoggerUtils.Printlogger(loggersDTO, false, true);
+			LoggerUtils.printlogger(loggersDTO, false, true);
 			throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
 		}
 
@@ -117,7 +112,7 @@ public class VersionedInputDocumentResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.Printlogger(loggersDTO, true, false);
+		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 
@@ -148,10 +143,10 @@ public class VersionedInputDocumentResource {
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
 		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			LoggerUtils.Printlogger(loggersDTO, false, false);
+			LoggerUtils.printlogger(loggersDTO, false, false);
 			return documentInjectionThrottlerResponse;
 		} else {
-			LoggerUtils.Printlogger(loggersDTO, false, false);
+			LoggerUtils.printlogger(loggersDTO, false, false);
 			throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
 		}
 	}

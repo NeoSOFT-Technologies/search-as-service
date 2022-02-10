@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
@@ -66,7 +65,7 @@ public class InputDocumentResource {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -94,10 +93,10 @@ public class InputDocumentResource {
         documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
       
         if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.Printlogger(loggersDTO,false,false);
+        	LoggerUtils.printlogger(loggersDTO,false,false);
         	return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
         }else{
-        	LoggerUtils.Printlogger(loggersDTO,false,true);
+        	LoggerUtils.printlogger(loggersDTO,false,true);
         	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
         }
     }
@@ -116,7 +115,7 @@ public class InputDocumentResource {
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
@@ -145,10 +144,10 @@ public class InputDocumentResource {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
 		} else {
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 		}
     }
@@ -156,9 +155,7 @@ public class InputDocumentResource {
 
     // Rate Limiter(Throttler) FALLBACK method
 	public ResponseEntity<ThrottlerResponseDTO> documentInjectionRateLimiterFallback(
-			String tableName, 
-			int clientid, 
-			String payload, 
+			
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 

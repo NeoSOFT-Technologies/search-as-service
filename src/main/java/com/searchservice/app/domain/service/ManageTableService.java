@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -28,17 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.ResponseDTO;
-
-import com.searchservice.app.domain.dto.logger.CorrelationID;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
@@ -116,12 +109,12 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
         
         loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        LoggerUtils.Printlogger(loggersDTO,false,false);
+        LoggerUtils.printlogger(loggersDTO,false,false);
         
         return new GetCapacityPlanDTO(capacityPlans);
 	}
@@ -169,15 +162,15 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		if(isTableExists(tableName)) {
 			
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 			return getTableSchema(tableName);
 		}
 		else {
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
             
 			throw new BadRequestOccurredException(400, 
 					String.format(TABLE_NOT_FOUND_MSG, tableName));
@@ -195,7 +188,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
@@ -210,14 +203,14 @@ public class ManageTableService implements ManageTableServicePort {
             getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
             getListItemsResponseDTO.setResponseStatusCode(200);
             getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
-            LoggerUtils.Printlogger(loggersDTO,false,false);
+            LoggerUtils.printlogger(loggersDTO,false,false);
             
 
         } catch (Exception e) {
             logger.error(e.toString());
             getListItemsResponseDTO.setResponseStatusCode(400);
             getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
-            LoggerUtils.Printlogger(loggersDTO,false,true);
+            LoggerUtils.printlogger(loggersDTO,false,true);
             
         }
         return getListItemsResponseDTO;
@@ -288,7 +281,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
 
@@ -313,11 +306,11 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
 			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
 
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 		}
 		else {
 			apiResponseDTO.setResponseStatusCode(400);
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
             
 		}
         
@@ -358,7 +351,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		if(!isTableExists(tableName))
 			throw new ContentNotFoundException(404, 
@@ -382,13 +375,13 @@ public class ManageTableService implements ManageTableServicePort {
             apiResponseDTO.setResponseStatusCode(200);
             apiResponseDTO.setResponseMessage("Table: "+tableName+", is successfully deleted");
 
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
             
         } catch (Exception e) {
             logger.error("Exception occurred: ", e);
             apiResponseDTO.setResponseStatusCode(400);
             apiResponseDTO.setResponseMessage("Unable to delete table: "+tableName);
-			LoggerUtils.Printlogger(loggersDTO,false,true);
+			LoggerUtils.printlogger(loggersDTO,false,true);
         }
         
         return apiResponseDTO;
@@ -406,11 +399,11 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
-		LoggerUtils.Printlogger(loggersDTO,false,false);
+		LoggerUtils.printlogger(loggersDTO,false,false);
 		return updateSchemaAttributes(tableSchemaDTO);
 	}
 
@@ -501,7 +494,7 @@ public class ManageTableService implements ManageTableServicePort {
 			request.process(solrClient);
 			apiResponseDTO.setResponseStatusCode(200);
 			apiResponseDTO.setResponseMessage("Successfully created table: " + manageTableDTO.getTableName());
-			;
+			
 		} catch (Exception e) {
 			logger.error(e.toString());
 			apiResponseDTO.setResponseStatusCode(400);
@@ -766,7 +759,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
-		LoggerUtils.Printlogger(loggersDTO,true,false);
+		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
 
@@ -793,12 +786,12 @@ public class ManageTableService implements ManageTableServicePort {
         if(collections.containsKey(tableName)){
             finalResponseMap=(Map<Object, Object>) collections.get(tableName);
 
-			LoggerUtils.Printlogger(loggersDTO,false,false);
+			LoggerUtils.printlogger(loggersDTO,false,false);
 			return finalResponseMap;
             
         }else{
             finalResponseMap.put("Error","Invalid table name.");
-            LoggerUtils.Printlogger(loggersDTO,false,true);
+            LoggerUtils.printlogger(loggersDTO,false,true);
             return finalResponseMap;
         }
 	}
