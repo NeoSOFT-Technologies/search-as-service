@@ -1,24 +1,7 @@
 package com.searchservice.app.table;
 
 
-import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.service.ManageTableService;
-import com.searchservice.app.infrastructure.enums.SchemaFieldType;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,18 +9,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.searchservice.app.IntegrationTest;
+import com.searchservice.app.TestUtil;
+import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
+import com.searchservice.app.domain.dto.table.ManageTableDTO;
+import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.service.ManageTableService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
 class ManageTableTest {
 
-    String manageTableEndpoint ="/api/v2/manage/table";
-    String tableName ="automatedTestCollection";
-    int clientId = 101;
+    @Value("${base-url.api-endpoint.home}")
+	private String apiEndpoint;
+    private String tableName ="automatedTestCollection";
+    private int clientId = 101;
 
 	String schemaName = "default-config";
-	SchemaFieldDTO solr = new SchemaFieldDTO("testField6", SchemaFieldType._nest_path_, "mydefault", true, true, false, true, true);
+	SchemaFieldDTO solr = new SchemaFieldDTO("testField6","string", "mydefault", true, true, false, true, true);
 	//SchemaFieldDTO[] attributes = { solr };
 	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"
@@ -159,7 +160,7 @@ class ManageTableTest {
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint +"/"+ clientId)
+        restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
                 .andExpect(status().isOk());
@@ -167,7 +168,7 @@ class ManageTableTest {
 
         //CREATE COLLECTION WITH SAME NAME AND TEST
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint +"/"+ clientId)
+        restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
                 .andExpect(status().isBadRequest());
@@ -176,7 +177,7 @@ class ManageTableTest {
         ResponseDTO deleteTableDTO=new ResponseDTO();
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ clientId +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
                 .andExpect(status().isOk());
@@ -190,7 +191,7 @@ class ManageTableTest {
         ResponseDTO deleteTableResponseDTO=new ResponseDTO();
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ clientId +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isBadRequest());
@@ -198,7 +199,7 @@ class ManageTableTest {
 
         //CREATE COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.post(manageTableEndpoint +"/"+ clientId)
+        restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
@@ -206,7 +207,7 @@ class ManageTableTest {
 
         //DELETE THE CREATED COLLECTION
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(manageTableEndpoint +"/"+ clientId +"/"+ tableName)
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
@@ -219,7 +220,7 @@ class ManageTableTest {
 		// Update Schema
 		setMockitoSuccessResponseForService();
 		TableSchemaDTO schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.put(manageTableEndpoint +"/"+ clientId +"/"+ tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
 		.andExpect(status().isOk());
@@ -227,7 +228,7 @@ class ManageTableTest {
 		// Update Schema for non-existing table
 		setMockitoBadResponseForService();
 		schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.put(manageTableEndpoint +"/"+ clientId +"/"+ tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
 		.andExpect(status().isBadRequest());
@@ -239,12 +240,12 @@ class ManageTableTest {
     void testGetTables() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint )
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint)
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
@@ -254,7 +255,7 @@ class ManageTableTest {
     @Test
     void testGetCapacityPlans() throws Exception {
 
-        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint +"/capacity-plans")
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" +"/capacity-plans")
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
@@ -265,12 +266,12 @@ class ManageTableTest {
     void testGetTableDetails() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint+"/details/testTable" )
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" +"/details/testTable" )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(manageTableEndpoint+"/details/testTable")
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table"+"/details/testTable")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
@@ -282,7 +283,7 @@ class ManageTableTest {
 		setMockitoSuccessResponseForService();;
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(manageTableEndpoint + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		//.andExpect(content().json(expectedGetResponse))
 		.andExpect(status().isOk());
@@ -290,7 +291,7 @@ class ManageTableTest {
 		setMockitoBadResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(manageTableEndpoint + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isBadRequest());
 	}

@@ -1,5 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetCapacityPlanDTOv2 implements VersionedObjectMapper {
 
 	private int statusCode;

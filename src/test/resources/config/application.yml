@@ -91,27 +91,29 @@ capacity-plan:
 #================================================================
 # Throttler configurations
 base-app-url: http://localhost:8080
-throttler-test-app-url: http://localhost:8081
+throttler:
+  maxRequestSizeLimiter:
+    maxAllowedRequestSizeNRT: 10kB
+    maxAllowedRequestSizeBatch: 100kB
+  test-app-url: http://localhost:2020
 resilience4j.ratelimiter:
   instances:
-    solrDataInjectionRateLimitThrottler:
-      limitForPeriod: 3
-      limitRefreshPeriod: 4s
-      timeoutDuration: 1s
+    documentInjectionRateLimitThrottler:
+      limitForPeriod: 2
+      limitRefreshPeriod: 10s
+      timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
     defaultRateLimitThrottler:
       limitForPeriod: 3
       limitRefreshPeriod: 5s
-      timeoutDuration: 1s
+      timeoutDuration: 0s
       eventConsumerBufferSize: 100
       registerHealthIndicator: true
-resilience4j:
-  maxRequestSize:
-    maxAllowedRequestSize: 10kB
+
 throttle-service:
   solr:
-    data-injection: solrDataInjectionRateLimitThrottler
+    data-injection: documentInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
 #================================================================
 
@@ -128,14 +130,12 @@ basic-auth:
 
 
 #================================================================
-#ObjectMapperVersioning configurations
-
+#API endpoints & ObjectMapperVersioning configurations
 base-url:
   api-endpoint:
-    home: /api-versioned/v2
-    manage-table: /api-versioned/v2/manage/table
-    rabbit-mq: /api/v2/rabbit-mq
-    versioned-rabbit-mq: /api-versioned/v2/rabbit-mq
+    home: /api/v1
+    versioned-home: /api-versioned/v1
+    manage-table: /api-versioned/v1/manage/table
     
 # {saas-ms.request-header.api-version}
 saas-ms:

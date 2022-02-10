@@ -1,25 +1,23 @@
 package com.searchservice.app.domain.service;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.logger.CorrelationID;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
-import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
-import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import org.json.JSONArray;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
+import com.searchservice.app.domain.dto.logger.CorrelationID;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.utils.LoggerUtils;
+import com.searchservice.app.domain.utils.UploadDocumentUtil;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -40,27 +38,17 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	private String username = "Username";
 
-	private ResponseDTO extracted(ResponseDTO responseDTO, Exception e, Exception e1) {
-		log.error("Exception: ", e);
-		log.error("Exception: ", e1);
-
-		String message = "Invalid input JSON array of document.";
-		log.debug(message);
-		responseDTO.setResponseMessage(message);
-		responseDTO.setResponseStatusCode(400);
-		return responseDTO;
-	}
-
-	private void extracted(ResponseDTO responseDTO, UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
+	private void extracted(ThrottlerResponseDTO responseDTO,
+			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
 			responseDTO.setResponseMessage("Successfully Added!");
-			responseDTO.setResponseStatusCode(200);
+			responseDTO.setStatusCode(200);
 		} else {
 			responseDTO.setResponseMessage(response.getMessage());
-			responseDTO.setResponseStatusCode(400);
+			responseDTO.setStatusCode(400);
 		}
 	}
-	
+
 	private UploadDocumentUtil extracted(String collectionName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
@@ -70,9 +58,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		return uploadDocumentUtil;
 	}
 
-	@Override
-	public ResponseDTO addDocuments(String collectionName, String payload,LoggersDTO loggersDTO) {
-		log.debug("get Tables");
+	public ThrottlerResponseDTO addDocuments(String collectionName, String payload,LoggersDTO loggersDTO) {
+		log.debug(" Add Document");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -82,36 +69,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		loggersDTO.setUsername(username);
 		LoggerUtils.Printlogger(loggersDTO,true,false);
 		
-		ResponseDTO responseDTO = new ResponseDTO(collectionName);
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
-		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
-				collectionName);
-
-		if (schemaKeyValuePair == (null)) {
-			String message = "Unable to get the Schema. Please check the collection name again!";
-			log.debug(message);
-			responseDTO.setResponseMessage(message);
-			responseDTO.setResponseStatusCode(400);
-			return responseDTO;
-		}
-
-		JSONArray payloadJSONArray = null;
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
-		try {
-			payloadJSONArray = new JSONArray(payload);
-
-		} catch (Exception e) {
-
-			// TRY BY REMOVING THE QUOTES FROM THE STRING
-			try {
-				payload = payload.substring(1, payload.length() - 1);
-				payloadJSONArray = new JSONArray(payload);
-
-			} catch (Exception e1) {
-				return extracted(responseDTO, e, e1);
-			}
-		}
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
@@ -121,6 +80,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		LoggerUtils.Printlogger(loggersDTO,false,false);
         
 		return responseDTO;
@@ -128,9 +88,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ResponseDTO addDocument(String collectionName, String payload,LoggersDTO loggersDTO) {
-		log.debug("get Tables");
-
+	public ThrottlerResponseDTO addDocument(String collectionName, String payload,LoggersDTO loggersDTO) {
+		log.debug("Add Document");
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		loggersDTO.setNameofmethod(nameofCurrMethod);
@@ -138,44 +97,19 @@ public class InputDocumentService implements InputDocumentServicePort {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		LoggerUtils.Printlogger(loggersDTO,true,false);
-		
-		ResponseDTO responseDTO = new ResponseDTO(collectionName);
+		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
-		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
-				collectionName);
-		if (schemaKeyValuePair == null) {
-			String message = "Unable to get the Schema. Please check the collection name again!";
-			log.debug(message);
-			responseDTO.setResponseMessage(message);
-			responseDTO.setResponseStatusCode(400);
-			return responseDTO;
-		}
 
-		JSONArray payloadJSONArray = null;
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
-		try {
-			payloadJSONArray = new JSONArray(payload);
-		} catch (Exception e) {
-
-			// TRY BY REMOVING THE QUOTES FROM THE STRING
-			try {
-				payload = payload.substring(1, payload.length() - 1);
-				payloadJSONArray = new JSONArray(payload);
-
-			} catch (Exception e1) {
-				return extracted(responseDTO, e, e1);
-			}
-
-		}               
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
-		
+
 		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
 
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		
 		LoggerUtils.Printlogger(loggersDTO,false,false);
         
 		return responseDTO;

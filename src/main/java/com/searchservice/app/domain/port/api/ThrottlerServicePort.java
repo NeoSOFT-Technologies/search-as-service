@@ -1,18 +1,18 @@
 package com.searchservice.app.domain.port.api;
 
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerMaxRequestSizeResponseDTO;
-import com.searchservice.app.domain.dto.throttler.ThrottlerRateLimitResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 
 public interface ThrottlerServicePort {
 	// Rate limiter- throttling ports
-	public ThrottlerRateLimitResponseDTO dataInjectionRateLimiter();
+	public ThrottlerResponseDTO documentInjectionRateLimiter();
 	
 	// Max Request Size- throttling ports
-	public ThrottlerMaxRequestSizeResponseDTO applyDataInjectionRequestSizeLimiter(
-			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO);
-	public ThrottlerMaxRequestSizeResponseDTO dataInjectionRequestSizeLimiter(
-			String incomingData);
+	public ThrottlerResponseDTO applyDocumentInjectionRequestSizeLimiter(
+			ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO);
+	public ThrottlerResponseDTO documentInjectionRequestSizeLimiter(
+			String incomingData, 
+			boolean isNRT);
 	public boolean isRequestSizeExceedingLimit(
-			ThrottlerMaxRequestSizeResponseDTO throttlerMaxRequestSizeResponseDTO);
+			ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO);
 }
