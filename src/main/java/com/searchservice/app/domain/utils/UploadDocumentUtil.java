@@ -13,7 +13,7 @@ public class UploadDocumentUtil {
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSolrUrl;
-	private String collectionName;
+	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
 	public UploadDocumentSolrUtilRespnse commit() {
@@ -22,7 +22,7 @@ public class UploadDocumentUtil {
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType, content);
 
-		String url = baseSolrUrl + "/" + collectionName + "/update?";
+		String url = baseSolrUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 		log.debug("COMMIT");
 	
@@ -52,7 +52,7 @@ public class UploadDocumentUtil {
 
 		RequestBody body = RequestBody.create(mediaType, content);
 
-		String url = baseSolrUrl + "/" + collectionName + "/update?";
+		String url = baseSolrUrl + "/" + tableName + "/update?";
 
 		url += "softCommit=true";
 

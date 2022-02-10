@@ -1,8 +1,6 @@
 package com.searchservice.app.domain.service;
 
-import java.util.Map;
 
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,27 +8,16 @@ import org.springframework.stereotype.Service;
 
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
-
+	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
+	
 	@Value("${base-solr-url}")
 	private String baseSolrUrl;
 
-	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
-
-	private ThrottlerResponseDTO extracted(ThrottlerResponseDTO responseDTO, Exception e, Exception e1) {
-		log.error("Exception: {} Exception: {}", e, e1);
-
-		String message = "Invalid input JSON array of document.";
-		log.debug(message);
-		responseDTO.setResponseMessage(message);
-		responseDTO.setStatusCode(400);
-		return responseDTO;
-	}
-
+	
 	private void extracted(ThrottlerResponseDTO responseDTO,
 			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
@@ -42,24 +29,24 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 	}
 
-	private UploadDocumentUtil extracted(String collectionName, String payload) {
+	private UploadDocumentUtil extracted(String tableName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
 		uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
-		uploadDocumentUtil.setCollectionName(collectionName);
+		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);
 		return uploadDocumentUtil;
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocuments(String collectionName, String payload) {
+	public ThrottlerResponseDTO addDocuments(String tableName, String payload) {
 
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
-		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
+		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
 
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
@@ -69,13 +56,13 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocument(String collectionName, String payload) {
+	public ThrottlerResponseDTO addDocument(String tableName, String payload) {
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
-		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
+		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
 
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
 
