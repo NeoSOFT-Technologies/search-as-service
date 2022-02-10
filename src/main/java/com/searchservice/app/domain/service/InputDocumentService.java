@@ -56,33 +56,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
-		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
-				collectionName);
-
-		if (schemaKeyValuePair == (null)) {
-			String message = "Unable to get the Schema. Please check the collection name again!";
-			log.debug(message);
-			responseDTO.setResponseMessage(message);
-			responseDTO.setStatusCode(400);
-			return responseDTO;
-		}
-
-		JSONArray payloadJSONArray = null;
-		try {
-			payloadJSONArray = new JSONArray(payload);
-
-		} catch (Exception e) {
-
-			// TRY BY REMOVING THE QUOTES FROM THE STRING
-			try {
-				payload = payload.substring(1, payload.length() - 1);
-				payloadJSONArray = new JSONArray(payload);
-
-			} catch (Exception e1) {
-				return extracted(responseDTO, e, e1);
-			}
-		}
-
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
@@ -99,31 +72,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponseDTO addDocument(String collectionName, String payload) {
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
 
-		Map<String, Map<String, Object>> schemaKeyValuePair = DocumentParserUtil.getSchemaOfCollection(baseSolrUrl,
-				collectionName);
-		if (schemaKeyValuePair == null) {
-			String message = "Unable to get the Schema. Please check the collection name again!";
-			log.debug(message);
-			responseDTO.setResponseMessage(message);
-			responseDTO.setStatusCode(400);
-			return responseDTO;
-		}
-
-		JSONArray payloadJSONArray = null;
-		try {
-			payloadJSONArray = new JSONArray(payload);
-		} catch (Exception e) {
-
-			// TRY BY REMOVING THE QUOTES FROM THE STRING
-			try {
-				payload = payload.substring(1, payload.length() - 1);
-				payloadJSONArray = new JSONArray(payload);
-
-			} catch (Exception e1) {
-				return extracted(responseDTO, e, e1);
-			}
-
-		}
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
