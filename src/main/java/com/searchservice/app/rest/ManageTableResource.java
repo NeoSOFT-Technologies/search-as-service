@@ -1,8 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -39,14 +36,12 @@ public class ManageTableResource {
 
 	private static final String BAD_REQUEST_MSG = "REST call could not be performed";
 
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-
 	private String servicename = "Manage_Table_Resource";
 
 	private String username = "Username";
 	
 	private ManageTableServicePort manageTableServicePort;
-
+	
 	ManageTableResource manageTableResource;
 	
 
@@ -59,7 +54,7 @@ public class ManageTableResource {
 	public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
 		log.debug("Get capacity plans");
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -70,7 +65,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 
 		LoggerUtils.printlogger(loggersDTO, false, false);
 		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
@@ -82,7 +78,7 @@ public class ManageTableResource {
 		log.debug("Get all tables");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -93,8 +89,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
@@ -113,7 +109,7 @@ public class ManageTableResource {
 		log.debug("getCollectionDetails");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -124,8 +120,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (!responseMap.containsKey("Error")) {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(responseMap);
@@ -142,7 +138,7 @@ public class ManageTableResource {
 		log.debug("Get table schema");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -154,8 +150,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (tableSchemaResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (tableSchemaResponseDTO.getStatusCode() == 200) {
@@ -174,7 +170,7 @@ public class ManageTableResource {
 		log.debug("Create table");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -186,8 +182,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
 			LoggerUtils.printlogger(loggersDTO, false, false);
@@ -205,7 +201,7 @@ public class ManageTableResource {
 		log.debug("Delete table");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -217,8 +213,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -238,7 +234,7 @@ public class ManageTableResource {
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -250,8 +246,8 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);

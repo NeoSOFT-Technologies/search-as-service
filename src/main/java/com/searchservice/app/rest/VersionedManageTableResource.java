@@ -44,7 +44,6 @@ public class VersionedManageTableResource {
     private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
     private static final String DEFAULT_EXCEPTION_MSG = ResponseMessages.DEFAULT_EXCEPTION_MSG;
     
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
 
 	private String servicename = "Manage_Table_Resource";
 
@@ -63,7 +62,7 @@ public class VersionedManageTableResource {
         log.debug("Get capacity plans");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -74,8 +73,9 @@ public class VersionedManageTableResource {
         loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
         if(getCapacityPlanDTO.getPlans() != null) {
         	LoggerUtils.printlogger(loggersDTO,false,false);
         	return getCapacityPlanDTO;
@@ -92,7 +92,7 @@ public class VersionedManageTableResource {
 		log.debug("Get all tables");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -103,8 +103,9 @@ public class VersionedManageTableResource {
         loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
@@ -124,7 +125,7 @@ public class VersionedManageTableResource {
         log.debug("Get table schema");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -135,8 +136,9 @@ public class VersionedManageTableResource {
         loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
         if(tableSchemaResponseDTO == null)
         	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
         if(tableSchemaResponseDTO.getStatusCode()==200){
@@ -156,7 +158,7 @@ public class VersionedManageTableResource {
         log.debug("Create table");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -167,8 +169,9 @@ public class VersionedManageTableResource {
         loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
         if(apiResponseDTO.getResponseStatusCode()==200){
         	LoggerUtils.printlogger(loggersDTO,false,false);
         	apiResponseDTO.setResponseMessage("Table: "+manageTableDTO.getTableName()+", is created successfully");
@@ -187,7 +190,7 @@ public class VersionedManageTableResource {
         log.debug("Delete table");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -198,8 +201,9 @@ public class VersionedManageTableResource {
         loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
         if(apiResponseDTO.getResponseStatusCode()==200){
         	LoggerUtils.printlogger(loggersDTO,false,false);
             return apiResponseDTO;
@@ -220,7 +224,7 @@ public class VersionedManageTableResource {
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -231,8 +235,9 @@ public class VersionedManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
 		if(apiResponseDTO.getResponseStatusCode() == 200) {
 			LoggerUtils.printlogger(loggersDTO,false,false);
 			return apiResponseDTO;

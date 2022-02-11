@@ -1,9 +1,6 @@
 package com.searchservice.app.domain.service;
 
 import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -87,10 +84,8 @@ public class ManageTableService implements ManageTableServicePort {
 	SolrAPIAdapter solrAPIAdapter;
 	HttpSolrClient solrClient;
 	
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-
 	private String servicename = "Manage_Table_Service";
-
+	
 	private String username = "Username";
 	
 	public ManageTableService(String solrUrl, SolrAPIAdapter solrAPIAdapter, HttpSolrClient solrClient) {
@@ -104,7 +99,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("capacity Plans");
 		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -113,7 +108,7 @@ public class ManageTableService implements ManageTableServicePort {
 		
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
         
-        loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
         LoggerUtils.printlogger(loggersDTO,false,false);
         
         return new GetCapacityPlanDTO(capacityPlans);
@@ -157,7 +152,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("Get Table Schema If Present");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -183,19 +178,21 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("get Tables");
 		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
+		
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         CollectionAdminRequest.List request = new CollectionAdminRequest.List();
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
         
         ResponseDTO getListItemsResponseDTO=new ResponseDTO();
-
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+		
 		
         try {
             CollectionAdminResponse response = request.process(solrClient);
@@ -203,6 +200,7 @@ public class ManageTableService implements ManageTableServicePort {
             getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
             getListItemsResponseDTO.setResponseStatusCode(200);
             getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
+            
             LoggerUtils.printlogger(loggersDTO,false,false);
             
 
@@ -210,6 +208,7 @@ public class ManageTableService implements ManageTableServicePort {
             logger.error(e.toString());
             getListItemsResponseDTO.setResponseStatusCode(400);
             getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
+            loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
             LoggerUtils.printlogger(loggersDTO,false,true);
             
         }
@@ -276,17 +275,20 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("create Table If Not Present");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		LoggerUtils.printlogger(loggersDTO,true,false);
-
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		
-		if(isTableExists(manageTableDTO.getTableName()))
+		if(isTableExists(manageTableDTO.getTableName())) {
+			LoggerUtils.printlogger(loggersDTO,false,true);
 			throw new BadRequestOccurredException(400, 
 					manageTableDTO.getTableName()+" table already exists");
+		}
 		
 		if(!isConfigSetExists(manageTableDTO.getSchemaName())) {
 			// Create Configset if not present
@@ -295,8 +297,8 @@ public class ManageTableService implements ManageTableServicePort {
 			createConfigSet(configSetDTO);
 		}
 		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp = LoggerUtils.utcTime().toString();;
+		loggersDTO.setTimestamp(timestamp);
 		if(apiResponseDTO.getResponseStatusCode()==200) {
 			// Add schemaAttributes
 			TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(manageTableDTO.getTableName(),
@@ -345,7 +347,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("delete Table");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -363,7 +365,7 @@ public class ManageTableService implements ManageTableServicePort {
         
         ResponseDTO apiResponseDTO=new ResponseDTO();
 
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
 		
         try {
         	request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
@@ -393,14 +395,15 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("update Table Schema");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
 		
 		LoggerUtils.printlogger(loggersDTO,false,false);
 		
@@ -754,7 +757,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("get Table Details");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -781,8 +784,9 @@ public class ManageTableService implements ManageTableServicePort {
 		Map<Object, Object> clusterResponse = (Map<Object, Object>) responseAsMap.get("cluster");
 		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get("collections");
 
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
         if(collections.containsKey(tableName)){
             finalResponseMap=(Map<Object, Object>) collections.get(tableName);
 

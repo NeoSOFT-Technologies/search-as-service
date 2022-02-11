@@ -2,9 +2,6 @@ package com.searchservice.app.rest;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +36,6 @@ public class VersionedInputDocumentResource {
 	public final InputDocumentServicePort inputDocumentServicePort;
 	public final ThrottlerServicePort throttlerServicePort;
 
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-
 	private String servicename = "Manage_Table_Resource";
 
 	private String username = "Username";
@@ -60,7 +55,7 @@ public class VersionedInputDocumentResource {
 		log.debug("Solr documents add");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -86,8 +81,8 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
 		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
@@ -110,7 +105,7 @@ public class VersionedInputDocumentResource {
 		log.info("Solr documents add");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -137,8 +132,8 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+		timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
 		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 

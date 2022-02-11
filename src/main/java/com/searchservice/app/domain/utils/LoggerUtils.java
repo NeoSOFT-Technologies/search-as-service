@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,5 +71,10 @@ public class LoggerUtils {
 					loggersDTO.getServicename(), loggersDTO.getUsername(), loggersDTO.getCorrelationid(),
 					loggersDTO.getIpaddress(), loggersDTO.getTimestamp(), loggersDTO.getNameofmethod());
 		}
+	}
+	public static DateTime utcTime() {
+		DateTime now = new DateTime(); // Gives the default time zone.
+	    DateTime dateTime = now.toDateTime(DateTimeZone.UTC );
+	    return dateTime;
 	}
 }
