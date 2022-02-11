@@ -136,10 +136,23 @@ base-url:
     home: /api/v1
     versioned-home: /api-versioned/v1
     manage-table: /api-versioned/v1/manage/table
-    
+
 # {saas-ms.request-header.api-version}
 saas-ms:
   request-header:
     api-version: X-Api-Version
 
 #================================================================
+
+
+#TableSoftDelete File Path
+
+table-delete-file:
+    path: src\\main\\resources\\TableDeleteRecord
+    
+ #================================================================
+ 
+ #CollectionDeleteDuration
+ 
+table-delete-duration:
+      days: 15

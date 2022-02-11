@@ -20,8 +20,12 @@ import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+
 import com.searchservice.app.domain.utils.LoggerUtils;
+
+import com.searchservice.app.domain.service.TableDeleteService;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 
@@ -39,14 +43,17 @@ public class ManageTableResource {
 	private String servicename = "Manage_Table_Resource";
 
 	private String username = "Username";
-	
-	private ManageTableServicePort manageTableServicePort;
-	
-	ManageTableResource manageTableResource;
-	
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
+	private ManageTableServicePort manageTableServicePort;
+
+	ManageTableResource manageTableResource;
+
+	private TableDeleteServicePort tableDeleteServicePort;
+
+	public ManageTableResource(ManageTableServicePort manageTableServicePort,
+			TableDeleteServicePort tableDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.tableDeleteServicePort = tableDeleteServicePort;
 	}
 
 	@GetMapping("/capacity-plans")
@@ -221,6 +228,35 @@ public class ManageTableResource {
 		} else {
 			log.debug("Exception occurred: {}", apiResponseDTO);
 			LoggerUtils.printlogger(loggersDTO, false, true);
+
+			tableName = tableName + "_" + clientid;
+			if (tableDeleteServicePort.checkTableExistensce(tableName)) {
+				ResponseDTO apiResponseDTOs = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
+				if (apiResponseDTOs.getResponseStatusCode() == 200) {
+					LoggerUtils.printlogger(loggersDTO, false, false);
+					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTOs);
+				} else {
+					log.debug("Exception occurred: {}", apiResponseDTOs);
+					LoggerUtils.printlogger(loggersDTO, false, true);
+					throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+				}
+			} else {
+				LoggerUtils.printlogger(loggersDTO, false, true);
+				throw new BadRequestOccurredException(400,
+						"Table " + tableName + " For Client ID " + clientid + " Does Not Exist");
+			}
+		}
+	}
+
+	@PutMapping("/{clientId}")
+	@Operation(summary = "/undo-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ResponseDTO> undoTable(@PathVariable int clientId) {
+		log.debug("Undo Table Delete");
+		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
+		if (apiResponseDTO.getResponseStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		} else {
+			log.debug("Exception Occured While Performing Undo Delete For Client ID: {} ", clientId);
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}

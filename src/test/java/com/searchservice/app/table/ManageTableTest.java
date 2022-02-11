@@ -27,6 +27,7 @@ import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.service.ManageTableService;
+import com.searchservice.app.domain.service.TableDeleteService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -77,8 +78,10 @@ class ManageTableTest {
 
     @MockBean
     private ManageTableService manageTableService;
-
-
+    
+    @MockBean
+    private TableDeleteService tableDeleteService;
+    
     public void setMockitoSuccessResponseForService() {
         ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setResponseStatusCode(200);
@@ -103,6 +106,10 @@ class ManageTableTest {
         		null);
         
         GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
+        
+        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
+        unodDeleteResponseDTO.setResponseStatusCode(200);
+        unodDeleteResponseDTO.setResponseMessage("Testing");
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
@@ -114,7 +121,12 @@ class ManageTableTest {
         
         Map finalResponseMap= new HashMap();
         finalResponseMap.put("Random message","Data is returned");
+
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+
     }
 
     public void setMockitoBadResponseForService() {
@@ -135,6 +147,10 @@ class ManageTableTest {
         		"Retrieved table schema");
         
         GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
+        
+        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
+        unodDeleteResponseDTO.setResponseStatusCode(400);
+        unodDeleteResponseDTO.setResponseMessage("Error!");
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
@@ -146,7 +162,11 @@ class ManageTableTest {
         
         Map finalResponseMap= new HashMap();
         finalResponseMap.put("Error","Error connecting to cluster.");
+
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
     }
 
     @Test
