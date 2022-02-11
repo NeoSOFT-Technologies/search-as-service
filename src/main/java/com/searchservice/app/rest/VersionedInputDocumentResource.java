@@ -146,17 +146,6 @@ public class VersionedInputDocumentResource {
 		}
 	}
 
-	// Rate Limiter(Throttler) FALLBACK method
-	public ThrottlerResponseDTO documentInjectionRateLimiterFallback(String tableName, int clientid, String payload,
-			RequestNotPermitted exception) {
-		log.error("Max request rate limit fallback triggered. Exception: ", exception);
-
-		// prepare Rate Limiting Response DTO
-		ThrottlerResponseDTO rateLimitResponseDTO = throttlerServicePort.documentInjectionRateLimiter();
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration());
-		// retry the request after given timeoutDuration
-		return rateLimitResponseDTO;
-	}
+	
 
 }
