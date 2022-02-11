@@ -69,7 +69,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String REQUIRED = "required";
 	private static final String VALIDATED = "validated";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
-
+	
 	@Value("${base-solr-url}")
 	private String solrURL;
 	@Value("${basic-auth.username}")
@@ -282,11 +282,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		LoggerUtils.printlogger(loggersDTO,true,false);
-		
-		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
 
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		
 		
 		if(isTableExists(manageTableDTO.getTableName()))
 			throw new BadRequestOccurredException(400, 
@@ -298,6 +294,9 @@ public class ManageTableService implements ManageTableServicePort {
 			ConfigSetDTO configSetDTO = new ConfigSetDTO(baseConfigSet, manageTableDTO.getSchemaName());
 			createConfigSet(configSetDTO);
 		}
+		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		
 		if(apiResponseDTO.getResponseStatusCode()==200) {
 			// Add schemaAttributes
 			TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(manageTableDTO.getTableName(),
@@ -404,6 +403,7 @@ public class ManageTableService implements ManageTableServicePort {
 		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		
 		LoggerUtils.printlogger(loggersDTO,false,false);
+		
 		return updateSchemaAttributes(tableSchemaDTO);
 	}
 

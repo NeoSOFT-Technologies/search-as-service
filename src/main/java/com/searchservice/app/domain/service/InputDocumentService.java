@@ -4,15 +4,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchservice.app.domain.dto.logger.CorrelationID;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
@@ -27,10 +23,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 	
-	CorrelationID correlationID = new CorrelationID();
-
-	@Autowired
-	HttpServletRequest request;
+	private String timepattern="yyyy-MM-dd HH:mm:ss";
 
 	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
 
@@ -62,7 +55,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		log.debug(" Add Document");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = utc.format(DateTimeFormatter.ofPattern(timepattern));
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -80,7 +73,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern(timepattern)));
 		LoggerUtils.printlogger(loggersDTO,false,false);
         
 		return responseDTO;
@@ -91,7 +84,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponseDTO addDocument(String collectionName, String payload,LoggersDTO loggersDTO) {
 		log.debug("Add Document");
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String timestamp = utc.format(DateTimeFormatter.ofPattern(timepattern));
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -108,7 +101,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
-		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		loggersDTO.setTimestamp(utc.format(DateTimeFormatter.ofPattern(timepattern)));
 		
 		LoggerUtils.printlogger(loggersDTO,false,false);
         

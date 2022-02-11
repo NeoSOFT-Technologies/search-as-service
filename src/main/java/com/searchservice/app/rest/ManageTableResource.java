@@ -44,10 +44,11 @@ public class ManageTableResource {
 	private String servicename = "Manage_Table_Resource";
 
 	private String username = "Username";
-
+	
 	private ManageTableServicePort manageTableServicePort;
 
 	ManageTableResource manageTableResource;
+	
 
 	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
@@ -179,6 +180,7 @@ public class ManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 
+		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
 		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
 
 		loggersDTO.setServicename(servicename);
