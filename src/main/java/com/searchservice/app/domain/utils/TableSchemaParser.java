@@ -30,7 +30,7 @@ public class TableSchemaParser {
 		
 		Map<String, Object> fieldDtoMap = new HashMap<>();
 		for(SchemaFieldDTO fieldDto: schemaFields) {
-			logger.debug("Validate SolrFieldDTO before parsing it");
+			logger.info("Validate SolrFieldDTO before parsing it");
 			if(!validateSchemaField(fieldDto)) {
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
@@ -48,27 +48,27 @@ public class TableSchemaParser {
 	
 	
 	public static boolean validateSchemaField(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field: {}", solrFieldDTO);
+		logger.info("Validate schema field: {}", solrFieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
 		String fieldType = solrFieldDTO.getType();
 		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
-			logger.debug("Invalid schema field name received: {}", fieldName);
+			logger.info("Invalid schema field name received: {}", fieldName);
 		} else if(fieldType == null) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field type received: {}", fieldType);
+			logger.info("Invalid/Empty schema field type received: {}", fieldType);
 		} else if(!validateSchemaFieldBooleanAttributes(solrFieldDTO)) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field boolean attributes received");
+			logger.info("Invalid/Empty schema field boolean attributes received");
 		}
 		return fieldValidated;
 	}
 	
 	
 	public static boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field boolean attributes: {}", solrFieldDTO);
+		logger.info("Validate schema field boolean attributes: {}", solrFieldDTO);
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
@@ -89,8 +89,8 @@ public class TableSchemaParser {
 			invalidAttribute = SORTED;
 		}
 		if(!fieldAttributesValidated)
-			logger.debug("Invalid entry for field attribute: \"{}\"", invalidAttribute);
-		logger.debug("All Schema field boolean attributes are valid");
+			logger.info("Invalid entry for field attribute: \"{}\"", invalidAttribute);
+		logger.info("All Schema field boolean attributes are valid");
 		return fieldAttributesValidated;
 	}
 	

@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String SOLR_EXCEPTION_MSG = "The table - {} is Not Found in the Solr Cloud!";
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
+	private static final String SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG = "Schema attributes could not be added to the table!";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -171,7 +173,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isConfigSetExists(manageTableDTO.getSchemaName())) {
 			// Create Configset if not present
-			logger.debug("{} configset is not present, creating..", manageTableDTO.getSchemaName());
+			logger.info("{} configset is not present, creating..", manageTableDTO.getSchemaName());
 			ConfigSetDTO configSetDTO = new ConfigSetDTO(baseConfigSet, manageTableDTO.getSchemaName());
 			createConfigSet(configSetDTO);
 		}
@@ -228,7 +230,19 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
 		tableSchemaDTO.setTableName(tableName);
-		return updateSchemaAttributes(tableSchemaDTO);
+		ResponseDTO apiResponseDTO = new ResponseDTO();
+		
+		// ADD new schema fields to the table
+		TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+		apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
+		apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
+		logger.info("New attributes addition response: {}", apiResponseDTO.getResponseMessage());
+		
+		// UPDATE existing schema attributes
+		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
+		logger.info("Existing attributes update response: {}", apiResponseDTO.getResponseMessage());
+		
+		return apiResponseDTO;
 	}
 
 
@@ -286,7 +300,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public TableSchemaDTO getTableSchema(String tableName) {
-		logger.debug("Getting table schema");
+		logger.info("Getting table schema");
 
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -298,7 +312,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String payloadOperation = "SchemaRequest";
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
-			logger.debug("Get request has been processed. Setting status code = 200");
+			logger.info("Get request has been processed. Setting status code = 200");
 			tableSchemaResponseDTO.setStatusCode(200);
 
 			SchemaRepresentation schemaRepresentation = schemaResponse.getSchemaRepresentation();
@@ -306,7 +320,7 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
 			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
-			logger.debug("Total number of fields: {}", numOfFields);
+			logger.info("Total number of fields: {}", numOfFields);
 
 			int schemaFieldIdx = 0;
 			for (Map<String, Object> f : schemaFields) {
@@ -325,7 +339,7 @@ public class ManageTableService implements ManageTableServicePort {
 				solrSchemaFieldDTOs[schemaFieldIdx] = solrFieldDTO;
 				schemaFieldIdx++;
 			}
-			logger.debug("Total fields stored in attributes array: {}", schemaFieldIdx);
+			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
 
 			// prepare response dto
 			tableSchemaResponseDTO.setSchemaName(schemaName);
@@ -336,11 +350,11 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
+			logger.info(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			logger.error(SOLR_EXCEPTION_MSG, tableName);
-			logger.debug(e.toString());
+			logger.info(e.toString());
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
@@ -421,16 +435,14 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	
 	@Override
 	public TableSchemaDTO addSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
-		logger.debug("Add schema attributes");
+		logger.info("Add schema attributes");
 
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
 		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
-
-		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
-		TableSchemaDTO schemaResponseDTOAfter = new TableSchemaDTO();
 
 		String schemaName = "";
 		String errorCausingField = null;
@@ -439,87 +451,102 @@ public class ManageTableService implements ManageTableServicePort {
 			// logic
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
-			schemaResponseDTOBefore.setStatusCode(200);
 
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 
-			// Add new fields present in the Target Schema to the given collection schema
+			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
-			SchemaFieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new SchemaFieldDTO[0]);
-			logger.debug("\nTarget Schema fields : {}", (Object[]) newSolrFieldDTOs);
+			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			for (SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
+			List<Integer> existingAttributesIndeces = new ArrayList<>();
+			for(int i=0; i<newAttributes.size(); i++) {
+
+				SchemaFieldDTO fieldDto = newAttributes.get(i);
+				
 				boolean isPresent = false;
 				for (Map<String, Object> field : schemaFields) {
-					if (field.containsKey(fieldDto.getName())) {
+					
+					if(field.get("name").equals(fieldDto.getName())) {
 						isPresent = true;
+						existingAttributesIndeces.add(i);
 						break;
 					}
 				}
 				if (!isPresent)
 					newFieldFound = true;
 			}
+			
 			if (!newFieldFound) {
-				schemaResponseDTOAfter.setStatusCode(400);
-			}
-			for (SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
-				if (!TableSchemaParser.validateSchemaField(fieldDto)) {
-					logger.debug("Validate SolrFieldDTO before updating the current schema- {}", schemaName);
-					schemaResponseDTOAfter.setStatusCode(400);
-					break;
+				tableSchemaResponseDTO.setStatusCode(400);
+				tableSchemaResponseDTO.setMessage("No new attributes found");
+				return tableSchemaResponseDTO;
+			} else {
+				// REMOVE existing attributess from newAttributes list
+				for(Integer i: existingAttributesIndeces) {
+					newAttributes.remove((int)i);
 				}
-				errorCausingField = fieldDto.getName();
-				Map<String, Object> newField = new HashMap<>();
-				newField.put("name", fieldDto.getName());
-				newField.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
-				newField.put(REQUIRED, fieldDto.isRequired());
-				newField.put(STORED, fieldDto.isStorable());
-				newField.put(MULTIVALUED, fieldDto.isMultiValue());
-
-				SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
-				addFieldResponse = addFieldRequest.process(solrClientActive);
-				schemaResponseDTOAfter.setStatusCode(200);
-
-				schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 			}
-			tableSchemaResponseDTO.setStatusCode(200);
-			tableSchemaResponseDTO.setMessage("Schema is created successfully");
-			logger.debug("Logging newly added fields' responses--");
-			for (Object field : schemaResponseAddFields) {
-				logger.debug("### Added Field Response : {}", field);
+			
+			if(newAttributes.isEmpty()) {
+				tableSchemaResponseDTO.setStatusCode(405);
+				tableSchemaResponseDTO.setMessage("Add attributes operation NOT ALLOWED");
+			} else {
+				for (SchemaFieldDTO fieldDto : newAttributes) {
+					if (!TableSchemaParser.validateSchemaField(fieldDto)) {
+						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}", schemaName);
+						tableSchemaResponseDTO.setStatusCode(400);
+						break;
+					}
+					
+					errorCausingField = fieldDto.getName();
+					Map<String, Object> newField = new HashMap<>();
+					newField.put("name", fieldDto.getName());
+					newField.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
+					newField.put(REQUIRED, fieldDto.isRequired());
+					newField.put(STORED, fieldDto.isStorable());
+					newField.put(MULTIVALUED, fieldDto.isMultiValue());
+
+					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
+					addFieldResponse = addFieldRequest.process(solrClientActive);
+					
+					tableSchemaResponseDTO.setStatusCode(200);
+					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
+				}
+				tableSchemaResponseDTO.setStatusCode(200);
+				tableSchemaResponseDTO.setMessage("New attributes are added successfully");
 			}
+
 		} catch (SolrServerException | IOException e) {
-			schemaResponseDTOAfter.setStatusCode(400);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (SolrException e) {
-			schemaResponseDTOAfter.setStatusCode(400);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
-			logger.error(SOLR_EXCEPTION_MSG + " So schema fields can't be found/deleted!",
-					newTableSchemaDTO.getTableName());
-			logger.debug(e.toString());
+			logger.error(SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.info(e.toString());
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return tableSchemaResponseDTO;
 	}
 
+	
 	@Override
 	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
-		logger.debug("Update Solr Schema");
+		logger.info("Update Solr Schema");
 
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
 				newTableSchemaDTO.getTableName());
+		
 		ResponseDTO apiResponseDTO = new ResponseDTO();
 
 		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
@@ -530,11 +557,12 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			
 			schemaResponseDTOBefore.setStatusCode(200);
 
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			logger.debug("Total number of fields: {}", numOfFields);
+			logger.info("Total number of fields: {}", numOfFields);
 
 			// Get all fields from incoming(from req Body) schemaDTO
 			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
@@ -564,34 +592,34 @@ public class ManageTableService implements ManageTableServicePort {
 
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
 				updatedFields++;
-				logger.debug("Field- {} is successfully updated", currField.get("name"));
+				logger.info("Field- {} is successfully updated", currField.get("name"));
 			}
 			apiResponseDTO.setResponseStatusCode(200);
 			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
 			// Compare required Vs Updated Fields
-			logger.debug("Total field updates required in the current schema: {}", totalUpdatesRequired);
-			logger.debug("Total fields updated in the current schema: {}", updatedFields);
+			logger.info("Total field updates required in the current schema: {}", totalUpdatesRequired);
+			logger.info("Total fields updated in the current schema: {}", updatedFields);
 
 		} catch (SolrServerException | IOException e) {
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (NullPointerException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
 			apiResponseDTO.setResponseStatusCode(200);
 			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
 			logger.error("Null value detected!", e);
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (SolrException e) {
 			apiResponseDTO.setResponseStatusCode(400);
 			apiResponseDTO.setResponseMessage("Schema could not be updated");
-			logger.error(SOLR_EXCEPTION_MSG + " So schema fields can't be found/deleted!",
+			logger.error(SOLR_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName());
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (SolrSchemaValidationException e) {
 			apiResponseDTO.setResponseStatusCode(400);
 			apiResponseDTO.setResponseMessage("Schema could not be updated");
 			logger.error("Error Message: {}", e.getMessage());
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
