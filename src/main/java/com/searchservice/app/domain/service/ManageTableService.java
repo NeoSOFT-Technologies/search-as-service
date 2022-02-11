@@ -36,6 +36,7 @@ import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SolrUtil;
 import com.searchservice.app.domain.utils.TableSchemaParser;
@@ -227,6 +228,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	
 	@Override
 	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
 		tableSchemaDTO.setTableName(tableName);
@@ -458,13 +460,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
+			HashMap<String, SchemaFieldDTO> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			List<Integer> existingAttributesIndeces = new ArrayList<>();
+			
+			List<String> existingAttributesNames = new ArrayList<>();
 			for(int i=0; i<newAttributes.size(); i++) {
 
 				SchemaFieldDTO fieldDto = newAttributes.get(i);
@@ -474,7 +478,7 @@ public class ManageTableService implements ManageTableServicePort {
 					
 					if(field.get("name").equals(fieldDto.getName())) {
 						isPresent = true;
-						existingAttributesIndeces.add(i);
+						existingAttributesNames.add(fieldDto.getName());
 						break;
 					}
 				}
@@ -488,16 +492,17 @@ public class ManageTableService implements ManageTableServicePort {
 				return tableSchemaResponseDTO;
 			} else {
 				// REMOVE existing attributess from newAttributes list
-				for(Integer i: existingAttributesIndeces) {
-					newAttributes.remove((int)i);
+				for(String attributeName: existingAttributesNames) {
+					newAttributesHashMap.remove(attributeName);
 				}
 			}
 			
-			if(newAttributes.isEmpty()) {
+			if(newAttributesHashMap.isEmpty()) {
 				tableSchemaResponseDTO.setStatusCode(405);
 				tableSchemaResponseDTO.setMessage("Add attributes operation NOT ALLOWED");
 			} else {
-				for (SchemaFieldDTO fieldDto : newAttributes) {
+				for(Map.Entry<String, SchemaFieldDTO> fieldDtoEntry: newAttributesHashMap.entrySet()) {
+					SchemaFieldDTO fieldDto = fieldDtoEntry.getValue();
 					if (!TableSchemaParser.validateSchemaField(fieldDto)) {
 						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}", schemaName);
 						tableSchemaResponseDTO.setStatusCode(400);
@@ -541,7 +546,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
-		logger.info("Update Solr Schema");
+		logger.info("Update Table Schema");
 
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
@@ -568,12 +573,12 @@ public class ManageTableService implements ManageTableServicePort {
 			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
-			// Validate Solr Schema Fields
+			// Validate Table Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if (validationEntry.containsKey(VALIDATED)) {
 				Object validatedFields = validationEntry.get(VALIDATED);
 				if (validatedFields.equals(false))
-					throw new SolrSchemaValidationException("Target Schema Fields validation falied!");
+					throw new SolrSchemaValidationException("Target Schema Fields validation failed!");
 			}
 
 			int totalUpdatesRequired = newSchemaFields.length;
@@ -585,7 +590,7 @@ public class ManageTableService implements ManageTableServicePort {
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
-				// Pass all fieldAttributes to be updated
+				// Pass the fieldAttribute to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
@@ -625,6 +630,7 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		return apiResponseDTO;
 	}
+	
 	
 	
 	@Override
