@@ -81,8 +81,8 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp=LoggerUtils.utcTime().toString();
-        loggersDTO.setTimestamp(timestamp);
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
@@ -132,8 +132,8 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp=LoggerUtils.utcTime().toString();
-        loggersDTO.setTimestamp(timestamp);
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
