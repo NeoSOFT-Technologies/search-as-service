@@ -141,7 +141,7 @@ public class VersionedInputDocumentResource {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return documentInjectionThrottlerResponse;
 		} else {
-			LoggerUtils.printlogger(loggersDTO, false, false);
+			LoggerUtils.printlogger(loggersDTO, false, true);
 			throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
 		}
 	}
