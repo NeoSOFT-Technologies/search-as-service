@@ -138,7 +138,7 @@ public class ManageTableResource {
 			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		   }
 		}else {
-			throw new BadRequestOccurredException(400, "Table "+tableName+" Does Not Exist");
+			throw new BadRequestOccurredException(400, "Table "+tableName+" For Client ID "+clientid+" Does Not Exist");
 		}
 	}
 	
