@@ -85,7 +85,7 @@ public class TableDeleteService implements TableDeleteServicePort{
 			        	if(performTableDeletion(currentDeleteRecord)) {
 			        		 delRecordCount++;
 			        	}else {
-			        		pw.println(currentDeleteRecord);	
+			        		pw.println(currentDeleteRecord);
 			        	}}}
 			       else {
 			        	pw.println(currentDeleteRecord);	
@@ -93,15 +93,19 @@ public class TableDeleteService implements TableDeleteServicePort{
 			        lineNumber++;	
 			    }
 			    pw.flush();pw.close();br.close();
-			    existingFile.delete();
-			    File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
-			    newFile.renameTo(deleteRecordFile);
-			    checkTableDeletionStatus(delRecordCount);
+			    makeDeleteTableFileChangesForDelete(newFile, existingFile, delRecordCount);
 			   } catch (IOException exception) {
 				  logger.error("Error While Performing Table Deletion ",exception);
 				  delRecordCount=-1;
 			} 
 		return delRecordCount;
+	}
+	
+	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int delRecordCount) {
+		File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
+		  if(existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
+		     checkTableDeletionStatus(delRecordCount);
+		  }
 	}
 
 	@Override
@@ -163,10 +167,10 @@ public class TableDeleteService implements TableDeleteServicePort{
 		  pw.flush();
 		  pw.close();
 		  br.close();
-		  existingFile.delete();
 		  File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
-		  newFile.renameTo(deleteRecordFile); 
-		  undoTableDeletionResponse =  getUndoDeleteResponse(undoRecord, clientId);
+		  if(existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
+		   undoTableDeletionResponse =  getUndoDeleteResponse(undoRecord, clientId);
+		  }
 		  }
 		  catch(Exception e)
 		  {
