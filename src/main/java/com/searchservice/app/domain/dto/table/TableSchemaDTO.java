@@ -18,9 +18,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TableSchemaDTO implements VersionedObjectMapper {
 
+	@JsonIgnore
     int statusCode;
+	@JsonIgnore
 	String message;
+	@JsonIgnore
 	String tableName;
+	@JsonIgnore
 	String schemaName;
 	List<SchemaFieldDTO> attributes;
 

@@ -20,7 +20,7 @@ public interface ManageTableServicePort {
 	GetCapacityPlanDTO capacityPlans();
 	ResponseDTO getTables();
 	TableSchemaDTO getTableSchemaIfPresent(String tableName);
-	Map getTableDetails(String tableName);
+	Map<Object, Object> getTableDetails(String tableName);
 
 	// CREATE requests
 	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);

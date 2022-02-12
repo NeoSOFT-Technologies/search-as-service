@@ -71,20 +71,47 @@ public class ManageTableResource {
     }
     
     
-    @GetMapping("/details/{tableName}")
-    @Operation(summary = "/ Get the table details like Shards, Nodes & Replication Factor.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Map> getTableDetails(@PathVariable String tableName) {
-
+	@GetMapping("/{clientid}/{tableName}")
+	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<TableSchemaDTO> getTable(
+			@PathVariable int clientid, 
+			@PathVariable String tableName) {
         log.debug("getCollectionDetails");
 
-        Map responseMap= manageTableServicePort.getTableDetails(tableName);
+//        Map responseMap= manageTableServicePort.getTableDetails(tableName);
+//        if(!responseMap.containsKey("Error")){
+//            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+//        }else{
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
+//        }
+        
+		log.debug("Get table schema");
 
+		tableName = tableName + "_" + clientid;
+		TableSchemaDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+
+		if (tableSchemaResponseDTO == null)
+			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
+		if (tableSchemaResponseDTO.getStatusCode() == 200) {
+			return ResponseEntity.status(HttpStatus.OK).body(tableSchemaResponseDTO);
+		} else {
+			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+		}
+	}
+
+    
+    
+    @GetMapping("/details/{tableName}")
+    @Operation(summary = "/ Get the table details like Shards, Nodes & Replication Factor.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map<Object, Object>> getTableDetails(@PathVariable String tableName) {
+        log.debug("getCollectionDetails");
+
+        Map<Object, Object> responseMap= manageTableServicePort.getTableDetails(tableName);
         if(!responseMap.containsKey("Error")){
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
         }
-
     }
 	
     
@@ -108,16 +135,17 @@ public class ManageTableResource {
 
 	@PostMapping("/{clientid}")
 	@Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ResponseDTO> createTable(@PathVariable int clientid,
+	public ResponseEntity<ResponseDTO> createTable(
+			@PathVariable int clientid,
 			@RequestBody ManageTableDTO manageTableDTO) {
 		log.debug("Create table");
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
 		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
+			apiResponseDTO.setResponseMessage("Table- " + manageTableDTO.getTableName() + ", is created successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
-			log.debug("Table could not be created: {}", apiResponseDTO);
+			log.info("Table could not be created: {}", apiResponseDTO);
 			throw new BadRequestOccurredException(400, "REST operation could not be performed");
 		}
 	}

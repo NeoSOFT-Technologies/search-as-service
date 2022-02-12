@@ -36,6 +36,7 @@ import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.BasicUtil;
+import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SolrUtil;
 import com.searchservice.app.domain.utils.TableSchemaParser;
@@ -153,17 +154,16 @@ public class ManageTableService implements ManageTableServicePort {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 
-		Map<Object, Object> responseAsMap = response.getResponse().asMap(20);
-		Map<Object, Object> clusterResponse = (Map<Object, Object>) responseAsMap.get("cluster");
-		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get("collections");
-
-		if (collections.containsKey(tableName)) {
-			finalResponseMap = (Map<Object, Object>) collections.get(tableName);
-		} else {
-			finalResponseMap.put("Error", "Invalid table name.");
-			return finalResponseMap;
+		finalResponseMap = ManageTableUtil.getTableInfoFromClusterStatusResponseObject(
+				response.getResponse().asMap(20), 
+				tableName);
+	
+		if(!finalResponseMap.containsKey("tableDetails")
+				|| finalResponseMap.get("tableDetails") == null) {
+			finalResponseMap = new HashMap<>();
+			finalResponseMap.put("Error", "Invalid table name provided.");
 		}
-
+		
 		return finalResponseMap;
 	}
 
@@ -186,9 +186,7 @@ public class ManageTableService implements ManageTableServicePort {
 			TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(manageTableDTO.getTableName(),
 					manageTableDTO.getSchemaName(), manageTableDTO.getAttributes());
 			TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
-			apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
-			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
-
+			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 		}
 		return apiResponseDTO;
 	}
@@ -424,12 +422,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
-			logger.info("Going to process TABLE CREATE request!!");
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			request.process(solrClientActive);
 			apiResponseDTO.setResponseStatusCode(200);
 			apiResponseDTO.setResponseMessage("Successfully created table: " + manageTableDTO.getTableName());
-			;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			apiResponseDTO.setResponseStatusCode(400);
@@ -461,7 +457,7 @@ public class ManageTableService implements ManageTableServicePort {
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-
+			
 			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
 			HashMap<String, SchemaFieldDTO> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
@@ -489,7 +485,7 @@ public class ManageTableService implements ManageTableServicePort {
 				if (!isPresent)
 					newFieldFound = true;
 			}
-			
+			// If No new schema attribute is found, RETURN
 			if (!newFieldFound) {
 				tableSchemaResponseDTO.setStatusCode(400);
 				tableSchemaResponseDTO.setMessage("No new attributes found");
