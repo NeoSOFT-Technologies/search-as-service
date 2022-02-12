@@ -25,25 +25,26 @@ public class TableSchemaParser {
 	private static final String SORTED = "sorted";
 	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
-		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		SchemaFieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
-		Map<String, Object> fieldDtoMap = new HashMap<>();
-		for(SchemaFieldDTO fieldDto: schemaFields) {
+		for(SchemaFieldDTO fieldDto: tableSchemaDTO.getAttributes()) {
 			logger.info("Validate SolrFieldDTO before parsing it");
+			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
+				logger.info("{} field couldn't be validated", fieldDto);
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
-				return schemaFieldsList;
+				return schemaFieldsListOfMap;
 			}
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
-			schemaFieldsList.add(fieldDtoMap);
+
+			schemaFieldsListOfMap.add(fieldDtoMap);
 		}
-		return schemaFieldsList;
+		return schemaFieldsListOfMap;
 	}
 	
 	

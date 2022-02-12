@@ -321,24 +321,27 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaName = schemaRepresentation.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
+			List<SchemaFieldDTO> solrSchemaFieldDTOs = new ArrayList<>();
 			logger.info("Total number of fields: {}", numOfFields);
 
 			int schemaFieldIdx = 0;
 			for (Map<String, Object> f : schemaFields) {
-
+				
+				// testing
+				logger.info("schemafield >>>>> {}", f);
+				
 				// Prepare the SolrFieldDTO
 				SchemaFieldDTO solrFieldDTO = new SchemaFieldDTO();
 				solrFieldDTO.setName((String) f.get("name"));
 
 				// Parse Field Type Object(String) to Enum
-				String fieldTypeObj = (String) f.get("type");
-				String solrFieldType = SchemaFieldType.fromObject(fieldTypeObj);
+				String solrFieldType = SchemaFieldType.fromSolrFieldTypeToStandardDataType(
+						(String) f.get("type"));
 
 				solrFieldDTO.setType(solrFieldType);
-				TableSchemaParser.setFieldsToDefaults(solrFieldDTO);
+//				TableSchemaParser.setFieldsToDefaults(solrFieldDTO);
 				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
-				solrSchemaFieldDTOs[schemaFieldIdx] = solrFieldDTO;
+				solrSchemaFieldDTOs.add(solrFieldDTO);
 				schemaFieldIdx++;
 			}
 			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
@@ -346,7 +349,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// prepare response dto
 			tableSchemaResponseDTO.setSchemaName(schemaName);
 			tableSchemaResponseDTO.setTableName(tableName);
-			tableSchemaResponseDTO.setAttributes(Arrays.asList(solrSchemaFieldDTOs));
+			tableSchemaResponseDTO.setAttributes(solrSchemaFieldDTOs);
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
 		} catch (SolrServerException | IOException e) {
@@ -512,7 +515,7 @@ public class ManageTableService implements ManageTableServicePort {
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
 					newField.put("name", fieldDto.getName());
-					newField.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
+					newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
@@ -570,9 +573,10 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.info("Total number of fields: {}", numOfFields);
 
 			// Get all fields from incoming(from req Body) schemaDTO
-			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+			List<SchemaFieldDTO> newSchemaFields = newTableSchemaDTO.getAttributes();
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
+			
 			// Validate Table Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if (validationEntry.containsKey(VALIDATED)) {
@@ -581,7 +585,7 @@ public class ManageTableService implements ManageTableServicePort {
 					throw new SolrSchemaValidationException("Target Schema Fields validation failed!");
 			}
 
-			int totalUpdatesRequired = newSchemaFields.length;
+			int totalUpdatesRequired = newSchemaFields.size();
 
 			// Update Schema Logic
 			UpdateResponse updateFieldsResponse;
