@@ -2,7 +2,6 @@ package com.searchservice.app.domain.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +67,8 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
 	private static final String VALIDATED = "validated";
+	private static final String DOCVALUES = "docValues";
+	private static final String INDEXED = "indexed";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -511,7 +512,9 @@ public class ManageTableService implements ManageTableServicePort {
 						tableSchemaResponseDTO.setStatusCode(400);
 						break;
 					}
-					
+					if (fieldDto.isSortable()) {
+						fieldDto.setMultiValue(false); // For SortOnField UseCase MultiValue must be False
+					}
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
 					newField.put("name", fieldDto.getName());
@@ -519,11 +522,11 @@ public class ManageTableService implements ManageTableServicePort {
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
-
+					newField.put(INDEXED, fieldDto.isFilterable());
+					newField.put(DOCVALUES, fieldDto.isSortable());
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 					addFieldResponse = addFieldRequest.process(solrClientActive);
 					
-					tableSchemaResponseDTO.setStatusCode(200);
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
 				tableSchemaResponseDTO.setStatusCode(200);

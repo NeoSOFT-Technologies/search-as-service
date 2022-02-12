@@ -19,6 +19,7 @@ import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
@@ -30,14 +31,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("${base-url.api-endpoint.home}"+"/manage/table")
 public class ManageTableResource {
 
+	
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 
 	private ManageTableServicePort manageTableServicePort;
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort) {
+	private TableDeleteServicePort tableDeleteServicePort;
+
+	public ManageTableResource(ManageTableServicePort manageTableServicePort,TableDeleteServicePort tableDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.tableDeleteServicePort = tableDeleteServicePort;
 	}
 
 	@GetMapping("/capacity-plans")
@@ -82,6 +87,7 @@ public class ManageTableResource {
 
     }
 	
+    
 	@GetMapping("/schema/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchemaDTO> getSchema(@PathVariable String tableName, @PathVariable int clientid) {
@@ -116,23 +122,45 @@ public class ManageTableResource {
 		}
 	}
 
+	
 	@DeleteMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ResponseDTO> deleteTable(
 			@PathVariable String tableName, 
 			@PathVariable int clientid) {
 		log.debug("Delete table");
-
 		tableName = tableName + "_" + clientid;
-		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName);
-
-		if (apiResponseDTO.getResponseStatusCode() == 200) {
+		if(tableDeleteServicePort.checkTableExistensce(tableName)) {
+		    ResponseDTO apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
+		    if (apiResponseDTO.getResponseStatusCode() == 200) {
+			 return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		   } else {
+			 log.debug("Exception occurred: {}", apiResponseDTO);
+			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+		   }
+		}else {
+			throw new BadRequestOccurredException(400, "Table "+tableName+" For Client ID "+clientid+" Does Not Exist");
+		}
+	}
+	
+	
+	@PutMapping("/{clientId}")
+	@Operation(summary = "/undo-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ResponseDTO> undoTable(@PathVariable int clientId)
+	{	
+		log.debug("Undo Table Delete");
+		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
+		if(apiResponseDTO.getResponseStatusCode() ==200)
+		{
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-		} else {
-			log.debug("Exception occurred: {}", apiResponseDTO);
+		}
+		else
+		{
+			log.debug("Exception Occured While Performing Undo Delete For Client ID: {} ",clientId);
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		}
 	}
+	
 
 	@PutMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))

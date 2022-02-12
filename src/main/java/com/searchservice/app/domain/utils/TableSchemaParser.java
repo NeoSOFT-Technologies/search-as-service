@@ -20,9 +20,10 @@ public class TableSchemaParser {
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
 	private static final String VALIDATED = "validated";
-	private static final String FILTERED = "filtered";
+	private static final String DOCVALUES = "docValues";
+	private static final String INDEXED = "indexed";
 	private static final String DEFAULT = "default";
-	private static final String SORTED = "sorted";
+	
 	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
@@ -42,6 +43,10 @@ public class TableSchemaParser {
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
 
+			schemaFieldsListOfMap.add(fieldDtoMap);
+
+			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
+			fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
 			schemaFieldsListOfMap.add(fieldDtoMap);
 		}
 		return schemaFieldsListOfMap;
@@ -78,7 +83,7 @@ public class TableSchemaParser {
 			invalidAttribute = REQUIRED;
 		} else if(!solrFieldDTO.isFilterable() && solrFieldDTO.isFilterable()) {
 			fieldAttributesValidated = false;
-			invalidAttribute = FILTERED;
+			invalidAttribute = INDEXED;
 		} else if(!solrFieldDTO.isMultiValue() && solrFieldDTO.isMultiValue()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = "multValued";
@@ -87,7 +92,7 @@ public class TableSchemaParser {
 			invalidAttribute = STORED;
 		} else if(!solrFieldDTO.isSortable() && solrFieldDTO.isSortable()) {
 			fieldAttributesValidated = false;
-			invalidAttribute = SORTED;
+			invalidAttribute = DOCVALUES;
 		}
 		if(!fieldAttributesValidated)
 			logger.info("Invalid entry for field attribute: \"{}\"", invalidAttribute);
@@ -107,16 +112,16 @@ public class TableSchemaParser {
 	
 	
 	public static void setFieldsAsPerTheSchema(SchemaFieldDTO solrFieldDTO, Map<String, Object> schemaField) {
-		if(schemaField.containsKey(FILTERED))
-			solrFieldDTO.setFilterable((boolean)schemaField.get(FILTERED));
+		if(schemaField.containsKey(INDEXED))
+			solrFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))
 			solrFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
 		if(schemaField.containsKey(DEFAULT))
 			solrFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
 		if(schemaField.containsKey(REQUIRED))
 			solrFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
-		if(schemaField.containsKey(SORTED))
-			solrFieldDTO.setSortable((boolean)schemaField.get(SORTED));
+		if(schemaField.containsKey(DOCVALUES))
+			solrFieldDTO.setSortable((boolean)schemaField.get(DOCVALUES));
 		if(schemaField.containsKey(STORED))
 			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
 	}
