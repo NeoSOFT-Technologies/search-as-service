@@ -85,16 +85,16 @@ class ManageTableTest {
     
     public void setMockitoSuccessResponseForService() {
         Response responseDTO = new Response();
-        responseDTO.setResponseStatusCode(200);
-        responseDTO.setResponseMessage("Testing");
+        responseDTO.setStatusCode(200);
+        responseDTO.setMessage("Testing");
 
         Response responseDTOisCollectionExists = new Response();
-        responseDTOisCollectionExists.setResponseStatusCode(200);
-        responseDTOisCollectionExists.setResponseMessage("true");
+        responseDTOisCollectionExists.setStatusCode(200);
+        responseDTOisCollectionExists.setMessage("true");
 
         Response getTablesResponseDTO=new Response();
-        getTablesResponseDTO.setResponseStatusCode(200);
-        getTablesResponseDTO.setResponseMessage("Testing");
+        getTablesResponseDTO.setStatusCode(200);
+        getTablesResponseDTO.setMessage("Testing");
         
         TableSchema tableSchemaExpectedResponse = new TableSchema(
         		200, 
@@ -108,8 +108,8 @@ class ManageTableTest {
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
         Response unodDeleteResponseDTO = new Response();
-        unodDeleteResponseDTO.setResponseStatusCode(200);
-        unodDeleteResponseDTO.setResponseMessage("Testing");
+        unodDeleteResponseDTO.setStatusCode(200);
+        unodDeleteResponseDTO.setMessage("Testing");
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
@@ -129,16 +129,16 @@ class ManageTableTest {
 
     public void setMockitoBadResponseForService() {
     	Response responseDTO = new Response();
-        responseDTO.setResponseStatusCode(400);
-        responseDTO.setResponseMessage("Testing");
+        responseDTO.setStatusCode(400);
+        responseDTO.setMessage("Testing");
 
         Response responseDTOisCollectionExists = new Response();
-        responseDTOisCollectionExists.setResponseStatusCode(400);
-        responseDTOisCollectionExists.setResponseMessage("Error!");
+        responseDTOisCollectionExists.setStatusCode(400);
+        responseDTOisCollectionExists.setMessage("Error!");
 
         Response getTablesResponseDTO=new Response();
-        getTablesResponseDTO.setResponseStatusCode(400);
-        getTablesResponseDTO.setResponseMessage("Testing");
+        getTablesResponseDTO.setStatusCode(400);
+        getTablesResponseDTO.setMessage("Testing");
         
         TableSchema tableSchemaExpectedResponse = new TableSchema(
         		400, 
@@ -148,8 +148,8 @@ class ManageTableTest {
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
         Response unodDeleteResponseDTO = new Response();
-        unodDeleteResponseDTO.setResponseStatusCode(400);
-        unodDeleteResponseDTO.setResponseMessage("Error!");
+        unodDeleteResponseDTO.setStatusCode(400);
+        unodDeleteResponseDTO.setMessage("Error!");
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);

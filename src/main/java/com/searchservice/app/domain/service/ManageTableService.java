@@ -116,14 +116,14 @@ public class ManageTableService implements ManageTableServicePort {
 			CollectionAdminResponse response = request.process(solrClientActive);
 
 			getListItemsResponseDTO
-					.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),clientId));
-			getListItemsResponseDTO.setResponseStatusCode(200);
-			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
+					.setData(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),clientId));
+			getListItemsResponseDTO.setStatusCode(200);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
 
 		} catch (Exception e) {
 			logger.error(e.toString());
-			getListItemsResponseDTO.setResponseStatusCode(400);
-			getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
+			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
@@ -186,7 +186,7 @@ public class ManageTableService implements ManageTableServicePort {
 //		}
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
-		if (apiResponseDTO.getResponseStatusCode() == 200) {
+		if (apiResponseDTO.getStatusCode() == 200) {
 			// Add schemaAttributes
 			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(),
 			        DEFAULT_CONFIGSET, manageTableDTO.getColumns());
@@ -214,12 +214,12 @@ public class ManageTableService implements ManageTableServicePort {
 			request.process(solrClientActive);
 			deleteAliasRequest.process(solrClientActive);
 
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage("Table: " + tableName + ", is successfully deleted");
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage("Table: " + tableName + ", is successfully deleted");
 		} catch (Exception e) {
 			logger.error("Exception occurred: ", e);
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Unable to delete table: " + tableName);
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Unable to delete table: " + tableName);
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
@@ -240,13 +240,13 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		// ADD new schema fields to the table
 		TableSchema tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
-		apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
-		apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
-		logger.info("New attributes addition response: {}", apiResponseDTO.getResponseMessage());
+		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
+		apiResponseDTO.setMessage(tableSchemaResponseDTO.getMessage());
+		logger.info("New attributes addition response: {}", apiResponseDTO.getMessage());
 		
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
-		logger.info("Existing attributes update response: {}", apiResponseDTO.getResponseMessage());
+		logger.info("Existing attributes update response: {}", apiResponseDTO.getMessage());
 		
 		return apiResponseDTO;
 	}
@@ -257,7 +257,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public boolean isConfigSetExists(String configSetName) {
 		Response configSets = getConfigSets();
 		if (configSetName != null)
-			return configSets.getItems().contains(configSetName);
+			return configSets.getData().contains(configSetName);
 		else
 			throw new NullPointerOccurredException(404, "Could not fetch any configset, null returned");
 	}
@@ -273,12 +273,12 @@ public class ManageTableService implements ManageTableServicePort {
 			ConfigSetAdminResponse configSetResponse = configSetRequest.process(solrClientActive);
 			NamedList<Object> configResponseObjects = configSetResponse.getResponse();
 			getListItemsResponseDTO
-					.setItems(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
-			getListItemsResponseDTO.setResponseStatusCode(200);
-			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all config sets");
+					.setData(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
+			getListItemsResponseDTO.setStatusCode(200);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all config sets");
 		} catch (Exception e) {
-			getListItemsResponseDTO.setResponseStatusCode(400);
-			getListItemsResponseDTO.setResponseMessage("Configsets could not be retrieved. Error occured");
+			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
 			logger.error("Error caused while retrieving configsets. Exception: ", e);
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
@@ -386,8 +386,8 @@ public class ManageTableService implements ManageTableServicePort {
 			configSetRequest.process(solrClientActive);
 			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} catch (Exception e) {
-			apiResponseDTO.setResponseMessage("ConfigSet could not be created");
-			apiResponseDTO.setResponseStatusCode(400);
+			apiResponseDTO.setMessage("ConfigSet could not be created");
+			apiResponseDTO.setStatusCode(400);
 			logger.error("Error caused while creating ConfigSet. Exception: ", e);
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
@@ -412,8 +412,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Invalid SKU: " + manageTableDTO.getSku());
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
 			return apiResponseDTO;
 		}
 
@@ -425,13 +425,13 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			request.process(solrClientActive);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage("Successfully created table: " + manageTableDTO.getTableName());
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
 			logger.error(e.toString());
-			apiResponseDTO.setResponseStatusCode(400);
+			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO
-					.setResponseMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
+					.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
@@ -607,8 +607,8 @@ public class ManageTableService implements ManageTableServicePort {
 				updatedFields++;
 				logger.info("Field- {} is successfully updated", currField.get("name"));
 			}
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			// Compare required Vs Updated Fields
 			logger.info("Total field updates required in the current schema: {}", totalUpdatesRequired);
 			logger.info("Total fields updated in the current schema: {}", updatedFields);
@@ -618,19 +618,19 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.error(e.toString());
 		} catch (NullPointerException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			logger.error("Null value detected!", e);
 			logger.error(e.toString());
 		} catch (SolrException e) {
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Schema could not be updated");
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error(SOLR_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName());
 			logger.error(e.toString());
 		} catch (SolrSchemaValidationException e) {
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Schema could not be updated");
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error("Error Message: {}", e.getMessage());
 			logger.error(e.toString());
 		} finally {
@@ -650,14 +650,14 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			request.process(solrClientActive);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(
 					"Successfully renamed Solr Collection: " + tableOriginalName + " to " + tableAlias);
 		} catch (Exception e) {
 			logger.error(e.toString());
-			apiResponseDTO.setResponseStatusCode(400);
+			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO
-					.setResponseMessage("Unable to rename Solr Collection: " + tableOriginalName + ". Exception.");
+					.setMessage("Unable to rename Solr Collection: " + tableOriginalName + ". Exception.");
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
@@ -678,8 +678,8 @@ public class ManageTableService implements ManageTableServicePort {
 			configSetRequest.process(solrClientActive);
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
 		} catch (Exception e) {
-			apiResponseDTO.setResponseMessage("ConfigSet could not be deleted");
-			apiResponseDTO.setResponseStatusCode(401);
+			apiResponseDTO.setMessage("ConfigSet could not be deleted");
+			apiResponseDTO.setStatusCode(401);
 			logger.error("Error occured while deleting Config set. Exception: ", e);
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);

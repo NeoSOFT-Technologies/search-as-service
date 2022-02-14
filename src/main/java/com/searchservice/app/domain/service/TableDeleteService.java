@@ -51,18 +51,18 @@ public class TableDeleteService implements TableDeleteServicePort{
 		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
 		      bw.write(newRecord);
 		      logger.debug("Table {} Successfully Initialized for Deletion ",tableName);
-		      deleteRecordInsertionResponse.setResponseStatusCode(200);
-		      deleteRecordInsertionResponse.setResponseMessage("Table:" +tableName+" Successfully Initialized For Deletion ");
+		      deleteRecordInsertionResponse.setStatusCode(200);
+		      deleteRecordInsertionResponse.setMessage("Table:" +tableName+" Successfully Initialized For Deletion ");
 		  }catch(Exception e)
 		  {
 			  logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG ,tableName,e);
-			  deleteRecordInsertionResponse.setResponseStatusCode(400);
-			  deleteRecordInsertionResponse.setResponseMessage("Error While Initializing Deletion For Table: "+tableName);
+			  deleteRecordInsertionResponse.setStatusCode(400);
+			  deleteRecordInsertionResponse.setMessage("Error While Initializing Deletion For Table: "+tableName);
 		  }
 		}else {
 			  logger.debug(TABLE_DELETE_INITIALIZE_ERROR_MSG ,tableName);
-			  deleteRecordInsertionResponse.setResponseStatusCode(400);
-			  deleteRecordInsertionResponse.setResponseMessage("Invalid Client ID or Table Name Provided");
+			  deleteRecordInsertionResponse.setStatusCode(400);
+			  deleteRecordInsertionResponse.setMessage("Invalid Client ID or Table Name Provided");
 		}
 		  return deleteRecordInsertionResponse;
 	}
@@ -116,8 +116,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 		}
 		else {
 			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
-			performUndoDeleteResponse.setResponseStatusCode(400);
-			performUndoDeleteResponse.setResponseMessage(TABLE_DELETE_UNDO_ERROR_MSG);
+			performUndoDeleteResponse.setStatusCode(400);
+			performUndoDeleteResponse.setMessage(TABLE_DELETE_UNDO_ERROR_MSG);
 		}
 		
           return performUndoDeleteResponse;
@@ -174,8 +174,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 		  }
 		  catch(Exception e)
 		  {
-			  undoTableDeletionResponse.setResponseStatusCode(400);
-			  undoTableDeletionResponse.setResponseMessage(e.getLocalizedMessage());
+			  undoTableDeletionResponse.setStatusCode(400);
+			  undoTableDeletionResponse.setMessage(e.getLocalizedMessage());
 		 }
 		  return undoTableDeletionResponse;
 	}
@@ -190,7 +190,7 @@ public class TableDeleteService implements TableDeleteServicePort{
 			}
 		}
 	    Response tableDeleteResponse  = manageTableServicePort.deleteTable(tableName);
-	    if(tableDeleteResponse.getResponseStatusCode() == 200) {
+	    if(tableDeleteResponse.getStatusCode() == 200) {
 	    	logger.debug("Successfully Deleted Table : {}", tableName);
 	    	return true;
 	    }
@@ -205,13 +205,13 @@ public class TableDeleteService implements TableDeleteServicePort{
 		if(undoRecordNumber > 0) {
 			logger.debug("Undo Record Performed Succesfully For Client ID: {} ",clientId);
 			logger.debug("Total Number of Tables Removed From Deletion: {} ",undoRecordNumber);
-			undoDeleteResponseDTO.setResponseStatusCode(200);
-			undoDeleteResponseDTO.setResponseMessage("Undo Deleteion of Table Performed Successfully for Client ID: "+clientId);
+			undoDeleteResponseDTO.setStatusCode(200);
+			undoDeleteResponseDTO.setMessage("Undo Deleteion of Table Performed Successfully for Client ID: "+clientId);
 	        }
 	        else {
 	        	logger.debug("No Records Were Found For Client ID: {} ",clientId);
-	        	undoDeleteResponseDTO.setResponseStatusCode(400);
-				undoDeleteResponseDTO.setResponseMessage("Undo Deleteion Failed No Table Found With Client ID: "+clientId);
+	        	undoDeleteResponseDTO.setStatusCode(400);
+				undoDeleteResponseDTO.setMessage("Undo Deleteion Failed No Table Found With Client ID: "+clientId);
 	        }   
 		return undoDeleteResponseDTO;
 	}
