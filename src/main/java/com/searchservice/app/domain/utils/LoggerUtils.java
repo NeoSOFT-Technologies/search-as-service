@@ -74,7 +74,6 @@ public class LoggerUtils {
 	}
 	public static DateTime utcTime() {
 		DateTime now = new DateTime(); // Gives the default time zone.
-	    DateTime dateTime = now.toDateTime(DateTimeZone.UTC );
-	    return dateTime;
+	    return now.toDateTime(DateTimeZone.UTC );
 	}
 }

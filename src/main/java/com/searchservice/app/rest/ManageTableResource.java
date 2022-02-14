@@ -20,12 +20,9 @@ import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
-
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
-
-import com.searchservice.app.domain.service.TableDeleteService;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 
@@ -45,8 +42,6 @@ public class ManageTableResource {
 	private String username = "Username";
 
 	private ManageTableServicePort manageTableServicePort;
-
-	ManageTableResource manageTableResource;
 
 	private TableDeleteServicePort tableDeleteServicePort;
 
@@ -213,9 +208,6 @@ public class ManageTableResource {
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-
-//		tableName = tableName + "_" + clientid;
-//		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName, loggersDTO);
 
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);

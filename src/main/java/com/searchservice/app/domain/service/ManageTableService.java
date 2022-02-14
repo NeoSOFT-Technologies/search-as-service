@@ -67,6 +67,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
+	private String collection="collections";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 	
 	@Value("${base-solr-url}")
@@ -125,7 +126,7 @@ public class ManageTableService implements ManageTableServicePort {
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         try {
             CollectionAdminResponse response = request.process(solrClient);
-            List<String> allCollections=TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+            List<String> allCollections=TypeCastingUtil.castToListOfStrings(response.getResponse().get(collection));
             if(allCollections.contains(tableName)){
                 apiResponseDTO.setResponseStatusCode(200);
                 apiResponseDTO.setResponseMessage("true");
@@ -199,7 +200,7 @@ public class ManageTableService implements ManageTableServicePort {
         try {
             CollectionAdminResponse response = request.process(solrClient);
 
-            getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
+            getListItemsResponseDTO.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get(collection)));
             getListItemsResponseDTO.setResponseStatusCode(200);
             getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
             
@@ -299,7 +300,7 @@ public class ManageTableService implements ManageTableServicePort {
 			createConfigSet(configSetDTO);
 		}
 		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
-		timestamp = LoggerUtils.utcTime().toString();;
+		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		if(apiResponseDTO.getResponseStatusCode()==200) {
 			// Add schemaAttributes
@@ -456,7 +457,7 @@ public class ManageTableService implements ManageTableServicePort {
         solrClient = new HttpSolrClient.Builder(solrURL).build();
         try {
             CollectionAdminResponse response = request.process(solrClient);
-            List<String> allTables=TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+            List<String> allTables=TypeCastingUtil.castToListOfStrings(response.getResponse().get(collection));
            
             return allTables.contains(tableName);
         } catch (Exception e) {
@@ -789,7 +790,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Map<Object, Object> responseAsMap = response.getResponse().asMap(20);
 		Map<Object, Object> clusterResponse = (Map<Object, Object>) responseAsMap.get("cluster");
-		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get("collections");
+		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get(collection);
 
 		timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
