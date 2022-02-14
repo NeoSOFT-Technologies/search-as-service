@@ -74,19 +74,20 @@ public class ManageTableResource {
 	@GetMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchemaDTOv2> getTable(
-			@PathVariable int clientid, 
+			@PathVariable int clientId, 
 			@PathVariable String tableName) {
-		log.debug("Get table info");
-
-		tableName = tableName + "_" + clientid;
-		
-		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName);
+		log.info("Get table info");
 
 		// GET tableSchema
-		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName, clientId);
 		if (tableInfoResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
+		
+		// testing
+		log.info("schema retrieved..... waiting for tableDetails >>>>>>");
+		
+		// GET tableDetails
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientId);
 		
 		// SET tableDetails in tableInfoResponseDTO
 		tableInfoResponseDTO.setTableDetails(tableDetailsMap);

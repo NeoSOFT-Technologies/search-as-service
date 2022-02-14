@@ -130,17 +130,25 @@ public class ManageTableService implements ManageTableServicePort {
 	
 
 	@Override
-	public TableSchemaDTOv2 getTableSchemaIfPresent(String tableName) {
-		if (!isTableExists(tableName))
+	public TableSchemaDTOv2 getTableSchemaIfPresent(String tableName, int clientId) {
+		if (!isTableExists(tableName + "_" + clientId))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
-		TableSchemaDTO tableSchema = getTableSchema(tableName); 
+		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		TableSchemaDTO currentTableSchema = compareLocalAndCloudSchemaReturnCurrent(tableName, clientId);
+		
+		// testing
+		logger.info("currentSchema after comparison local Vs. cloud >>>>>>> {}", currentTableSchema);
+		
+		TableSchemaDTO tableSchema = getTableSchema(tableName + "_" + clientId); 
 		return new TableSchemaDTOv2(
 				tableSchema);
 	}
 	
 	
 	@Override
-	public Map<Object, Object> getTableDetails(String tableName) {
+	public Map<Object, Object> getTableDetails(String tableName, int clientId) {
+		tableName = tableName + "_" + clientId;
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
@@ -299,6 +307,13 @@ public class ManageTableService implements ManageTableServicePort {
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
+	}
+	
+	
+	@Override
+	public TableSchemaDTO compareLocalAndCloudSchemaReturnCurrent(String tableName, int clientId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
@@ -638,7 +653,6 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 	
 	
-	
 	@Override
 	public ResponseDTO addAliasTable(String tableOriginalName, String tableAlias) {
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
@@ -684,5 +698,8 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		return apiResponseDTO;
 	}
+
+
+
 	 
 }

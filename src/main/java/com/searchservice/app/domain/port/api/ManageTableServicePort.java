@@ -20,8 +20,8 @@ public interface ManageTableServicePort {
 	// GET request
 	GetCapacityPlanDTO capacityPlans();
 	ResponseDTO getTables();
-	TableSchemaDTOv2 getTableSchemaIfPresent(String tableName);
-	Map<Object, Object> getTableDetails(String tableName);
+	TableSchemaDTOv2 getTableSchemaIfPresent(String tableName, int clientId);
+	Map<Object, Object> getTableDetails(String tableName, int clientId);
 
 	// CREATE requests
 	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
@@ -41,6 +41,8 @@ public interface ManageTableServicePort {
     ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
     ResponseDTO createTable(ManageTableDTO manageTableDTO);
     TableSchemaDTO addSchemaAttributes(TableSchemaDTO tableSchemaDTO);
+    // UPDATE
+    TableSchemaDTO compareLocalAndCloudSchemaReturnCurrent(String tableName, int clientId);
     ResponseDTO updateSchemaAttributes(TableSchemaDTO tableSchemaDTO);
     ResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
 	ResponseDTO deleteConfigSet(String configSetName);
