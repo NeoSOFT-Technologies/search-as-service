@@ -19,20 +19,23 @@ import lombok.NoArgsConstructor;
 public class TableSchemav2 implements VersionedObjectMapper {
 
 	public static class TableSchemav2Data {
-        private String schemaName;
+        private String tableName;
         private List<SchemaField> columns;
         private Map<Object, Object> tableDetails;
 
         public TableSchemav2Data() {
         }
 
-        public String getSchemaName() {
-            return schemaName;
+       
+        public String getTableName() {
+            return tableName;
         }
 
-        public void setSchemaName(String schemaName) {
-            this.schemaName = schemaName;
+
+        public void setTableName(String tableName) {
+            this.tableName = tableName;
         }
+
 
         public List<SchemaField> getColumns() {
             return columns;
@@ -56,10 +59,10 @@ public class TableSchemav2 implements VersionedObjectMapper {
 	private TableSchemav2Data data = new TableSchemav2Data();
 
     public TableSchemav2(TableSchema schemaResponseDTO) {
-		this.statusCode=schemaResponseDTO.getStatusCode();
-		this.message=schemaResponseDTO.getMessage();
-		this.data.setSchemaName(schemaResponseDTO.getSchemaName());
-		this.data.setColumns(schemaResponseDTO.getAttributes());
+//		this.statusCode=schemaResponseDTO.getStatusCode();
+//		this.message=schemaResponseDTO.getMessage();
+		this.data.setTableName(schemaResponseDTO.getTableName());
+		this.data.setColumns(schemaResponseDTO.getColumns());
 		this.data.setTableDetails(schemaResponseDTO.getTableDetails());
 	}
 	
@@ -71,23 +74,7 @@ public class TableSchemav2 implements VersionedObjectMapper {
 //		
 //	}
 	
-	public TableSchemav2(TableSchemav2 schemaResponseDTO) {
-		this.statusCode=schemaResponseDTO.getStatusCode();
-		this.message=schemaResponseDTO.getMessage();
-		this.data.setSchemaName(schemaResponseDTO.getData().getSchemaName());
-		this.data.setColumns(schemaResponseDTO.getData().getColumns());	
-	}
 	
-	public TableSchemav2(String schemaName, List<SchemaField> attributes) {
-		this.data.setSchemaName(schemaName);
-		this.data.setColumns(attributes);
-	}
-	
-	public TableSchemav2(String message, String schemaName) {
-		this.message = message;
-		this.data.setSchemaName(schemaName);
-	}
-
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
 		return this;

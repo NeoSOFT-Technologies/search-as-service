@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
@@ -36,6 +34,7 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
+import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
@@ -134,10 +133,9 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
 		if (!isTableExists(tableName))
-			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
-		TableSchema tableSchema = getTableSchema(tableName); 
-		return new TableSchemav2(
-				tableSchema);
+			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
+		TableSchemav2 tableSchema = getTableSchema(tableName); 
+		return  tableSchema;
 	}
 	
 	
@@ -190,7 +188,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// Add schemaAttributes
 			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(),
 			        DEFAULT_CONFIGSET, manageTableDTO.getColumns());
-			TableSchema tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 		}
 		return apiResponseDTO;
@@ -200,7 +198,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response deleteTable(String tableName) {
 		if (!isTableExists(tableName))
-			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName));
+			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 
 		// Delete table
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
@@ -239,7 +237,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response apiResponseDTO = new Response();
 		
 		// ADD new schema fields to the table
-		TableSchema tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+		Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
 		apiResponseDTO.setMessage(tableSchemaResponseDTO.getMessage());
 		logger.info("New attributes addition response: {}", apiResponseDTO.getMessage());
@@ -305,14 +303,14 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	@Override
-	public TableSchema getTableSchema(String tableName) {
+	public TableSchemav2 getTableSchema(String tableName) {
 		logger.info("Getting table schema");
 
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 
-		TableSchema tableSchemaResponseDTO = new TableSchema();
-
+		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
+		TableSchemav2Data data= new TableSchemav2Data();
 		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
@@ -347,9 +345,9 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
 
 			// prepare response dto
-			tableSchemaResponseDTO.setSchemaName(schemaName);
-			tableSchemaResponseDTO.setTableName(tableName);
-			tableSchemaResponseDTO.setAttributes(solrSchemaFieldDTOs);
+			data.setTableName(tableName.split("_")[0]);
+			data.setColumns(solrSchemaFieldDTOs);
+			tableSchemaResponseDTO.setData(data);
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
 		} catch (SolrServerException | IOException e) {
@@ -440,12 +438,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	@Override
-	public TableSchema addSchemaAttributes(TableSchema newTableSchemaDTO) {
+	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
 		logger.info("Add schema attributes");
 
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
-		TableSchema tableSchemaResponseDTO = new TableSchema();
+		Response tableSchemaResponseDTO = new Response();
 
 		String schemaName = "";
 		String errorCausingField = null;
@@ -460,7 +458,7 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			
 			// Add new fields present in the Target Schema to the given collection/table schema
-			List<SchemaField> newAttributes = newTableSchemaDTO.getAttributes();
+			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
 			HashMap<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
@@ -537,7 +535,8 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.error(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
+			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
+			
 			logger.error(SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} finally {
@@ -557,8 +556,8 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		Response apiResponseDTO = new Response();
 
-		TableSchema schemaResponseDTOBefore = new TableSchema();
-		TableSchema schemaResponseDTOAfter = new TableSchema();
+		Response schemaResponseDTOBefore = new Response();
+		Response schemaResponseDTOAfter = new Response();
 
 		String errorCausingField = null;
 		String payloadOperation = "";
@@ -573,7 +572,7 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.info("Total number of fields: {}", numOfFields);
 
 			// Get all fields from incoming(from req Body) schemaDTO
-			List<SchemaField> newSchemaFields = newTableSchemaDTO.getAttributes();
+			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 			
