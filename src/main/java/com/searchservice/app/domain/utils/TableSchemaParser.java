@@ -26,52 +26,59 @@ public class TableSchemaParser {
 	
 	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
-		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		SchemaFieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
-		Map<String, Object> fieldDtoMap = new HashMap<>();
-		for(SchemaFieldDTO fieldDto: schemaFields) {
-			logger.debug("Validate SolrFieldDTO before parsing it");
+		for(SchemaFieldDTO fieldDto: tableSchemaDTO.getAttributes()) {
+			logger.info("Validate SolrFieldDTO before parsing it");
+			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
+				logger.info("{} field couldn't be validated", fieldDto);
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
-				return schemaFieldsList;
+				return schemaFieldsListOfMap;
 			}
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+
+			schemaFieldsListOfMap.add(fieldDtoMap);
+
 			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
 			fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
-			schemaFieldsList.add(fieldDtoMap);
+			schemaFieldsListOfMap.add(fieldDtoMap);
 		}
-		return schemaFieldsList;
+		return schemaFieldsListOfMap;
 	}
 	
 	
 	public static boolean validateSchemaField(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field: {}", solrFieldDTO);
+		logger.info("Validate schema field: {}", solrFieldDTO);
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
 		String fieldType = solrFieldDTO.getType();
 		
+		// If DOCVALUES == TRUE(=> SORTABLE == TRUE), then MULTIVALUED = FALSE
+		if(solrFieldDTO.isSortable())
+			solrFieldDTO.setMultiValue(false);
+		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
-			logger.debug("Invalid schema field name received: {}", fieldName);
+			logger.info("Invalid schema field name received: {}", fieldName);
 		} else if(fieldType == null) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field type received: {}", fieldType);
+			logger.info("Invalid/Empty schema field type received: {}", fieldType);
 		} else if(!validateSchemaFieldBooleanAttributes(solrFieldDTO)) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field boolean attributes received");
+			logger.info("Invalid/Empty schema field boolean attributes received");
 		}
 		return fieldValidated;
 	}
 	
 	
 	public static boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field boolean attributes: {}", solrFieldDTO);
+		logger.info("Validate schema field boolean attributes: {}", solrFieldDTO);
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
@@ -92,8 +99,8 @@ public class TableSchemaParser {
 			invalidAttribute = DOCVALUES;
 		}
 		if(!fieldAttributesValidated)
-			logger.debug("Invalid entry for field attribute: \"{}\"", invalidAttribute);
-		logger.debug("All Schema field boolean attributes are valid");
+			logger.info("Invalid entry for field attribute: \"{}\"", invalidAttribute);
+		logger.info("All Schema field boolean attributes are valid");
 		return fieldAttributesValidated;
 	}
 	

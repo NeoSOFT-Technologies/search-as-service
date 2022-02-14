@@ -26,6 +26,7 @@ import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -90,20 +91,19 @@ class ManageTableTest {
         ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
         responseDTOisCollectionExists.setResponseStatusCode(200);
         responseDTOisCollectionExists.setResponseMessage("true");
-//        
-//        TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
-//        		tableName, schemaName, attributes);
 
         ResponseDTO getTablesResponseDTO=new ResponseDTO();
         getTablesResponseDTO.setResponseStatusCode(200);
         getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
+        TableSchemaDTO tableSchemaExpectedResponse = new TableSchemaDTO(
         		200, 
         		"Schema couldn't be fetched. Error!", 
         		"", 
         		"", 
+        		null, 
         		null);
+        TableSchemaDTOv2 tableSchemaResponseDTO = new TableSchemaDTOv2(tableSchemaExpectedResponse);
         
         GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
         
@@ -119,7 +119,7 @@ class ManageTableTest {
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
-        Map finalResponseMap= new HashMap();
+        Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Random message","Data is returned");
         Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
@@ -140,9 +140,10 @@ class ManageTableTest {
         getTablesResponseDTO.setResponseStatusCode(400);
         getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
+        TableSchemaDTO tableSchemaExpectedResponse = new TableSchemaDTO(
         		400, 
         		"Retrieved table schema");
+        TableSchemaDTOv2 tableSchemaResponseDTO = new TableSchemaDTOv2(tableSchemaExpectedResponse);
         
         GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
         
@@ -158,7 +159,7 @@ class ManageTableTest {
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
-        Map finalResponseMap= new HashMap();
+        Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Error","Error connecting to cluster.");
         Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
@@ -277,38 +278,21 @@ class ManageTableTest {
         .andExpect(status().isOk());
 
     }
-
-
-    @Test
-    void testGetTableDetails() throws Exception {
-
-        setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" +"/details/testTable" )
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table"+"/details/testTable")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-    }
     
     
 	@Test
-	void testGetSchema() throws Exception {
+	void testGetTableInfo() throws Exception {
 		setMockitoSuccessResponseForService();;
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
-		//.andExpect(content().json(expectedGetResponse))
 		.andExpect(status().isOk());
 		
 		setMockitoBadResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isBadRequest());
 	}

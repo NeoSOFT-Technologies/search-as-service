@@ -4,9 +4,9 @@ public class SchemaFieldType {
 
 	public static final String Boolean = "boolean";
 
-	public static String fromObject(String fieldType) {
+	public static String fromStandardDataTypeToSolrFieldType(String dataType) {
 
-		switch (fieldType) {
+		switch (dataType) {
 		case Boolean:
 			return Boolean;
 		case "Boolean":
@@ -40,7 +40,7 @@ public class SchemaFieldType {
 		}
 	}
 
-	public static String toSchemaFieldType(String fieldType) {
+	public static String fromSolrFieldTypeToStandardDataType(String fieldType) {
 		switch (fieldType) {
 		case Boolean:
 			return Boolean;
