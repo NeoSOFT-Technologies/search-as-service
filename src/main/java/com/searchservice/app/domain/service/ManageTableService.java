@@ -1,7 +1,12 @@
 package com.searchservice.app.domain.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +249,10 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
+		
+		if(apiResponseDTO.getResponseStatusCode() == 200) {
+		   checkForSchemaDeletion(tableName, tableSchemaDTO.getAttributes());
+		}
 		logger.info("Existing attributes update response: {}", apiResponseDTO.getResponseMessage());
 		
 		return apiResponseDTO;
@@ -683,6 +692,31 @@ public class ManageTableService implements ManageTableServicePort {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return apiResponseDTO;
+	}
+	
+	public void checkForSchemaDeletion(String tableName,List<SchemaFieldDTO> newSchemaDTO) {
+		int clientId = Integer.parseInt(tableName.substring(tableName.lastIndexOf("_")+1));
+		List<SchemaFieldDTO> existingSchemaAttributes = getTableSchemaIfPresent(tableName).getAttributes();
+		for(SchemaFieldDTO existingSchema : existingSchemaAttributes) {
+			if(!newSchemaDTO.contains(existingSchema)) {
+				initializeSchemaDeletion(clientId, tableName , existingSchema.getName());
+			}
+     	}
+			
+	}
+	
+	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+		  File file=new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		  try(FileWriter fw = new FileWriter(file, true);
+				   BufferedWriter bw = new BufferedWriter(fw)) {
+			  String newRecord = String.format("%d %18s %20s %25s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()),columnName);
+		      bw.write(newRecord);
+		      bw.newLine();
+		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
+		  } catch (IOException e) {
+			logger.error("Error While Intializing Deletion for Schema :{} ",columnName);
+		}
 	}
 	 
 }
