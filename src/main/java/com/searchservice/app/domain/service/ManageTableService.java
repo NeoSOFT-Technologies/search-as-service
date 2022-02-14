@@ -100,13 +100,8 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public GetCapacityPlanDTO capacityPlans(LoggersDTO loggersDTO) {
 		logger.debug("capacity Plans");
-		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
@@ -155,11 +150,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.debug("Get Table Schema If Present");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		if(isTableExists(tableName)) {
@@ -179,13 +170,9 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public ResponseDTO getTables(LoggersDTO loggersDTO) {
 		logger.debug("get Tables");
-		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		String timestamp;
+		requestMethod(loggersDTO,nameofCurrMethod);
 		
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
@@ -217,6 +204,15 @@ public class ManageTableService implements ManageTableServicePort {
         }
         return getListItemsResponseDTO;
 
+	}
+
+	private void requestMethod(LoggersDTO loggersDTO,String nameofCurrMethod) {
+		
+		String timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
 	}
 
 	@Override
@@ -277,12 +273,9 @@ public class ManageTableService implements ManageTableServicePort {
 	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO,LoggersDTO loggersDTO) {	
 		logger.debug("create Table If Not Present");
 
+		String timestamp;
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
@@ -349,12 +342,9 @@ public class ManageTableService implements ManageTableServicePort {
 	public ResponseDTO deleteTable(String tableName,LoggersDTO loggersDTO) {
 		logger.debug("delete Table");
 
+		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		if(!isTableExists(tableName))
@@ -397,12 +387,9 @@ public class ManageTableService implements ManageTableServicePort {
 	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO,LoggersDTO loggersDTO) {
 		logger.debug("update Table Schema");
 
+		String timestamp;
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 
 		timestamp=LoggerUtils.utcTime().toString();
@@ -763,13 +750,9 @@ public class ManageTableService implements ManageTableServicePort {
 	public Map<Object, Object> getTableDetails(String tableName,LoggersDTO loggersDTO) {
 		
 		logger.debug("get Table Details");
-
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
+		String timestamp;
+		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
         solrClient = solrAPIAdapter.getSolrClient(solrURL);
@@ -788,15 +771,15 @@ public class ManageTableService implements ManageTableServicePort {
 			return finalResponseMap;
 		}
 
-		Map<Object, Object> responseAsMap = response.getResponse().asMap(20);
-		Map<Object, Object> clusterResponse = (Map<Object, Object>) responseAsMap.get("cluster");
-		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get(collection);
+		Map<?, ?> responseAsMap = response.getResponse().asMap(20);
+		Map<?, ?> clusterResponse = (Map<?, ?>) responseAsMap.get("cluster");
+		Map<?, ?> collections = (Map<?, ?>) clusterResponse.get(collection);
 
 		timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
         
         if(collections.containsKey(tableName)){
-            finalResponseMap=(Map<Object, Object>) collections.get(tableName);
+            finalResponseMap= (Map<Object, Object>) collections.get(tableName);
 
 			LoggerUtils.printlogger(loggersDTO,false,false);
 			return finalResponseMap;

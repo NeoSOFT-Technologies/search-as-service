@@ -96,21 +96,21 @@ class TableDeletionTest{
 		
 		//Checking for Valid Client ID
 		setMockitoSuccessTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1).getResponseStatusCode());
+		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1,new LoggersDTO()).getResponseStatusCode());
 		
 		//Checking For Invalid Client ID as 0
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0).getResponseStatusCode());
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0,new LoggersDTO()).getResponseStatusCode());
 		
 		//Checking For Invalid Client ID as -100
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100).getResponseStatusCode());
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100,new LoggersDTO()).getResponseStatusCode());
 
 	}
 	

@@ -123,7 +123,7 @@ class ManageTableTest {
         finalResponseMap.put("Random message","Data is returned");
 
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 
@@ -164,7 +164,7 @@ class ManageTableTest {
         finalResponseMap.put("Error","Error connecting to cluster.");
 
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
     }

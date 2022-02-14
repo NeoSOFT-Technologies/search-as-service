@@ -64,11 +64,7 @@ public class ManageTableResource {
 
 		GetCapacityPlanDTO getCapacityPlanDTO = manageTableServicePort.capacityPlans(loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 
 		LoggerUtils.printlogger(loggersDTO, false, false);
 		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
@@ -88,11 +84,8 @@ public class ManageTableResource {
 
 		ResponseDTO getListItemsResponseDTO = manageTableServicePort.getTables(loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
+		
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
@@ -102,6 +95,15 @@ public class ManageTableResource {
 			LoggerUtils.printlogger(loggersDTO, false, true);
 			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
 		}
+	}
+
+	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
+		String timestamp;
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 	}
 
 	@GetMapping("/details/{tableName}")
@@ -119,11 +121,7 @@ public class ManageTableResource {
 
 		Map<?, ?> responseMap = manageTableServicePort.getTableDetails(tableName, loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 		if (!responseMap.containsKey("Error")) {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(responseMap);
@@ -149,11 +147,7 @@ public class ManageTableResource {
 		tableName = tableName + "_" + clientid;
 		TableSchemaDTO tableSchemaResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName, loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 		if (tableSchemaResponseDTO == null)
 			throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
 		if (tableSchemaResponseDTO.getStatusCode() == 200) {
@@ -181,11 +175,7 @@ public class ManageTableResource {
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
 		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
 			LoggerUtils.printlogger(loggersDTO, false, false);
@@ -209,11 +199,7 @@ public class ManageTableResource {
 		
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 
 		tableName = tableName + "_" + clientid;
 		if (tableDeleteServicePort.checkTableExistensce(tableName)) {
@@ -246,11 +232,7 @@ public class ManageTableResource {
 
 		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId,loggersDTO);
 		
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 		
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -278,11 +260,7 @@ public class ManageTableResource {
 		newTableSchemaDTO.setTableName(tableName);
 		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO, loggersDTO);
 
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+		successMethod(nameofCurrMethod, loggersDTO);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			LoggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
