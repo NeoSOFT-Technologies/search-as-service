@@ -21,12 +21,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
+import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -40,9 +40,9 @@ class ManageTableTest {
     private int clientId = 101;
 
 	String schemaName = "default-config";
-	SchemaFieldDTO solr = new SchemaFieldDTO("testField6","string", "mydefault", true, true, false, true, true);
+	SchemaField solr = new SchemaField("testField6","string", "mydefault", true, true, false, true, true);
 	//SchemaFieldDTO[] attributes = { solr };
-	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
+	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
@@ -84,30 +84,30 @@ class ManageTableTest {
     private TableDeleteService tableDeleteService;
     
     public void setMockitoSuccessResponseForService() {
-        ResponseDTO responseDTO = new ResponseDTO();
+        Response responseDTO = new Response();
         responseDTO.setResponseStatusCode(200);
         responseDTO.setResponseMessage("Testing");
 
-        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
+        Response responseDTOisCollectionExists = new Response();
         responseDTOisCollectionExists.setResponseStatusCode(200);
         responseDTOisCollectionExists.setResponseMessage("true");
 
-        ResponseDTO getTablesResponseDTO=new ResponseDTO();
+        Response getTablesResponseDTO=new Response();
         getTablesResponseDTO.setResponseStatusCode(200);
         getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaDTO tableSchemaExpectedResponse = new TableSchemaDTO(
+        TableSchema tableSchemaExpectedResponse = new TableSchema(
         		200, 
         		"Schema couldn't be fetched. Error!", 
         		"", 
         		"", 
         		null, 
         		null);
-        TableSchemaDTOv2 tableSchemaResponseDTO = new TableSchemaDTOv2(tableSchemaExpectedResponse);
+        TableSchemav2 tableSchemaResponseDTO = new TableSchemav2(tableSchemaExpectedResponse);
         
-        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
+        GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
-        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
+        Response unodDeleteResponseDTO = new Response();
         unodDeleteResponseDTO.setResponseStatusCode(200);
         unodDeleteResponseDTO.setResponseMessage("Testing");
 
@@ -115,7 +115,7 @@ class ManageTableTest {
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
+//        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
@@ -128,26 +128,26 @@ class ManageTableTest {
     }
 
     public void setMockitoBadResponseForService() {
-    	ResponseDTO responseDTO = new ResponseDTO();
+    	Response responseDTO = new Response();
         responseDTO.setResponseStatusCode(400);
         responseDTO.setResponseMessage("Testing");
 
-        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
+        Response responseDTOisCollectionExists = new Response();
         responseDTOisCollectionExists.setResponseStatusCode(400);
         responseDTOisCollectionExists.setResponseMessage("Error!");
 
-        ResponseDTO getTablesResponseDTO=new ResponseDTO();
+        Response getTablesResponseDTO=new Response();
         getTablesResponseDTO.setResponseStatusCode(400);
         getTablesResponseDTO.setResponseMessage("Testing");
         
-        TableSchemaDTO tableSchemaExpectedResponse = new TableSchemaDTO(
+        TableSchema tableSchemaExpectedResponse = new TableSchema(
         		400, 
         		"Retrieved table schema");
-        TableSchemaDTOv2 tableSchemaResponseDTO = new TableSchemaDTOv2(tableSchemaExpectedResponse);
+        TableSchemav2 tableSchemaResponseDTO = new TableSchemav2(tableSchemaExpectedResponse);
         
-        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
+        GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
-        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
+        Response unodDeleteResponseDTO = new Response();
         unodDeleteResponseDTO.setResponseStatusCode(400);
         unodDeleteResponseDTO.setResponseMessage("Error!");
 
@@ -155,7 +155,7 @@ class ManageTableTest {
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
+//        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
@@ -170,7 +170,7 @@ class ManageTableTest {
     @Test
     void testCreateTable() throws Exception {
 
-        ManageTableDTO createTableDTO =new ManageTableDTO(
+        ManageTable createTableDTO =new ManageTable(
         		tableName, 
         		"B", 
         		"default-schema", 
@@ -192,7 +192,7 @@ class ManageTableTest {
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
-        ResponseDTO deleteTableDTO=new ResponseDTO();
+        Response deleteTableDTO=new Response();
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
@@ -206,7 +206,7 @@ class ManageTableTest {
     void testDeleteTable() throws Exception {
 
         //DELETE A NON EXISTING COLLECTION
-        ResponseDTO deleteTableResponseDTO=new ResponseDTO();
+        Response deleteTableResponseDTO=new Response();
 
         setMockitoBadResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
@@ -237,7 +237,7 @@ class ManageTableTest {
 
 		// Update Schema
 		setMockitoSuccessResponseForService();
-		TableSchemaDTO schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		TableSchema schemaDTO = new TableSchema(tableName, schemaName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -245,7 +245,7 @@ class ManageTableTest {
 		
 		// Update Schema for non-existing table
 		setMockitoBadResponseForService();
-		schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		schemaDTO = new TableSchema(tableName, schemaName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))

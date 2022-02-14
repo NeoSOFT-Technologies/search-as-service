@@ -2,7 +2,7 @@ package com.searchservice.app.domain.dto.document;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -17,22 +17,22 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DocumentDTO implements VersionedObjectMapper {
+public class Document implements VersionedObjectMapper {
 
 	String tableName;
 	String name;
-	SchemaFieldDTO[] attributes;
+	SchemaField[] attributes;
 	int statusCode;
 
 
-	public DocumentDTO(DocumentDTO documentDTO) {
+	public Document(Document documentDTO) {
 		this.tableName = documentDTO.getTableName();
 		this.name = documentDTO.getName();
 		this.attributes= documentDTO.getAttributes();
 		this.statusCode = documentDTO.getStatusCode();
 	}
 	
-	public DocumentDTO(String tableName, String name, SchemaFieldDTO[] attributes) {
+	public Document(String tableName, String name, SchemaField[] attributes) {
 		this.tableName = tableName;
 		this.name = name;
 		this.attributes = attributes;

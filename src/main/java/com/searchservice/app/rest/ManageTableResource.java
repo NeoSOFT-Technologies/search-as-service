@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
+import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -47,19 +47,19 @@ public class ManageTableResource {
 
 	@GetMapping("/capacity-plans")
     @Operation(summary = "/get-capacity-plans")
-    public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
+    public ResponseEntity<GetCapacityPlan> capacityPlans() {
         log.debug("Get capacity plans");
-        GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
+        GetCapacityPlan getCapacityPlanDTO=manageTableServicePort.capacityPlans();
         return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
     }
 	
 	
-    @GetMapping
+    @GetMapping("/{clientId}")
     @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseDTO> getTables() {
+    public ResponseEntity<Response> getTables(@PathVariable int clientId) {
         log.debug("Get all tables");
 
-       ResponseDTO getListItemsResponseDTO=manageTableServicePort.getTables();
+       Response getListItemsResponseDTO=manageTableServicePort.getTables(clientId);
         
         if(getListItemsResponseDTO == null)
         	throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
@@ -71,20 +71,20 @@ public class ManageTableResource {
     }
     
     
-	@GetMapping("/{clientid}/{tableName}")
+	@GetMapping("/{clientId}/{tableName}")
 	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<TableSchemaDTOv2> getTable(
-			@PathVariable int clientid, 
+	public ResponseEntity<TableSchemav2> getTable(
+			@PathVariable int clientId, 
 			@PathVariable String tableName) {
 		log.debug("Get table info");
 
-		tableName = tableName + "_" + clientid;
+		tableName = tableName + "_" + clientId;
 		
 		// GET tableDetails
 		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName);
 
 		// GET tableSchema
-		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+		TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
 		if (tableInfoResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		
@@ -99,16 +99,16 @@ public class ManageTableResource {
 	}
 
 
-	@PostMapping("/{clientid}")
+	@PostMapping("/{clientId}")
 	@Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ResponseDTO> createTable(
-			@PathVariable int clientid,
-			@RequestBody ManageTableDTO manageTableDTO) {
+	public ResponseEntity<Response> createTable(
+			@PathVariable int clientId,
+			@RequestBody ManageTable manageTableDTO) {
 		log.debug("Create table");
-		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientid);
-		ResponseDTO apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
+		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);
+		Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			apiResponseDTO.setResponseMessage("Table- " + manageTableDTO.getTableName() + ", is created successfully");
+			apiResponseDTO.setResponseMessage("Table- " + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
 			log.info("Table could not be created: {}", apiResponseDTO);
@@ -117,15 +117,15 @@ public class ManageTableResource {
 	}
 
 	
-	@DeleteMapping("/{clientid}/{tableName}")
+	@DeleteMapping("/{clientId}/{tableName}")
 	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ResponseDTO> deleteTable(
+	public ResponseEntity<Response> deleteTable(
 			@PathVariable String tableName, 
-			@PathVariable int clientid) {
+			@PathVariable int clientId) {
 		log.debug("Delete table");
-		tableName = tableName + "_" + clientid;
+		tableName = tableName + "_" + clientId;
 		if(tableDeleteServicePort.checkTableExistensce(tableName)) {
-		    ResponseDTO apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
+		    Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientId, tableName);
 		    if (apiResponseDTO.getResponseStatusCode() == 200) {
 			 return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		   } else {
@@ -133,17 +133,17 @@ public class ManageTableResource {
 			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 		   }
 		}else {
-			throw new BadRequestOccurredException(400, "Table "+tableName+" For Client ID "+clientid+" Does Not Exist");
+			throw new BadRequestOccurredException(400, "Table "+tableName+" For Client ID "+clientId+" Does Not Exist");
 		}
 	}
 	
 	
 	@PutMapping("/{clientId}")
 	@Operation(summary = "/undo-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ResponseDTO> undoTable(@PathVariable int clientId)
+	public ResponseEntity<Response> undoTable(@PathVariable int clientId)
 	{	
 		log.debug("Undo Table Delete");
-		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
+		Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
 		if(apiResponseDTO.getResponseStatusCode() ==200)
 		{
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -156,18 +156,18 @@ public class ManageTableResource {
 	}
 	
 
-	@PutMapping("/{clientid}/{tableName}")
+	@PutMapping("/{clientId}/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ResponseDTO> updateTableSchema(
+	public ResponseEntity<Response> updateTableSchema(
 			@PathVariable String tableName, 
-			@PathVariable int clientid,
-			@RequestBody TableSchemaDTO newTableSchemaDTO) {
-		tableName = tableName + "_" + clientid;
+			@PathVariable int clientId,
+			@RequestBody TableSchema newTableSchemaDTO) {
+		tableName = tableName + "_" + clientId;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
 		newTableSchemaDTO.setTableName(tableName);
-		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+		Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
 	
 		if (apiResponseDTO.getResponseStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);

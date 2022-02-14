@@ -3,12 +3,13 @@ package com.searchservice.app.domain.port.api;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.ConfigSetDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
+
+import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.table.ConfigSet;
+import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.dto.table.TableSchemav2;
 
 
 @Component
@@ -18,30 +19,30 @@ public interface ManageTableServicePort {
 	 * CRUD operations for managing tables
 	 */
 	// GET request
-	GetCapacityPlanDTO capacityPlans();
-	ResponseDTO getTables();
-	TableSchemaDTOv2 getTableSchemaIfPresent(String tableName);
+	GetCapacityPlan capacityPlans();
+	Response getTables(int clientid);
+	TableSchemav2 getTableSchemaIfPresent(String tableName);
 	Map<Object, Object> getTableDetails(String tableName);
 
 	// CREATE requests
-	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
+	Response createTableIfNotPresent(ManageTable manageTableDTO);
 	// DELETE requests
-	ResponseDTO deleteTable(String tableName);
+	Response deleteTable(String tableName);
 	// UPDATE requests
-	ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO);
+	Response updateTableSchema(String tableName, TableSchema tableSchemaDTO);
     
     
     /*
      * Auxiliary TableServices
      */
     boolean isConfigSetExists(String configSetName);
-    ResponseDTO getConfigSets();
+    Response getConfigSets();
     boolean isTableExists(String tableName);
-    TableSchemaDTO getTableSchema(String tableName);
-    ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
-    ResponseDTO createTable(ManageTableDTO manageTableDTO);
-    TableSchemaDTO addSchemaAttributes(TableSchemaDTO tableSchemaDTO);
-    ResponseDTO updateSchemaAttributes(TableSchemaDTO tableSchemaDTO);
-    ResponseDTO addAliasTable(String tableOriginalName, String tableAlias);
-	ResponseDTO deleteConfigSet(String configSetName);
+    TableSchema getTableSchema(String tableName);
+    Response createConfigSet(ConfigSet configSetDTO);
+    Response createTable(ManageTable manageTableDTO);
+    TableSchema addSchemaAttributes(TableSchema tableSchemaDTO);
+    Response updateSchemaAttributes(TableSchema tableSchemaDTO);
+    Response addAliasTable(String tableOriginalName, String tableAlias);
+	Response deleteConfigSet(String configSetName);
 }

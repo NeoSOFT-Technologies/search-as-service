@@ -13,23 +13,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseDTO implements VersionedObjectMapper {
+public class Response implements VersionedObjectMapper {
 
     private int responseStatusCode;
     private String name;
     private String responseMessage;
     private List<String> items;
 
-    public ResponseDTO(String name) {
+    public Response(String name) {
         this.name = name;
     }
     
-    public ResponseDTO(int responseStatusCode, String responseMessage) {
+    public Response(int responseStatusCode, String responseMessage) {
     	this.responseStatusCode = responseStatusCode;
     	this.responseMessage = responseMessage;
     }
 
-	public ResponseDTO(int statusCode, String name, String message) {
+	public Response(int statusCode, String name, String message) {
 		this.responseStatusCode = statusCode;
 		this.name = name;
 		this.responseMessage = message;

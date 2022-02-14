@@ -16,15 +16,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TableSchemaDTOv2 implements VersionedObjectMapper {
+public class TableSchemav2 implements VersionedObjectMapper {
 
 	private int statusCode;
 	private String message;
 	private String schemaName;
-	private List<SchemaFieldDTO> attributes;
+	private List<SchemaField> attributes;
 	private Map<Object, Object> tableDetails;
 	
-	public TableSchemaDTOv2(TableSchemaDTO schemaResponseDTO) {
+	public TableSchemav2(TableSchema schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();
 		this.message=schemaResponseDTO.getMessage();
 		this.schemaName=schemaResponseDTO.getSchemaName();
@@ -40,19 +40,19 @@ public class TableSchemaDTOv2 implements VersionedObjectMapper {
 //		
 //	}
 	
-	public TableSchemaDTOv2(TableSchemaDTOv2 schemaResponseDTO) {
+	public TableSchemav2(TableSchemav2 schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();
 		this.message=schemaResponseDTO.getMessage();
 		this.schemaName=schemaResponseDTO.getSchemaName();
 		this.attributes=schemaResponseDTO.getAttributes();	
 	}
 	
-	public TableSchemaDTOv2(String schemaName, List<SchemaFieldDTO> attributes) {
+	public TableSchemav2(String schemaName, List<SchemaField> attributes) {
 		this.schemaName = schemaName;
 		this.attributes = attributes;
 	}
 	
-	public TableSchemaDTOv2(String message, String schemaName) {
+	public TableSchemav2(String message, String schemaName) {
 		this.message = message;
 		this.schemaName = schemaName;
 	}

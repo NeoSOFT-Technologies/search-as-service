@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -27,31 +27,31 @@ class TableDeletionTest{
 	@InjectMocks
 	private TableDeleteService tableDeleteService;
 	
-	private ResponseDTO tableDeleteIntializeResponseDTO;
-	private ResponseDTO tableDeleteUndoResponseDTO;
+	private Response tableDeleteIntializeResponseDTO;
+	private Response tableDeleteUndoResponseDTO;
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private void setMockitoSuccessTableDeleteInitialize() {
-		tableDeleteIntializeResponseDTO = new ResponseDTO();
+		tableDeleteIntializeResponseDTO = new Response();
 		tableDeleteIntializeResponseDTO.setResponseStatusCode(200);
 		tableDeleteIntializeResponseDTO.setResponseMessage(" Successfully Initialized Table For Deletion" );
 	}
 	
 	private void setMockitoFailedTableDeleteInitialize() {
-		tableDeleteIntializeResponseDTO = new ResponseDTO();
+		tableDeleteIntializeResponseDTO = new Response();
 		tableDeleteIntializeResponseDTO.setResponseStatusCode(400);
 		tableDeleteIntializeResponseDTO.setResponseMessage(" Failure While Initializing Table For Deletion" );
 	}
 	
 	private void setMockitoFailedTableDeleteUndo() {
-		tableDeleteUndoResponseDTO = new ResponseDTO();
+		tableDeleteUndoResponseDTO = new Response();
 		tableDeleteUndoResponseDTO.setResponseStatusCode(400);
 		tableDeleteUndoResponseDTO.setResponseMessage("Failure While Performing Undo For Table Deletion" );
 	}
 	
 	private void setMockitoSuccessTableDeleteUndo() {
-		tableDeleteUndoResponseDTO = new ResponseDTO();
+		tableDeleteUndoResponseDTO = new Response();
 		tableDeleteUndoResponseDTO.setResponseStatusCode(200);
 		tableDeleteUndoResponseDTO.setResponseMessage("Successfully Performed Undo For Table Deletion" );
 	}

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 
@@ -18,7 +18,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private String baseSolrUrl;
 
 	
-	private void extracted(ThrottlerResponseDTO responseDTO,
+	private void extracted(ThrottlerResponse responseDTO,
 			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
 			responseDTO.setResponseMessage("Successfully Added!");
@@ -39,9 +39,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocuments(String tableName, String payload) {
+	public ThrottlerResponse addDocuments(String tableName, String payload) {
 
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
@@ -56,8 +56,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocument(String tableName, String payload) {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+	public ThrottlerResponse addDocument(String tableName, String payload) {
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT

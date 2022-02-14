@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConfigSetDTO implements VersionedObjectMapper {
+public class ConfigSet implements VersionedObjectMapper {
 	String baseConfigSetName;
 	String configSetName;
 	
