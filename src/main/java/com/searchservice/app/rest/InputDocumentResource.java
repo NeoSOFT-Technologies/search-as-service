@@ -60,23 +60,9 @@ public class InputDocumentResource {
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         tableName = tableName+"_"+clientid;
         
-      //Checking Whether the Table Exist Or Not , If Not this block will not be processed
         if(manageTableServicePort.isTableExists(tableName)) {
-        Instant start = Instant.now();
-        ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
-        Instant end = Instant.now();
-        Duration timeElapsed = Duration.between(start, end);
-        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
-        log.info(result);
-
-        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
-        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+        	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse);
       
-        if(documentInjectionThrottlerResponse.getStatusCode()==200){
-            return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
-        }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
-        }
         }
         else {
         	 return documentInjectWithInvalidTableName(tableName,clientid);
@@ -106,21 +92,8 @@ public class InputDocumentResource {
 		
 		//Checking Whether the Table Exist Or Not , If Not this block will not be processed
 		if(manageTableServicePort.isTableExists(tableName)) {
-		Instant start = Instant.now();
-		ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload);
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
-		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
-		log.info(result);
-
-		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
-		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
-
-		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
-		}}
+			return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse);
+		}
 		else {
               return documentInjectWithInvalidTableName(tableName,clientid);
         }
@@ -151,6 +124,24 @@ public class InputDocumentResource {
 		documentInjectionThrottlerResponse.setStatusCode(400);
     	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+	}
+	
+	public ResponseEntity<ThrottlerResponseDTO> performDocumentInjection(String tableName,String payload,ThrottlerResponseDTO documentInjectionThrottlerResponse){
+		   Instant start = Instant.now();
+	        ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
+	        Instant end = Instant.now();
+	        Duration timeElapsed = Duration.between(start, end);
+	        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
+	        log.info(result);
+
+	        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+	        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+	      
+	        if(documentInjectionThrottlerResponse.getStatusCode()==200){
+	            return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
+	        }else{
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+	        }
 	}
 	
 }
