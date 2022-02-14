@@ -206,9 +206,9 @@ public class ManageTableResource {
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
 		LoggerUtils.printlogger(loggersDTO, true, false);
+		
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
@@ -237,7 +237,21 @@ public class ManageTableResource {
 	@Operation(summary = "/undo-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ResponseDTO> undoTable(@PathVariable int clientId) {
 		log.debug("Undo Table Delete");
-		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
+		LoggerUtils.printlogger(loggersDTO, true, false);
+		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
+		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+
+		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId,loggersDTO);
+		
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
+		
 		if (apiResponseDTO.getResponseStatusCode() == 200) {
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {

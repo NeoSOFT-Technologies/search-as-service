@@ -146,13 +146,27 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public ResponseDTO undoTableDeleteRecord(int clientId) {
+	public ResponseDTO undoTableDeleteRecord(int clientId,LoggersDTO loggersDTO) {
+		
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+		
+		LoggerUtils.printlogger(loggersDTO, true, false);
+		
 		ResponseDTO performUndoDeleteResponse = new ResponseDTO();
+		
+		loggersDTO.setTimestamp(LoggerUtils.utcTime().toString());
 		if (clientId > 0) {
 			performUndoDeleteResponse = performUndoTableDeletion(clientId);
+			LoggerUtils.printlogger(loggersDTO, false, false);
 		} else {
 			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
 			performUndoDeleteResponse.setResponseStatusCode(400);
+			LoggerUtils.printlogger(loggersDTO, false, true);
 			performUndoDeleteResponse.setResponseMessage(TABLE_DELETE_UNDO_ERROR_MSG);
 		}
 

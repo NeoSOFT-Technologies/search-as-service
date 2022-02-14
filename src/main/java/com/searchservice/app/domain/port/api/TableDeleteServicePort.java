@@ -14,7 +14,7 @@ public interface TableDeleteServicePort {
 		public int checkDeletionofTable(LoggersDTO loggersDTO);
 		
 		//Undoing Table To Be Deleted
-		public ResponseDTO undoTableDeleteRecord(int clientId);
+		public ResponseDTO undoTableDeleteRecord(int clientId,LoggersDTO loggersDTO);
 		
 		//To Check Status of Table Deletion Process
 		public boolean checkTableDeletionStatus(int deleteRecordCount);
