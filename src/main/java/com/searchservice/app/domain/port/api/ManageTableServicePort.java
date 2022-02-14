@@ -8,6 +8,7 @@ import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
 
 
 @Component
@@ -19,7 +20,7 @@ public interface ManageTableServicePort {
 	// GET request
 	GetCapacityPlanDTO capacityPlans();
 	ResponseDTO getTables();
-	TableSchemaDTO getTableSchemaIfPresent(String tableName);
+	TableSchemaDTOv2 getTableSchemaIfPresent(String tableName);
 	Map<Object, Object> getTableDetails(String tableName);
 
 	// CREATE requests

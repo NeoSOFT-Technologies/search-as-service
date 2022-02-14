@@ -34,6 +34,7 @@ import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
@@ -129,10 +130,12 @@ public class ManageTableService implements ManageTableServicePort {
 	
 
 	@Override
-	public TableSchemaDTO getTableSchemaIfPresent(String tableName) {
+	public TableSchemaDTOv2 getTableSchemaIfPresent(String tableName) {
 		if (!isTableExists(tableName))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
-		return getTableSchema(tableName);
+		TableSchemaDTO tableSchema = getTableSchema(tableName); 
+		return new TableSchemaDTOv2(
+				tableSchema);
 	}
 	
 	

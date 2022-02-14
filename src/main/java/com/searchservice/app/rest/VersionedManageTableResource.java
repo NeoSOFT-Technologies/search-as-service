@@ -1,9 +1,9 @@
 package com.searchservice.app.rest;
 
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.searchservice.app.domain.dto.ResponseDTO;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
 import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.table.TableSchemaDTOv2;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
@@ -25,34 +26,29 @@ import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
-
 @RestController
 @RequestMapping("${base-url.api-endpoint.versioned-home}"+"/manage/table")
 public class VersionedManageTableResource {
 
-    private final Logger log = LoggerFactory.getLogger(VersionedManageTableResource.class);
+	private final Logger log = LoggerFactory.getLogger(VersionedManageTableResource.class);
 
-    @Value("${saas-ms.request-header.api-version}")
-	private static String saasVersionHeader;
-    
-    private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
-    private static final String DEFAULT_EXCEPTION_MSG = ResponseMessages.DEFAULT_EXCEPTION_MSG;
-    
-    private ManageTableServicePort manageTableServicePort;
-	public VersionedManageTableResource(ManageTableServicePort manageTableServicePort) {
+	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
+
+	private ManageTableServicePort manageTableServicePort;
+
+	private TableDeleteServicePort tableDeleteServicePort;
+
+	public VersionedManageTableResource(ManageTableServicePort manageTableServicePort,TableDeleteServicePort tableDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.tableDeleteServicePort = tableDeleteServicePort;
 	}
-	
-	
+
 	@GetMapping("/capacity-plans")
     @Operation(summary = "/get-capacity-plans")
     public GetCapacityPlanDTO capacityPlans() {
         log.debug("Get capacity plans");
         GetCapacityPlanDTO getCapacityPlanDTO=manageTableServicePort.capacityPlans();
-        if(getCapacityPlanDTO.getPlans() != null)
-        	return getCapacityPlanDTO;
-        else
-        	throw new NullPointerOccurredException(500, DEFAULT_EXCEPTION_MSG);
+        return getCapacityPlanDTO;
     }
 	
 	
@@ -71,26 +67,36 @@ public class VersionedManageTableResource {
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
-
     
-    @GetMapping("/schema/{tableName}")
-    @Operation(summary = "/get-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-    public TableSchemaDTO getTableSchema(
-    		//@RequestHeader(name = SAAS_VERSION_HEADER, defaultValue = "1") String apiVersion, 
-    		@PathVariable String tableName) {
-        log.debug("Get table schema");
-
-        TableSchemaDTO tableSchemaResponseDTO=manageTableServicePort.getTableSchemaIfPresent(tableName);        
-        if(tableSchemaResponseDTO == null)
-        	throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
-        if(tableSchemaResponseDTO.getStatusCode()==200){
-            return tableSchemaResponseDTO;
-        }else{
-            throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
-        }
-    }
-
     
+	@GetMapping("/{clientid}/{tableName}")
+	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
+	public TableSchemaDTOv2 getTable(
+			@PathVariable int clientid, 
+			@PathVariable String tableName) {
+		log.debug("Get table info");
+
+		tableName = tableName + "_" + clientid;
+		
+		// GET tableDetails
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName);
+
+		// GET tableSchema
+		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+		if (tableInfoResponseDTO == null)
+			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
+		
+		// SET tableDetails in tableInfoResponseDTO
+		tableInfoResponseDTO.setTableDetails(tableDetailsMap);
+		if (tableInfoResponseDTO.getStatusCode() == 200) {
+			tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
+			return tableInfoResponseDTO;
+		} else {
+			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+		}
+	}
+
+
     @PostMapping
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseDTO createTable(
@@ -106,24 +112,47 @@ public class VersionedManageTableResource {
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
         }
     }
-    
-    
-    @DeleteMapping("/{tableName}")
-    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseDTO deleteTable(@PathVariable String tableName) {
-        log.debug("Delete table");
 
-        ResponseDTO apiResponseDTO=manageTableServicePort.deleteTable(tableName);
+	
+	@DeleteMapping("/{clientid}/{tableName}")
+	@Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseDTO deleteTable(
+			@PathVariable String tableName, 
+			@PathVariable int clientid) {
+		log.debug("Delete table");
+		tableName = tableName + "_" + clientid;
+		if(tableDeleteServicePort.checkTableExistensce(tableName)) {
+		    ResponseDTO apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
+		    if (apiResponseDTO.getResponseStatusCode() == 200) {
+			 return apiResponseDTO;
+		   } else {
+			 log.debug("Exception occurred: {}", apiResponseDTO);
+			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+		   }
+		}else {
+			throw new BadRequestOccurredException(400, "Table "+tableName+" For Client ID "+clientid+" Does Not Exist");
+		}
+	}
+	
+	
+	@PutMapping("/{clientId}")
+	@Operation(summary = "/undo-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseDTO undoTable(@PathVariable int clientId)
+	{	
+		log.debug("Undo Table Delete");
+		ResponseDTO apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
+		if(apiResponseDTO.getResponseStatusCode() ==200)
+		{
+			return apiResponseDTO;
+		}
+		else
+		{
+			log.debug("Exception Occured While Performing Undo Delete For Client ID: {} ",clientId);
+			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+		}
+	}
+	
 
-        if(apiResponseDTO.getResponseStatusCode()==200){
-            return apiResponseDTO;
-        }else{
-        	log.debug("Exception occurred: {}", apiResponseDTO);
-            throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
-        }
-    }
-    
-    
 	@PutMapping("/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseDTO updateTableSchema(

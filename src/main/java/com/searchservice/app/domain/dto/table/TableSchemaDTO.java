@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,14 +20,16 @@ import lombok.NoArgsConstructor;
 public class TableSchemaDTO implements VersionedObjectMapper {
 
 	@JsonIgnore
-    int statusCode;
+	private int statusCode;
 	@JsonIgnore
-	String message;
+	private String message;
 	@JsonIgnore
-	String tableName;
+	private String tableName;
 	@JsonIgnore
-	String schemaName;
-	List<SchemaFieldDTO> attributes;
+	private String schemaName;
+	private List<SchemaFieldDTO> attributes;
+	@JsonIgnore
+	private Map<Object, Object> tableDetails;
 
 	public TableSchemaDTO(TableSchemaDTO schemaDTO) {
 		this.tableName = schemaDTO.getTableName();

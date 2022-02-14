@@ -1,8 +1,8 @@
 package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
@@ -22,6 +22,23 @@ public class TableSchemaDTOv2 implements VersionedObjectMapper {
 	private String message;
 	private String schemaName;
 	private List<SchemaFieldDTO> attributes;
+	private Map<Object, Object> tableDetails;
+	
+	public TableSchemaDTOv2(TableSchemaDTO schemaResponseDTO) {
+		this.statusCode=schemaResponseDTO.getStatusCode();
+		this.message=schemaResponseDTO.getMessage();
+		this.schemaName=schemaResponseDTO.getSchemaName();
+		this.attributes=schemaResponseDTO.getAttributes();
+		this.tableDetails=schemaResponseDTO.getTableDetails();
+	}
+	
+//	public TableSchemaDTOv2(TableSchemaDTO schemaResponseDTO) {
+//		this.statusCode=schemaResponseDTO.getStatusCode();
+//		this.message=schemaResponseDTO.getMessage();
+//		this.schemaName=schemaResponseDTO.getSchemaName();
+//		this.attributes=schemaResponseDTO.getAttributes();
+//		
+//	}
 	
 	public TableSchemaDTOv2(TableSchemaDTOv2 schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();
