@@ -79,9 +79,7 @@ public class InputDocumentResource {
         }
         }
         else {
-        	documentInjectionThrottlerResponse.setStatusCode(400);
-        	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+        	 return documentInjectWithInvalidTableName(tableName,clientid);
         }
     }
     
@@ -124,9 +122,7 @@ public class InputDocumentResource {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 		}}
 		else {
-        	documentInjectionThrottlerResponse.setStatusCode(400);
-        	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+              return documentInjectWithInvalidTableName(tableName,clientid);
         }
 		
     }
@@ -148,6 +144,13 @@ public class InputDocumentResource {
 		
 		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).headers(responseHeaders) // attach retry-info header
 				.body(rateLimitResponseDTO);
+	}
+	
+	public ResponseEntity<ThrottlerResponseDTO> documentInjectWithInvalidTableName(String tableName,int clientid){
+		ThrottlerResponseDTO documentInjectionThrottlerResponse= new ThrottlerResponseDTO();
+		documentInjectionThrottlerResponse.setStatusCode(400);
+    	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 	
 }
