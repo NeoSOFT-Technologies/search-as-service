@@ -63,7 +63,7 @@ public class ManageTableResource {
         
         if(getListItemsResponseDTO == null)
         	throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
-        if(getListItemsResponseDTO.getResponseStatusCode()==200){
+        if(getListItemsResponseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
         }else{
             throw new BadRequestOccurredException(400, ResponseMessages.DEFAULT_EXCEPTION_MSG);
@@ -89,7 +89,7 @@ public class ManageTableResource {
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		
 		// SET tableDetails in tableInfoResponseDTO
-		tableInfoResponseDTO.setTableDetails(tableDetailsMap);
+//		tableInfoResponseDTO.setTableDetails(tableDetailsMap);
 		if (tableInfoResponseDTO.getStatusCode() == 200) {
 			tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
@@ -107,8 +107,8 @@ public class ManageTableResource {
 		log.debug("Create table");
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);
 		Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
-		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			apiResponseDTO.setResponseMessage("Table- " + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
+		if (apiResponseDTO.getStatusCode() == 200) {
+			apiResponseDTO.setMessage("Table- " + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
 			log.info("Table could not be created: {}", apiResponseDTO);
@@ -126,7 +126,7 @@ public class ManageTableResource {
 		tableName = tableName + "_" + clientId;
 		if(tableDeleteServicePort.checkTableExistensce(tableName)) {
 		    Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientId, tableName);
-		    if (apiResponseDTO.getResponseStatusCode() == 200) {
+		    if (apiResponseDTO.getStatusCode() == 200) {
 			 return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		   } else {
 			 log.debug("Exception occurred: {}", apiResponseDTO);
@@ -144,7 +144,7 @@ public class ManageTableResource {
 	{	
 		log.debug("Undo Table Delete");
 		Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
-		if(apiResponseDTO.getResponseStatusCode() ==200)
+		if(apiResponseDTO.getStatusCode() ==200)
 		{
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		}
@@ -169,7 +169,7 @@ public class ManageTableResource {
 		newTableSchemaDTO.setTableName(tableName);
 		Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
 	
-		if (apiResponseDTO.getResponseStatusCode() == 200)
+		if (apiResponseDTO.getStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		else
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);

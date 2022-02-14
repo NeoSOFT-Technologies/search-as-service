@@ -38,10 +38,10 @@ public interface ManageTableServicePort {
     boolean isConfigSetExists(String configSetName);
     Response getConfigSets();
     boolean isTableExists(String tableName);
-    TableSchema getTableSchema(String tableName);
+    TableSchemav2 getTableSchema(String tableName);
     Response createConfigSet(ConfigSet configSetDTO);
     Response createTable(ManageTable manageTableDTO);
-    TableSchema addSchemaAttributes(TableSchema tableSchemaDTO);
+    Response addSchemaAttributes(TableSchema tableSchemaDTO);
     Response updateSchemaAttributes(TableSchema tableSchemaDTO);
     Response addAliasTable(String tableOriginalName, String tableAlias);
 	Response deleteConfigSet(String configSetName);

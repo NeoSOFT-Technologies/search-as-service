@@ -20,44 +20,32 @@ import lombok.NoArgsConstructor;
 public class TableSchema implements VersionedObjectMapper {
 
 	@JsonIgnore
-	private int statusCode;
-	@JsonIgnore
-	private String message;
-	@JsonIgnore
 	private String tableName;
 	@JsonIgnore
 	private String schemaName;
-	private List<SchemaField> attributes;
+	private List<SchemaField> columns;
 	@JsonIgnore
 	private Map<Object, Object> tableDetails;
 
 	public TableSchema(TableSchema schemaDTO) {
 		this.tableName = schemaDTO.getTableName();
 		this.schemaName = schemaDTO.getSchemaName();
-		this.attributes=schemaDTO.getAttributes();
-		this.statusCode = schemaDTO.getStatusCode();
-		this.message = schemaDTO.getMessage();
+		this.columns=schemaDTO.getColumns();
+	
 	}
 	
 	public TableSchema(String tableName, String schemaName, List<SchemaField> attributes) {
 		this.tableName = tableName;
 		this.schemaName = schemaName;
-		this.attributes = attributes;
+		this.columns = attributes;
 	}
 	
-	public TableSchema(int statusCode, String message) {
-		this.statusCode = statusCode;
-		this.message = message;
-	}
+	
 	
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
 		if(version >= 2) {
 			return new TableSchemav2(
-//					statusCode, 
-					message, 
-					"NoooTHinggggg"
-//					attributes, 
 					).toVersion(version);
 		}
 		

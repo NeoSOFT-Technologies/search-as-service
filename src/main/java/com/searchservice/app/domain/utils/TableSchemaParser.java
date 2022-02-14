@@ -28,7 +28,7 @@ public class TableSchemaParser {
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
-		for(SchemaField fieldDto: tableSchemaDTO.getAttributes()) {
+		for(SchemaField fieldDto: tableSchemaDTO.getColumns()) {
 			logger.info("Validate SolrFieldDTO before parsing it");
 			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {

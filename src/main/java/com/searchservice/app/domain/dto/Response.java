@@ -15,24 +15,24 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response implements VersionedObjectMapper {
 
-    private int responseStatusCode;
+    private int statusCode;
     private String name;
-    private String responseMessage;
-    private List<String> items;
+    private String message;
+    private List<String> data;
 
     public Response(String name) {
         this.name = name;
     }
     
     public Response(int responseStatusCode, String responseMessage) {
-    	this.responseStatusCode = responseStatusCode;
-    	this.responseMessage = responseMessage;
+    	this.statusCode = responseStatusCode;
+    	this.message = responseMessage;
     }
 
 	public Response(int statusCode, String name, String message) {
-		this.responseStatusCode = statusCode;
+		this.statusCode = statusCode;
 		this.name = name;
-		this.responseMessage = message;
+		this.message = message;
 	}
 	
 	@Override

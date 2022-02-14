@@ -60,7 +60,7 @@ public class VersionedManageTableResource {
 
         if (getListItemsResponseDTO == null)
             throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
-        if (getListItemsResponseDTO.getResponseStatusCode() == 200) {
+        if (getListItemsResponseDTO.getStatusCode() == 200) {
             return getListItemsResponseDTO;
         } else {
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
@@ -83,7 +83,7 @@ public class VersionedManageTableResource {
             throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 
         // SET tableDetails in tableInfoResponseDTO
-        tableInfoResponseDTO.setTableDetails(tableDetailsMap);
+//        tableInfoResponseDTO.setTableDetails(tableDetailsMap);
         if (tableInfoResponseDTO.getStatusCode() == 200) {
             tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
             return tableInfoResponseDTO;
@@ -98,8 +98,8 @@ public class VersionedManageTableResource {
         log.debug("Create table");
 
         Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
-        if (apiResponseDTO.getResponseStatusCode() == 200) {
-            apiResponseDTO.setResponseMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
+        if (apiResponseDTO.getStatusCode() == 200) {
+            apiResponseDTO.setMessage("Table: " + manageTableDTO.getTableName() + ", is created successfully");
             return apiResponseDTO;
         } else {
             log.debug("Table could not be created: {}", apiResponseDTO);
@@ -114,7 +114,7 @@ public class VersionedManageTableResource {
         tableName = tableName + "_" + clientid;
         if (tableDeleteServicePort.checkTableExistensce(tableName)) {
             Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
-            if (apiResponseDTO.getResponseStatusCode() == 200) {
+            if (apiResponseDTO.getStatusCode() == 200) {
                 return apiResponseDTO;
             } else {
                 log.debug("Exception occurred: {}", apiResponseDTO);
@@ -130,7 +130,7 @@ public class VersionedManageTableResource {
     public Response undoTable(@PathVariable int clientId) {
         log.debug("Undo Table Delete");
         Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId);
-        if (apiResponseDTO.getResponseStatusCode() == 200) {
+        if (apiResponseDTO.getStatusCode() == 200) {
             return apiResponseDTO;
         } else {
             log.debug("Exception Occured While Performing Undo Delete For Client ID: {} ", clientId);
@@ -144,7 +144,7 @@ public class VersionedManageTableResource {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
         Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
-        if (apiResponseDTO.getResponseStatusCode() == 200)
+        if (apiResponseDTO.getStatusCode() == 200)
             return apiResponseDTO;
         else
             throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
