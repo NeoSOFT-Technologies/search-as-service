@@ -3,6 +3,7 @@ package com.searchservice.app.rest;
 
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -28,12 +29,14 @@ public class InputDocumentResource {
     private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
     public final InputDocumentServicePort inputDocumentServicePort;
+    public final ManageTableServicePort manageTableServicePort;
     public final ThrottlerServicePort throttlerServicePort;
     public InputDocumentResource(
     		InputDocumentServicePort inputDocumentServicePort, 
-    		ThrottlerServicePort throttlerServicePort) {
+    		ThrottlerServicePort throttlerServicePort , ManageTableServicePort manageTableServicePort) {
         this.inputDocumentServicePort = inputDocumentServicePort;
         this.throttlerServicePort = throttlerServicePort;
+        this.manageTableServicePort = manageTableServicePort;
     }
 
 
@@ -46,7 +49,6 @@ public class InputDocumentResource {
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
-        
         // Apply RequestSizeLimiting Throttler on payload before service the request
     	ThrottlerResponseDTO documentInjectionThrottlerResponse
     		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
@@ -56,8 +58,10 @@ public class InputDocumentResource {
         			.body(documentInjectionThrottlerResponse);
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        
         tableName = tableName+"_"+clientid;
+        
+      //Checking Whether the Table Exist Or Not , If Not this block will not be processed
+        if(manageTableServicePort.isTableExists(tableName)) {
         Instant start = Instant.now();
         ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
         Instant end = Instant.now();
@@ -72,6 +76,12 @@ public class InputDocumentResource {
             return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+        }
+        }
+        else {
+        	documentInjectionThrottlerResponse.setStatusCode(400);
+        	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
         }
     }
     
@@ -95,6 +105,9 @@ public class InputDocumentResource {
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
 		tableName = tableName + "_" + clientid;
+		
+		//Checking Whether the Table Exist Or Not , If Not this block will not be processed
+		if(manageTableServicePort.isTableExists(tableName)) {
 		Instant start = Instant.now();
 		ThrottlerResponseDTO documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload);
 		Instant end = Instant.now();
@@ -109,7 +122,13 @@ public class InputDocumentResource {
 			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
-		}
+		}}
+		else {
+        	documentInjectionThrottlerResponse.setStatusCode(400);
+        	documentInjectionThrottlerResponse.setResponseMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+        }
+		
     }
 
 

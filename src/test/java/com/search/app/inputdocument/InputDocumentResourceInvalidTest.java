@@ -20,19 +20,16 @@ import com.searchservice.app.domain.service.InputDocumentService;
 
 @IntegrationTest
 @AutoConfigureMockMvc
-class InputDocumentResourceTest {
-
-	// String apiEndpoint = "/api/v1";
+class InputDocumentResourceInvalidTest {
+	
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
 	int statusCode;
 	String name;
 	String message;
 	int clientid;
-	String tableName = "book";
-	String expectedGetResponse = "{\r\n" + "  \"statusCode\": 200,\r\n" + "  \"name\": \"book\",\r\n"
-			+ "  \"message\": \"Successfully Added!\"\r\n" + "}";
-
+	String invalidTableName = "book"+"1234";
+	
 	String expectedCreateResponse400 = "{\r\n" + "  \"statusCode\": 400,\r\n" + "  \"name\": \"booksdfsd\",\r\n"
 			+ "  \"message\": \"Unable to get the Schema. Please check the collection name again!\"\r\n" + "}";
 
@@ -46,15 +43,7 @@ class InputDocumentResourceTest {
 	
 	@MockBean
 	ManageTableServicePort manageTableServicePort;
-
-	public void setMockitoSucccessResponseForService() {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
-		responseDTO.setStatusCode(200);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-	}
-
+	
 	public void setMockitoBadResponseForService() {
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
 		responseDTO.setStatusCode(400);
@@ -64,32 +53,20 @@ class InputDocumentResourceTest {
 	}
 
 	@Test
-	void testinputdocs() throws Exception {
+	void testinputdocsInvalidCase() throws Exception {
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
-		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isOk());
-		
-		/*//Testing to Ingest NRT With Wrong Table Name
 		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName+"090")
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + invalidTableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isBadRequest());*/
-		
+				.andExpect(status().isBadRequest());	
 	}
 
 	@Test
-	void testinputdoc() throws Exception {
+	void testinputdocInvalidCase() throws Exception {
 		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
-		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName)
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + invalidTableName+"090")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isOk());
-		
-		/*setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName+"090")
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isBadRequest());*/
+				.andExpect(status().isBadRequest());
 	}
 }
