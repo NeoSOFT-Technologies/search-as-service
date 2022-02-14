@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.InputDocumentService;
 
 @IntegrationTest
@@ -44,14 +44,14 @@ class InputDocumentResourceTest {
 	InputDocumentService inputDocumentService;
 
 	public void setMockitoSucccessResponseForService() {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
 	public void setMockitoBadResponseForService() {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
@@ -59,7 +59,7 @@ class InputDocumentResourceTest {
 
 	@Test
 	void testinputdocs() throws Exception {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
@@ -68,7 +68,7 @@ class InputDocumentResourceTest {
 
 	@Test
 	void testinputdoc() throws Exception {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))

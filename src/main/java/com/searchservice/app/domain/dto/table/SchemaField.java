@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SchemaFieldDTO implements VersionedObjectMapper {
+public class SchemaField implements VersionedObjectMapper {
 
 	String name;
 	String type;

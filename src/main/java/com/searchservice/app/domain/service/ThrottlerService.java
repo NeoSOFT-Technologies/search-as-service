@@ -1,7 +1,7 @@
 package com.searchservice.app.domain.service;
 
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.utils.ThrottlerUtils;
 import org.slf4j.Logger;
@@ -28,11 +28,11 @@ public class ThrottlerService implements ThrottlerServicePort {
     String maxAllowedRequestSizeBatch;
     
 	@Override
-	public ThrottlerResponseDTO documentInjectionRateLimiter() {
+	public ThrottlerResponse documentInjectionRateLimiter() {
         logger.info("Max request rate limit is applied, no further calls are accepted");
 
         // prepare Rate Limiting Response DTO
-        ThrottlerResponseDTO rateLimitResponseDTO = new ThrottlerResponseDTO();
+        ThrottlerResponse rateLimitResponseDTO = new ThrottlerResponse();
         rateLimitResponseDTO.setResponseMessage(
         		"Too many requests made! "
         		+ "No further calls are accepted right now");
@@ -45,8 +45,8 @@ public class ThrottlerService implements ThrottlerServicePort {
 	}
 
 	@Override
-	public ThrottlerResponseDTO applyDocumentInjectionRequestSizeLimiter(
-			ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO) {
+	public ThrottlerResponse applyDocumentInjectionRequestSizeLimiter(
+			ThrottlerResponse throttlerMaxRequestSizeResponseDTO) {
 		/*
 		 * This method can apply Request Size Limiter Filter
 		 * accepting the ThrottlerResponseDTO as argument  
@@ -68,7 +68,7 @@ public class ThrottlerService implements ThrottlerServicePort {
 	}
 	
 	@Override
-	public ThrottlerResponseDTO documentInjectionRequestSizeLimiter(
+	public ThrottlerResponse documentInjectionRequestSizeLimiter(
 			String incomingData, 
 			boolean isNRT) {
 		/*
@@ -79,8 +79,8 @@ public class ThrottlerService implements ThrottlerServicePort {
 		
     	double incomingRequestSizeInKBs = ThrottlerUtils.getSizeInkBs(incomingData);
     	
-    	ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO
-    		= new ThrottlerResponseDTO();
+    	ThrottlerResponse throttlerMaxRequestSizeResponseDTO
+    		= new ThrottlerResponse();
     	throttlerMaxRequestSizeResponseDTO.setIncomingRequestSize(incomingRequestSizeInKBs+"kB");
     	
     	// Max Request Size Limiter Logic
@@ -103,7 +103,7 @@ public class ThrottlerService implements ThrottlerServicePort {
 	}
 
 	@Override
-	public boolean isRequestSizeExceedingLimit(ThrottlerResponseDTO throttlerMaxRequestSizeResponseDTO) {
+	public boolean isRequestSizeExceedingLimit(ThrottlerResponse throttlerMaxRequestSizeResponseDTO) {
 		return (ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getIncomingRequestSize())
 				> ThrottlerUtils.formatRequestSizeStringToDouble(throttlerMaxRequestSizeResponseDTO.getMaxAllowedRequestSize()));
 	}

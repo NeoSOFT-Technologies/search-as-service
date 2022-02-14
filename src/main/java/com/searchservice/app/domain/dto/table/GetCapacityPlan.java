@@ -16,14 +16,14 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetCapacityPlanDTO implements VersionedObjectMapper {
+public class GetCapacityPlan implements VersionedObjectMapper {
 
     private List<CapacityPlanProperties.Plan> plans;
 
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
 		if(version >= 2)
-			return new GetCapacityPlanDTOv2(
+			return new GetCapacityPlanv2(
 					200, 
 					"Operation completed successfully" ,
 					plans).toVersion(version);

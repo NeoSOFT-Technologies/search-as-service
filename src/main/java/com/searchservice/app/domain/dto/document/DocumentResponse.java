@@ -1,7 +1,7 @@
 package com.searchservice.app.domain.dto.document;
 
 
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.Data;
@@ -11,20 +11,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class DocumentResponseDTO implements VersionedObjectMapper {
+public class DocumentResponse implements VersionedObjectMapper {
 	
 	private String tableName;
 	private String name;
-	private SchemaFieldDTO[] attributes;
+	private SchemaField[] attributes;
 	private int statusCode;
-	public DocumentResponseDTO(DocumentResponseDTO documentResponseDTO) {
+	public DocumentResponse(DocumentResponse documentResponseDTO) {
 		this.tableName = documentResponseDTO.getTableName();
 		this.name= documentResponseDTO.getName();
 		this.attributes= documentResponseDTO.getAttributes();
 		this.statusCode= documentResponseDTO.getStatusCode();
 	}
 	
-	public DocumentResponseDTO(String tableName, String name, SchemaFieldDTO[] attributes) {
+	public DocumentResponse(String tableName, String name, SchemaField[] attributes) {
 		this.tableName = tableName;
 		this.name = name;
 		this.attributes = attributes;

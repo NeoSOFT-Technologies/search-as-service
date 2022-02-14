@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 
@@ -42,8 +42,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 	private static final String TABLE_DELETE_INITIALIZE_ERROR_MSG = "Error While Initializing Deletion For Table: {}"; 
 	private static final String TABLE_DELETE_UNDO_ERROR_MSG = "Undo Table Delete Failed , Invalid CLient ID Provided";
 	@Override
-	public ResponseDTO initializeTableDelete(int clientId, String tableName) {
-		ResponseDTO deleteRecordInsertionResponse = new ResponseDTO();
+	public Response initializeTableDelete(int clientId, String tableName) {
+		Response deleteRecordInsertionResponse = new Response();
 		  File file=new File(deleteRecordFilePath + ".txt");
 		  if((clientId>0) && (tableName!=null)) {
 		  try(FileWriter fw = new FileWriter(file, true);
@@ -109,8 +109,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 	}
 
 	@Override
-	public ResponseDTO undoTableDeleteRecord(int clientId)  {
-		ResponseDTO performUndoDeleteResponse = new ResponseDTO();
+	public Response undoTableDeleteRecord(int clientId)  {
+		Response performUndoDeleteResponse = new Response();
 		if(clientId>0) {
 			performUndoDeleteResponse = performUndoTableDeletion(clientId);
 		}
@@ -142,8 +142,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 	}
 	
 
-	public ResponseDTO performUndoTableDeletion(int clientId) {
-		ResponseDTO undoTableDeletionResponse = new ResponseDTO();
+	public Response performUndoTableDeletion(int clientId) {
+		Response undoTableDeletionResponse = new Response();
 		File existingFile = new File(deleteRecordFilePath + ".txt");
 	    File newFile = new File(deleteRecordFilePath + "Temp.txt");
 		  int lineNumber=0;
@@ -189,7 +189,7 @@ public class TableDeleteService implements TableDeleteServicePort{
 				break;
 			}
 		}
-	    ResponseDTO tableDeleteResponse  = manageTableServicePort.deleteTable(tableName);
+	    Response tableDeleteResponse  = manageTableServicePort.deleteTable(tableName);
 	    if(tableDeleteResponse.getResponseStatusCode() == 200) {
 	    	logger.debug("Successfully Deleted Table : {}", tableName);
 	    	return true;
@@ -200,8 +200,8 @@ public class TableDeleteService implements TableDeleteServicePort{
 	    }
 	}
 
-	public ResponseDTO getUndoDeleteResponse(int undoRecordNumber,int clientId) {
-		ResponseDTO undoDeleteResponseDTO = new ResponseDTO();
+	public Response getUndoDeleteResponse(int undoRecordNumber,int clientId) {
+		Response undoDeleteResponseDTO = new Response();
 		if(undoRecordNumber > 0) {
 			logger.debug("Undo Record Performed Succesfully For Client ID: {} ",clientId);
 			logger.debug("Total Number of Tables Removed From Deletion: {} ",undoRecordNumber);

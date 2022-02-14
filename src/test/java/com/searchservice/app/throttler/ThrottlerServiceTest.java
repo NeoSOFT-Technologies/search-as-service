@@ -1,6 +1,6 @@
 package com.searchservice.app.throttler;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.ThrottlerService;
 import com.searchservice.app.domain.utils.ThrottlerUtils;
@@ -50,7 +50,7 @@ class ThrottlerServiceTest {
     String maxRequestAllowedForCurrentWindow;
     @Value("${resilience4j.ratelimiter.instances.documentInjectionRateLimitThrottler.limitRefreshPeriod}")
     String currentRefreshWindow;
-    private ThrottlerResponseDTO rateLimitResponseDTO;
+    private ThrottlerResponse rateLimitResponseDTO;
     
     // Max request size limiter configuration values
     @Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSize202}")
@@ -61,8 +61,8 @@ class ThrottlerServiceTest {
     String maxAllowedRequestSize;
     private String stringWithinMaxSizeLimit = "IAmIronMan";
     private String stringNotWithinMaxSizeLimit = "IAmNotIronMan";
-    private ThrottlerResponseDTO maxReqSizeResponseDTO;
-    private ThrottlerResponseDTO throttlerMaxReqSizeResponseDTO;
+    private ThrottlerResponse maxReqSizeResponseDTO;
+    private ThrottlerResponse throttlerMaxReqSizeResponseDTO;
     
 	@MockBean
 	private ThrottlerServicePort throttlerServicePort;
@@ -74,7 +74,7 @@ class ThrottlerServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		// Set up Mockito response for Rate Limiter Tester
-		rateLimitResponseDTO = new ThrottlerResponseDTO();
+		rateLimitResponseDTO = new ThrottlerResponse();
 	    rateLimitResponseDTO.setResponseMessage(
 		"Too many requests made! "
 		+ "No further calls are accepted right now");
@@ -85,14 +85,14 @@ class ThrottlerServiceTest {
 	
 	private void setUpMockitoAcceptanceResponseForReqSizeLimiter() {
 	    // Set up Mockito Acceptance response for Max Request Size Limiter Tester
-	    maxReqSizeResponseDTO = new ThrottlerResponseDTO();
+	    maxReqSizeResponseDTO = new ThrottlerResponse();
 	    maxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize202);
 	    maxReqSizeResponseDTO.setIncomingRequestSize("0.06kB");
 	    maxReqSizeResponseDTO.setStatusCode(202);
 	    maxReqSizeResponseDTO.setResponseMessage(
 				"Incoming request size is under the limit, can be processed");
 	    
-	    throttlerMaxReqSizeResponseDTO = new ThrottlerResponseDTO();	    
+	    throttlerMaxReqSizeResponseDTO = new ThrottlerResponse();	    
     	double incomingRequestSizeInKBs = ThrottlerUtils.getSizeInkBs(stringWithinMaxSizeLimit);  	
     	throttlerMaxReqSizeResponseDTO.setIncomingRequestSize(""+incomingRequestSizeInKBs+"kB");  	
 	    throttlerMaxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize202);
@@ -100,7 +100,7 @@ class ThrottlerServiceTest {
 	
 	private void setUpMockitoRejectionResponseForReqSizeLimiter() {
 	    // Set up Mockito rejection response for Max Request Size Limiter Tester
-	    maxReqSizeResponseDTO = new ThrottlerResponseDTO();
+	    maxReqSizeResponseDTO = new ThrottlerResponse();
 	    maxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize405);
 	    maxReqSizeResponseDTO.setIncomingRequestSize("0.066kB");
 	    maxReqSizeResponseDTO.setStatusCode(405);
@@ -108,7 +108,7 @@ class ThrottlerServiceTest {
 				"Incoming request size exceeded the limit! "
 				+ "This request can't be processed");
 	    
-	    throttlerMaxReqSizeResponseDTO = new ThrottlerResponseDTO();	
+	    throttlerMaxReqSizeResponseDTO = new ThrottlerResponse();	
     	double incomingRequestSizeInKBs = ThrottlerUtils.getSizeInkBs(stringNotWithinMaxSizeLimit);
     	throttlerMaxReqSizeResponseDTO.setIncomingRequestSize(incomingRequestSizeInKBs+"kB");
 	    throttlerMaxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize405);
@@ -118,7 +118,7 @@ class ThrottlerServiceTest {
 	@DisplayName("Testing Rate Limiter Throttler Service")
 	void testDataInjectionRateLimiter() {
 		logger.info("Solr data injection rate limiter test case getting executed..");
-		ThrottlerResponseDTO receivedResponse;
+		ThrottlerResponse receivedResponse;
 		
 		logger.debug("Expecting status code: {}", 429);
 		when(throttlerServicePort.documentInjectionRateLimiter())
@@ -133,7 +133,7 @@ class ThrottlerServiceTest {
 	@DisplayName("Testing Max Request Size Limiter Throttler Service")
 	void testDataInjectionRequestSizeLimiter() {	
 		logger.info("Solr data injection max request size limiter test case getting executed..");
-		ThrottlerResponseDTO receivedMRSResponse;
+		ThrottlerResponse receivedMRSResponse;
 		
 		// When Request data size limit is not exceeded
 		logger.debug("Expecting status code: {}", 202);

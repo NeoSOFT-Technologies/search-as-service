@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
+import com.searchservice.app.domain.dto.table.SchemaField;
 
 public class BasicUtil {
-    public static HashMap<String, SchemaFieldDTO> convertSchemaFieldListToHashMap(
-    		List<SchemaFieldDTO> list)
+    public static HashMap<String, SchemaField> convertSchemaFieldListToHashMap(
+    		List<SchemaField> list)
     {
-        HashMap<String, SchemaFieldDTO> hashMap = new HashMap<>();
+        HashMap<String, SchemaField> hashMap = new HashMap<>();
   
-        for (SchemaFieldDTO dto : list) {
+        for (SchemaField dto : list) {
   
             hashMap.put(dto.getName(), dto);
         }

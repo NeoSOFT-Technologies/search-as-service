@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TableSchemaDTO implements VersionedObjectMapper {
+public class TableSchema implements VersionedObjectMapper {
 
 	@JsonIgnore
 	private int statusCode;
@@ -27,11 +27,11 @@ public class TableSchemaDTO implements VersionedObjectMapper {
 	private String tableName;
 	@JsonIgnore
 	private String schemaName;
-	private List<SchemaFieldDTO> attributes;
+	private List<SchemaField> attributes;
 	@JsonIgnore
 	private Map<Object, Object> tableDetails;
 
-	public TableSchemaDTO(TableSchemaDTO schemaDTO) {
+	public TableSchema(TableSchema schemaDTO) {
 		this.tableName = schemaDTO.getTableName();
 		this.schemaName = schemaDTO.getSchemaName();
 		this.attributes=schemaDTO.getAttributes();
@@ -39,13 +39,13 @@ public class TableSchemaDTO implements VersionedObjectMapper {
 		this.message = schemaDTO.getMessage();
 	}
 	
-	public TableSchemaDTO(String tableName, String schemaName, List<SchemaFieldDTO> attributes) {
+	public TableSchema(String tableName, String schemaName, List<SchemaField> attributes) {
 		this.tableName = tableName;
 		this.schemaName = schemaName;
 		this.attributes = attributes;
 	}
 	
-	public TableSchemaDTO(int statusCode, String message) {
+	public TableSchema(int statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
 	}
@@ -53,7 +53,7 @@ public class TableSchemaDTO implements VersionedObjectMapper {
 	@Override
 	public VersionedObjectMapper toVersion(int version) {
 		if(version >= 2) {
-			return new TableSchemaDTOv2(
+			return new TableSchemav2(
 //					statusCode, 
 					message, 
 					"NoooTHinggggg"
