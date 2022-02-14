@@ -60,7 +60,6 @@ class InputDocumentResourceTest {
 		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
 	}
 
 	@Test
@@ -69,14 +68,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isOk());
-		
-		/*//Testing to Ingest NRT With Wrong Table Name
-		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName+"090")
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isBadRequest());*/
-		
+				.andExpect(status().isOk());	
 	}
 
 	@Test
@@ -86,10 +78,5 @@ class InputDocumentResourceTest {
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
 				.andExpect(status().isOk());
-		
-		/*setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName+"090")
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
-				.andExpect(status().isBadRequest());*/
 	}
 }
