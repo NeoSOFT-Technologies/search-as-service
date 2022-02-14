@@ -59,6 +59,10 @@ public class TableSchemaParser {
 		String fieldName = solrFieldDTO.getName();
 		String fieldType = solrFieldDTO.getType();
 		
+		// If DOCVALUES == TRUE(=> SORTABLE == TRUE), then MULTIVALUED = FALSE
+		if(solrFieldDTO.isSortable())
+			solrFieldDTO.setMultiValue(false);
+		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
 			logger.info("Invalid schema field name received: {}", fieldName);

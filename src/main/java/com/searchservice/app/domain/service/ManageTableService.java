@@ -326,9 +326,6 @@ public class ManageTableService implements ManageTableServicePort {
 			int schemaFieldIdx = 0;
 			for (Map<String, Object> f : schemaFields) {
 				
-				// testing
-				logger.info("schemafield >>>>> {}", f);
-				
 				// Prepare the SolrFieldDTO
 				SchemaFieldDTO solrFieldDTO = new SchemaFieldDTO();
 				solrFieldDTO.setName((String) f.get("name"));
@@ -338,7 +335,6 @@ public class ManageTableService implements ManageTableServicePort {
 						(String) f.get("type"));
 
 				solrFieldDTO.setType(solrFieldType);
-//				TableSchemaParser.setFieldsToDefaults(solrFieldDTO);
 				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
 				solrSchemaFieldDTOs.add(solrFieldDTO);
 				schemaFieldIdx++;
@@ -545,7 +541,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchemaResponseDTO;
 	}
 
-	
+
 	@Override
 	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
 		logger.info("Update Table Schema");
@@ -594,6 +590,10 @@ public class ManageTableService implements ManageTableServicePort {
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
 				// Pass the fieldAttribute to be updated
+				
+//				tempDelete
+				// delete
+				
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
