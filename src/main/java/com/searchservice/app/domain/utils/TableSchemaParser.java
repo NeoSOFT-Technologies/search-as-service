@@ -25,6 +25,25 @@ public class TableSchemaParser {
 	private static final String DEFAULT = "default";
 	
 	
+	public static List<Map<String, Object>> validateTargetSchemaFields(
+			List<Map<String, Object>> listOfSchemaFieldsMap) {										
+		
+		List<Map<String, Object>> finalListOfSchemaFieldsMap = new ArrayList<>();
+		for(Map<String, Object> m: listOfSchemaFieldsMap) {
+			if(
+					!(((String) m.get("name")).equalsIgnoreCase("_nest_path_")
+				||	((String) m.get("name")).equalsIgnoreCase("_root_")
+				||	((String) m.get("name")).equalsIgnoreCase("_text_")
+				||	((String) m.get("name")).equalsIgnoreCase("_version_")
+				||	((String) m.get("name")).equalsIgnoreCase("id"))) {
+				finalListOfSchemaFieldsMap.add(m);
+			}
+		}
+		
+		return finalListOfSchemaFieldsMap;
+	}
+	
+	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
@@ -42,9 +61,6 @@ public class TableSchemaParser {
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
-
-			schemaFieldsListOfMap.add(fieldDtoMap);
-
 			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
 			fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
 			schemaFieldsListOfMap.add(fieldDtoMap);

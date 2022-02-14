@@ -1,7 +1,12 @@
 package com.searchservice.app.domain.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.ResponseDTO;
+import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.ConfigSetDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
 import com.searchservice.app.domain.dto.table.ManageTableDTO;
@@ -82,6 +88,11 @@ public class ManageTableService implements ManageTableServicePort {
 	// ConfigSet
 	@Value("${base-configset}")
 	private String baseConfigSet;
+	
+	// UPDATE Table
+	@Value("${table-schema-attributes.delete-file-path}")
+	String deleteSchemaAttributesFilePath;
+	//SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 
 	@Autowired
 	CapacityPlanProperties capacityPlanProperties;
@@ -130,15 +141,14 @@ public class ManageTableService implements ManageTableServicePort {
 	
 
 	@Override
-	public TableSchemaDTOv2 getTableSchemaIfPresent(String tableName, int clientId) {
+	public TableSchemaDTOv2 getTableSchemaIfPresent(int clientId, String tableName) {
+		
 		if (!isTableExists(tableName + "_" + clientId))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
 		
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
-		TableSchemaDTO currentTableSchema = compareLocalAndCloudSchemaReturnCurrent(tableName, clientId);
-		
-		// testing
-		logger.info("currentSchema after comparison local Vs. cloud >>>>>>> {}", currentTableSchema);
+		TableSchemaDTO currentTableSchema = compareLocalAndCloudSchemaReturnCurrentSchema(tableName, clientId);
+
 		
 		TableSchemaDTO tableSchema = getTableSchema(tableName + "_" + clientId); 
 		return new TableSchemaDTOv2(
@@ -147,7 +157,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	@Override
-	public Map<Object, Object> getTableDetails(String tableName, int clientId) {
+	public Map<Object, Object> getTableDetails(String tableName, int clientId) {		
 		tableName = tableName + "_" + clientId;
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
 
@@ -240,9 +250,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	@Override
-	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
-		tableSchemaDTO.setTableName(tableName);
+	public ResponseDTO updateTableSchema(int clientId, String tableName, TableSchemaDTO tableSchemaDTO) {
+		tableSchemaDTO.setTableName(tableName+ "_" +clientId);
 		ResponseDTO apiResponseDTO = new ResponseDTO();
+		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		checkForSchemaDeletion(clientId, tableName, tableSchemaDTO.getAttributes());
 		
 		// ADD new schema fields to the table
 		TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
@@ -311,8 +324,9 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	@Override
-	public TableSchemaDTO compareLocalAndCloudSchemaReturnCurrent(String tableName, int clientId) {
-		// TODO Auto-generated method stub
+	public TableSchemaDTO compareLocalAndCloudSchemaReturnCurrentSchema(String tableName, int clientId) {
+	
+
 		return null;
 	}
 	
@@ -590,7 +604,10 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 			
-			// Validate Table Schema Fields
+			// Validate Target Schema Fields
+			targetSchemafields = TableSchemaParser.validateTargetSchemaFields(targetSchemafields);
+			
+			// Check one validation -- useless
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if (validationEntry.containsKey(VALIDATED)) {
 				Object validatedFields = validationEntry.get(VALIDATED);
@@ -605,13 +622,10 @@ public class ManageTableService implements ManageTableServicePort {
 			NamedList<Object> schemaResponseUpdateFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.ReplaceField";
 			int updatedFields = 0;
-			for (Map<String, Object> currField : targetSchemafields) {
+			
+			for (Map<String, Object> currField : targetSchemafields) {	
 				errorCausingField = (String) currField.get("name");
-				// Pass the fieldAttribute to be updated
-				
-//				tempDelete
-				// delete
-				
+				// Pass the fieldAttribute to be updated			
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
@@ -638,8 +652,7 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrException e) {
 			apiResponseDTO.setResponseStatusCode(400);
 			apiResponseDTO.setResponseMessage("Schema could not be updated");
-			logger.error(SOLR_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
-					newTableSchemaDTO.getTableName());
+			logger.error(e.getMessage(), " Existing schema fields couldn't be updated!");
 			logger.error(e.toString());
 		} catch (SolrSchemaValidationException e) {
 			apiResponseDTO.setResponseStatusCode(400);
@@ -700,6 +713,77 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 
+	@Override
+	public ResponseDTO initializeDeleteTableSchemaAttributes(
+			TableSchemaDTO tableSchemaDTO, 
+			int clientId, 
+			String tableName) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+		ResponseDTO deleteRecordInsertionResponse = new ResponseDTO();
+		
+		  File file=new File(deleteSchemaAttributesFilePath + ".txt");
+		  if((clientId>0) && (tableName!=null)) {
+		  try(FileWriter fw = new FileWriter(file, true);
+		   BufferedWriter bw = new BufferedWriter(fw)) {
+		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
+		      bw.write(newRecord);
+		      logger.debug("Table {} Successfully Initialized for Deletion ",tableName);
+		      deleteRecordInsertionResponse.setResponseStatusCode(200);
+		      deleteRecordInsertionResponse.setResponseMessage("Table:" +tableName+" Successfully Initialized For Deletion ");
+		  }catch(Exception e)
+		  {
+			  logger.error(ResponseMessages.TABLE_DELETE_INITIALIZE_ERROR_MSG ,tableName,e);
+			  deleteRecordInsertionResponse.setResponseStatusCode(400);
+			  deleteRecordInsertionResponse.setResponseMessage("Error While Initializing Deletion For Table: "+tableName);
+		  }
+		}else {
+			  logger.debug(ResponseMessages.TABLE_DELETE_INITIALIZE_ERROR_MSG ,tableName);
+			  deleteRecordInsertionResponse.setResponseStatusCode(400);
+			  deleteRecordInsertionResponse.setResponseMessage("Invalid Client ID or Table Name Provided");
+		}
+		  return deleteRecordInsertionResponse;
+	}
+	
+	
+	// Table schema deletion
+	public void checkForSchemaDeletion(
+			int clientId, 
+			String tableName, 
+			List<SchemaFieldDTO> newSchemaDTO) {
+		
+		List<SchemaFieldDTO> existingSchemaAttributes
+			= getTableSchemaIfPresent(clientId, tableName).getAttributes();
+		for(SchemaFieldDTO existingSchemaAttribute : existingSchemaAttributes) {
+			String exsitingSchemaName = existingSchemaAttribute.getName();
+			if(!(exsitingSchemaName.equalsIgnoreCase("_nest_path_")
+					|| exsitingSchemaName.equalsIgnoreCase("_root_")
+					|| exsitingSchemaName.equalsIgnoreCase("_text_") 
+					|| exsitingSchemaName.equalsIgnoreCase("_version_") 
+					|| exsitingSchemaName.equalsIgnoreCase("id"))
+				&& !newSchemaDTO.contains(existingSchemaAttribute)) {
+				initializeSchemaDeletion(clientId, tableName , existingSchemaAttribute.getName());
+			}
+		}
+			
+	}
+	
+	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+		  File file=new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		  try(FileWriter fw = new FileWriter(file, true);
+				   BufferedWriter bw = new BufferedWriter(fw)) {
+			  String newRecord = String.format(
+					  "%d %18s %20s %25s",
+					  clientId,
+					  tableName,
+					  formatter.format(Calendar.getInstance().getTime()),columnName);
+		      bw.write(newRecord);
+		      bw.newLine();
+		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
+		  } catch (IOException e) {
+			logger.error("Error While Intializing Deletion for Schema :{} ",columnName);
+		}
+	}
 
 	 
 }

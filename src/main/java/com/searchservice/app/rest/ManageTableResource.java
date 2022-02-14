@@ -73,21 +73,18 @@ public class ManageTableResource {
     
 	@GetMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<TableSchemaDTOv2> getTable(
-			@PathVariable int clientId, 
-			@PathVariable String tableName) {
+	public ResponseEntity<TableSchemaDTOv2> getTable( 
+			@PathVariable String tableName, 
+			@PathVariable int clientid) {
 		log.info("Get table info");
 
 		// GET tableSchema
-		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName, clientId);
+		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(clientid, tableName);
 		if (tableInfoResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		
-		// testing
-		log.info("schema retrieved..... waiting for tableDetails >>>>>>");
-		
 		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientId);
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientid);
 		
 		// SET tableDetails in tableInfoResponseDTO
 		tableInfoResponseDTO.setTableDetails(tableDetailsMap);
@@ -160,15 +157,15 @@ public class ManageTableResource {
 	@PutMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ResponseDTO> updateTableSchema(
+			@PathVariable int clientid, 
 			@PathVariable String tableName, 
-			@PathVariable int clientid,
 			@RequestBody TableSchemaDTO newTableSchemaDTO) {
-		tableName = tableName + "_" + clientid;
-		log.debug("Solr schema update");
+		log.info("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
-		newTableSchemaDTO.setTableName(tableName);
-		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+		newTableSchemaDTO.setTableName(tableName+ "_" +clientid);
+		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(
+				clientid, tableName, newTableSchemaDTO);
 	
 		if (apiResponseDTO.getResponseStatusCode() == 200)
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);

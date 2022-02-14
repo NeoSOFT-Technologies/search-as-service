@@ -72,17 +72,17 @@ public class VersionedManageTableResource {
 	@GetMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
 	public TableSchemaDTOv2 getTable(
-			@PathVariable int clientid, 
+			@PathVariable int clientId, 
 			@PathVariable String tableName) {
 		log.debug("Get table info");
 
-		tableName = tableName + "_" + clientid;
+		tableName = tableName + "_" + clientId;
 		
 		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName);
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientId);
 
 		// GET tableSchema
-		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName);
+		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(clientId, tableName);
 		if (tableInfoResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		
@@ -156,11 +156,12 @@ public class VersionedManageTableResource {
 	@PutMapping("/{tableName}")
 	@Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseDTO updateTableSchema(
+			@PathVariable int clientId, 
 			@PathVariable String tableName,
 			@RequestBody TableSchemaDTO newTableSchemaDTO) {
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
-		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO);
+		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(clientId, tableName, newTableSchemaDTO);
 		if(apiResponseDTO.getResponseStatusCode() == 200)
 			return apiResponseDTO;
 		else

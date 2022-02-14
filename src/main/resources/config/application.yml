@@ -137,3 +137,9 @@ table-delete-file:
  
 table-delete-duration:
       days: 15
+      
+
+#=================================================================
+#UpdateTable configurations
+table-schema-attributes:
+  delete-file-path: src\\main\\resources\\TableSchemaAttributesDeleteRecord
