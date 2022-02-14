@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.service;
 
 
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.utils.ThrottlerUtils;

@@ -124,7 +124,7 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
-        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 
     }
@@ -165,7 +165,7 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
-        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
     }
 

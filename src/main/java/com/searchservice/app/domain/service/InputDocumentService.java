@@ -19,7 +19,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 	
-	private String servicename = "Manage_Table_Service";
+	private String servicename = "Input_Document_Service";
 
 	private String username = "Username";
 

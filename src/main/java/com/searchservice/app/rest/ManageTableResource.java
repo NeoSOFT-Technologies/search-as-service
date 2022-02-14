@@ -214,37 +214,30 @@ public class ManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 
-		tableName = tableName + "_" + clientid;
-		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName, loggersDTO);
+//		tableName = tableName + "_" + clientid;
+//		ResponseDTO apiResponseDTO = manageTableServicePort.deleteTable(tableName, loggersDTO);
 
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
-		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			LoggerUtils.printlogger(loggersDTO, false, false);
-			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-		} else {
-			log.debug("Exception occurred: {}", apiResponseDTO);
-			LoggerUtils.printlogger(loggersDTO, false, true);
 
-			tableName = tableName + "_" + clientid;
-			if (tableDeleteServicePort.checkTableExistensce(tableName)) {
-				ResponseDTO apiResponseDTOs = tableDeleteServicePort.initializeTableDelete(clientid, tableName);
-				if (apiResponseDTOs.getResponseStatusCode() == 200) {
-					LoggerUtils.printlogger(loggersDTO, false, false);
-					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTOs);
-				} else {
-					log.debug("Exception occurred: {}", apiResponseDTOs);
-					LoggerUtils.printlogger(loggersDTO, false, true);
-					throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
-				}
+		tableName = tableName + "_" + clientid;
+		if (tableDeleteServicePort.checkTableExistensce(tableName)) {
+			ResponseDTO apiResponseDTOs = tableDeleteServicePort.initializeTableDelete(clientid, tableName,loggersDTO);
+			if (apiResponseDTOs.getResponseStatusCode() == 200) {
+				LoggerUtils.printlogger(loggersDTO, false, false);
+				return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTOs);
 			} else {
+				log.debug("Exception occurred: {}", apiResponseDTOs);
 				LoggerUtils.printlogger(loggersDTO, false, true);
-				throw new BadRequestOccurredException(400,
-						"Table " + tableName + " For Client ID " + clientid + " Does Not Exist");
+				throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 			}
+		} else {
+			LoggerUtils.printlogger(loggersDTO, false, true);
+			throw new BadRequestOccurredException(400,
+					"Table " + tableName + " For Client ID " + clientid + " Does Not Exist");
 		}
 	}
 
