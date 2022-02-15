@@ -45,6 +45,7 @@ public class ManageTableResource {
 		this.tableDeleteServicePort = tableDeleteServicePort;
 	}
 
+	
 	@GetMapping("/capacity-plans")
     @Operation(summary = "/get-capacity-plans")
     public ResponseEntity<GetCapacityPlanDTO> capacityPlans() {
@@ -168,8 +169,10 @@ public class ManageTableResource {
 		ResponseDTO apiResponseDTO = manageTableServicePort.updateTableSchema(
 				clientid, tableName, newTableSchemaDTO);
 	
-		if (apiResponseDTO.getResponseStatusCode() == 200)
+		if (apiResponseDTO.getResponseStatusCode() == 200) {
+			apiResponseDTO.setResponseMessage("Table is updated successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		}
 		else
 			throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 	}
