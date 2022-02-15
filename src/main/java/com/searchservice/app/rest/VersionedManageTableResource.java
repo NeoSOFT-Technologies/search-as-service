@@ -79,7 +79,7 @@ public class VersionedManageTableResource {
 		tableName = tableName + "_" + clientId;
 		
 		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientId);
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(clientId, tableName);
 
 		// GET tableSchema
 		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(clientId, tableName);

@@ -86,7 +86,7 @@ public class ManageTableResource {
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		
 		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName, clientid);
+		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(clientid, tableName);
 		
 		// SET tableDetails in tableInfoResponseDTO
 		tableInfoResponseDTO.setTableDetails(tableDetailsMap);

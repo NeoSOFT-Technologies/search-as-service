@@ -20,11 +20,7 @@ public interface ManageTableServicePort {
 	// GET request
 	GetCapacityPlanDTO capacityPlans();
 	ResponseDTO getTables();
-	
 	TableSchemaDTOv2 getCurrentTableSchema(int clientId, String tableName);
-	TableSchemaDTOv2 getTableSchemaIfPresent(int clientId, String tableName);
-	
-	Map<Object, Object> getTableDetails(String tableName, int clientId);
 
 	// CREATE requests
 	ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO);
@@ -41,6 +37,8 @@ public interface ManageTableServicePort {
     ResponseDTO getConfigSets();
     boolean isTableExists(String tableName);
     TableSchemaDTO getTableSchema(String tableName);
+	TableSchemaDTOv2 getTableSchemaIfPresent(int clientId, String tableName);
+	Map<Object, Object> getTableDetails(int clientId, String tableName);
     ResponseDTO createConfigSet(ConfigSetDTO configSetDTO);
     ResponseDTO createTable(ManageTableDTO manageTableDTO);
     TableSchemaDTO addSchemaAttributes(TableSchemaDTO tableSchemaDTO);

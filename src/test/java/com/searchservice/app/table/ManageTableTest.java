@@ -113,15 +113,16 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
-        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.anyInt(), Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.getCurrentTableSchema(Mockito.anyInt(), Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Random message","Data is returned");
-        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(manageTableService.getTableDetails(Mockito.anyInt(), Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
@@ -153,15 +154,16 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
-        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.anyInt(), Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.getCurrentTableSchema(Mockito.anyInt(), Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
         
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Error","Error connecting to cluster.");
-        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(manageTableService.getTableDetails(Mockito.anyInt(), Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);

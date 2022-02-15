@@ -171,51 +171,6 @@ public class ManageTableService implements ManageTableServicePort {
 				currentTableSchema);
 	}
 	
-	
-	@Override
-	public TableSchemaDTOv2 getTableSchemaIfPresent(int clientId, String tableName) {
-		
-		if (!isTableExists(tableName + "_" + clientId))
-			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
-		
-		TableSchemaDTO tableSchema = getTableSchema(tableName + "_" + clientId); 
-		return new TableSchemaDTOv2(
-				tableSchema);
-	}
-	
-	
-	@Override
-	public Map<Object, Object> getTableDetails(String tableName, int clientId) {		
-		tableName = tableName + "_" + clientId;
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
-
-		Map<Object, Object> finalResponseMap = new HashMap<>();
-
-		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
-		CollectionAdminResponse response = null;
-		try {
-			response = clusterStatus.process(solrClientActive);
-		} catch (Exception e) {
-			logger.error(e.toString());
-			finalResponseMap.put("Error", "Error connecting to cluster.");
-			return finalResponseMap;
-		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
-		}
-
-		finalResponseMap = ManageTableUtil.getTableInfoFromClusterStatusResponseObject(
-				response.getResponse().asMap(20), 
-				tableName);
-	
-		if(!finalResponseMap.containsKey("tableDetails")
-				|| finalResponseMap.get("tableDetails") == null) {
-			finalResponseMap = new HashMap<>();
-			finalResponseMap.put("Error", "Invalid table name provided.");
-		}
-		
-		return finalResponseMap;
-	}
-
 
 	@Override
 	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO) {
@@ -436,6 +391,51 @@ public class ManageTableService implements ManageTableServicePort {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return tableSchemaResponseDTO;
+	}
+	
+	
+	@Override
+	public TableSchemaDTOv2 getTableSchemaIfPresent(int clientId, String tableName) {
+		
+		if (!isTableExists(tableName + "_" + clientId))
+			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
+		
+		TableSchemaDTO tableSchema = getTableSchema(tableName + "_" + clientId); 
+		return new TableSchemaDTOv2(
+				tableSchema);
+	}
+	
+	
+	@Override
+	public Map<Object, Object> getTableDetails(int clientId, String tableName) {		
+		tableName = tableName + "_" + clientId;
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+
+		Map<Object, Object> finalResponseMap = new HashMap<>();
+
+		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
+		CollectionAdminResponse response = null;
+		try {
+			response = clusterStatus.process(solrClientActive);
+		} catch (Exception e) {
+			logger.error(e.toString());
+			finalResponseMap.put("Error", "Error connecting to cluster.");
+			return finalResponseMap;
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+
+		finalResponseMap = ManageTableUtil.getTableInfoFromClusterStatusResponseObject(
+				response.getResponse().asMap(20), 
+				tableName);
+	
+		if(!finalResponseMap.containsKey("tableDetails")
+				|| finalResponseMap.get("tableDetails") == null) {
+			finalResponseMap = new HashMap<>();
+			finalResponseMap.put("Error", "Invalid table name provided.");
+		}
+		
+		return finalResponseMap;
 	}
 	
 	
