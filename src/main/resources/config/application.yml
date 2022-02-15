@@ -4,7 +4,7 @@ spring:
     name: basicSample
     data:
     solr:
-      host: http://localhost:8983/solr/
+      host: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr/
       repositories:
         enabled: false
 
@@ -49,7 +49,7 @@ springdoc:
 
 #================================================================
 #Solr Configurations
-base-solr-url: http://localhost:8983/solr
+base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 #================================================================
 
 
