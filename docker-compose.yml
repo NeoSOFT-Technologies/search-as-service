@@ -9,7 +9,7 @@ version: '3.7'
 services:
 
   search-service-ingress:
-    image: karthikpillai/search-service-ingress:latest
+    image: neosoftcoe/search-service-ingress:latest
     container_name: ssi-container
     ports:
       - "3001:8080"
@@ -19,7 +19,7 @@ services:
       - solr1-container
 
   search-service-egress:
-    image: karthikpillai/search-service-egress:latest
+    image: neosoftcoe/search-service-egress:latest
     container_name: sse-container
     ports:
       - "3002:8080"
