@@ -32,13 +32,6 @@ public class TableSchemav2 implements VersionedObjectMapper {
 		this.tableDetails=schemaResponseDTO.getTableDetails();
 	}
 	
-//	public TableSchemaDTOv2(TableSchemaDTO schemaResponseDTO) {
-//		this.statusCode=schemaResponseDTO.getStatusCode();
-//		this.message=schemaResponseDTO.getMessage();
-//		this.schemaName=schemaResponseDTO.getSchemaName();
-//		this.attributes=schemaResponseDTO.getAttributes();
-//		
-//	}
 	
 	public TableSchemav2(TableSchemav2 schemaResponseDTO) {
 		this.statusCode=schemaResponseDTO.getStatusCode();

@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -34,47 +35,47 @@ class TableDeletionTest{
 	
 	private void setMockitoSuccessTableDeleteInitialize() {
 		tableDeleteIntializeResponseDTO = new Response();
-		tableDeleteIntializeResponseDTO.setResponseStatusCode(200);
-		tableDeleteIntializeResponseDTO.setResponseMessage(" Successfully Initialized Table For Deletion" );
+		tableDeleteIntializeResponseDTO.setStatusCode(200);
+		tableDeleteIntializeResponseDTO.setMessage(" Successfully Initialized Table For Deletion" );
 	}
 	
 	private void setMockitoFailedTableDeleteInitialize() {
 		tableDeleteIntializeResponseDTO = new Response();
-		tableDeleteIntializeResponseDTO.setResponseStatusCode(400);
-		tableDeleteIntializeResponseDTO.setResponseMessage(" Failure While Initializing Table For Deletion" );
+		tableDeleteIntializeResponseDTO.setStatusCode(400);
+		tableDeleteIntializeResponseDTO.setMessage(" Failure While Initializing Table For Deletion" );
 	}
 	
 	private void setMockitoFailedTableDeleteUndo() {
 		tableDeleteUndoResponseDTO = new Response();
-		tableDeleteUndoResponseDTO.setResponseStatusCode(400);
-		tableDeleteUndoResponseDTO.setResponseMessage("Failure While Performing Undo For Table Deletion" );
+		tableDeleteUndoResponseDTO.setStatusCode(400);
+		tableDeleteUndoResponseDTO.setMessage("Failure While Performing Undo For Table Deletion" );
 	}
 	
 	private void setMockitoSuccessTableDeleteUndo() {
 		tableDeleteUndoResponseDTO = new Response();
-		tableDeleteUndoResponseDTO.setResponseStatusCode(200);
-		tableDeleteUndoResponseDTO.setResponseMessage("Successfully Performed Undo For Table Deletion" );
+		tableDeleteUndoResponseDTO.setStatusCode(200);
+		tableDeleteUndoResponseDTO.setMessage("Successfully Performed Undo For Table Deletion" );
 	}
 	@Test
 	void testTableDeleteInitialize() {
 		logger.info("Table Delete Intialization test cases getting executed..");
 		//For Valid Client ID and Table Name
 		setMockitoSuccessTableDeleteInitialize();
-		when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		thenReturn(tableDeleteIntializeResponseDTO);
-		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable").getResponseStatusCode());
+		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable",new LoggersDTO()).getStatusCode());
 		
 		//Checking With CLient ID as 0
 		 setMockitoFailedTableDeleteInitialize();
-		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test").getResponseStatusCode());
+		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test",new LoggersDTO()).getStatusCode());
 		
 		//Checking With Table Name as Empty
 		 setMockitoFailedTableDeleteInitialize();
-		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null).getResponseStatusCode());
+		 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null,new LoggersDTO()).getStatusCode());
 	}
 	
 	@Test
@@ -84,21 +85,21 @@ class TableDeletionTest{
 		
 		//Checking for Valid Client ID
 		setMockitoSuccessTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1).getResponseStatusCode());
+		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1,new LoggersDTO()).getStatusCode());
 		
 		//Checking For Invalid Client ID as 0
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0).getResponseStatusCode());
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0,new LoggersDTO()).getStatusCode());
 		
 		//Checking For Invalid Client ID as -100
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100).getResponseStatusCode());
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100,new LoggersDTO()).getStatusCode());
 
 	}
 	
@@ -107,10 +108,10 @@ class TableDeletionTest{
 	
 		logger.info("Table Deletion test cases getting executed..");
 		//Checking for any error while performing deletion
-		when(tableDeleteServicePort.checkDeletionofTable()).
+		when(tableDeleteServicePort.checkDeletionofTable(Mockito.any())).
 		thenReturn(1);
 		try {
-			tableDeleteService.checkDeletionofTable();
+			tableDeleteService.checkDeletionofTable(new LoggersDTO());
 		}catch(Exception e) {
 			assertTrue(0<1);
 		}
