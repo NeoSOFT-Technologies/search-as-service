@@ -1,12 +1,7 @@
 package com.searchservice.app.rest;
 
 
-import java.io.IOException;
-
-
-
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -33,13 +28,7 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}"+"/manage/table")
@@ -89,9 +78,6 @@ public class ManageTableResource {
 	
 	
     @GetMapping("/{clientId}")
-
-
-
     @Operation(summary = "/all-tables summary", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> getTables(@PathVariable int clientId) {
  
@@ -137,34 +123,28 @@ public class ManageTableResource {
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-		tableName = tableName + "_" + clientId;
-		 if(tableDeleteServicePort.isTableUnderDeletion(tableName))
-	     {
-	        throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
-	     }
-	      else {
-		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName,loggersDTO);
 
-		// GET tableSchema
-		TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,loggersDTO);
-
-		successMethod(nameofCurrMethod, loggersDTO);
-		
-		if (tableInfoResponseDTO == null)
-			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
-		
-		// SET tableDetails in tableInfoResponseDTO
-//		tableInfoResponseDTO.setTableDetails(tableDetailsMap);
-		if (tableInfoResponseDTO.getStatusCode() == 200) {
-			LoggerUtils.printlogger(loggersDTO, false, false);
-			tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
-			return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + clientId)) {
+			throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
 		} else {
-			LoggerUtils.printlogger(loggersDTO, false, true);
-			throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+
+			// GET tableSchema
+			TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(clientId, tableName);
+
+			successMethod(nameofCurrMethod, loggersDTO);
+
+			if (tableInfoResponseDTO == null)
+				throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
+
+			if (tableInfoResponseDTO.getStatusCode() == 200) {
+				LoggerUtils.printlogger(loggersDTO, false, false);
+				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
+				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
+			} else {
+				LoggerUtils.printlogger(loggersDTO, false, true);
+				throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+			}
 		}
-	    }
 	}
 
 
@@ -271,7 +251,6 @@ public class ManageTableResource {
 			@PathVariable String tableName, 
 			@PathVariable int clientId,
 			@RequestBody TableSchema newTableSchemaDTO) {
-		tableName = tableName + "_" + clientId;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -285,7 +264,7 @@ public class ManageTableResource {
 		if(!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 		newTableSchemaDTO.setTableName(tableName);
 
-		Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,loggersDTO);
+		Response apiResponseDTO = manageTableServicePort.updateTableSchema(clientId, tableName, newTableSchemaDTO,loggersDTO);
 		
 		successMethod(nameofCurrMethod, loggersDTO);
 		

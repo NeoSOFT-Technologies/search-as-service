@@ -1,7 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,9 +120,6 @@ public class VersionedManageTableResource {
 	        throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
 	     }
 	      else {
-        // GET tableDetails
-        Map<Object, Object> tableDetailsMap = manageTableServicePort.getTableDetails(tableName,loggersDTO);
-
         // GET tableSchema
         TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,loggersDTO);
        
@@ -132,8 +127,6 @@ public class VersionedManageTableResource {
         
         if (tableInfoResponseDTO == null)
             throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
-
-        // SET tableDetails in tableInfoResponseDTO
 
         if (tableInfoResponseDTO.getStatusCode() == 200) {
             tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
@@ -235,7 +228,8 @@ public class VersionedManageTableResource {
 
     @PutMapping("/{tableName}")
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-    public Response updateTableSchema(@PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
+    public Response updateTableSchema(
+    		@PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -246,21 +240,22 @@ public class VersionedManageTableResource {
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-		if(!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+
+		if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 			newTableSchemaDTO.setTableName(tableName);
-			Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,loggersDTO);
+			Response apiResponseDTO = manageTableServicePort.updateTableSchema(101, tableName, newTableSchemaDTO,
+					loggersDTO);
 			successMethod(nameofCurrMethod, loggersDTO);
-			
+
 			if (apiResponseDTO.getStatusCode() == 200) {
 				LoggerUtils.printlogger(loggersDTO, false, false);
 				return apiResponseDTO;
-			}
-			else {
+			} else {
 				LoggerUtils.printlogger(loggersDTO, false, true);
 				throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 			}
-		}else {
-			throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
-		}	
+		} else {
+			throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
 		}
+	}
 }

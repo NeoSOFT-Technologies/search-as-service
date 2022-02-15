@@ -85,7 +85,7 @@ public class DocumentParserUtil {
             String payloadJsonObjectKey = itr.next();
             Object payloadJsonObjectValue = payloadJSON.get(payloadJsonObjectKey);
 
-            log.debug(payloadJsonObjectKey + "=" + payloadJsonObjectValue);
+            log.debug("{}={}", payloadJsonObjectKey, payloadJsonObjectValue);
 
             if(schemaKeyValuePair.containsKey(payloadJsonObjectKey)) {
 
@@ -202,8 +202,7 @@ public class DocumentParserUtil {
             schemaResponse = schemaRequest.process(solrClient);
         } catch (Exception e) {        	
             log.error(e.toString());          
-            return null;
-         
+            return new HashMap<>();
         }
 
         List<Map<String, Object>> schemaResponseFields= null;

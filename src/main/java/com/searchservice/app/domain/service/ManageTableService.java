@@ -1,10 +1,20 @@
 package com.searchservice.app.domain.service;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -48,6 +58,7 @@ import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.OperationIncompleteException;
 import com.searchservice.app.rest.errors.SolrSchemaValidationException;
 
 import lombok.AllArgsConstructor;
@@ -74,6 +85,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
     private static final String DEFAULT_CONFIGSET = "_default";
+    private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -86,8 +98,12 @@ public class ManageTableService implements ManageTableServicePort {
 	@Value("${base-configset}")
 	private String baseConfigSet;
 	
-	private String servicename = "Manage_Table_Service";
+	// UPDATE Table
+	@Value("${table-schema-attributes.delete-file-path}")
+	String deleteSchemaAttributesFilePath;
+	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 	
+	private String servicename = "Manage_Table_Service";
 	private String username = "Username";
 
 	@Autowired
@@ -167,6 +183,21 @@ public class ManageTableService implements ManageTableServicePort {
 		return getListItemsResponseDTO;
 	}
 	
+	
+	@Override
+	public TableSchemav2 getCurrentTableSchema(int clientId, String tableName) {
+		
+		if (!isTableExists(tableName + "_" + clientId))
+			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
+
+		// GET tableSchema at solr cloud
+		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + clientId);
+		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		return compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
+				tableName, clientId, tableSchema);
+	}
+	
 
 	@Override
 	public TableSchemav2 getTableSchemaIfPresent(String tableName,LoggersDTO loggersDTO) {
@@ -183,10 +214,8 @@ public class ManageTableService implements ManageTableServicePort {
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 		TableSchemav2 tableSchema = getTableSchema(tableName); 
 		LoggerUtils.printlogger(loggersDTO,false,false);
+		
 		return  tableSchema;
-
-		
-		
 	}
 	
 	
@@ -318,18 +347,20 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	@Override
-	public Response updateTableSchema(String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO) {
+	public Response updateTableSchema(int clientId, String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO) {
 
 		logger.debug("update Table Schema");
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
-		tableSchemaDTO.setTableName(tableName);
+		tableSchemaDTO.setTableName(tableName + "_" + clientId);
 		Response apiResponseDTO = new Response();
 		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		checkForSchemaSoftDeletion(clientId, tableName, tableSchemaDTO.getColumns());
+		
 		// ADD new schema fields to the table
-
 		Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 
 		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
@@ -401,6 +432,35 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	@Override
+	public TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
+			String tableName, int clientId, TableSchemav2 tableSchema) {
+	
+		TableSchemav2Data data= new TableSchemav2Data();
+		data.setTableName(tableName);
+		
+		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
+		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
+		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
+				clientId, tableName);
+
+		// Prepare the final tableSchema to return
+		List<SchemaField> schemaAttributesFinal = new ArrayList<>();
+		List<String> schemaAttributesToSkipNames = new ArrayList<>();
+		// Note down schemaAttributes to skip
+		for(SchemaField dto: schemaAttributesCloud) {
+			if(!deletedSchemaAttributesNames.contains(dto.getName())) {
+				schemaAttributesFinal.add(dto);	
+			}
+			schemaAttributesToSkipNames.add(dto.getName());
+		}
+		data.setColumns(schemaAttributesFinal);
+		tableSchema.setData(data);
+		
+		return tableSchema;
+	}
+	
+	
+	@Override
 	public TableSchemav2 getTableSchema(String tableName) {
 		logger.info("Getting table schema");
 
@@ -409,7 +469,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
 		TableSchemav2Data data= new TableSchemav2Data();
-		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
 		try {
@@ -417,8 +476,6 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.info("Get request has been processed. Setting status code = 200");
 			tableSchemaResponseDTO.setStatusCode(200);
 
-			SchemaRepresentation schemaRepresentation = schemaResponse.getSchemaRepresentation();
-			schemaName = schemaRepresentation.getName();
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
 			List<SchemaField> solrSchemaFieldDTOs = new ArrayList<>();
@@ -557,7 +614,7 @@ public class ManageTableService implements ManageTableServicePort {
 			
 			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
-			HashMap<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
+			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
@@ -691,11 +748,7 @@ public class ManageTableService implements ManageTableServicePort {
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
-				// Pass the fieldAttribute to be updated
-				
-//				tempDelete
-				// delete
-				
+				// Pass the fieldAttribute to be updated	
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
@@ -782,6 +835,170 @@ public class ManageTableService implements ManageTableServicePort {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return apiResponseDTO;
+	}
+	
+	
+	// Table schema deletion
+	public void checkForSchemaSoftDeletion(
+			int clientId, 
+			String tableName, 
+			List<SchemaField> newSchemaDTO) {
+		
+		List<SchemaField> existingSchemaAttributes
+			= getTableSchema(tableName).getData().getColumns();
+		for(SchemaField existingSchemaAttribute : existingSchemaAttributes) {
+			String exsitingSchemaName = existingSchemaAttribute.getName();
+			if(!(exsitingSchemaName.equalsIgnoreCase("_nest_path_")
+					|| exsitingSchemaName.equalsIgnoreCase("_root_")
+					|| exsitingSchemaName.equalsIgnoreCase("_text_") 
+					|| exsitingSchemaName.equalsIgnoreCase("_version_") 
+					|| exsitingSchemaName.equalsIgnoreCase("id"))
+				&& !newSchemaDTO.contains(existingSchemaAttribute)) {
+				initializeSchemaDeletion(clientId, tableName , existingSchemaAttribute.getName());
+			}
+		}
+			
+	}
+	
+	
+	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
+		  File file=new File(deleteSchemaAttributesFilePath);
+		  try(FileWriter fw = new FileWriter(file, true);
+				   BufferedWriter bw = new BufferedWriter(fw)) {
+			  String newRecord = String.format(
+					  "%d %18s %20s %25s",
+					  clientId,
+					  tableName,
+					  formatter.format(Calendar.getInstance().getTime()),columnName);
+		      bw.write(newRecord);
+		      bw.newLine();
+		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
+		  } catch (IOException e) {
+			logger.error("Error While Intializing Deletion for Schema :{} ",columnName);
+		}
+	}
+
+	
+	// Soft Delete Table Schema Info Retrieval
+	public List<String> readSchemaInfoFromSchemaDeleteManager(
+			int clientId, String tableName) {
+		List<String> deletedSchemaAttributes = new ArrayList<>();
+		
+		File schemaSoftDeleteFile = new File(deleteSchemaAttributesFilePath + ".txt");
+		try (BufferedReader br = new BufferedReader(new FileReader(schemaSoftDeleteFile))) {
+			int lineNumber = 0;
+			String currentDeleteRecordLine;
+			while ((currentDeleteRecordLine = br.readLine()) != null) {
+				if (lineNumber > 0) {
+					String[] currentRecordData = currentDeleteRecordLine.split("\\s+");				
+					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
+							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
+						deletedSchemaAttributes.add(currentRecordData[4]);
+					}
+				}
+				lineNumber++;
+			}
+		} catch (Exception e) {
+			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
+		}
+		
+		return deletedSchemaAttributes;
+	}
+
+	
+	public void checkForSchemaDeletion() {
+		File existingSchemaFile = new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		File newSchemaFile = new File("src\\main\\resources\\SchemaDeleteRecordTemp.txt");
+		int lineNumber = 0;
+		int schemaDeleteRecordCount = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
+				PrintWriter pw = new PrintWriter(new FileWriter(newSchemaFile))) {
+			String currentSchemaDeleteRecord;
+			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					long diff = checkDatesDifference(currentSchemaDeleteRecord);
+					if (diff < 15) {
+						pw.println(currentSchemaDeleteRecord);
+					} else {
+						if (performSchemaDeletion(currentSchemaDeleteRecord.split(" "))) {
+							schemaDeleteRecordCount++;
+
+						} else {
+							pw.println(currentSchemaDeleteRecord);
+						}
+					}
+				} else {
+					pw.println(currentSchemaDeleteRecord);
+				}
+				lineNumber++;
+			}
+			pw.flush();
+			makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
+		} catch (IOException exception) {
+			logger.error("Error While Performing Schema Deletion ", exception);
+		}
+	}
+	 
+	
+	public long checkDatesDifference(String currentDeleteRecord) {
+		try{
+	    String[] data =  currentDeleteRecord.split(" ");
+		StringBuilder date = new StringBuilder();
+		int position = data.length - 2;
+		for(int i = position ; i<data.length;i++) {
+    		date.append( (i!= data.length -1) ? data[i] + " " : data[i] );
+    	}
+      Date requestDate = formatter.parse(date.toString());
+      Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
+      long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
+	  return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		}catch(Exception e) {
+			logger.error("Error!",e);
+			return 0;
+		}
+	}
+	
+	
+	public boolean performSchemaDeletion(String[] schemaDeleteData) {
+		String columnName = schemaDeleteData[schemaDeleteData.length-1];
+		String tableName = schemaDeleteData[7];
+		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
+				tableName);
+		try {
+			SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
+			UpdateResponse deleteFieldResponse = deleteFieldRequest.process(solrClientActive);
+			if(deleteFieldResponse.getStatus() == 200) {
+				logger.debug("Schema {} Succesfully Deleted ",columnName);
+				return true;
+			}else {
+				logger.debug("Schema {} Deletion Failed ",columnName);
+				return false;
+			}	
+		}catch(Exception e) {
+			logger.error("Exception Occured While Performing Deletion for Schema {} "+columnName,e);
+			return false;
+		}
+	}
+	
+	
+	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
+		File schemaDeleteRecordFile = new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
+		     checkTableDeletionStatus(schemaDeleteRecordCount);
+		  }
+	}
+	
+	
+	public boolean checkTableDeletionStatus(int schemaDeleteRecordCount) {
+		if(schemaDeleteRecordCount >0) {
+        	logger.debug("Total Number of Schema's Found and Deleted: {}",schemaDeleteRecordCount);
+        	return true;
+	     }
+	     else {
+	      	logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
+	      	return false;
+	      }
 	}
 	 
 }
