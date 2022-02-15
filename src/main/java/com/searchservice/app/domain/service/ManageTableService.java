@@ -973,7 +973,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	public boolean performSchemaDeletion(String[] schemaDeleteData) {
 		String columnName = schemaDeleteData[schemaDeleteData.length-1];
-		String tableName = schemaDeleteData[schemaDeleteData.length-4];
+		String tableName = schemaDeleteData[7];
+		
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
 				tableName);
 		try {
