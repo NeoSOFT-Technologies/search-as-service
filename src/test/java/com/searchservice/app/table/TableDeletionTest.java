@@ -63,51 +63,68 @@ class TableDeletionTest{
 		setMockitoSuccessTableDeleteInitialize();
 		when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		thenReturn(tableDeleteIntializeResponseDTO);
-
-		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable",new LoggersDTO()).getStatusCode());
+		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable_10_101",new LoggersDTO()).getStatusCode());
 
 		
 		//Checking With CLient ID as 0
 		 setMockitoFailedTableDeleteInitialize();
 		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test",new LoggersDTO()).getStatusCode());
+		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test_10_101",new LoggersDTO()).getStatusCode());
 
 		
+		//Checking With Table Name as Null
+		 setMockitoFailedTableDeleteInitialize();
+		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
+		 thenReturn(tableDeleteIntializeResponseDTO);
+		 try {
+			 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null,new LoggersDTO()).getStatusCode());
+			}catch(Exception e) {
+				assertTrue(0<1);
+			}
+		 
 		//Checking With Table Name as Empty
 		 setMockitoFailedTableDeleteInitialize();
 		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null,new LoggersDTO()).getStatusCode());
+		 try {
+			 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,"",new LoggersDTO()).getStatusCode());
+			}catch(Exception e) {
+				assertTrue(0<1);
+			}
+		
 	}
 	
 	@Test
 	void testTableDeletionUndo() {
 		
 		logger.info("Undo Table Deletion test cases getting executed..");
-		
-		//Checking for Valid Client ID
-		setMockitoSuccessTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
-		thenReturn(tableDeleteUndoResponseDTO);
-
-		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1,new LoggersDTO()).getStatusCode());
-		
-		//Checking For Invalid Client ID as 0
+			
+		//Checking With Valid Details
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0,new LoggersDTO()).getStatusCode());
-
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord("Test_10_101",new LoggersDTO()).getStatusCode());
 		
-		//Checking For Invalid Client ID as -100
+		//Checking For Invalid Table Name As Null 
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100,new LoggersDTO()).getStatusCode());
-
+		 try {
+			 assertEquals(400, tableDeleteService.undoTableDeleteRecord(null,new LoggersDTO()).getStatusCode());
+			}catch(Exception e) {
+				assertTrue(0<1);
+			}
+		
+		//Checking For Invalid Table Name As Empty String 
+			setMockitoFailedTableDeleteUndo();
+			when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).
+			thenReturn(tableDeleteUndoResponseDTO);
+			 try {
+				 assertEquals(400, tableDeleteService.undoTableDeleteRecord("",new LoggersDTO()).getStatusCode());
+				}catch(Exception e) {
+					assertTrue(0<1);
+				}
 	}
 	
 	@Test
