@@ -16,6 +16,7 @@ spring:
 
 server:
   port: 8080
+<<<<<<< HEAD
   
   
 #================================================================
@@ -36,6 +37,8 @@ logging:
     org.hibernate: "error"
     org: "error"
     
+=======
+>>>>>>> branch 'main' of https://github.com/NeoSOFT-Technologies/search-as-service.git
 
 #================================================================
 #Swagger
@@ -157,3 +160,16 @@ table-delete-file:
  
 table-delete-duration:
       days: 15
+      
+
+#=================================================================
+#UpdateTable configurations
+table-schema-attributes:
+  delete-file-path: src\\main\\resources\\SchemaDeleteRecord
+schema-delete-record:
+  formatter:
+    table-name: 18
+    request-time: 20
+    column-name: 25
+  
+#=================================================================
