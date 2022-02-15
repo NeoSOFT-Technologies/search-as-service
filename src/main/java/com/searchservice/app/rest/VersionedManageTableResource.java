@@ -97,9 +97,6 @@ public class VersionedManageTableResource {
             throw new NullPointerOccurredException(404, "Received Null response from 'GET tables' service");
         if (getListItemsResponseDTO.getStatusCode() == 200) {
         	LoggerUtils.printlogger(loggersDTO, false, false);
-        	 List<String> existingTablesList=getListItemsResponseDTO.getData();
-             existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
-             getListItemsResponseDTO.setData(existingTablesList);
             return getListItemsResponseDTO;
         } else {
         	LoggerUtils.printlogger(loggersDTO, false, true);

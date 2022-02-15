@@ -1,5 +1,6 @@
 package com.searchservice.app.rest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class ManageTableResource {
 	
     @GetMapping("/{clientId}")
     @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> getTables(@PathVariable int clientId) {
+    public ResponseEntity<Response> getTables(@PathVariable int clientId) throws IOException {
         log.debug("Get all tables");
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
