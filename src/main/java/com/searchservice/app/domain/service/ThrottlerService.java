@@ -33,7 +33,7 @@ public class ThrottlerService implements ThrottlerServicePort {
 
         // prepare Rate Limiting Response DTO
         ThrottlerResponse rateLimitResponseDTO = new ThrottlerResponse();
-        rateLimitResponseDTO.setResponseMessage(
+        rateLimitResponseDTO.setMessage(
         		"Too many requests made! "
         		+ "No further calls are accepted right now");
         rateLimitResponseDTO.setStatusCode(429);
@@ -55,12 +55,12 @@ public class ThrottlerService implements ThrottlerServicePort {
 		
 		if(isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(405);
-			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+			throttlerMaxRequestSizeResponseDTO.setMessage(
 					"Incoming request size exceeded the limit! "
 					+ "This request can't be processed");
 		} else {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
-			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+			throttlerMaxRequestSizeResponseDTO.setMessage(
 					"Incoming request size is under the limit, can be processed");
 		}
 		logger.info("Max request size limiting has been applied");
@@ -90,12 +90,12 @@ public class ThrottlerService implements ThrottlerServicePort {
     		throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSizeBatch);
 		if(isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(406);
-			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+			throttlerMaxRequestSizeResponseDTO.setMessage(
 					"Incoming request size exceeded the limit! "
 					+ "This request can't be processed");
 		} else {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
-			throttlerMaxRequestSizeResponseDTO.setResponseMessage(
+			throttlerMaxRequestSizeResponseDTO.setMessage(
 					"Incoming request size is under the limit, can be processed");
 		}
 		logger.info("Max request size limiting has been applied");

@@ -56,16 +56,20 @@ public class ManageTableResource {
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 		
         GetCapacityPlan getCapacityPlanDTO=manageTableServicePort.capacityPlans(loggersDTO);
         
         successMethod(nameofCurrMethod, loggersDTO);
         LoggerUtils.printlogger(loggersDTO, false, false);
         return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
+    }
+    private LoggersDTO logGen(String nameofCurrMethod, String timestamp) {
+        LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
+		LoggerUtils.printlogger(loggersDTO, true, false);
+		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
+		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+        return loggersDTO;
     }
 	
 	
@@ -76,10 +80,7 @@ public class ManageTableResource {
         
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
        Response getListItemsResponseDTO=manageTableServicePort.getTables(clientId,loggersDTO);
 
@@ -107,10 +108,7 @@ public class ManageTableResource {
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 		
 
 		tableName = tableName + "_" + clientId;
@@ -148,10 +146,7 @@ public class ManageTableResource {
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 		
 		manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);
 
@@ -180,10 +175,7 @@ public class ManageTableResource {
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 		
 		tableName = tableName + "_" + clientId;
 
@@ -216,10 +208,7 @@ public class ManageTableResource {
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
-		LoggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 		
 		Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(clientId,loggersDTO);
 

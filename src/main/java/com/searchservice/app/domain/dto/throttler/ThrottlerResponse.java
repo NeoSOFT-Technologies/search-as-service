@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ThrottlerResponse implements VersionedObjectMapper {
 	private int statusCode;
-	private String responseMessage;
+	private String message;
 	
 	// Rate Limiter member variables
 	private String maxRequestsAllowed; // maximum number of requests allowed for current limitRefreshPeriod
@@ -29,7 +29,7 @@ public class ThrottlerResponse implements VersionedObjectMapper {
 	
 	public ThrottlerResponse(int statusCode, String responseMessage) {
 		this.statusCode = statusCode;
-		this.responseMessage = responseMessage;
+		this.message = responseMessage;
 	}
 	
 	@Override

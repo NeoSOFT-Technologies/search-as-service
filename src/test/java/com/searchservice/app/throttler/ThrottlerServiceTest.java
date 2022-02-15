@@ -75,7 +75,7 @@ class ThrottlerServiceTest {
 	void setUp() throws Exception {
 		// Set up Mockito response for Rate Limiter Tester
 		rateLimitResponseDTO = new ThrottlerResponse();
-	    rateLimitResponseDTO.setResponseMessage(
+	    rateLimitResponseDTO.setMessage(
 		"Too many requests made! "
 		+ "No further calls are accepted right now");
 	    rateLimitResponseDTO.setStatusCode(429);
@@ -89,7 +89,7 @@ class ThrottlerServiceTest {
 	    maxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize202);
 	    maxReqSizeResponseDTO.setIncomingRequestSize("0.06kB");
 	    maxReqSizeResponseDTO.setStatusCode(202);
-	    maxReqSizeResponseDTO.setResponseMessage(
+	    maxReqSizeResponseDTO.setMessage(
 				"Incoming request size is under the limit, can be processed");
 	    
 	    throttlerMaxReqSizeResponseDTO = new ThrottlerResponse();	    
@@ -104,7 +104,7 @@ class ThrottlerServiceTest {
 	    maxReqSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSize405);
 	    maxReqSizeResponseDTO.setIncomingRequestSize("0.066kB");
 	    maxReqSizeResponseDTO.setStatusCode(405);
-	    maxReqSizeResponseDTO.setResponseMessage(
+	    maxReqSizeResponseDTO.setMessage(
 				"Incoming request size exceeded the limit! "
 				+ "This request can't be processed");
 	    
