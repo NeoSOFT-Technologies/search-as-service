@@ -22,12 +22,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlan;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
