@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TableSchemav2 implements VersionedObjectMapper {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class TableSchemav2Data {
         private String tableName;
         private List<SchemaField> columns;

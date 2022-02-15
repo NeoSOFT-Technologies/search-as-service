@@ -298,37 +298,34 @@ private String servicename = "Table_Delete_Service";
 		return res;
 	}
 	@Override
-	public List<String> getTableUnderDeletion()  {
-		List<String> tableUnderDeletionList=new ArrayList<String>();
+	public List<String> getTableUnderDeletion() {
+		List<String> tableUnderDeletionList = new ArrayList<String>();
 		BufferedReader br = null;
 		File existingFile = new File(deleteRecordFilePath + ".txt");
 		int lineNumber = 0;
 		try {
 			br = new BufferedReader(new FileReader(existingFile));
 			String st;
-			while ((st = br.readLine()) != null) 
-			{
-		       if(lineNumber!=0) {
-		         String currentntTableName="";
-			     String[] tableDeleteData = st.split(" ");
-			     currentntTableName=tableDeleteData[tableDeleteData.length-5];
-			     tableUnderDeletionList.add(currentntTableName);
-		       	}
-			lineNumber++;
-		   	}      
-		  
-		  }
-		catch(Exception e)
-		{
-			logger.error("Some Error Occured While Getting Table",e);	
-		}finally {
-			
+			while ((st = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					String currentTableName = "";
+					String[] tableDeleteData = st.split(" ");
+					currentTableName = tableDeleteData[tableDeleteData.length - 5];
+					tableUnderDeletionList.add(currentTableName);
+				}
+				lineNumber++;
+			}
+
+		} catch (Exception e) {
+			logger.error("Some Error Occured While Getting Table", e);
+		} finally {
+
 			try {
 				br.close();
 			} catch (IOException e) {
-				logger.error("Some Error Occured While Getting Table",e);
+				logger.error("Some Error Occured While Getting Table", e);
 			}
 		}
 		return tableUnderDeletionList;
 	}
-	}
+}

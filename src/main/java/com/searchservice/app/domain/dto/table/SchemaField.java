@@ -1,5 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
@@ -17,6 +18,7 @@ public class SchemaField implements VersionedObjectMapper {
 
 	String name;
 	String type;
+	@JsonIgnore
 	String default_;
 	boolean isRequired;
 	boolean isFilterable;
