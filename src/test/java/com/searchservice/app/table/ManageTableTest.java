@@ -22,12 +22,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.GetCapacityPlan;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -86,7 +84,7 @@ class ManageTableTest {
     
     public void setMockitoSuccessResponseForService() {
         Response responseDTO = new Response();
-        responseDTO.setStatusCode(200);;
+        responseDTO.setStatusCode(200);
         responseDTO.setMessage("Testing");
 
         Response responseDTOisCollectionExists = new Response();
@@ -115,9 +113,8 @@ class ManageTableTest {
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables(clientId,Mockito.any())).thenReturn(getTablesResponseDTO);
-//        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+ //       Mockito.when(manageTableService.getTables(clientId,Mockito.any())).thenReturn(getTablesResponseDTO);
+        Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
         Mockito.when(manageTableService.capacityPlans(Mockito.any())).thenReturn(capacityPlanResponseDTO);
         
         Map<Object, Object> finalResponseMap= new HashMap<>();
@@ -154,9 +151,9 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.any(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables(clientId,Mockito.any())).thenReturn(getTablesResponseDTO);
+       
 //        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans(Mockito.any())).thenReturn(capacityPlanResponseDTO);
         
@@ -259,7 +256,7 @@ class ManageTableTest {
     void testGetTables() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/"+clientId)
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/"+clientId )
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
