@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.service.TableDeleteService;
 
 @EnableScheduling
@@ -16,9 +17,9 @@ public class SearchServiceSchedular {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Scheduled(cron="0 15 8 * * ?")
-	public void checkCollectionSoftDelete()
+	public void checkCollectionSoftDelete(LoggersDTO loggersDTO)
 	{
 		logger.debug("Check Table Delete Operation Started");
-		 tableDeleteService.checkDeletionofTable();
+		 tableDeleteService.checkDeletionofTable(loggersDTO);
 	}
 }

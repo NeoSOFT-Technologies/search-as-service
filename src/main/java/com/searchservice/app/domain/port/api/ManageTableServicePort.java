@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.GetCapacityPlan;
 import com.searchservice.app.domain.dto.table.ManageTable;
@@ -19,17 +20,17 @@ public interface ManageTableServicePort {
 	 * CRUD operations for managing tables
 	 */
 	// GET request
-	GetCapacityPlan capacityPlans();
-	Response getTables(int clientid);
-	TableSchemav2 getTableSchemaIfPresent(String tableName);
-	Map<Object, Object> getTableDetails(String tableName);
+	GetCapacityPlan capacityPlans(LoggersDTO loggersDTO);
+	Response getTables(int clientid,LoggersDTO loggersDTO);
+	TableSchemav2 getTableSchemaIfPresent(String tableName,LoggersDTO loggersDTO);
+	Map<Object, Object> getTableDetails(String tableName,LoggersDTO loggersDTO);
 
 	// CREATE requests
-	Response createTableIfNotPresent(ManageTable manageTableDTO);
+	Response createTableIfNotPresent(ManageTable manageTableDTO,LoggersDTO loggersDTO);
 	// DELETE requests
-	Response deleteTable(String tableName);
+	Response deleteTable(String tableName,LoggersDTO loggersDTO);
 	// UPDATE requests
-	Response updateTableSchema(String tableName, TableSchema tableSchemaDTO);
+	Response updateTableSchema(String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO);
     
     
     /*
