@@ -26,7 +26,7 @@ public class MapperVersioningUtil {
 	
 	// Base urls
 	@Value("${base-url.api-endpoint.manage-table}")
-	public static String BASE_URL_MANAGE_TABLE;
+	private static String BASE_URL_MANAGE_TABLE;
 	
 	// VersionedResources
 	private static List<Class<?>> versioned = new ArrayList<>();

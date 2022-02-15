@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -60,21 +61,25 @@ class TableDeletionTest{
 		logger.info("Table Delete Intialization test cases getting executed..");
 		//For Valid Client ID and Table Name
 		setMockitoSuccessTableDeleteInitialize();
-		when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		thenReturn(tableDeleteIntializeResponseDTO);
-		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable").getStatusCode());
+
+		assertEquals(200,tableDeleteService.initializeTableDelete(1,"TestTable",new LoggersDTO()).getStatusCode());
+
 		
 		//Checking With CLient ID as 0
 		 setMockitoFailedTableDeleteInitialize();
-		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test").getStatusCode());
+		 assertEquals(400 ,tableDeleteService.initializeTableDelete(0,"Test",new LoggersDTO()).getStatusCode());
+
 		
 		//Checking With Table Name as Empty
 		 setMockitoFailedTableDeleteInitialize();
-		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString())).
+		 when(tableDeleteServicePort.initializeTableDelete(Mockito.anyInt(),Mockito.anyString(),Mockito.any())).
 		 thenReturn(tableDeleteIntializeResponseDTO);
-		 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null).getStatusCode());
+
+		 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,null,new LoggersDTO()).getStatusCode());
 	}
 	
 	@Test
@@ -84,21 +89,24 @@ class TableDeletionTest{
 		
 		//Checking for Valid Client ID
 		setMockitoSuccessTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1).getStatusCode());
+
+		assertEquals(200, tableDeleteService.undoTableDeleteRecord(1,new LoggersDTO()).getStatusCode());
 		
 		//Checking For Invalid Client ID as 0
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0).getStatusCode());
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(0,new LoggersDTO()).getStatusCode());
+
 		
 		//Checking For Invalid Client ID as -100
 		setMockitoFailedTableDeleteUndo();
-		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt())).
+		when(tableDeleteServicePort.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).
 		thenReturn(tableDeleteUndoResponseDTO);
-		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100).getStatusCode());
+
+		assertEquals(400, tableDeleteService.undoTableDeleteRecord(-100,new LoggersDTO()).getStatusCode());
 
 	}
 	
@@ -107,10 +115,10 @@ class TableDeletionTest{
 	
 		logger.info("Table Deletion test cases getting executed..");
 		//Checking for any error while performing deletion
-		when(tableDeleteServicePort.checkDeletionofTable()).
+		when(tableDeleteServicePort.checkDeletionofTable(Mockito.any())).
 		thenReturn(1);
 		try {
-			tableDeleteService.checkDeletionofTable();
+			tableDeleteService.checkDeletionofTable(new LoggersDTO());
 		}catch(Exception e) {
 			assertTrue(0<1);
 		}

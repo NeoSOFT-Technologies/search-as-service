@@ -88,6 +88,10 @@ dependencies {
 
 	//SolrJ
 	implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
+	
+	// https://mvnrepository.com/artifact/joda-time/joda-time
+	implementation group: 'joda-time', name: 'joda-time', version: '2.10.13'
+	
 
 	//Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.22'
