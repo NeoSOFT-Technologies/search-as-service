@@ -112,14 +112,12 @@ public class ManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
-
-		tableName = tableName + "_" + clientId;
-		
 		// GET tableDetails
-		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(tableName,loggersDTO);
+//		Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(
+//				tableName + "_" + clientId, loggersDTO);
 
 		// GET tableSchema
-		TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,loggersDTO);
+		TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(clientId, tableName);
 
 		successMethod(nameofCurrMethod, loggersDTO);
 		
@@ -245,7 +243,6 @@ public class ManageTableResource {
 			@PathVariable String tableName, 
 			@PathVariable int clientId,
 			@RequestBody TableSchema newTableSchemaDTO) {
-		tableName = tableName + "_" + clientId;
 		log.debug("Solr schema update");
 		log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -258,7 +255,7 @@ public class ManageTableResource {
 		
 		newTableSchemaDTO.setTableName(tableName);
 
-		Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,loggersDTO);
+		Response apiResponseDTO = manageTableServicePort.updateTableSchema(clientId, tableName, newTableSchemaDTO,loggersDTO);
 		
 		successMethod(nameofCurrMethod, loggersDTO);
 		

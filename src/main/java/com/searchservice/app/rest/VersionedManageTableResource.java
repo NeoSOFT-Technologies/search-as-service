@@ -226,7 +226,8 @@ public class VersionedManageTableResource {
 
     @PutMapping("/{tableName}")
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-    public Response updateTableSchema(@PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
+    public Response updateTableSchema(
+    		@PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -238,7 +239,7 @@ public class VersionedManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
-        Response apiResponseDTO = manageTableServicePort.updateTableSchema(tableName, newTableSchemaDTO,loggersDTO);
+        Response apiResponseDTO = manageTableServicePort.updateTableSchema(101, tableName, newTableSchemaDTO,loggersDTO);
 
         successMethod(nameofCurrMethod, loggersDTO);
         
