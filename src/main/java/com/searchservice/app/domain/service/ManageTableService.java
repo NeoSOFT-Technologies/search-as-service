@@ -1,16 +1,20 @@
 package com.searchservice.app.domain.service;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.TimeUnit;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -95,6 +99,7 @@ public class ManageTableService implements ManageTableServicePort {
 	SolrAPIAdapter solrAPIAdapter;
 	HttpSolrClient solrClient;
 
+	SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	public ManageTableService(String solrUrl, SolrAPIAdapter solrAPIAdapter, HttpSolrClient solrClient) {
 		this.solrURL = solrUrl;
 		this.solrAPIAdapter = solrAPIAdapter;
@@ -249,9 +254,8 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
-		
 		if(apiResponseDTO.getResponseStatusCode() == 200) {
-		   checkForSchemaDeletion(tableName, tableSchemaDTO.getAttributes());
+			checkIfSchemaToBeDeleted(tableName, tableSchemaDTO.getAttributes());
 		}
 		logger.info("Existing attributes update response: {}", apiResponseDTO.getResponseMessage());
 		
@@ -694,29 +698,119 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 	
-	public void checkForSchemaDeletion(String tableName,List<SchemaFieldDTO> newSchemaDTO) {
+	public void checkIfSchemaToBeDeleted(String tableName,List<SchemaFieldDTO> newSchemaDTO) {
 		int clientId = Integer.parseInt(tableName.substring(tableName.lastIndexOf("_")+1));
 		List<SchemaFieldDTO> existingSchemaAttributes = getTableSchemaIfPresent(tableName).getAttributes();
 		for(SchemaFieldDTO existingSchema : existingSchemaAttributes) {
-			if(!newSchemaDTO.contains(existingSchema)) {
+			String exsitingSchemaName = existingSchema.getName();
+			if(!(exsitingSchemaName.equalsIgnoreCase("_nest_path_") || exsitingSchemaName.equalsIgnoreCase("_root_")
+					 || exsitingSchemaName.equalsIgnoreCase("_text_")  || exsitingSchemaName.equalsIgnoreCase("_version_") 
+					 || exsitingSchemaName.equalsIgnoreCase("id"))  && !newSchemaDTO.contains(existingSchema)){
 				initializeSchemaDeletion(clientId, tableName , existingSchema.getName());
 			}
-     	}
+		}
 			
 	}
 	
 	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 		  File file=new File("src\\main\\resources\\SchemaDeleteRecord.txt");
 		  try(FileWriter fw = new FileWriter(file, true);
 				   BufferedWriter bw = new BufferedWriter(fw)) {
-			  String newRecord = String.format("%d %18s %20s %25s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()),columnName);
+			  String newRecord = String.format("%d %18s %20s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()),columnName)+"\n";
 		      bw.write(newRecord);
-		      bw.newLine();
 		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
 		  } catch (IOException e) {
 			logger.error("Error While Intializing Deletion for Schema :{} ",columnName);
 		}
 	}
+	
+	public void checkForSchemaDeletion() {
+		File existingSchemaFile=new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		File newSchemaFile=new File("src\\main\\resources\\SchemaDeleteRecordTemp.txt");
+		int lineNumber = 0;
+		int schemaDeleteRecordCount = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
+			     PrintWriter pw =  new PrintWriter(new FileWriter(newSchemaFile)) ){
+			   String currentSchemaDeleteRecord;
+			   while ((currentSchemaDeleteRecord = br.readLine()) != null) {
+			       if(lineNumber!=0) {
+			        long diff = checkDatesDifference(currentSchemaDeleteRecord);
+			        if(diff < 15) {
+			        	 pw.println(currentSchemaDeleteRecord);
+			         }else{
+			        	if(performSchemaDeletion(currentSchemaDeleteRecord.split(" "))){
+			        		schemaDeleteRecordCount++;
+			        		
+			        	}else {
+			        		pw.println(currentSchemaDeleteRecord);
+			        	}}}
+			       else {
+			        	pw.println(currentSchemaDeleteRecord);	
+			       }
+			        lineNumber++;	
+			    }
+			    pw.flush();pw.close();br.close();
+			    makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
+			   } catch (IOException exception) {
+				  logger.error("Error While Performing Schema Deletion ",exception);
+			} 
+		
+	}
 	 
+	public long checkDatesDifference(String currentDeleteRecord) {
+		try{
+	    String[] data =  currentDeleteRecord.split(" ");
+		StringBuilder date = new StringBuilder();
+		int position = data.length - 2;
+		for(int i = position ; i<data.length;i++) {
+    		date.append( (i!= data.length -1) ? data[i] + " " : data[i] );
+    	}
+      Date requestDate = formatter.parse(date.toString());
+      Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
+      long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
+	  return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		}catch(Exception e) {
+			logger.error("Error!",e);
+			return 0;
+		}
+	}
+	
+	public boolean performSchemaDeletion(String[] schemaDeleteData) {
+		String columnName = schemaDeleteData[schemaDeleteData.length-1];
+		String tableName = schemaDeleteData[schemaDeleteData.length-4];
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
+				tableName);
+		try {
+			SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
+			UpdateResponse deleteFieldResponse = deleteFieldRequest.process(solrClientActive);
+			if(deleteFieldResponse.getStatus() == 200) {
+				logger.debug("Schema {} Succesfully Deleted ",columnName);
+				return true;
+			}else {
+				logger.debug("Schema {} Deletion Failed ",columnName);
+				return false;
+			}	
+		}catch(Exception e) {
+			logger.error("Exception Occured While Performing Deletion for Schema {} "+columnName,e);
+			return false;
+		}
+	}
+	
+	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
+		File schemaDeleteRecordFile = new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
+		     checkTableDeletionStatus(schemaDeleteRecordCount);
+		  }
+	}
+	
+	public boolean checkTableDeletionStatus(int schemaDeleteRecordCount) {
+		if(schemaDeleteRecordCount >0) {
+        	logger.debug("Total Number of Schema's Found and Deleted: {}",schemaDeleteRecordCount);
+        	return true;
+	     }
+	     else {
+	      	logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
+	      	return false;
+	      }
+	}
 }
