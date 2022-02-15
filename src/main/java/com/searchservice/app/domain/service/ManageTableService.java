@@ -85,6 +85,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
     private static final String DEFAULT_CONFIGSET = "_default";
+    private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -100,13 +101,7 @@ public class ManageTableService implements ManageTableServicePort {
 	// UPDATE Table
 	@Value("${table-schema-attributes.delete-file-path}")
 	String deleteSchemaAttributesFilePath;
-	@Value("${schema-delete-record.formatter.table-name}")
-	String tableNameFormatter;
-	@Value("${schema-delete-record.formatter.request-time}")
-	String requestTimeFormatter;
-	@Value("${schema-delete-record.formatter.column-name}")
-	String columnNameFormatter;
-	SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 	
 	private String servicename = "Manage_Table_Service";
 	private String username = "Username";
@@ -619,7 +614,7 @@ public class ManageTableService implements ManageTableServicePort {
 			
 			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
-			HashMap<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
+			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
@@ -753,11 +748,7 @@ public class ManageTableService implements ManageTableServicePort {
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
-				// Pass the fieldAttribute to be updated
-				
-//				tempDelete
-				// delete
-				
+				// Pass the fieldAttribute to be updated	
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
@@ -871,8 +862,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-		  File file=new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		  File file=new File(deleteSchemaAttributesFilePath);
 		  try(FileWriter fw = new FileWriter(file, true);
 				   BufferedWriter bw = new BufferedWriter(fw)) {
 			  String newRecord = String.format(
@@ -943,8 +933,6 @@ public class ManageTableService implements ManageTableServicePort {
 				lineNumber++;
 			}
 			pw.flush();
-			pw.close();
-			br.close();
 			makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
 		} catch (IOException exception) {
 			logger.error("Error While Performing Schema Deletion ", exception);

@@ -294,7 +294,7 @@ class ManageTableTest {
     }
     
     @Test
-    public void testUndoDeleteTable() throws Exception {
+    void testUndoDeleteTable() throws Exception {
     	
     	Response undoDeleteTableDTO=new Response();
     	
