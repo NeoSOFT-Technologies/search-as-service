@@ -38,7 +38,7 @@ services:
     ports:
      - "8981:8983"
     volumes:
-      - ./solr1:/var/solr
+      - ./docker-container-data/solr1:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -54,7 +54,7 @@ services:
     ports:
      - "8982:8983"
     volumes:
-      - ./solr2:/var/solr
+      - ./docker-container-data/solr2:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -70,7 +70,7 @@ services:
     ports:
      - "8983:8983"
     volumes:
-      - ./solr3:/var/solr
+      - ./docker-container-data/solr3:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
