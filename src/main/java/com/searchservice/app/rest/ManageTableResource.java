@@ -69,7 +69,7 @@ public class ManageTableResource {
             throw new BadRequestOccurredException(400, ResponseMessages.DEFAULT_EXCEPTION_MSG);
         }
     }
-    
+
     
 	@GetMapping("/{clientid}/{tableName}")
 	@Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
@@ -79,7 +79,8 @@ public class ManageTableResource {
 		log.info("Get table info");
 
 		// GET tableSchema
-		TableSchemaDTOv2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(clientid, tableName);
+        TableSchemaDTOv2 tableInfoResponseDTO=manageTableServicePort.getCurrentTableSchema(
+        		clientid, tableName);
 		if (tableInfoResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		

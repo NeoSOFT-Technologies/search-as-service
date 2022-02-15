@@ -142,4 +142,11 @@ table-delete-duration:
 #=================================================================
 #UpdateTable configurations
 table-schema-attributes:
-  delete-file-path: src\\main\\resources\\TableSchemaAttributesDeleteRecord
+  delete-file-path: src\\main\\resources\\SchemaDeleteRecord
+schema-delete-record:
+  formatter:
+    table-name: 18
+    request-time: 20
+    column-name: 25
+  
+#=================================================================

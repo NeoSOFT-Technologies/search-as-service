@@ -67,39 +67,44 @@ public class TableDeleteService implements TableDeleteServicePort{
 		  return deleteRecordInsertionResponse;
 	}
 
+	
 	@Override
 	public int checkDeletionofTable() {
-			File existingFile = new File(deleteRecordFilePath + ".txt");
-		    File newFile = new File(deleteRecordFilePath + "Temp.txt");
-			int lineNumber = 0;
-			int delRecordCount=0;
-			try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
-			     PrintWriter pw =  new PrintWriter(new FileWriter(newFile)) ){
-			   String currentDeleteRecord;
-			   while ((currentDeleteRecord = br.readLine()) != null) {
-			       if(lineNumber!=0) {
-			        long diff = checkDatesDifference(currentDeleteRecord);
-			        if(diff < tableDeleteDuration) {
-			        	 pw.println(currentDeleteRecord);
-			         }else{
-			        	if(performTableDeletion(currentDeleteRecord)) {
-			        		 delRecordCount++;
-			        	}else {
-			        		pw.println(currentDeleteRecord);
-			        	}}}
-			       else {
-			        	pw.println(currentDeleteRecord);	
-			       }
-			        lineNumber++;	
-			    }
-			    pw.flush();pw.close();br.close();
-			    makeDeleteTableFileChangesForDelete(newFile, existingFile, delRecordCount);
-			   } catch (IOException exception) {
-				  logger.error("Error While Performing Table Deletion ",exception);
-				  delRecordCount=-1;
-			} 
+		File existingFile = new File(deleteRecordFilePath + ".txt");
+		File newFile = new File(deleteRecordFilePath + "Temp.txt");
+		int lineNumber = 0;
+		int delRecordCount = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
+				PrintWriter pw = new PrintWriter(new FileWriter(newFile))) {
+			String currentDeleteRecord;
+			while ((currentDeleteRecord = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					long diff = checkDatesDifference(currentDeleteRecord);
+					if (diff < tableDeleteDuration) {
+						pw.println(currentDeleteRecord);
+					} else {
+						if (performTableDeletion(currentDeleteRecord)) {
+							delRecordCount++;
+						} else {
+							pw.println(currentDeleteRecord);
+						}
+					}
+				} else {
+					pw.println(currentDeleteRecord);
+				}
+				lineNumber++;
+			}
+			pw.flush();
+			pw.close();
+			br.close();
+			makeDeleteTableFileChangesForDelete(newFile, existingFile, delRecordCount);
+		} catch (IOException exception) {
+			logger.error("Error While Performing Table Deletion ", exception);
+			delRecordCount = -1;
+		}
 		return delRecordCount;
 	}
+
 	
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int delRecordCount) {
 		File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
@@ -108,6 +113,7 @@ public class TableDeleteService implements TableDeleteServicePort{
 		  }
 	}
 
+	
 	@Override
 	public ResponseDTO undoTableDeleteRecord(int clientId)  {
 		ResponseDTO performUndoDeleteResponse = new ResponseDTO();
@@ -122,6 +128,7 @@ public class TableDeleteService implements TableDeleteServicePort{
 		
           return performUndoDeleteResponse;
 	 } 
+	
 	
 	public long checkDatesDifference(String currentDeleteRecord) {
 		try{
@@ -145,39 +152,37 @@ public class TableDeleteService implements TableDeleteServicePort{
 	public ResponseDTO performUndoTableDeletion(int clientId) {
 		ResponseDTO undoTableDeletionResponse = new ResponseDTO();
 		File existingFile = new File(deleteRecordFilePath + ".txt");
-	    File newFile = new File(deleteRecordFilePath + "Temp.txt");
-		  int lineNumber=0;
-		  int undoRecord=0;
-		  try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
-			   PrintWriter pw =  new PrintWriter(new FileWriter(newFile))){
-		    String currentDeleteRecordLine;  
-		    while((currentDeleteRecordLine = br.readLine()) != null) {
-			  if(lineNumber>0) {
-			  String[] currentRecordData = currentDeleteRecordLine.split(" ");
-     		 if(!(currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId)))) {
-     			 pw.println(currentDeleteRecordLine);
-     		 }else{
-				  undoRecord++;
-			  }
-     		  }else{
-				  pw.println(currentDeleteRecordLine);
-			  }
-			  lineNumber++; 
-		  }
-		  pw.flush();
-		  pw.close();
-		  br.close();
-		  File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
-		  if(existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
-		   undoTableDeletionResponse =  getUndoDeleteResponse(undoRecord, clientId);
-		  }
-		  }
-		  catch(Exception e)
-		  {
-			  undoTableDeletionResponse.setResponseStatusCode(400);
-			  undoTableDeletionResponse.setResponseMessage(e.getLocalizedMessage());
-		 }
-		  return undoTableDeletionResponse;
+		File newFile = new File(deleteRecordFilePath + "Temp.txt");
+		int lineNumber = 0;
+		int undoRecord = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
+				PrintWriter pw = new PrintWriter(new FileWriter(newFile))) {
+			String currentDeleteRecordLine;
+			while ((currentDeleteRecordLine = br.readLine()) != null) {
+				if (lineNumber > 0) {
+					String[] currentRecordData = currentDeleteRecordLine.split(" ");
+					if (!(currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId)))) {
+						pw.println(currentDeleteRecordLine);
+					} else {
+						undoRecord++;
+					}
+				} else {
+					pw.println(currentDeleteRecordLine);
+				}
+				lineNumber++;
+			}
+			pw.flush();
+			pw.close();
+			br.close();
+			File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
+			if (existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
+				undoTableDeletionResponse = getUndoDeleteResponse(undoRecord, clientId);
+			}
+		} catch (Exception e) {
+			undoTableDeletionResponse.setResponseStatusCode(400);
+			undoTableDeletionResponse.setResponseMessage(e.getLocalizedMessage());
+		}
+		return undoTableDeletionResponse;
 	}
 	
 	public boolean performTableDeletion(String tableRecord) {
