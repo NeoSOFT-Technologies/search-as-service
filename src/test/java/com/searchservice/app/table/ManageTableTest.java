@@ -88,10 +88,6 @@ class ManageTableTest {
         responseDTO.setStatusCode(200);
         responseDTO.setMessage("Testing");
 
-        List<String> mockGetTableList = new ArrayList<>();
-        mockGetTableList.add("Testing1");
-        mockGetTableList.add("Test2"); 
-        
         Response responseDTOisCollectionExists = new Response();
         responseDTOisCollectionExists.setStatusCode(200);
         responseDTOisCollectionExists.setMessage("true");
@@ -99,7 +95,7 @@ class ManageTableTest {
         Response getTablesResponseDTO=new Response();
         getTablesResponseDTO.setStatusCode(200);
         getTablesResponseDTO.setMessage("Testing");
-        getTablesResponseDTO.setData(mockGetTableList);
+        
    
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
@@ -109,7 +105,7 @@ class ManageTableTest {
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
 
         Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
@@ -120,7 +116,7 @@ class ManageTableTest {
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Random message","Data is returned");
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
     }
@@ -130,10 +126,6 @@ class ManageTableTest {
         responseDTO.setStatusCode(400);
         responseDTO.setMessage("Testing");
 
-        Response unodDeleteResponseDTO = new Response();
-        unodDeleteResponseDTO.setStatusCode(400);
-        unodDeleteResponseDTO.setMessage("Error!");
-        
         Response responseDTOisCollectionExists = new Response();
         responseDTOisCollectionExists.setStatusCode(400);
         responseDTOisCollectionExists.setMessage("Error!");
@@ -148,11 +140,14 @@ class ManageTableTest {
 //        TableSchemav2 tableSchemaResponseDTO = new TableSchemav2(tableSchemaExpectedResponse);
         
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
- 
+        
+        Response unodDeleteResponseDTO = new Response();
+        unodDeleteResponseDTO.setStatusCode(400);
+        unodDeleteResponseDTO.setMessage("Error!");
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(),Mockito.any(), Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.any(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
 //        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
@@ -161,13 +156,9 @@ class ManageTableTest {
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Error","Error connecting to cluster.");
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
-       
-    }
-    public void setMockitoForTableUnderDeletion() {
-    	Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
     }
 
     @Test
@@ -232,14 +223,6 @@ class ManageTableTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
-        
-        //TRY TO DELETE TABLE UNDER DELETION
-      
-        setMockitoForTableUnderDeletion();
-        restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
-                .andExpect(status().isBadRequest());
     }
     
     
@@ -256,14 +239,6 @@ class ManageTableTest {
 		
 		// Update Schema for non-existing table
 		setMockitoBadResponseForService();
-		schemaDTO = new TableSchema(tableName, schemaName, attributes);
-		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
-				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
-		.andExpect(status().isBadRequest());
-		
-		//Update Schema for Table Under Deletion
-		setMockitoForTableUnderDeletion();
 		schemaDTO = new TableSchema(tableName, schemaName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
@@ -293,25 +268,7 @@ class ManageTableTest {
 
     }
     
-    @Test
-    void testUndoDeleteTable() throws Exception {
-    	
-    	Response undoDeleteTableDTO=new Response();
-    	
-    	//Testing Undo Table Delete For Valid Table
-    	setMockitoSuccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ clientId +"/"+ tableName)
-				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
-		.andExpect(status().isOk());
-		
-		//Testing Undo Table Delete For Invalid Table
-		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ clientId +"/"+ tableName+"0901")
-				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
-		.andExpect(status().isBadRequest());
-    }
+    
 //	@Test
 	void testGetTableInfo() throws Exception {
 		setMockitoSuccessResponseForService();;
@@ -322,14 +279,6 @@ class ManageTableTest {
 		.andExpect(status().isOk());
 		
 		setMockitoBadResponseForService();
-		restAMockMvc.perform(
-				MockMvcRequestBuilders
-				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
-				.accept(MediaType.APPLICATION_JSON))
-		.andExpect(status().isBadRequest());
-		
-		//Accessing Table Under Deletion
-		setMockitoForTableUnderDeletion();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
 				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)

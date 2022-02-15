@@ -22,14 +22,15 @@ public interface ManageTableServicePort {
 	// GET request
 	GetCapacityPlan capacityPlans(LoggersDTO loggersDTO);
 	Response getTables(int clientid,LoggersDTO loggersDTO);
-	TableSchemav2 getCurrentTableSchema(int clientId, String tableName);
+	TableSchemav2 getTableSchemaIfPresent(String tableName,LoggersDTO loggersDTO);
+	Map<Object, Object> getTableDetails(String tableName,LoggersDTO loggersDTO);
 
 	// CREATE requests
 	Response createTableIfNotPresent(ManageTable manageTableDTO,LoggersDTO loggersDTO);
 	// DELETE requests
 	Response deleteTable(String tableName,LoggersDTO loggersDTO);
 	// UPDATE requests
-	Response updateTableSchema(int clientId, String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO);
+	Response updateTableSchema(String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO);
     
     
     /*
@@ -38,8 +39,6 @@ public interface ManageTableServicePort {
     boolean isConfigSetExists(String configSetName);
     Response getConfigSets();
     boolean isTableExists(String tableName);
-	TableSchemav2 getTableSchemaIfPresent(String tableName,LoggersDTO loggersDTO);
-	Map<Object, Object> getTableDetails(String tableName,LoggersDTO loggersDTO);
     TableSchemav2 getTableSchema(String tableName);
     Response createConfigSet(ConfigSet configSetDTO);
     Response createTable(ManageTable manageTableDTO);
@@ -47,7 +46,4 @@ public interface ManageTableServicePort {
     Response updateSchemaAttributes(TableSchema tableSchemaDTO);
     Response addAliasTable(String tableOriginalName, String tableAlias);
 	Response deleteConfigSet(String configSetName);
-    // UPDATE Table additional methods
-    TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
-    		String tableName, int clientId, TableSchemav2 tableSchema);
 }

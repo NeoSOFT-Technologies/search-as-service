@@ -85,7 +85,7 @@ public class InputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
         log.info(result);
 
-        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
         documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
       
 
@@ -134,7 +134,7 @@ public class InputDocumentResource {
 		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
 		log.info(result);
 
-		documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
         successMethod(nameofCurrMethod, loggersDTO);

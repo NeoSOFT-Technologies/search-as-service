@@ -1,1 +1,0 @@
-ClientId  TableName  		RequestTime					ColumnName

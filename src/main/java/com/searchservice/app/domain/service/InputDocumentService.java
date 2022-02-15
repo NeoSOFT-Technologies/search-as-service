@@ -35,10 +35,10 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private void extracted(ThrottlerResponse responseDTO,
 			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
-			responseDTO.setResponseMessage("Successfully Added!");
+			responseDTO.setMessage("Successfully Added!");
 			responseDTO.setStatusCode(200);
 		} else {
-			responseDTO.setResponseMessage(response.getMessage());
+			responseDTO.setMessage(response.getMessage());
 			responseDTO.setStatusCode(400);
 		}
 	}

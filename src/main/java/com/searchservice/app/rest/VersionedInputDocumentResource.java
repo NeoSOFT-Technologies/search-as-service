@@ -81,7 +81,7 @@ public class VersionedInputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
         log.info(result);
 
-        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
         documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
         successMethod(nameofCurrMethod, loggersDTO);
@@ -130,7 +130,7 @@ public class VersionedInputDocumentResource {
         String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
         log.info(result);
 
-        documentInjectionThrottlerResponse.setResponseMessage(documentInjectionResponse.getResponseMessage());
+        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
         documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 
         successMethod(nameofCurrMethod, loggersDTO);
