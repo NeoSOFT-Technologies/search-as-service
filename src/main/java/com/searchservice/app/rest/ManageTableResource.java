@@ -1,19 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -21,14 +7,20 @@ import com.searchservice.app.domain.dto.table.GetCapacityPlan;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}"+"/manage/table")
@@ -78,7 +70,7 @@ public class ManageTableResource {
 	
 	
     @GetMapping("/{clientId}")
-    @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "/all-tables summary", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> getTables(@PathVariable int clientId) {
         log.debug("Get all tables");
         
