@@ -1,6 +1,5 @@
 package com.searchservice.app.domain.port.api;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -27,5 +26,6 @@ public interface TableDeleteServicePort {
 		
 		public boolean isTableUnderDeletion(String tableName);
 		
-		public List<String> getTableUnderDeletion() throws IOException;
+		public List<String> getTableUnderDeletion();
+		
 }

@@ -289,18 +289,16 @@ private String servicename = "Table_Delete_Service";
 	public boolean isTableUnderDeletion(String tableName) {
 		boolean res=false;
 		List<String> listofTablesUnderDeletion;
-		try {
+	
 			listofTablesUnderDeletion = getTableUnderDeletion();
 			if(listofTablesUnderDeletion.contains(tableName))
 				res=true;
-		} catch (IOException e) {
-			logger.error("Error While Obtaining Table List",e);
-		}
+	
 		
 		return res;
 	}
 	@Override
-	public List<String> getTableUnderDeletion() throws IOException {
+	public List<String> getTableUnderDeletion()  {
 		List<String> tableUnderDeletionList=new ArrayList<String>();
 		BufferedReader br = null;
 		File existingFile = new File(deleteRecordFilePath + ".txt");
@@ -318,13 +316,18 @@ private String servicename = "Table_Delete_Service";
 		       	}
 			lineNumber++;
 		   	}      
-		    br.close();
+		  
 		  }
 		catch(Exception e)
 		{
 			logger.error("Some Error Occured While Getting Table",e);	
 		}finally {
-			br.close();
+			
+			try {
+				br.close();
+			} catch (IOException e) {
+				logger.error("Some Error Occured While Getting Table",e);
+			}
 		}
 		return tableUnderDeletionList;
 	}
