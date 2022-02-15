@@ -127,9 +127,6 @@ public class ManageTableResource {
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + clientId)) {
 			throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
 		} else {
-			// GET tableDetails
-			//Map<Object, Object> tableDetailsMap= manageTableServicePort.getTableDetails(
-			//	tableName + "_" + clientId, loggersDTO);
 
 			// GET tableSchema
 			TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(clientId, tableName);
@@ -139,8 +136,6 @@ public class ManageTableResource {
 			if (tableInfoResponseDTO == null)
 				throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 
-			// SET tableDetails in tableInfoResponseDTO
-			// tableInfoResponseDTO.setTableDetails(tableDetailsMap);
 			if (tableInfoResponseDTO.getStatusCode() == 200) {
 				LoggerUtils.printlogger(loggersDTO, false, false);
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");

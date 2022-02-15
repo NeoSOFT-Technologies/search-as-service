@@ -120,9 +120,6 @@ public class VersionedManageTableResource {
 	        throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
 	     }
 	      else {
-        // GET tableDetails
-        //Map<Object, Object> tableDetailsMap = manageTableServicePort.getTableDetails(tableName,loggersDTO);
-
         // GET tableSchema
         TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getTableSchemaIfPresent(tableName,loggersDTO);
        
@@ -130,8 +127,6 @@ public class VersionedManageTableResource {
         
         if (tableInfoResponseDTO == null)
             throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
-
-        // SET tableDetails in tableInfoResponseDTO
 
         if (tableInfoResponseDTO.getStatusCode() == 200) {
             tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
