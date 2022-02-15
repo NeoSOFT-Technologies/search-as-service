@@ -13,6 +13,8 @@ services:
     container_name: ssi-container
     ports:
       - "3001:8080"
+    environment:
+      - SOLR_CONTAINER_NAME=solr1-container
     networks:
       - saas-network
     depends_on:
@@ -23,6 +25,8 @@ services:
     container_name: sse-container
     ports:
       - "3002:8080"
+    environment:
+      - SOLR_CONTAINER_NAME=solr1-container
     networks:
       - saas-network
     depends_on:
