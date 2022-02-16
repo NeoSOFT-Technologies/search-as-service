@@ -73,12 +73,15 @@ private String servicename = "Table_Delete_Service";
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
         String actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
-		  File file=new File(deleteRecordFilePath + ".txt");
+		  File file=new File("src/main/resources/TableDeleteRecord.txt");
 		  if((clientId>0) && (tableName!=null)) {
-		  try(FileWriter fw = new FileWriter(file, true);
-		   BufferedWriter bw = new BufferedWriter(fw)) {
+		  try {
+		      FileWriter fw = new FileWriter(file, true);
+	           BufferedWriter bw = new BufferedWriter(fw);
 		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
-		      bw.write(newRecord);
+		      fw.write(newRecord);
+		      fw.flush();
+		      fw.close();
 		      logger.debug("Table {} Successfully Initialized for Deletion ",actualTableName);
 		      deleteRecordInsertionResponse.setStatusCode(200);
 

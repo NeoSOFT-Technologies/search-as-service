@@ -24,10 +24,10 @@ class InputDocumentResourceTest {
 	// String apiEndpoint = "/api/v1";
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
-	int statusCode;
+	int statusCode=0;
 	String name;
-	String message;
-	int clientid;
+	String message="";
+	int clientid = 101;
 	String tableName = "book";
 	String expectedGetResponse = "{\r\n" + "  \"statusCode\": 200,\r\n" + "  \"name\": \"book\",\r\n"
 			+ "  \"message\": \"Successfully Added!\"\r\n" + "}";
@@ -59,19 +59,21 @@ class InputDocumentResourceTest {
 
 	@Test
 	void testinputdocs() throws Exception {
-		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
+		ThrottlerResponse inpDocsResponseDTO=new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(inpDocsResponseDTO)))
 				.andExpect(status().isOk());
 	}
 
 	@Test
 	void testinputdoc() throws Exception {
-		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
+		ThrottlerResponse inpDocResponseDTO=new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName)
-				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(responseDTO)))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(inpDocResponseDTO)))
 				.andExpect(status().isOk());
 	}
 }

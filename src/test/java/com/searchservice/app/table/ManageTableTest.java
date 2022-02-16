@@ -142,13 +142,7 @@ class ManageTableTest {
         getTablesResponseDTO.setStatusCode(400);
         getTablesResponseDTO.setMessage("Testing");
         
-//        TableSchema tableSchemaExpectedResponse = new TableSchema(
-//        		400, 
-//        		"Retrieved table schema");
-//        TableSchemav2 tableSchemaResponseDTO = new TableSchemav2(tableSchemaExpectedResponse);
-        
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
- 
 
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
