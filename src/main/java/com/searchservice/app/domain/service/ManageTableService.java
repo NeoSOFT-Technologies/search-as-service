@@ -922,12 +922,14 @@ public class ManageTableService implements ManageTableServicePort {
 					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
 							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
 						deletedSchemaAttributes.add(currentRecordData[4]);
+						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[4]);
 					}
 				}
 				lineNumber++;
 			}
 			
 		} catch (Exception e) {
+			logger.error("Soft Delete SchemaInfo could not be retrieved");
 			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
 		}
 		
