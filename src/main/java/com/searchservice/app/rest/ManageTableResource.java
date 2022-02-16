@@ -150,8 +150,8 @@ public class ManageTableResource {
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);
-
+        manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);    
+        
         Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
 
         successMethod(nameofCurrMethod, loggersDTO);

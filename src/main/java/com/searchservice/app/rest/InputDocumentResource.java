@@ -4,8 +4,10 @@ package com.searchservice.app.rest;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -33,11 +35,14 @@ public class InputDocumentResource {
     
     public final InputDocumentServicePort inputDocumentServicePort;
     public final ThrottlerServicePort throttlerServicePort;
+    public final ManageTableServicePort manageTableServicePort;
     public InputDocumentResource(
     		InputDocumentServicePort inputDocumentServicePort, 
-    		ThrottlerServicePort throttlerServicePort) {
+    		ThrottlerServicePort throttlerServicePort, 
+    		ManageTableServicePort manageTableServicePort) {
         this.inputDocumentServicePort = inputDocumentServicePort;
         this.throttlerServicePort = throttlerServicePort;
+        this.manageTableServicePort = manageTableServicePort;
     }
 
     private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -64,6 +69,12 @@ public class InputDocumentResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         
+		tableName = tableName+"_"+clientid;
+		
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+
+		
         // Apply RequestSizeLimiting Throttler on payload before service the request
     	ThrottlerResponse documentInjectionThrottlerResponse
     		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
@@ -77,7 +88,6 @@ public class InputDocumentResource {
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         
-        tableName = tableName+"_"+clientid;
         Instant start = Instant.now();
         ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
         Instant end = Instant.now();
@@ -118,6 +128,10 @@ public class InputDocumentResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
+		tableName = tableName+"_"+clientid;
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+		
         // Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, false);
@@ -126,7 +140,6 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
-		tableName = tableName + "_" + clientid;
 		Instant start = Instant.now();
 		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
 		Instant end = Instant.now();
