@@ -158,7 +158,7 @@ public class ManageTableResource {
 
         if (apiResponseDTO.getStatusCode() == 200) {
             LoggerUtils.printlogger(loggersDTO, false, false);
-            apiResponseDTO.setMessage("Table- " + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
+            apiResponseDTO.setMessage("Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
             return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
         } else {
             log.info("Table could not be created: {}", apiResponseDTO);
@@ -245,6 +245,7 @@ public class ManageTableResource {
 
             if (apiResponseDTO.getStatusCode() == 200) {
                 LoggerUtils.printlogger(loggersDTO, false, false);
+                apiResponseDTO.setMessage("Table is updated successfully");
                 return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
             } else {
                 LoggerUtils.printlogger(loggersDTO, false, true);
