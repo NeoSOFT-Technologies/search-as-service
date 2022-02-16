@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -359,7 +361,6 @@ public class ManageTableService implements ManageTableServicePort {
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
-		tableSchemaDTO.setTableName(tableName + "_" + clientId);
 		Response apiResponseDTO = new Response();
 		
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
@@ -895,8 +896,8 @@ public class ManageTableService implements ManageTableServicePort {
 			int clientId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
 		
-		File schemaSoftDeleteFile = new File(deleteSchemaAttributesFilePath);
-		try (BufferedReader br = new BufferedReader(new FileReader(schemaSoftDeleteFile))) {
+		try (InputStream inputStream = getClass().getResourceAsStream("/SchemaDeleteRecord.txt")) {
+		    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 			int lineNumber = 0;
 			String currentDeleteRecordLine;
 			while ((currentDeleteRecordLine = br.readLine()) != null) {
