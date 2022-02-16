@@ -22,8 +22,15 @@ public class SearchServiceSchedular {
 	@Scheduled(cron="0 15 8 * * ?")
 	public void checkCollectionSoftDelete(LoggersDTO loggersDTO)
 	{
-		 logger.debug("Check For Table and Schema Deletion Operation Started");
+		 logger.debug("Check For Table Deletion Operation Started");
 		 tableDeleteService.checkDeletionofTable(loggersDTO);
+		 manageTableService.checkForSchemaDeletion();
+	}
+	
+	@Scheduled(cron="0 15 8 * * ?")
+	public void checkScheamaoftDelete(LoggersDTO loggersDTO)
+	{
+		 logger.debug("Check For Table Schema Deletion Operation Started");
 		 manageTableService.checkForSchemaDeletion();
 	}
 }
