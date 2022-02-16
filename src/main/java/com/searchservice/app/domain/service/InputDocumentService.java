@@ -66,7 +66,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		// STRUCTURALLY CORRECT
 
 		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
-
+		
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);

@@ -20,6 +20,7 @@ public class ManageTable implements VersionedObjectMapper {
 
 	private String tableName;
 	private String sku;
+	@JsonIgnore
 	private String schemaName;
 	private List<SchemaField> columns;
 	@JsonIgnore

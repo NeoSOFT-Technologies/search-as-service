@@ -4,6 +4,7 @@ import com.squareup.okhttp.*;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 
@@ -12,6 +13,7 @@ public class UploadDocumentUtil {
 
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
+	@Value("${base-solr-url}")
 	private String baseSolrUrl;
 	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
