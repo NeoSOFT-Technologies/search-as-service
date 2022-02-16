@@ -235,10 +235,11 @@ public class ManageTableResource {
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         tableName = tableName + "_" + clientId;
 
-        if (!tableDeleteServicePort.isTableUnderDeletion(tableName+"_"+clientId)) {
+        if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
             newTableSchemaDTO.setTableName(tableName);
 
-            Response apiResponseDTO = manageTableServicePort.updateTableSchema(clientId, tableName, newTableSchemaDTO, loggersDTO);
+            Response apiResponseDTO = manageTableServicePort.updateTableSchema(
+            		clientId, tableName.split("_")[0], newTableSchemaDTO, loggersDTO);
 
             successMethod(nameofCurrMethod, loggersDTO);
 
