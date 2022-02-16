@@ -29,3 +29,5 @@ ClientId  TableName  		RequestTime					ColumnName
 101           mytable2   16-2-2022 12:45:54               skd_field_3
 101           mytable2   16-2-2022 12:46:55               skd_field_1
 101           mytable2   16-2-2022 12:46:55               skd_field_3
+101           mytable1   16-2-2022 06:13:17               skd_field_2
+101           mytable1   16-2-2022 06:13:17               skd_field_3
