@@ -297,7 +297,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (apiResponseDTO.getStatusCode() == 200) {
 			// Add schemaAttributes
-			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(),
+			TableSchema tableSchemaDTO = new TableSchema(
+					manageTableDTO.getTableName(),
 			        DEFAULT_CONFIGSET, manageTableDTO.getColumns());
 			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
@@ -582,8 +583,9 @@ public class ManageTableService implements ManageTableServicePort {
 			return apiResponseDTO;
 		}
 
-		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
-				DEFAULT_CONFIGSET, selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
+		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
+				manageTableDTO.getTableName(),
+				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
