@@ -103,6 +103,10 @@ public class ManageTableService implements ManageTableServicePort {
 	// UPDATE Table
 	@Value("${table-schema-attributes.delete-file-path}")
 	String deleteSchemaAttributesFilePath;
+	
+	@Value("${table-schema-attributes.days}")
+	long schemaDeleteDuration;
+	
 	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 	
 	private String servicename = "Manage_Table_Service";
@@ -929,7 +933,7 @@ public class ManageTableService implements ManageTableServicePort {
 			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
 				if (lineNumber != 0) {
 					long diff = checkDatesDifference(currentSchemaDeleteRecord);
-					if (diff < 15) {
+					if (diff < schemaDeleteDuration) {
 						pw.println(currentSchemaDeleteRecord);
 					} else {
 						if (performSchemaDeletion(currentSchemaDeleteRecord.split(" "))) {
