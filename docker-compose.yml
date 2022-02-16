@@ -13,6 +13,8 @@ services:
     container_name: ssi-container
     ports:
       - "3001:8080"
+    environment:
+      - SOLR_CONTAINER_NAME=solr1-container
     networks:
       - saas-network
     depends_on:
@@ -23,6 +25,8 @@ services:
     container_name: sse-container
     ports:
       - "3002:8080"
+    environment:
+      - SOLR_CONTAINER_NAME=solr1-container
     networks:
       - saas-network
     depends_on:
@@ -34,7 +38,7 @@ services:
     ports:
      - "8981:8983"
     volumes:
-      - ./solr1:/var/solr
+      - ./docker-container-data/solr1:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -50,7 +54,7 @@ services:
     ports:
      - "8982:8983"
     volumes:
-      - ./solr2:/var/solr
+      - ./docker-container-data/solr2:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -66,7 +70,7 @@ services:
     ports:
      - "8983:8983"
     volumes:
-      - ./solr3:/var/solr
+      - ./docker-container-data/solr3:/var/solr
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
