@@ -3,14 +3,17 @@ package com.searchservice.app.domain.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -22,6 +25,12 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private String servicename = "Input_Document_Service";
 
 	private String username = "Username";
+	
+	@Autowired
+	public final ManageTableServicePort manageTableServicePort;
+	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
+		this.manageTableServicePort = manageTableServicePort;
+	}
 	
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
@@ -56,6 +65,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocuments(String tableName, String payload,LoggersDTO loggersDTO) {
 		log.debug(" Add Documents");
 
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
@@ -82,6 +94,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocument(String tableName, String payload,LoggersDTO loggersDTO) {
 		log.debug(" Add Document");
 
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
