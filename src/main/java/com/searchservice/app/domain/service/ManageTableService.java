@@ -443,16 +443,7 @@ public class ManageTableService implements ManageTableServicePort {
 		TableSchemav2Data data= new TableSchemav2Data();
 		data.setTableName(tableName);
 		
-		// testing
-		logger.info("tableName >>>> {}", tableName);
-		logger.info("tableSchema >>>>>>> {}", tableSchema);
-		logger.info("tableSchema Data ###### {}", tableSchema.getData());
-		logger.info("tableSchema Data Columns @@@@@@@ {}", tableSchema.getData().getColumns());
-		
 		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
-		
-		// testing
-		logger.info("all good till here ######");
 		
 		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
 		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
@@ -513,11 +504,6 @@ public class ManageTableService implements ManageTableServicePort {
 				schemaFieldIdx++;
 			}
 			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
-
-			
-			// testing
-			logger.info("schemaFieldDTOs ###### {}", solrSchemaFieldDTOs);
-			logger.info("tableName >>>>> {}", tableName);
 			
 			// prepare response dto
 			data.setTableName(tableName.split("_")[0]);
@@ -536,9 +522,6 @@ public class ManageTableService implements ManageTableServicePort {
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
-		
-		// test
-		logger.info("returning response from getTableSchema @@@@@@");
 		
 		return tableSchemaResponseDTO;
 	}
