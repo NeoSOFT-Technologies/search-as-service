@@ -914,6 +914,7 @@ public class ManageTableService implements ManageTableServicePort {
 				}
 				lineNumber++;
 			}
+			
 		} catch (Exception e) {
 			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
 		}
