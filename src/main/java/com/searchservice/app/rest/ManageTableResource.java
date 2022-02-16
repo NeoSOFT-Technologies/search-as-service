@@ -232,6 +232,7 @@ public class ManageTableResource {
         LoggerUtils.printlogger(loggersDTO, true, false);
         loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+        tableName = tableName + "_" + clientId;
 
         if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
             newTableSchemaDTO.setTableName(tableName);

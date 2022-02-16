@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,16 +16,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
 
 @Service
 @Transactional
@@ -303,8 +307,9 @@ private String servicename = "Table_Delete_Service";
 		BufferedReader br = null;
 		File existingFile = new File(deleteRecordFilePath + ".txt");
 		int lineNumber = 0;
-		try {
-			br = new BufferedReader(new FileReader(existingFile));
+		try(InputStream inputStream = getClass().getResourceAsStream("/TableDeleteRecord.txt")) {
+
+		    br = new BufferedReader(new InputStreamReader(inputStream));
 			String st;
 			while ((st = br.readLine()) != null) 
 			{
