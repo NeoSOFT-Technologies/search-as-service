@@ -118,7 +118,7 @@ public class ManageTableResource {
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + clientId)) {
+        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + clientId)) {	
             throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
         } else {
 
@@ -222,7 +222,8 @@ public class ManageTableResource {
 
     @PutMapping("/{clientId}/{tableName}")
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> updateTableSchema(@PathVariable String tableName, @PathVariable int clientId, @RequestBody TableSchema newTableSchemaDTO) {
+    public ResponseEntity<Response> updateTableSchema(
+    		@PathVariable String tableName, @PathVariable int clientId, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -234,7 +235,7 @@ public class ManageTableResource {
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         tableName = tableName + "_" + clientId;
 
-        if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+        if (!tableDeleteServicePort.isTableUnderDeletion(tableName+"_"+clientId)) {
             newTableSchemaDTO.setTableName(tableName);
 
             Response apiResponseDTO = manageTableServicePort.updateTableSchema(clientId, tableName, newTableSchemaDTO, loggersDTO);

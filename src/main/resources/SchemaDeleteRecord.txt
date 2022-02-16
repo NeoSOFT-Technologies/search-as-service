@@ -20,3 +20,4 @@ ClientId  TableName  		RequestTime					ColumnName
 101  skd_mang_table_11   15-2-2022 01:10:09               skd_field_3
 101  skd_mang_table_11   15-2-2022 01:10:58               skd_field_1
 101  skd_mang_table_11   15-2-2022 01:10:58               skd_field_3
+101  skd_mang_table_12   15-2-2022 08:59:43               skd_field_2

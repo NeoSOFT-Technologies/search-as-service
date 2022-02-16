@@ -196,8 +196,13 @@ public class ManageTableService implements ManageTableServicePort {
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + clientId);
 		
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
-		return compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
+		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
 				tableName, clientId, tableSchema);
+		
+		// tes
+		logger.info("returning resp from getCurrSchema ######");
+		
+		return schemaResponse;
 	}
 	
 
@@ -439,7 +444,17 @@ public class ManageTableService implements ManageTableServicePort {
 		TableSchemav2Data data= new TableSchemav2Data();
 		data.setTableName(tableName);
 		
+		// testing
+		logger.info("tableName >>>> {}", tableName);
+		logger.info("tableSchema >>>>>>> {}", tableSchema);
+		logger.info("tableSchema Data ###### {}", tableSchema.getData());
+		logger.info("tableSchema Data Columns @@@@@@@ {}", tableSchema.getData().getColumns());
+		
 		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
+		
+		// testing
+		logger.info("all good till here ######");
+		
 		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
 		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
 				clientId, tableName);
@@ -500,6 +515,11 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
 
+			
+			// testing
+			logger.info("schemaFieldDTOs ###### {}", solrSchemaFieldDTOs);
+			logger.info("tableName >>>>> {}", tableName);
+			
 			// prepare response dto
 			data.setTableName(tableName.split("_")[0]);
 			data.setColumns(solrSchemaFieldDTOs);
@@ -517,6 +537,10 @@ public class ManageTableService implements ManageTableServicePort {
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
+		
+		// test
+		logger.info("returning response from getTableSchema @@@@@@");
+		
 		return tableSchemaResponseDTO;
 	}
 	
@@ -843,18 +867,22 @@ public class ManageTableService implements ManageTableServicePort {
 	public void checkForSchemaSoftDeletion(
 			int clientId, 
 			String tableName, 
-			List<SchemaField> newSchemaDTO) {
+			List<SchemaField> schemaColumns) {
 		
 		List<SchemaField> existingSchemaAttributes
-			= getTableSchema(tableName).getData().getColumns();
+			= getTableSchema(tableName+"_"+clientId).getData().getColumns();
+		
 		for(SchemaField existingSchemaAttribute : existingSchemaAttributes) {
+			
 			String exsitingSchemaName = existingSchemaAttribute.getName();
+			boolean isContains = ManageTableUtil.checkIfListContainsSchemaColumn(schemaColumns, existingSchemaAttribute);
+			
 			if(!(exsitingSchemaName.equalsIgnoreCase("_nest_path_")
 					|| exsitingSchemaName.equalsIgnoreCase("_root_")
 					|| exsitingSchemaName.equalsIgnoreCase("_text_") 
 					|| exsitingSchemaName.equalsIgnoreCase("_version_") 
 					|| exsitingSchemaName.equalsIgnoreCase("id"))
-				&& !newSchemaDTO.contains(existingSchemaAttribute)) {
+					&& !isContains) {	
 				initializeSchemaDeletion(clientId, tableName , existingSchemaAttribute.getName());
 			}
 		}
@@ -941,18 +969,15 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 	 
 	
-	public long checkDatesDifference(String currentDeleteRecord) {
+	public long checkDatesDifference(String currentSchemaDeleteRecord) {
 		try{
-	    String[] data =  currentDeleteRecord.split(" ");
+	    String[] data =  currentSchemaDeleteRecord.split(" ");
 		StringBuilder date = new StringBuilder();
-		int position = data.length - 2;
-		for(int i = position ; i<data.length;i++) {
-    		date.append( (i!= data.length -1) ? data[i] + " " : data[i] );
-    	}
-      Date requestDate = formatter.parse(date.toString());
-      Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
-      long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
-	  return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		date.append(data[10]+" "+data[11]);
+        Date requestDate = formatter.parse(date.toString());
+        Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
+        long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
+	    return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 		}catch(Exception e) {
 			logger.error("Error!",e);
 			return 0;
