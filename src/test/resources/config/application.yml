@@ -4,7 +4,7 @@ spring:
     name: basicSample
     data:
     solr:
-      host: http://localhost:8983/solr/
+      host: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr/
       repositories:
         enabled: false
 
@@ -16,7 +16,26 @@ spring:
 
 server:
   port: 8080
-
+  
+  
+#================================================================
+#Logger
+logging:
+   #file:
+    #path: logs
+    #name: logs/dailylogs.log
+    #max-history: '30'
+    #max-size: 10MB
+    
+   pattern:
+    console: '%d{"yyyy/MM/dd HH:mm:ss,SSS", UTC} [%thread] %-5level %-50logger{40} : %msg%n'
+    #rolling-file-name: logs/dailylogs-%d{yyyy-MM-dd}.%i.log
+   level:
+    ROOT: DEBUG
+    org.springframework.web: "error"
+    org.hibernate: "error"
+    org: "error"
+  
 #================================================================
 #Swagger
 springdoc:
@@ -29,6 +48,7 @@ springdoc:
 
 #================================================================
 #Solr Configurations
+#base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 base-solr-url: http://localhost:8983/solr
 #================================================================
 
@@ -129,7 +149,7 @@ saas-ms:
 #TableSoftDelete File Path
 
 table-delete-file:
-    path: src\\main\\resources\\TableDeleteRecord
+    path: src\main\resources\TableDeleteRecord
     
  #================================================================
  
@@ -142,7 +162,7 @@ table-delete-duration:
 #=================================================================
 #UpdateTable configurations
 table-schema-attributes:
-  delete-file-path: src\\main\\resources\\SchemaDeleteRecord
+  delete-file-path: src\\main\\resources\\SchemaDeleteRecord.txt
   days: 15
   
 schema-delete-record:
