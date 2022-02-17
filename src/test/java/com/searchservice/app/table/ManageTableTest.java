@@ -123,7 +123,7 @@ class ManageTableTest {
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
-        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(true);
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
     }
 
     public void setMockitoBadResponseForService() {
@@ -199,8 +199,7 @@ class ManageTableTest {
                 .andExpect(status().isOk());
         
         //CREATING COLLECTION WITH INVALID TABLE NAME
-        setMockitoBadResponseForService();
-        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(true);
         createTableDTO.setTableName("Testing_123");
         restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -244,7 +243,6 @@ class ManageTableTest {
                 .andExpect(status().isOk());
         
         //TRY TO DELETE TABLE UNDER DELETION
-      
         setMockitoForTableUnderDeletion();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
