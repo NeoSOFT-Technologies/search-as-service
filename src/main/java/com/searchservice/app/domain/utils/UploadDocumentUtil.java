@@ -13,7 +13,7 @@ public class UploadDocumentUtil {
 
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
-	@Value("${base-solr-url}")
+	//@Value("${base-solr-url}")
 	private String baseSolrUrl;
 	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
