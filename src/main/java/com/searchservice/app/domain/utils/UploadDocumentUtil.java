@@ -25,7 +25,7 @@ public class UploadDocumentUtil {
 		String url = baseSolrUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 		log.debug("COMMIT");
-	
+		
 		Request request = new Request.Builder().url(url).method("POST", body)
 				.addHeader("Content-Type", "application/json").build();
 

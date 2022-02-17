@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,8 @@ public class TableSchemaParser {
 				fieldDtoMap.put(VALIDATED, false);
 				return schemaFieldsListOfMap;
 			}
+			if(isFieldUnchangeable(fieldDto.getName()))
+				continue;
 			fieldDtoMap.put("name", fieldDto.getName());
 			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
@@ -55,6 +59,9 @@ public class TableSchemaParser {
 	
 	public static boolean validateSchemaField(SchemaField solrFieldDTO) {
 		logger.info("Validate schema field: {}", solrFieldDTO);
+		
+		solrFieldDTO.setDefault_(DEFAULT);
+		
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
 		String fieldType = solrFieldDTO.getType();
@@ -102,6 +109,14 @@ public class TableSchemaParser {
 			logger.info("Invalid entry for field attribute: \"{}\"", invalidAttribute);
 		logger.info("All Schema field boolean attributes are valid");
 		return fieldAttributesValidated;
+	}
+	
+	
+	public static boolean isFieldUnchangeable(String fieldName) {
+		Pattern pattern = Pattern.compile("^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$");
+        Matcher matcher = pattern.matcher(fieldName);
+
+		return matcher.matches() || fieldName.equals("id");
 	}
 	
 	

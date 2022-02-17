@@ -48,7 +48,8 @@ springdoc:
 
 #================================================================
 #Solr Configurations
-base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
+#base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
+base-solr-url: http://localhost:8983/solr
 #================================================================
 
 
