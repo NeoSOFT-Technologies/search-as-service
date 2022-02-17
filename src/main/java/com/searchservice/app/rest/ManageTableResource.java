@@ -1,6 +1,9 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -149,7 +152,11 @@ public class ManageTableResource {
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
-
+        if(!manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
+        	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
+             LoggerUtils.printlogger(loggersDTO, false, true);
+             throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
+        }else {
         manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);    
         
         Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
@@ -164,7 +171,7 @@ public class ManageTableResource {
             log.info("Table could not be created: {}", apiResponseDTO);
             LoggerUtils.printlogger(loggersDTO, false, true);
             throw new BadRequestOccurredException(400, "REST operation could not be performed");
-        }
+        }}
     }
 
     @DeleteMapping("/{clientId}/{tableName}")

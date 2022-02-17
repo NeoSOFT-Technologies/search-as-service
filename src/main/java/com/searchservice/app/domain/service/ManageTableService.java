@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -890,7 +892,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
-		  File file=new File(deleteSchemaAttributesFilePath);
+		  File file=new File(deleteSchemaAttributesFilePath+".txt");
 		  try(FileWriter fw = new FileWriter(file, true);
 				   BufferedWriter bw = new BufferedWriter(fw)) {
 			  String newRecord = String.format(
@@ -912,8 +914,8 @@ public class ManageTableService implements ManageTableServicePort {
 			int clientId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
 		
-		try (InputStream inputStream = getClass().getResourceAsStream("/SchemaDeleteRecord.txt")) {
-		    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+		try (FileReader fr = new FileReader(deleteSchemaAttributesFilePath+".txt")) {
+		    BufferedReader br = new BufferedReader(fr);
 			int lineNumber = 0;
 			String currentDeleteRecordLine;
 			while ((currentDeleteRecordLine = br.readLine()) != null) {
@@ -938,8 +940,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File("src\\main\\resources\\SchemaDeleteRecord.txt");
-		File newSchemaFile = new File("src\\main\\resources\\SchemaDeleteRecordTemp.txt");
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".txt");
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath+".Temptxt");
 		int lineNumber = 0;
 		int schemaDeleteRecordCount = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
@@ -1011,7 +1013,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
-		File schemaDeleteRecordFile = new File("src\\main\\resources\\SchemaDeleteRecord.txt");
+		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".txt");
 		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
 		     checkTableDeletionStatus(schemaDeleteRecordCount);
 		  }
@@ -1027,6 +1029,13 @@ public class ManageTableService implements ManageTableServicePort {
 	      	logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
 	      	return false;
 	      }
+	}
+	
+	@Override
+	public boolean checkIfTableNameisValid(String tableName) {
+		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+	      Matcher matcher = pattern.matcher(tableName);
+	      return matcher.find();
 	}
 	 
 }

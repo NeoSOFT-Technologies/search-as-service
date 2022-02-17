@@ -123,6 +123,7 @@ class ManageTableTest {
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(true);
     }
 
     public void setMockitoBadResponseForService() {
@@ -196,12 +197,27 @@ class ManageTableTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
                 .andExpect(status().isOk());
+        
+        //CREATING COLLECTION WITH INVALID TABLE NAME
+        setMockitoBadResponseForService();
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
+        createTableDTO.setTableName("Testing_123");
+        restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     void testDeleteTable() throws Exception {
 
+    	 ManageTable createTableForDeletion =new ManageTable(
+         		tableName, 
+         		"B", 
+         		"default-schema", 
+         		attributes);
+    	 
         //DELETE A NON EXISTING COLLECTION
         Response deleteTableResponseDTO=new Response();
 
@@ -216,7 +232,7 @@ class ManageTableTest {
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(createTableForDeletion)))
                 .andExpect(status().isOk());
 
 
