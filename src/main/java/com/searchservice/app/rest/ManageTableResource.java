@@ -152,7 +152,7 @@ public class ManageTableResource {
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
-        if(!manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
+        if(manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
         	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
              LoggerUtils.printlogger(loggersDTO, false, true);
              throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
