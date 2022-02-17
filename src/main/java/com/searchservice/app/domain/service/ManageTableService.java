@@ -296,6 +296,14 @@ public class ManageTableService implements ManageTableServicePort {
         loggersDTO.setTimestamp(timestamp);
 
 		if (apiResponseDTO.getStatusCode() == 200) {
+			// Check if new table columns are to be added(Non-null list of columns)
+			if(manageTableDTO.getColumns() == null) {
+				String updatedMsg = String.format("%s. No new columns found", apiResponseDTO.getMessage()); 
+				apiResponseDTO.setMessage(updatedMsg);
+				return apiResponseDTO;
+			} else if(manageTableDTO.getColumns().isEmpty())
+				return apiResponseDTO;
+			
 			// Add schemaAttributes
 			TableSchema tableSchemaDTO = new TableSchema(
 					manageTableDTO.getTableName(),
@@ -609,8 +617,10 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
 		logger.info("Add schema attributes");
-
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
+		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
+				solrURL, newTableSchemaDTO.getTableName());
+		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
 
@@ -624,8 +634,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
-			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-			
+			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
+
 			// Add new fields present in the Target Schema to the given collection/table schema
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
 			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
@@ -912,12 +922,14 @@ public class ManageTableService implements ManageTableServicePort {
 					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
 							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
 						deletedSchemaAttributes.add(currentRecordData[4]);
+						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[4]);
 					}
 				}
 				lineNumber++;
 			}
 			
 		} catch (Exception e) {
+			logger.error("Soft Delete SchemaInfo could not be retrieved");
 			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
 		}
 		

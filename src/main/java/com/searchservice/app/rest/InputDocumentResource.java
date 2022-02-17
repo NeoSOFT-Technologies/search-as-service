@@ -76,7 +76,6 @@ public class InputDocumentResource {
         			.body(documentInjectionThrottlerResponse);
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        
         tableName = tableName+"_"+clientid;
         Instant start = Instant.now();
         ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
@@ -117,7 +116,7 @@ public class InputDocumentResource {
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-		
+
         // Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, false);
@@ -126,7 +125,7 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
-		tableName = tableName + "_" + clientid;
+		tableName = tableName+"_"+clientid;
 		Instant start = Instant.now();
 		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
 		Instant end = Instant.now();
