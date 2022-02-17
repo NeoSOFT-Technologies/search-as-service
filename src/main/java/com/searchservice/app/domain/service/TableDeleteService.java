@@ -72,12 +72,12 @@ private String servicename = "Table_Delete_Service";
 		Response deleteRecordInsertionResponse = new Response();
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
-        String actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
-		  File file=new File("src/main/resources/TableDeleteRecord.txt");
-		  if((clientId>0) && (tableName!=null)) {
-		  try {
-		      FileWriter fw = new FileWriter(file, true);
-	           BufferedWriter bw = new BufferedWriter(fw);
+        String actualTableName = "";
+		  if((clientId>0) && (tableName!=null && tableName.length()!=0)) {
+			  File file=new File(deleteRecordFilePath+".txt");
+		  try ( FileWriter fw = new FileWriter(file, true);
+	           BufferedWriter bw = new BufferedWriter(fw);){
+			  actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
 		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
 		      fw.write(newRecord);
 		      fw.flush();
@@ -87,6 +87,8 @@ private String servicename = "Table_Delete_Service";
 
 		      LoggerUtils.printlogger(loggersDTO,false,false);
 		      deleteRecordInsertionResponse.setMessage("Table:" +actualTableName+" Successfully Initialized For Deletion ");
+		      fw.close();
+		      bw.close();
 		  }catch(Exception e)
 		  {
 			  logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG ,actualTableName,e);
@@ -307,12 +309,11 @@ private String servicename = "Table_Delete_Service";
 	@Override
 	public List<String> getTableUnderDeletion() {
 		List<String> tableUnderDeletionList = new ArrayList<String>();
-		BufferedReader br = null;
 		File existingFile = new File(deleteRecordFilePath + ".txt");
 		int lineNumber = 0;
-		try(InputStream inputStream = getClass().getResourceAsStream("/TableDeleteRecord.txt")) {
-
-		    br = new BufferedReader(new InputStreamReader(inputStream));
+		try(FileReader fr = new FileReader(existingFile);
+			BufferedReader br = new BufferedReader(fr) ;
+		   ){
 			String st;
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
@@ -326,14 +327,7 @@ private String servicename = "Table_Delete_Service";
 
 		} catch (Exception e) {
 			logger.error("Some Error Occured While Getting Table", e);
-		} finally {
-
-			try {
-				br.close();
-			} catch (IOException e) {
-				logger.error("Some Error Occured While Getting Table", e);
-			}
-		}
+		} 
 		return tableUnderDeletionList;
 	}
 }
