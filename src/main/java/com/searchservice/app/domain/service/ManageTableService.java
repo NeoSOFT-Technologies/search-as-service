@@ -694,7 +694,7 @@ public class ManageTableService implements ManageTableServicePort {
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
 					newField.put("name", fieldDto.getName());
-					newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
+					newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
