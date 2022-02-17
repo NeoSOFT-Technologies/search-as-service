@@ -42,7 +42,7 @@ public class TableSchemaParser {
 			if(isFieldUnchangeable(fieldDto.getName()))
 				continue;
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType()));
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
