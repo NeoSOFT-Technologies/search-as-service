@@ -20,11 +20,11 @@ ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
 
-RUN mkdir /DeletedRecordFiles
-RUN chmod 755 /DeletedRecordFiles
+RUN mkdir $APP_HOME/DeletedRecordFiles
+RUN chmod 755 $APP_HOME/DeletedRecordFiles
 #RUN cd DeletedRecordFiles
-#RUN touch DeletedRecordFiles/TableDeleteRecord.txt
-#RUN touch DeletedRecordFiles/SchemaDeleteRecord.txt
+RUN touch $APP_HOME/DeletedRecordFiles/TableDeleteRecord.txt
+RUN touch $APP_HOME/DeletedRecordFiles/SchemaDeleteRecord.txt
 
 
 #API Port
