@@ -22,9 +22,9 @@ COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
 
 RUN mkdir /DeletedRecordFiles
 RUN chmod 755 /DeletedRecordFiles
-RUN cd DeletedRecordFiles
-RUN touch TableDeleteRecord.txt
-RUN touch SchemaDeleteRecord.txt
+#RUN cd DeletedRecordFiles
+RUN touch DeletedRecordFiles/TableDeleteRecord.txt
+RUN touch DeletedRecordFiles/SchemaDeleteRecord.txt
 
 
 #API Port
