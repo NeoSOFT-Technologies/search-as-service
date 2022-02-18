@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.Instant;
 
-@RestController
-@RequestMapping("${base-url.api-endpoint.versioned-home}")
+//@RestController
+//@RequestMapping("${base-url.api-endpoint.versioned-home}")
 public class VersionedInputDocumentResource {
 	private String servicename = "Versioned_Input_Document_Resource";
 
