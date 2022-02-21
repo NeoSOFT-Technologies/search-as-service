@@ -90,6 +90,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String INDEXED = "indexed";
     private static final String DEFAULT_CONFIGSET = "_default";
     private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
+    private static final String FILE_CREATE_ERROR="Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -461,7 +462,7 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
 		
-		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
+		// READ from SchemaDeleteRecord.csv and exclude the deleted attributes
 		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
 				clientId, tableName);
 
@@ -892,14 +893,12 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
-		  File file=new File(deleteSchemaAttributesFilePath+".txt");
+		  File file=new File(deleteSchemaAttributesFilePath+".csv");
+		  checkIfSchemaFileExist(file);
 		  try(FileWriter fw = new FileWriter(file, true);
 				   BufferedWriter bw = new BufferedWriter(fw)) {
-			  String newRecord = String.format(
-					  "%d %18s %20s %25s",
-					  clientId,
-					  tableName,
-					  formatter.format(Calendar.getInstance().getTime()),columnName);
+			  String newRecord = clientId+","+tableName+","+
+				   formatter.format(Calendar.getInstance().getTime())+","+columnName;
 		      bw.write(newRecord);
 		      bw.newLine();
 		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
@@ -913,14 +912,15 @@ public class ManageTableService implements ManageTableServicePort {
 	public List<String> readSchemaInfoFromSchemaDeleteManager(
 			int clientId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
-		
-		try (FileReader fr = new FileReader(deleteSchemaAttributesFilePath+".txt")) {
+		File file = new File(deleteSchemaAttributesFilePath+".csv");
+		checkIfSchemaFileExist(file);
+		try (FileReader fr = new FileReader(file)) {
 		    BufferedReader br = new BufferedReader(fr);
 			int lineNumber = 0;
 			String currentDeleteRecordLine;
 			while ((currentDeleteRecordLine = br.readLine()) != null) {
 				if (lineNumber > 0) {
-					String[] currentRecordData = currentDeleteRecordLine.split("\\s+");				
+					String[] currentRecordData = currentDeleteRecordLine.split(",");				
 					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
 							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
 						deletedSchemaAttributes.add(currentRecordData[4]);
@@ -940,8 +940,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".txt");
-		File newSchemaFile = new File(deleteSchemaAttributesFilePath+".Temptxt");
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".csv");
+		checkIfSchemaFileExist(existingSchemaFile);
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath+"Temp"+".csv");
 		int lineNumber = 0;
 		int schemaDeleteRecordCount = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
@@ -953,7 +954,7 @@ public class ManageTableService implements ManageTableServicePort {
 					if (diff < schemaDeleteDuration) {
 						pw.println(currentSchemaDeleteRecord);
 					} else {
-						if (performSchemaDeletion(currentSchemaDeleteRecord.split(" "))) {
+						if (performSchemaDeletion(currentSchemaDeleteRecord)){
 							schemaDeleteRecordCount++;
 
 						} else {
@@ -975,10 +976,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	public long checkDatesDifference(String currentSchemaDeleteRecord) {
 		try{
-	    String[] data =  currentSchemaDeleteRecord.split(" ");
-		StringBuilder date = new StringBuilder();
-		date.append(data[10]+" "+data[11]);
-        Date requestDate = formatter.parse(date.toString());
+		String date = currentSchemaDeleteRecord.split(",")[2];
+        Date requestDate = formatter.parse(date);
         Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
         long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
 	    return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
@@ -989,9 +988,9 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 	
 	
-	public boolean performSchemaDeletion(String[] schemaDeleteData) {
-		String columnName = schemaDeleteData[schemaDeleteData.length-1];
-		String tableName = schemaDeleteData[7];
+	public boolean performSchemaDeletion(String schemaDeleteData) {
+		String columnName = schemaDeleteData.split(",")[3];
+		String tableName = schemaDeleteData.split(",")[1];
 		
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
 				tableName);
@@ -1013,7 +1012,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
-		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".txt");
+		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".csv");
+		 checkIfSchemaFileExist(schemaDeleteRecordFile);
 		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
 		     checkTableDeletionStatus(schemaDeleteRecordCount);
 		  }
@@ -1036,6 +1036,21 @@ public class ManageTableService implements ManageTableServicePort {
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();
+	}
+	
+	public boolean checkIfSchemaFileExist(File file) {
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+				return true;
+			} catch (IOException e) {
+                logger.error(FILE_CREATE_ERROR,file.getName(),e);
+                return false;
+			}
+		}
+		else {
+			return false;
+		}
 	}
 	 
 }

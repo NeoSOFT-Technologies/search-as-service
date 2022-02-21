@@ -51,4 +51,5 @@ public interface ManageTableServicePort {
     TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
     		String tableName, int clientId, TableSchemav2 tableSchema);
     boolean checkIfTableNameisValid(String tableName);
+ 
 }
