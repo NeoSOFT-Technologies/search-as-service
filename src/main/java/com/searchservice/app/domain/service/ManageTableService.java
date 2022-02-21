@@ -1041,7 +1041,10 @@ public class ManageTableService implements ManageTableServicePort {
 	public boolean checkIfSchemaFileExist(File file) {
 		if(!file.exists()) {
 			try {
-				file.createNewFile();
+				boolean createFile = file.createNewFile();
+				if(createFile) {
+					logger.debug("File With Name: {} Created Succesfully",file.getName());
+				}
 				return true;
 			} catch (IOException e) {
                 logger.error(FILE_CREATE_ERROR,file.getName(),e);
