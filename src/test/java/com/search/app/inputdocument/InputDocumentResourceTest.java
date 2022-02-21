@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.InputDocumentService;
 
@@ -42,10 +43,14 @@ class InputDocumentResourceTest {
 
 	@MockBean
 	InputDocumentService inputDocumentService;
+	
+	@MockBean
+	ManageTableServicePort manageTableServicePort;
 
 	public void setMockitoSucccessResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
+		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}

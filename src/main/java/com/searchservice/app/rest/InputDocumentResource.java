@@ -4,6 +4,7 @@ package com.searchservice.app.rest;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 
@@ -33,11 +34,13 @@ public class InputDocumentResource {
     
     public final InputDocumentServicePort inputDocumentServicePort;
     public final ThrottlerServicePort throttlerServicePort;
+    public final ManageTableServicePort manageTableServicePort;
     public InputDocumentResource(
     		InputDocumentServicePort inputDocumentServicePort, 
-    		ThrottlerServicePort throttlerServicePort) {
+    		ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort) {
         this.inputDocumentServicePort = inputDocumentServicePort;
         this.throttlerServicePort = throttlerServicePort;
+        this.manageTableServicePort = manageTableServicePort;
     }
 
     private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -69,7 +72,6 @@ public class InputDocumentResource {
     		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
 
         successMethod(nameofCurrMethod, loggersDTO);
-        
         if(documentInjectionThrottlerResponse.getStatusCode() == 406)
         	return ResponseEntity
         			.status(HttpStatus.NOT_ACCEPTABLE)
@@ -77,25 +79,11 @@ public class InputDocumentResource {
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         tableName = tableName+"_"+clientid;
-        Instant start = Instant.now();
-        ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
-        Instant end = Instant.now();
-        Duration timeElapsed = Duration.between(start, end);
-        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
-        log.info(result);
-
-        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
-        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
-      
-
-        successMethod(nameofCurrMethod, loggersDTO);
-        
-        if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.printlogger(loggersDTO, false, false);
-            return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
-        }else{
-        	LoggerUtils.printlogger(loggersDTO, false, true);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+        if(manageTableServicePort.isTableExists(tableName)) {
+        	 successMethod(nameofCurrMethod, loggersDTO);
+        	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
+        }else {
+          return documentInjectWithInvalidTableName(tableName.split("_")[0],clientid);	
         }
     }
     
@@ -126,25 +114,17 @@ public class InputDocumentResource {
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
 		tableName = tableName+"_"+clientid;
-		Instant start = Instant.now();
-		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
-		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
-		log.info(result);
-
-		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
-		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
-
-        successMethod(nameofCurrMethod, loggersDTO);
-        
-		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			LoggerUtils.printlogger(loggersDTO, false, false);
-			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
-		} else {
-			LoggerUtils.printlogger(loggersDTO, false, true);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
-		}
+		 if(documentInjectionThrottlerResponse.getStatusCode() == 406)
+	        	return ResponseEntity
+	        			.status(HttpStatus.NOT_ACCEPTABLE)
+	        			.body(documentInjectionThrottlerResponse);
+	    	
+	        // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
+	      if(manageTableServicePort.isTableExists(tableName)) {
+	       	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
+	      }else {
+	         return documentInjectWithInvalidTableName(tableName.split("_")[0],clientid);	
+	      }
     }
 
 
@@ -165,5 +145,32 @@ public class InputDocumentResource {
 		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).headers(responseHeaders) // attach retry-info header
 				.body(rateLimitResponseDTO);
 	}
+	
+	public ResponseEntity<ThrottlerResponse> performDocumentInjection(String tableName,String payload,ThrottlerResponse documentInjectionThrottlerResponse,LoggersDTO loggersDTO){
+		   Instant start = Instant.now();
+	        ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
+	        Instant end = Instant.now();
+	        Duration timeElapsed = Duration.between(start, end);
+	        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
+	        log.info(result);
+
+	        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
+	        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+	        if(documentInjectionThrottlerResponse.getStatusCode()==200){
+	        	LoggerUtils.printlogger(loggersDTO, false, false);
+	            return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
+	        }else{
+	        	LoggerUtils.printlogger(loggersDTO, false, true);
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+	        }
+	}
+	
+	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(String tableName,int clientid){
+		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
+		documentInjectionThrottlerResponse.setStatusCode(400);
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+	}
+	
 	
 }
