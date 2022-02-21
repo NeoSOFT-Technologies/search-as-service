@@ -12,3 +12,7 @@ ClientId  TableName  		RequestTime					ColumnName
 99          demotable   18-2-2022 11:14:28                 vendor_id
 99         demotable4   18-2-2022 11:22:20                     title
 99         demotable4   18-2-2022 11:22:20                 vendor_id
+202         egresstest   18-2-2022 01:15:59                 vendor_id
+202         egresstest   18-2-2022 04:26:12              product_name
+202         egresstest   18-2-2022 04:26:12                     title
+202         egresstest   18-2-2022 04:26:12                 vendor_id
