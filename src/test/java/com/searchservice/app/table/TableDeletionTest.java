@@ -91,8 +91,7 @@ class TableDeletionTest{
 			 assertEquals(400 ,tableDeleteService.initializeTableDelete(1,"",new LoggersDTO()).getStatusCode());
 			}catch(Exception e) {
 				assertTrue(0<1);
-			}
-		
+			}		
 	}
 	
 	@Test

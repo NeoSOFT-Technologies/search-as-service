@@ -259,5 +259,6 @@ public class ManageTableResource {
         } else {
             throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
         }
+        
     }
 }

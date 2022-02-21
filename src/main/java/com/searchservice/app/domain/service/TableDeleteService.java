@@ -53,6 +53,7 @@ private String servicename = "Table_Delete_Service";
 	
 	private static final String TABLE_DELETE_INITIALIZE_ERROR_MSG = "Error While Initializing Deletion For Table: {}"; 
 	private static final String TABLE_DELETE_UNDO_ERROR_MSG = "Undo Table Delete Failed , Invalid CLient ID Provided";
+	private static final String TABLE_FILE_CREATE_ERROR="Error File Creating File {}";
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
 		String timestamp = LoggerUtils.utcTime().toString();
@@ -74,11 +75,12 @@ private String servicename = "Table_Delete_Service";
         loggersDTO.setTimestamp(timestamp);
         String actualTableName = "";
 		  if((clientId>0) && (tableName!=null && tableName.length()!=0)) {
-			  File file=new File(deleteRecordFilePath+".txt");
+			  File file=new File(deleteRecordFilePath+".csv");
+			  checkIfTableDeleteFileExist(file);
 		  try ( FileWriter fw = new FileWriter(file, true);
 	           BufferedWriter bw = new BufferedWriter(fw);){
 			  actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
-		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
+		      String newRecord =clientId+","+tableName+","+formatter.format(Calendar.getInstance().getTime())+"\n";
 		      fw.write(newRecord);
 		      fw.flush();
 		      fw.close();
@@ -112,14 +114,12 @@ private String servicename = "Table_Delete_Service";
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
-		
-			File existingFile = new File(deleteRecordFilePath + ".txt");
-		    File newFile = new File(deleteRecordFilePath + "Temp.txt");
+    		File existingFile = new File(deleteRecordFilePath + ".csv");
+		    File newFile = new File(deleteRecordFilePath + "Temp.csv");
 			int lineNumber = 0;
 			int delRecordCount=0;
 			String timestamp=LoggerUtils.utcTime().toString();
 	        loggersDTO.setTimestamp(timestamp);
-	        
 			try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
 			     PrintWriter pw =  new PrintWriter(new FileWriter(newFile)) ){
 			   String currentDeleteRecord;
@@ -152,7 +152,7 @@ private String servicename = "Table_Delete_Service";
 	}
 	
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int delRecordCount) {
-		File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
+		File deleteRecordFile = new File(deleteRecordFilePath + ".csv");
 		  if(existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
 		     checkTableDeletionStatus(delRecordCount);
 		  }
@@ -184,16 +184,11 @@ private String servicename = "Table_Delete_Service";
 	
 	public long checkDatesDifference(String currentDeleteRecord) {
 		try{
-	    String[] data =  currentDeleteRecord.split(" ");
-		StringBuilder date = new StringBuilder();
-		int position = data.length - 2;
-		for(int i = position ; i<data.length;i++) {
-    		date.append( (i!= data.length -1) ? data[i] + " " : data[i] );
-    	}
-      Date requestDate = formatter.parse(date.toString());
-      Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
-      long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
-	  return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+	    String date =  currentDeleteRecord.split(",")[2];
+       Date requestDate = formatter.parse(date);
+       Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
+       long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
+	   return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 		}catch(Exception e) {
 			logger.error("Error!",e);
 			return 0;
@@ -204,8 +199,9 @@ private String servicename = "Table_Delete_Service";
 	public Response performUndoTableDeletion(String tableName) {
 		 String actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
 		Response undoTableDeletionResponse = new Response();
-		File existingFile = new File(deleteRecordFilePath + ".txt");
-	    File newFile = new File(deleteRecordFilePath + "Temp.txt");
+		File existingFile = new File(deleteRecordFilePath + ".csv");
+		checkIfTableDeleteFileExist(existingFile);
+	    File newFile = new File(deleteRecordFilePath + "Temp.csv");
 		  int lineNumber=0;
 		  int undoRecord=0;
 		  try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
@@ -213,8 +209,8 @@ private String servicename = "Table_Delete_Service";
 		    String currentDeleteRecordLine;  
 		    while((currentDeleteRecordLine = br.readLine()) != null) {
 			  if(lineNumber>0) {
-				  String[] currentRecordData = currentDeleteRecordLine.split(" ");
-		     	  if(!currentRecordData[currentRecordData.length-5].equalsIgnoreCase(tableName)) {
+				  String[] currentRecordData = currentDeleteRecordLine.split(",");
+		     	  if(!currentRecordData[1].equalsIgnoreCase(tableName)) {
      			   pw.println(currentDeleteRecordLine);
      		 }else{
 				  undoRecord++;
@@ -227,7 +223,7 @@ private String servicename = "Table_Delete_Service";
 		  pw.flush();
 		  pw.close();
 		  br.close();
-		  File deleteRecordFile = new File(deleteRecordFilePath + ".txt");
+		  File deleteRecordFile = new File(deleteRecordFilePath + ".csv");
 		  if(existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
 		   undoTableDeletionResponse =  getUndoDeleteResponse(undoRecord, actualTableName);
 		  }
@@ -241,17 +237,8 @@ private String servicename = "Table_Delete_Service";
 	}
 	
 	public boolean performTableDeletion(String tableRecord,LoggersDTO loggersDTO) {
-		String tableName= "";
-		String[] tableDeleteData = tableRecord.split(" ");
-		for(int i=1; i<tableDeleteData.length; i++) {
-			if(!tableDeleteData[i].equalsIgnoreCase("")) {
-				tableName = tableDeleteData[i];
-				break;
-			}
-		}
-
+		String tableName= tableRecord.split(",")[1];
 	    Response tableDeleteResponse  = manageTableServicePort.deleteTable(tableName,loggersDTO);
-
 	    if(tableDeleteResponse.getStatusCode() == 200) {
 	    	logger.debug("Successfully Deleted Table : {}", tableName);
 	    	return true;
@@ -308,8 +295,9 @@ private String servicename = "Table_Delete_Service";
 	}
 	@Override
 	public List<String> getTableUnderDeletion() {
-		List<String> tableUnderDeletionList = new ArrayList<String>();
-		File existingFile = new File(deleteRecordFilePath + ".txt");
+		List<String> tableUnderDeletionList = new ArrayList<>();
+		File existingFile = new File(deleteRecordFilePath + ".csv");
+		checkIfTableDeleteFileExist(existingFile);
 		int lineNumber = 0;
 		try(FileReader fr = new FileReader(existingFile);
 			BufferedReader br = new BufferedReader(fr) ;
@@ -317,9 +305,7 @@ private String servicename = "Table_Delete_Service";
 			String st;
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
-					String currentTableName = "";
-					String[] tableDeleteData = st.split(" ");
-					currentTableName = tableDeleteData[tableDeleteData.length - 5];
+					String currentTableName = st.split(",")[1];
 					tableUnderDeletionList.add(currentTableName);
 				}
 				lineNumber++;
@@ -329,5 +315,24 @@ private String servicename = "Table_Delete_Service";
 			logger.error("Some Error Occured While Getting Table", e);
 		} 
 		return tableUnderDeletionList;
+	}
+	
+	@Override
+	public boolean checkIfTableDeleteFileExist(File file) {
+		if(!file.exists()) {
+			try {
+				boolean createFile = file.createNewFile();
+				if(createFile) {
+					logger.debug("File With Name: {} Created Succesfully",file.getName());
+				}
+				return true;
+			} catch (IOException e) {
+                logger.error(TABLE_FILE_CREATE_ERROR,file.getName(),e);
+                return false;
+			}
+		}
+		else {
+			return false;
+		}
 	}
 }
