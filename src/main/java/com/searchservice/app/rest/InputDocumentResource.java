@@ -49,11 +49,11 @@ public class InputDocumentResource {
 		loggersDTO.setTimestamp(timestamp);
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-    @PostMapping("/ingest-nrt/{clientid}/{tableName}")
+    @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> documents(
 							    		@PathVariable String tableName, 
-							    		@PathVariable int clientid, 
+							    		@PathVariable int tenantId, 
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
@@ -76,7 +76,7 @@ public class InputDocumentResource {
         			.body(documentInjectionThrottlerResponse);
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        tableName = tableName+"_"+clientid;
+        tableName = tableName+"_"+tenantId;
         Instant start = Instant.now();
         ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
         Instant end = Instant.now();
@@ -101,11 +101,11 @@ public class InputDocumentResource {
     
 
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-	@PostMapping("/ingest/{clientid}/{tableName}")
+	@PostMapping("/ingest/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> document(
 							    		@PathVariable String tableName, 
-							    		@PathVariable int clientid, 
+							    		@PathVariable int tenantId, 
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
@@ -125,7 +125,7 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
-		tableName = tableName+"_"+clientid;
+		tableName = tableName+"_"+tenantId;
 		Instant start = Instant.now();
 		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
 		Instant end = Instant.now();
@@ -151,7 +151,7 @@ public class InputDocumentResource {
     // Rate Limiter(Throttler) FALLBACK method
 	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(
 			String tableName, 
-			int clientid, 
+			int tenantId, 
 			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);

@@ -62,7 +62,7 @@ private String servicename = "Table_Delete_Service";
 		loggersDTO.setUsername(username);
 	}
 	@Override
-	public Response initializeTableDelete(int clientId, String tableName, LoggersDTO loggersDTO) {
+	public Response initializeTableDelete(int tenantId, String tableName, LoggersDTO loggersDTO) {
 		
 		logger.debug("capacity Plans");
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -73,12 +73,12 @@ private String servicename = "Table_Delete_Service";
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
         String actualTableName = "";
-		  if((clientId>0) && (tableName!=null && tableName.length()!=0)) {
+		  if((tenantId>0) && (tableName!=null && tableName.length()!=0)) {
 			  File file=new File(deleteRecordFilePath+".txt");
 		  try ( FileWriter fw = new FileWriter(file, true);
 	           BufferedWriter bw = new BufferedWriter(fw);){
 			  actualTableName = tableName.substring(0,tableName.lastIndexOf("_"));
-		      String newRecord = String.format("%d %18s %20s",clientId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
+		      String newRecord = String.format("%d %18s %20s",tenantId,tableName,formatter.format(Calendar.getInstance().getTime()))+"\n";
 		      fw.write(newRecord);
 		      fw.flush();
 		      fw.close();
