@@ -293,7 +293,6 @@ public class ManageTableService implements ManageTableServicePort {
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
 
-
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
 
@@ -512,7 +511,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 				// Parse Field Type Object(String) to Enum
 				String solrFieldType = SchemaFieldType.fromSolrFieldTypeToStandardDataType(
-						(String) f.get("type"));
+						(String) f.get("type"), f.get(MULTIVALUED));
 
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
@@ -671,15 +670,17 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchemaResponseDTO.setMessage("No new attributes found");
 				return tableSchemaResponseDTO;
 			} else {
-				// REMOVE existing attributess from newAttributes list
-				for(String attributeName: existingAttributesNames) {
-					newAttributesHashMap.remove(attributeName);
+				if(!existingAttributesNames.isEmpty()) {
+					// REMOVE existing attributess from newAttributes list
+					for(String attributeName: existingAttributesNames) {
+						newAttributesHashMap.remove(attributeName);
+					}
 				}
 			}
 			
 			if(newAttributesHashMap.isEmpty()) {
 				tableSchemaResponseDTO.setStatusCode(405);
-				tableSchemaResponseDTO.setMessage("Add attributes operation NOT ALLOWED");
+				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
 			} else {
 				for(Map.Entry<String, SchemaField> fieldDtoEntry: newAttributesHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
@@ -712,17 +713,17 @@ public class ManageTableService implements ManageTableServicePort {
 						newField.put("type", fieldTypeAttributes.get("name"));
 						// Since "partial search" is enabled on this field, docValues has to be disabled
 						fieldDto.setSortable(false);
-						//newField.put(DOCVALUES, fieldDto.isSortable());
 					} else {
 						newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 						newField.put(DOCVALUES, fieldDto.isSortable());
 					}
+
 					newField.put("name", fieldDto.getName());
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
 					newField.put(INDEXED, fieldDto.isFilterable());
-					
+
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 					addFieldResponse = addFieldRequest.process(solrClientActive);
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
