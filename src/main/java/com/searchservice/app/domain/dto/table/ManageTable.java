@@ -34,11 +34,11 @@ public class ManageTable implements VersionedObjectMapper {
 		this.tableNewName = manageTableDTO.tableNewName;
 	}
 	
-	public ManageTable(String tableName, String sku ,String schemaName, List<SchemaField> attributes2) {
+	public ManageTable(String tableName, String sku ,String schemaName, List<SchemaField> columns) {
 		this.tableName = tableName;
 		this.sku = sku;
 		this.schemaName = schemaName;
-		this.columns = attributes2;
+		this.columns = columns;
 	}
 	
 	@Override

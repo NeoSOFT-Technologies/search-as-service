@@ -29,8 +29,8 @@ import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
-@RestController
-@RequestMapping("${base-url.api-endpoint.versioned-home}" + "/manage/table")
+//@RestController
+//@RequestMapping("${base-url.api-endpoint.versioned-home}" + "/manage/table")
 public class VersionedManageTableResource {
 	private String servicename = "Versioned_Manage_Table_Resource";
 

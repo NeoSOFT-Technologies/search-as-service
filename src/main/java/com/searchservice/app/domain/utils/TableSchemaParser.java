@@ -25,6 +25,7 @@ public class TableSchemaParser {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String DEFAULT = "default";
+	private static final String PARTIAL_SEARCH = "partial_search";
 	
 	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
@@ -131,6 +132,10 @@ public class TableSchemaParser {
 	
 	
 	public static void setFieldsAsPerTheSchema(SchemaField solrFieldDTO, Map<String, Object> schemaField) {
+		
+		// testing
+		logger.info("current schema Field @@@@@@ {}", schemaField);
+		
 		if(schemaField.containsKey(INDEXED))
 			solrFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))
@@ -143,5 +148,9 @@ public class TableSchemaParser {
 			solrFieldDTO.setSortable((boolean)schemaField.get(DOCVALUES));
 		if(schemaField.containsKey(STORED))
 			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
+		if(schemaField.get("type").equals(PARTIAL_SEARCH)) {
+			solrFieldDTO.setPartialSearch(true);
+		}
+
 	}
 }

@@ -47,23 +47,37 @@ public class SchemaFieldType {
         }
     }
 
-    public static String fromSolrFieldTypeToStandardDataType(String fieldType) {
+    public static String fromSolrFieldTypeToStandardDataType(String fieldType, Object isMultivalue) {
         switch (fieldType) {
             case "boolean":
-                return "boolean";
+            	return "boolean";
+            case "booleans":
+            	return "booleans";
             case "plong":
-                return "long";
+            	return "long";
+            case "plongs":
+            	return "longs";
             case "pint":
-                return "int";
+            	return "int";
+            case "pints":
+            	return "ints";
             case "pfloat":
-                return "float";
+            	return "float";
+            case "pfloats":
+            	return "floats";
             case "pdouble":
-                return "double";
+            	return "double";
+            case "pdoubles":
+            	return "doubles";
             case "pdate":
-                return "Date";
+            	return "Date";
+            case "pdates":
+            	return "Dates";
             default:
-                return "string";
-
+                if (isMultivalue != null && (boolean)isMultivalue)
+                    return "strings";
+                else
+                    return "string";
         }
     }
 }
