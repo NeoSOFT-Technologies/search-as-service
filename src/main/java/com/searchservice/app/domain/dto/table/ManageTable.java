@@ -16,28 +16,29 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ManageTableDTO implements VersionedObjectMapper {
+public class ManageTable implements VersionedObjectMapper {
 
 	private String tableName;
 	private String sku;
+	@JsonIgnore
 	private String schemaName;
-	private List<SchemaFieldDTO> attributes;
+	private List<SchemaField> columns;
 	@JsonIgnore
 	private String tableNewName;
 	
-	public ManageTableDTO(ManageTableDTO manageTableDTO) {
+	public ManageTable(ManageTable manageTableDTO) {
 		this.tableName = manageTableDTO.getTableName();
 		this.sku = manageTableDTO.getSku();
 		this.schemaName=manageTableDTO.getSchemaName();
-		this.attributes=manageTableDTO.getAttributes();
+		this.columns=manageTableDTO.getColumns();
 		this.tableNewName = manageTableDTO.tableNewName;
 	}
 	
-	public ManageTableDTO(String tableName, String sku ,String schemaName, List<SchemaFieldDTO> attributes2) {
+	public ManageTable(String tableName, String sku ,String schemaName, List<SchemaField> columns) {
 		this.tableName = tableName;
 		this.sku = sku;
 		this.schemaName = schemaName;
-		this.attributes = attributes2;
+		this.columns = columns;
 	}
 	
 	@Override

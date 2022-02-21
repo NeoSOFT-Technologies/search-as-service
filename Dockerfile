@@ -20,6 +20,14 @@ ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
 
+ENV SOFT_DELETE_DIR=DeletedRecordFiles
+
+RUN mkdir $APP_HOME/$SOFT_DELETE_DIR
+RUN chmod 777 $APP_HOME/$SOFT_DELETE_DIR
+RUN touch $APP_HOME/$SOFT_DELETE_DIR/TableDeleteRecord.txt
+RUN touch $APP_HOME/$SOFT_DELETE_DIR/SchemaDeleteRecord.txt
+
+
 #API Port
 EXPOSE 8080
 

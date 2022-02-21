@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableSchema;
 
 public class TableSchemaParser {
 	private static final Logger logger = LoggerFactory.getLogger(TableSchemaParser.class);
@@ -23,55 +25,68 @@ public class TableSchemaParser {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String DEFAULT = "default";
+	private static final String PARTIAL_SEARCH = "partial_search";
 	
 	
-	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchemaDTO tableSchemaDTO) {
-		List<Map<String, Object>> schemaFieldsList = new ArrayList<>();
-		SchemaFieldDTO[] schemaFields = tableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
-		Map<String, Object> fieldDtoMap = new HashMap<>();
-		for(SchemaFieldDTO fieldDto: schemaFields) {
-			logger.debug("Validate SolrFieldDTO before parsing it");
+		for(SchemaField fieldDto: tableSchemaDTO.getColumns()) {
+			logger.info("Validate SolrFieldDTO before parsing it");
+			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
+				logger.info("{} field couldn't be validated", fieldDto);
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
-				return schemaFieldsList;
+				return schemaFieldsListOfMap;
 			}
+			if(isFieldUnchangeable(fieldDto.getName()))
+				continue;
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+
+			schemaFieldsListOfMap.add(fieldDtoMap);
+
 			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
 			fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
-			schemaFieldsList.add(fieldDtoMap);
+			schemaFieldsListOfMap.add(fieldDtoMap);
 		}
-		return schemaFieldsList;
+		return schemaFieldsListOfMap;
 	}
 	
 	
-	public static boolean validateSchemaField(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field: {}", solrFieldDTO);
+	public static boolean validateSchemaField(SchemaField solrFieldDTO) {
+		logger.info("Validate schema field: {}", solrFieldDTO);
+		
+		solrFieldDTO.setDefault_(DEFAULT);
+		
 		boolean fieldValidated = true;
 		String fieldName = solrFieldDTO.getName();
 		String fieldType = solrFieldDTO.getType();
 		
+		// If DOCVALUES == TRUE(=> SORTABLE == TRUE), then MULTIVALUED = FALSE
+		if(solrFieldDTO.isSortable())
+			solrFieldDTO.setMultiValue(false);
+		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
-			logger.debug("Invalid schema field name received: {}", fieldName);
+			logger.info("Invalid schema field name received: {}", fieldName);
 		} else if(fieldType == null) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field type received: {}", fieldType);
+			logger.info("Invalid/Empty schema field type received: {}", fieldType);
 		} else if(!validateSchemaFieldBooleanAttributes(solrFieldDTO)) {
 			fieldValidated = false;
-			logger.debug("Invalid/Empty schema field boolean attributes received");
+			logger.info("Invalid/Empty schema field boolean attributes received");
 		}
 		return fieldValidated;
 	}
 	
 	
-	public static boolean validateSchemaFieldBooleanAttributes(SchemaFieldDTO solrFieldDTO) {
-		logger.debug("Validate schema field boolean attributes: {}", solrFieldDTO);
+	public static boolean validateSchemaFieldBooleanAttributes(SchemaField solrFieldDTO) {
+		logger.info("Validate schema field boolean attributes: {}", solrFieldDTO);
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
@@ -92,13 +107,21 @@ public class TableSchemaParser {
 			invalidAttribute = DOCVALUES;
 		}
 		if(!fieldAttributesValidated)
-			logger.debug("Invalid entry for field attribute: \"{}\"", invalidAttribute);
-		logger.debug("All Schema field boolean attributes are valid");
+			logger.info("Invalid entry for field attribute: \"{}\"", invalidAttribute);
+		logger.info("All Schema field boolean attributes are valid");
 		return fieldAttributesValidated;
 	}
 	
 	
-	public static void setFieldsToDefaults(SchemaFieldDTO solrFieldDTO) {
+	public static boolean isFieldUnchangeable(String fieldName) {
+		Pattern pattern = Pattern.compile("^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$");
+        Matcher matcher = pattern.matcher(fieldName);
+
+		return matcher.matches() || fieldName.equals("id");
+	}
+	
+	
+	public static void setFieldsToDefaults(SchemaField solrFieldDTO) {
 		solrFieldDTO.setFilterable(false);
 		solrFieldDTO.setMultiValue(false);
 		solrFieldDTO.setDefault_("mydefault");
@@ -108,7 +131,11 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static void setFieldsAsPerTheSchema(SchemaFieldDTO solrFieldDTO, Map<String, Object> schemaField) {
+	public static void setFieldsAsPerTheSchema(SchemaField solrFieldDTO, Map<String, Object> schemaField) {
+		
+		// testing
+		logger.info("current schema Field @@@@@@ {}", schemaField);
+		
 		if(schemaField.containsKey(INDEXED))
 			solrFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))
@@ -121,5 +148,9 @@ public class TableSchemaParser {
 			solrFieldDTO.setSortable((boolean)schemaField.get(DOCVALUES));
 		if(schemaField.containsKey(STORED))
 			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
+		if(schemaField.get("type").equals(PARTIAL_SEARCH)) {
+			solrFieldDTO.setPartialSearch(true);
+		}
+
 	}
 }

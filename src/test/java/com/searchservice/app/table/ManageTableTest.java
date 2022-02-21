@@ -21,11 +21,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -39,9 +39,9 @@ class ManageTableTest {
     private int clientId = 101;
 
 	String schemaName = "default-config";
-	SchemaFieldDTO solr = new SchemaFieldDTO("testField6","string", "mydefault", true, true, false, true, true);
+	SchemaField solr = new SchemaField("testField6","string", "mydefault", true, true, false, true, true, false);
 	//SchemaFieldDTO[] attributes = { solr };
-	List<SchemaFieldDTO> attributes = new ArrayList<>(Arrays.asList(solr));
+	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(solr));
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"
@@ -83,93 +83,92 @@ class ManageTableTest {
     private TableDeleteService tableDeleteService;
     
     public void setMockitoSuccessResponseForService() {
-        ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setResponseStatusCode(200);
-        responseDTO.setResponseMessage("Testing");
+        Response responseDTO = new Response();
 
-        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
-        responseDTOisCollectionExists.setResponseStatusCode(200);
-        responseDTOisCollectionExists.setResponseMessage("true");
-//        
-//        TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(
-//        		tableName, schemaName, attributes);
+        responseDTO.setStatusCode(200);
+        responseDTO.setMessage("Testing");
 
-        ResponseDTO getTablesResponseDTO=new ResponseDTO();
-        getTablesResponseDTO.setResponseStatusCode(200);
-        getTablesResponseDTO.setResponseMessage("Testing");
+        List<String> mockGetTableList = new ArrayList<>();
+        mockGetTableList.add("Testing1");
+        mockGetTableList.add("Test2"); 
         
-        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
-        		200, 
-        		"Schema couldn't be fetched. Error!", 
-        		"", 
-        		"", 
-        		null);
-        
-        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
-        
-        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
-        unodDeleteResponseDTO.setResponseStatusCode(200);
-        unodDeleteResponseDTO.setResponseMessage("Testing");
+        Response responseDTOisCollectionExists = new Response();
+        responseDTOisCollectionExists.setStatusCode(200);
+        responseDTOisCollectionExists.setMessage("true");
 
-        Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+        Response getTablesResponseDTO=new Response();
+        getTablesResponseDTO.setStatusCode(200);
+        getTablesResponseDTO.setMessage("Testing");
+        getTablesResponseDTO.setData(mockGetTableList);
+   
+        GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
+        
+        Response unodDeleteResponseDTO = new Response();
+        unodDeleteResponseDTO.setStatusCode(200);
+        unodDeleteResponseDTO.setMessage("Testing");
+
+        Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
-        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
-        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+
+        Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
+//        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.capacityPlans(Mockito.any())).thenReturn(capacityPlanResponseDTO);
+
         
-        Map finalResponseMap= new HashMap();
+        Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Random message","Data is returned");
-        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
-        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
     }
 
     public void setMockitoBadResponseForService() {
-    	ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setResponseStatusCode(400);
-        responseDTO.setResponseMessage("Testing");
+    	Response responseDTO = new Response();
+        responseDTO.setStatusCode(400);
+        responseDTO.setMessage("Testing");
 
-        ResponseDTO responseDTOisCollectionExists = new ResponseDTO();
-        responseDTOisCollectionExists.setResponseStatusCode(400);
-        responseDTOisCollectionExists.setResponseMessage("Error!");
+        Response unodDeleteResponseDTO = new Response();
+        unodDeleteResponseDTO.setStatusCode(400);
+        unodDeleteResponseDTO.setMessage("Error!");
+        
+        Response responseDTOisCollectionExists = new Response();
+        responseDTOisCollectionExists.setStatusCode(400);
+        responseDTOisCollectionExists.setMessage("Error!");
 
-        ResponseDTO getTablesResponseDTO=new ResponseDTO();
-        getTablesResponseDTO.setResponseStatusCode(400);
-        getTablesResponseDTO.setResponseMessage("Testing");
+        Response getTablesResponseDTO=new Response();
+        getTablesResponseDTO.setStatusCode(400);
+        getTablesResponseDTO.setMessage("Testing");
         
-        TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO(
-        		400, 
-        		"Retrieved table schema");
-        
-        GetCapacityPlanDTO capacityPlanResponseDTO = new GetCapacityPlanDTO();
-        
-        ResponseDTO unodDeleteResponseDTO = new ResponseDTO();
-        unodDeleteResponseDTO.setResponseStatusCode(400);
-        unodDeleteResponseDTO.setResponseMessage("Error!");
+        GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
 
-        Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.updateTableSchema(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(),Mockito.any(), Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         //Mockito.when(tableService.rename(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
-        Mockito.when(manageTableService.getTables()).thenReturn(getTablesResponseDTO);
-        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
-        Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
+        Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
+//        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
+        Mockito.when(manageTableService.capacityPlans(Mockito.any())).thenReturn(capacityPlanResponseDTO);
         
-        Map finalResponseMap= new HashMap();
+        Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Error","Error connecting to cluster.");
-        Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyInt())).thenReturn(unodDeleteResponseDTO);
-        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString())).thenReturn(responseDTO);
+        Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
+        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+        Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+       
+    }
+    public void setMockitoForTableUnderDeletion() {
+    	Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
     }
 
     @Test
     void testCreateTable() throws Exception {
 
-        ManageTableDTO createTableDTO =new ManageTableDTO(
+        ManageTable createTableDTO =new ManageTable(
         		tableName, 
         		"B", 
         		"default-schema", 
@@ -191,21 +190,35 @@ class ManageTableTest {
                 .andExpect(status().isBadRequest());
 
         //DELETE THE CREATED COLLECTION
-        ResponseDTO deleteTableDTO=new ResponseDTO();
+        Response deleteTableDTO=new Response();
 
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableDTO)))
                 .andExpect(status().isOk());
+        
+        //CREATING COLLECTION WITH INVALID TABLE NAME
+        Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(true);
+        createTableDTO.setTableName("Testing_123");
+        restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     void testDeleteTable() throws Exception {
 
+    	 ManageTable createTableForDeletion =new ManageTable(
+         		tableName, 
+         		"B", 
+         		"default-schema", 
+         		attributes);
+    	 
         //DELETE A NON EXISTING COLLECTION
-        ResponseDTO deleteTableResponseDTO=new ResponseDTO();
+        Response deleteTableResponseDTO=new Response();
 
         setMockitoBadResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
@@ -218,7 +231,7 @@ class ManageTableTest {
         setMockitoSuccessResponseForService();
         restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" +"/"+ clientId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
+                        .content(TestUtil.convertObjectToJsonBytes(createTableForDeletion)))
                 .andExpect(status().isOk());
 
 
@@ -228,6 +241,13 @@ class ManageTableTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
                 .andExpect(status().isOk());
+        
+        //TRY TO DELETE TABLE UNDER DELETION
+        setMockitoForTableUnderDeletion();
+        restAMockMvc.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
+                .andExpect(status().isBadRequest());
     }
     
     
@@ -236,7 +256,7 @@ class ManageTableTest {
 
 		// Update Schema
 		setMockitoSuccessResponseForService();
-		TableSchemaDTO schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		TableSchema schemaDTO = new TableSchema(tableName, schemaName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -244,7 +264,15 @@ class ManageTableTest {
 		
 		// Update Schema for non-existing table
 		setMockitoBadResponseForService();
-		schemaDTO = new TableSchemaDTO(tableName, schemaName, attributes);
+		schemaDTO = new TableSchema(tableName, schemaName, attributes);
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
+		.andExpect(status().isBadRequest());
+		
+		//Update Schema for Table Under Deletion
+		setMockitoForTableUnderDeletion();
+		schemaDTO = new TableSchema(tableName, schemaName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/"+ clientId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -257,14 +285,9 @@ class ManageTableTest {
     void testGetTables() throws Exception {
 
         setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" )
+        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/"+clientId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
-        setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
 
     }
 
@@ -277,38 +300,47 @@ class ManageTableTest {
         .andExpect(status().isOk());
 
     }
-
-
+    
     @Test
-    void testGetTableDetails() throws Exception {
-
-        setMockitoSuccessResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" +"/details/testTable" )
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        setMockitoBadResponseForService();
-        restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table"+"/details/testTable")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
+    void testUndoDeleteTable() throws Exception {
+    	
+    	Response undoDeleteTableDTO=new Response();
+    	
+    	//Testing Undo Table Delete For Valid Table
+    	setMockitoSuccessResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ clientId +"/"+ tableName)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
+		.andExpect(status().isOk());
+		
+		//Testing Undo Table Delete For Invalid Table
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ clientId +"/"+ tableName+"0901")
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
+		.andExpect(status().isBadRequest());
     }
-    
-    
-	@Test
-	void testGetSchema() throws Exception {
+//	@Test
+	void testGetTableInfo() throws Exception {
 		setMockitoSuccessResponseForService();;
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
-		//.andExpect(content().json(expectedGetResponse))
 		.andExpect(status().isOk());
 		
 		setMockitoBadResponseForService();
 		restAMockMvc.perform(
 				MockMvcRequestBuilders
-				.get(apiEndpoint + "/manage/table" + "/schema" +"/"+ clientId +"/"+ tableName)
+				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isBadRequest());
+		
+		//Accessing Table Under Deletion
+		setMockitoForTableUnderDeletion();
+		restAMockMvc.perform(
+				MockMvcRequestBuilders
+				.get(apiEndpoint + "/manage/table" + "/"+ clientId +"/"+ tableName)
 				.accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isBadRequest());
 	}

@@ -15,13 +15,13 @@ import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMa
 @EqualsAndHashCode
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConfigSetResponseDTO implements VersionedObjectMapper {
+public class ConfigSetResponse implements VersionedObjectMapper {
 
     private int statusCode;
     private String message;
     private List<String> configSets;
 	
-    public ConfigSetResponseDTO(int statusCode, String message) {
+    public ConfigSetResponse(int statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
 	}

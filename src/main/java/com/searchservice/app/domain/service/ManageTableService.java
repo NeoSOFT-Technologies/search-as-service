@@ -1,16 +1,30 @@
 package com.searchservice.app.domain.service;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
@@ -27,20 +41,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.searchservice.app.config.CapacityPlanProperties;
-import com.searchservice.app.domain.dto.ResponseDTO;
-import com.searchservice.app.domain.dto.table.ConfigSetDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlanDTO;
-import com.searchservice.app.domain.dto.table.ManageTableDTO;
-import com.searchservice.app.domain.dto.table.SchemaFieldDTO;
-import com.searchservice.app.domain.dto.table.TableSchemaDTO;
+import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.dto.table.ConfigSet;
+import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.dto.table.TableSchemav2;
+import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.BasicUtil;
+import com.searchservice.app.domain.utils.LoggerUtils;
+import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
+import com.searchservice.app.domain.utils.SolrUtil;
 import com.searchservice.app.domain.utils.TableSchemaParser;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.OperationIncompleteException;
 import com.searchservice.app.rest.errors.SolrSchemaValidationException;
 
 import lombok.AllArgsConstructor;
@@ -65,6 +87,9 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
+	private static final String PARTIAL_SEARCH = "partial_search";
+    private static final String DEFAULT_CONFIGSET = "_default";
+    private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -76,6 +101,18 @@ public class ManageTableService implements ManageTableServicePort {
 	// ConfigSet
 	@Value("${base-configset}")
 	private String baseConfigSet;
+	
+	// UPDATE Table
+	@Value("${table-schema-attributes.delete-file-path}")
+	String deleteSchemaAttributesFilePath;
+	
+	@Value("${table-schema-attributes.days}")
+	long schemaDeleteDuration;
+	
+	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
+	
+	private String servicename = "Manage_Table_Service";
+	private String username = "Username";
 
 	@Autowired
 	CapacityPlanProperties capacityPlanProperties;
@@ -90,92 +127,426 @@ public class ManageTableService implements ManageTableServicePort {
 		this.solrClient = solrClient;
 	}
 
-	@Override
-	public GetCapacityPlanDTO capacityPlans() {
-		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-		return new GetCapacityPlanDTO(capacityPlans);
+	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
+		String timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+	}
+	
+	@Override
+	public GetCapacityPlan capacityPlans(LoggersDTO loggersDTO) {
+		
+		logger.debug("capacity Plans");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
+		
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        LoggerUtils.printlogger(loggersDTO,false,false);
+		return new GetCapacityPlan(capacityPlans);
 	}
 
+	
 	@Override
-	public ResponseDTO isTablePresent(String tableName) {
-		ResponseDTO apiResponseDTO = new ResponseDTO();
+	public Response getTables(int clientId,LoggersDTO loggersDTO) {
+		
+		logger.debug("get Tables");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		solrClient = new HttpSolrClient.Builder(solrURL).build();
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+
+		Response getListItemsResponseDTO = new Response();
+
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
 		try {
-			CollectionAdminResponse response = request.process(solrClient);
-			List<String> allCollections = TypeCastingUtil
-					.castToListOfStrings(response.getResponse().get("collections"));
-			if (allCollections.contains(tableName)) {
-				apiResponseDTO.setResponseStatusCode(200);
-				apiResponseDTO.setResponseMessage("true");
-			} else {
-				apiResponseDTO.setResponseStatusCode(400);
-				apiResponseDTO.setResponseMessage("false");
-			}
+			CollectionAdminResponse response = request.process(solrClientActive);
+
+			getListItemsResponseDTO
+					.setData(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),clientId));
+			getListItemsResponseDTO.setStatusCode(200);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+
+			LoggerUtils.printlogger(loggersDTO,false,false);
+
 		} catch (Exception e) {
 			logger.error(e.toString());
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Error!");
+			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
+
+			LoggerUtils.printlogger(loggersDTO,false,true);
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		return getListItemsResponseDTO;
+	}
+	
+	
+	@Override
+	public TableSchemav2 getCurrentTableSchema(int clientId, String tableName) {
+		
+		if (!isTableExists(tableName + "_" + clientId))
+			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
+
+		// GET tableSchema at solr cloud
+		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + clientId);
+		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
+				tableName, clientId, tableSchema);
+		
+		// tes
+		logger.info("returning resp from getCurrSchema ######");
+		
+		return schemaResponse;
+	}
+	
+
+	@Override
+	public TableSchemav2 getTableSchemaIfPresent(String tableName,LoggersDTO loggersDTO) {
+
+		logger.debug("get Table Schema");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
+		if (!isTableExists(tableName))
+			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
+		TableSchemav2 tableSchema = getTableSchema(tableName); 
+		LoggerUtils.printlogger(loggersDTO,false,false);
+		
+		return  tableSchema;
+	}
+	
+	
+	@Override
+	public Map<Object, Object> getTableDetails(String tableName,LoggersDTO loggersDTO) {
+
+		logger.debug("get Table Details");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+
+		Map<Object, Object> finalResponseMap = new HashMap<>();
+
+		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
+		CollectionAdminResponse response = null;
+		try {
+			response = clusterStatus.process(solrClientActive);
+		} catch (Exception e) {
+			logger.error(e.toString());
+			finalResponseMap.put("Error", "Error connecting to cluster.");
+			
+			return finalResponseMap;
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+
+		finalResponseMap = ManageTableUtil.getTableInfoFromClusterStatusResponseObject(
+				response.getResponse().asMap(20), 
+				tableName);
+
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
+		if(!finalResponseMap.containsKey("tableDetails")
+				|| finalResponseMap.get("tableDetails") == null) {
+			finalResponseMap = new HashMap<>();
+			finalResponseMap.put("Error", "Invalid table name provided.");
+			LoggerUtils.printlogger(loggersDTO,false,true);
+			return finalResponseMap;
+		}
+		else {
+
+            LoggerUtils.printlogger(loggersDTO,false,false);
+			return finalResponseMap;
+		}
+	}
+
+
+	@Override
+	public Response createTableIfNotPresent(ManageTable manageTableDTO,LoggersDTO loggersDTO) {
+
+		logger.debug("create Table If Not Present");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		if (isTableExists(manageTableDTO.getTableName()))
+			throw new BadRequestOccurredException(400, manageTableDTO.getTableName() + " table already exists");
+
+		// Configset is present, proceed
+		Response apiResponseDTO = createTable(manageTableDTO);
+
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+
+		if (apiResponseDTO.getStatusCode() == 200) {
+			// Check if new table columns are to be added(Non-null list of columns)
+			if(manageTableDTO.getColumns() == null) {
+				String updatedMsg = String.format("%s. No new columns found", apiResponseDTO.getMessage()); 
+				apiResponseDTO.setMessage(updatedMsg);
+				return apiResponseDTO;
+			} else if(manageTableDTO.getColumns().isEmpty())
+				return apiResponseDTO;
+			
+			// Add schemaAttributes
+			TableSchema tableSchemaDTO = new TableSchema(
+					manageTableDTO.getTableName(),
+			        DEFAULT_CONFIGSET, manageTableDTO.getColumns());
+			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
+
+            LoggerUtils.printlogger(loggersDTO,false,false);
+		}
+		else if(apiResponseDTO.getStatusCode() == 400) {
+			LoggerUtils.printlogger(loggersDTO,false,true);
 		}
 		return apiResponseDTO;
 	}
 
+
 	@Override
-	public TableSchemaDTO getTableSchemaIfPresent(String tableName) {
+	public Response deleteTable(String tableName,LoggersDTO loggersDTO) {
+
+		logger.debug("delete Table");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
 		if (!isTableExists(tableName))
-			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
-		return getTableSchema(tableName);
-	}
+			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 
-	@Override
-	public ResponseDTO getTables() {
-		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		solrClient = solrAPIAdapter.getSolrClient(solrURL);
+		// Delete table
+		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
+		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
+		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
 
-		ResponseDTO getListItemsResponseDTO = new ResponseDTO();
+		Response apiResponseDTO = new Response();
+
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
 		try {
-			CollectionAdminResponse response = request.process(solrClient);
+			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+			deleteAliasRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+			request.process(solrClientActive);
+			deleteAliasRequest.process(solrClientActive);
 
-			getListItemsResponseDTO
-					.setItems(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections")));
-			getListItemsResponseDTO.setResponseStatusCode(200);
-			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all tables");
+			apiResponseDTO.setStatusCode(200);
+			LoggerUtils.printlogger(loggersDTO,false,false);
+			apiResponseDTO.setMessage("Table: " + tableName + ", is successfully deleted");
 
+            
 		} catch (Exception e) {
-			logger.error(e.toString());
-			getListItemsResponseDTO.setResponseStatusCode(400);
-			getListItemsResponseDTO.setResponseMessage("Unable to retrieve tables");
+			logger.error("Exception occurred: ", e);
+			apiResponseDTO.setStatusCode(400);
+			LoggerUtils.printlogger(loggersDTO,false,true);
+			apiResponseDTO.setMessage("Unable to delete table: " + tableName);
+
+			
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
-		return getListItemsResponseDTO;
+		return apiResponseDTO;
 	}
 
+	
 	@Override
-	public ResponseDTO getConfigSets() {
-		solrClient = solrAPIAdapter.getSolrClient(solrURL);
+	public Response updateTableSchema(int clientId, String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO) {
+
+		logger.debug("update Table Schema");
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		Response apiResponseDTO = new Response();
+		
+		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		checkForSchemaSoftDeletion(clientId, tableName, tableSchemaDTO.getColumns());
+		
+		// ADD new schema fields to the table
+		Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+
+		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
+		apiResponseDTO.setMessage(tableSchemaResponseDTO.getMessage());
+		logger.info("New attributes addition response: {}", apiResponseDTO.getMessage());
+		
+		// UPDATE existing schema attributes
+		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
+		logger.info("Existing attributes update response: {}", apiResponseDTO.getMessage());
+		
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        
+        LoggerUtils.printlogger(loggersDTO,false,false);
+		return apiResponseDTO;
+	}
+
+
+	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
+	@Override
+	public boolean isConfigSetExists(String configSetName) {
+		Response configSets = getConfigSets();
+		if (configSetName != null)
+			return configSets.getData().contains(configSetName);
+		else
+			throw new NullPointerOccurredException(404, "Could not fetch any configset, null returned");
+	}
+	
+	
+	@Override
+	public Response getConfigSets() {
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
 
-		ResponseDTO getListItemsResponseDTO = new ResponseDTO();
+		Response getListItemsResponseDTO = new Response();
 		try {
-			ConfigSetAdminResponse configSetResponse = configSetRequest.process(solrClient);
+			ConfigSetAdminResponse configSetResponse = configSetRequest.process(solrClientActive);
 			NamedList<Object> configResponseObjects = configSetResponse.getResponse();
 			getListItemsResponseDTO
-					.setItems(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
-			getListItemsResponseDTO.setResponseStatusCode(200);
-			getListItemsResponseDTO.setResponseMessage("Successfully retrieved all config sets");
+					.setData(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
+			getListItemsResponseDTO.setStatusCode(200);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all config sets");
 		} catch (Exception e) {
-			getListItemsResponseDTO.setResponseStatusCode(400);
-			getListItemsResponseDTO.setResponseMessage("Configsets could not be retrieved. Error occured");
+			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
 			logger.error("Error caused while retrieving configsets. Exception: ", e);
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return getListItemsResponseDTO;
 	}
+	
 
 	@Override
-	public ResponseDTO createConfigSet(ConfigSetDTO configSetDTO) {
-		solrClient = solrAPIAdapter.getSolrClient(solrURL);
+	public boolean isTableExists(String tableName) {
+		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		try {
+			CollectionAdminResponse response = request.process(solrClientActive);
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+			return allTables.contains(tableName);
+		} catch (Exception e) {
+			logger.error(e.toString());
+			throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+	}
+	
+	
+	@Override
+	public TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
+			String tableName, int clientId, TableSchemav2 tableSchema) {
+	
+		TableSchemav2Data data= new TableSchemav2Data();
+		data.setTableName(tableName);
+		
+		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
+		
+		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
+		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
+				clientId, tableName);
+
+		// Prepare the final tableSchema to return
+		List<SchemaField> schemaAttributesFinal = new ArrayList<>();
+		List<String> schemaAttributesToSkipNames = new ArrayList<>();
+		// Note down schemaAttributes to skip
+		for(SchemaField dto: schemaAttributesCloud) {
+			if(!deletedSchemaAttributesNames.contains(dto.getName())) {
+				schemaAttributesFinal.add(dto);	
+			}
+			schemaAttributesToSkipNames.add(dto.getName());
+		}
+		data.setColumns(schemaAttributesFinal);
+		tableSchema.setData(data);
+		
+		return tableSchema;
+	}
+	
+	
+	@Override
+	public TableSchemav2 getTableSchema(String tableName) {
+		logger.info("Getting table schema");
+
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+
+		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
+		TableSchemav2Data data= new TableSchemav2Data();
+		String errorCausingField = null;
+		String payloadOperation = "SchemaRequest";
+		try {
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			logger.info("Get request has been processed. Setting status code = 200");
+			tableSchemaResponseDTO.setStatusCode(200);
+
+			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
+			int numOfFields = schemaFields.size();
+			List<SchemaField> solrSchemaFieldDTOs = new ArrayList<>();
+			logger.info("Total number of fields: {}", numOfFields);
+
+			int schemaFieldIdx = 0;
+			for (Map<String, Object> f : schemaFields) {
+				
+				// Prepare the SolrFieldDTO
+				SchemaField solrFieldDTO = new SchemaField();
+				solrFieldDTO.setName((String) f.get("name"));
+
+				// Parse Field Type Object(String) to Enum
+				String solrFieldType = SchemaFieldType.fromSolrFieldTypeToStandardDataType(
+						(String) f.get("type"), f.get(MULTIVALUED));
+
+				solrFieldDTO.setType(solrFieldType);
+				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
+				solrSchemaFieldDTOs.add(solrFieldDTO);
+				schemaFieldIdx++;
+			}
+			logger.info("Total fields stored in attributes array: {}", schemaFieldIdx);
+			
+			// prepare response dto
+			data.setTableName(tableName.split("_")[0]);
+			data.setColumns(solrSchemaFieldDTOs);
+			tableSchemaResponseDTO.setData(data);
+			tableSchemaResponseDTO.setStatusCode(200);
+			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
+		} catch (SolrServerException | IOException e) {
+			tableSchemaResponseDTO.setStatusCode(400);
+			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.info(e.toString());
+		} catch (SolrException e) {
+			tableSchemaResponseDTO.setStatusCode(400);
+			logger.error(SOLR_EXCEPTION_MSG, tableName);
+			logger.info(e.toString());
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		
+		return tableSchemaResponseDTO;
+	}
+	
+	
+	@Override
+	public Response createConfigSet(ConfigSet configSetDTO) {
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
 		ConfigSetAdminRequest.Create configSetRequest = new ConfigSetAdminRequest.Create();
-		ResponseDTO apiResponseDTO = new ResponseDTO();
+		Response apiResponseDTO = new Response();
 
 		configSetRequest.setBaseConfigSetName(configSetDTO.getBaseConfigSetName());
 		configSetRequest.setConfigSetName(configSetDTO.getConfigSetName());
@@ -187,149 +558,23 @@ public class ManageTableService implements ManageTableServicePort {
 			 * Authenticate in order to access @schema_designer API
 			 */
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			configSetRequest.process(solrClient);
-			apiResponseDTO = new ResponseDTO(200, "ConfigSet is created successfully");
+			configSetRequest.process(solrClientActive);
+			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} catch (Exception e) {
-			apiResponseDTO.setResponseMessage("ConfigSet could not be created");
-			apiResponseDTO.setResponseStatusCode(400);
+			apiResponseDTO.setMessage("ConfigSet could not be created");
+			apiResponseDTO.setStatusCode(400);
 			logger.error("Error caused while creating ConfigSet. Exception: ", e);
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return apiResponseDTO;
 	}
+	
 
 	@Override
-	public ResponseDTO createTableIfNotPresent(ManageTableDTO manageTableDTO) {
-		if (isTableExists(manageTableDTO.getTableName()))
-			throw new BadRequestOccurredException(400, manageTableDTO.getTableName() + " table already exists");
-
-		if (!isConfigSetExists(manageTableDTO.getSchemaName())) {
-			// Create Configset if not present
-			logger.debug("{} configset is not present, creating..", manageTableDTO.getSchemaName());
-			ConfigSetDTO configSetDTO = new ConfigSetDTO(baseConfigSet, manageTableDTO.getSchemaName());
-			createConfigSet(configSetDTO);
-		}
-		// Configset is present, proceed
-		ResponseDTO apiResponseDTO = createTable(manageTableDTO);
-		if (apiResponseDTO.getResponseStatusCode() == 200) {
-			// Add schemaAttributes
-			TableSchemaDTO tableSchemaDTO = new TableSchemaDTO(manageTableDTO.getTableName(),
-					manageTableDTO.getSchemaName(), manageTableDTO.getAttributes());
-			TableSchemaDTO tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
-			apiResponseDTO.setResponseStatusCode(tableSchemaResponseDTO.getStatusCode());
-			apiResponseDTO.setResponseMessage(tableSchemaResponseDTO.getMessage());
-
-		}
-		return apiResponseDTO;
-	}
-
-	@Override
-	public ResponseDTO deleteConfigSet(String configSetName) {
-		solrClient = solrAPIAdapter.getSolrClient(solrURL);
-		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
-
-		ResponseDTO apiResponseDTO = new ResponseDTO();
-		configSetRequest.setMethod(METHOD.DELETE);
-		configSetRequest.setConfigSetName(configSetName);
-		try {
-			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			configSetRequest.process(solrClient);
-			apiResponseDTO = new ResponseDTO(200, "ConfigSet got deleted successfully");
-		} catch (Exception e) {
-			apiResponseDTO.setResponseMessage("ConfigSet could not be deleted");
-			apiResponseDTO.setResponseStatusCode(401);
-			logger.error("Error occured while deleting Config set. Exception: ", e);
-		}
-		return apiResponseDTO;
-	}
-
-	@Override
-	public ResponseDTO deleteTable(String tableName) {
-		if (!isTableExists(tableName))
-			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName));
-
-		// Delete table
-		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
-		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
-		solrClient = new HttpSolrClient.Builder(solrURL).build();
-
-		ResponseDTO apiResponseDTO = new ResponseDTO();
-		try {
-			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			deleteAliasRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClient);
-			deleteAliasRequest.process(solrClient);
-
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage("Table: " + tableName + ", is successfully deleted");
-		} catch (Exception e) {
-			logger.error("Exception occurred: ", e);
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Unable to delete table: " + tableName);
-		}
-
-		// Delete configSet attached to the table
-		/*
-		 * String configSetName = ""; if(apiResponseDTO.getResponseStatusCode()==200)
-		 * apiResponseDTO = deleteConfigSet(configSetName);
-		 */
-		return apiResponseDTO;
-	}
-
-	@Override
-	public ResponseDTO updateTableSchema(String tableName, TableSchemaDTO tableSchemaDTO) {
-		tableSchemaDTO.setTableName(tableName);
-		return updateSchemaAttributes(tableSchemaDTO);
-	}
-
-	@Override
-	public ResponseDTO addAliasTable(String tableOriginalName, String tableAlias) {
-		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
-		solrClient = new HttpSolrClient.Builder(solrURL).build();
-
-		ResponseDTO apiResponseDTO = new ResponseDTO();
-		try {
-			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClient);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(
-					"Successfully renamed Solr Collection: " + tableOriginalName + " to " + tableAlias);
-		} catch (Exception e) {
-			logger.error(e.toString());
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO
-					.setResponseMessage("Unable to rename Solr Collection: " + tableOriginalName + ". Exception.");
-		}
-		return apiResponseDTO;
-	}
-
-	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
-	@Override
-	public boolean isConfigSetExists(String configSetName) {
-		ResponseDTO configSets = getConfigSets();
-		if (configSetName != null)
-			return configSets.getItems().contains(configSetName);
-		else
-			throw new NullPointerOccurredException(404, "Could not fetch any configset, null returned");
-	}
-
-	@Override
-	public boolean isTableExists(String tableName) {
-		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		solrClient = new HttpSolrClient.Builder(solrURL).build();
-		try {
-			CollectionAdminResponse response = request.process(solrClient);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
-			return allTables.contains(tableName);
-		} catch (Exception e) {
-			logger.error(e.toString());
-			throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
-		}
-	}
-
-	@Override
-	public ResponseDTO createTable(ManageTableDTO manageTableDTO) {
+	public Response createTable(ManageTable manageTableDTO) {
 		logger.info("creating table..");
-		ResponseDTO apiResponseDTO = new ResponseDTO();
+		Response apiResponseDTO = new Response();
 
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 		CapacityPlanProperties.Plan selectedCapacityPlan = null;
@@ -342,42 +587,43 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Invalid SKU: " + manageTableDTO.getSku());
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
 			return apiResponseDTO;
 		}
 
-		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
-				manageTableDTO.getSchemaName(), selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
-		solrClient = new HttpSolrClient.Builder(solrURL).build();
+		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
+				manageTableDTO.getTableName(),
+				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
+		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
-			logger.info("Going to process TABLE CREATE request!!");
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClient);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage("Successfully created table: " + manageTableDTO.getTableName());
-			;
+			request.process(solrClientActive);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
 			logger.error(e.toString());
-			apiResponseDTO.setResponseStatusCode(400);
+			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO
-					.setResponseMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
+					.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return apiResponseDTO;
 	}
 
+	
 	@Override
-	public TableSchemaDTO addSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
-		logger.debug("Add schema attributes");
-
-		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, newTableSchemaDTO.getTableName());
+	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
+		logger.info("Add schema attributes");
+		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
+				solrURL, newTableSchemaDTO.getTableName());
+		
 		SchemaRequest schemaRequest = new SchemaRequest();
-		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
-
-		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
-		TableSchemaDTO schemaResponseDTOAfter = new TableSchemaDTO();
+		Response tableSchemaResponseDTO = new Response();
 
 		String schemaName = "";
 		String errorCausingField = null;
@@ -385,120 +631,164 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			// logic
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = schemaRequest.process(solrClient);
-			schemaResponseDTOBefore.setStatusCode(200);
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
 
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
-			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
+			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
 
-			// Add new fields present in the Target Schema to the given collection schema
-			List<SchemaFieldDTO> newAttributes = newTableSchemaDTO.getAttributes();
-			SchemaFieldDTO[] newSolrFieldDTOs = newAttributes.toArray(new SchemaFieldDTO[0]);
-			logger.debug("\nTarget Schema fields : {}", (Object[]) newSolrFieldDTOs);
+			// Add new fields present in the Target Schema to the given collection/table schema
+			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
+			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
+			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
 			UpdateResponse addFieldResponse;
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-			for (SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
+			
+			List<String> existingAttributesNames = new ArrayList<>();
+			for(int i=0; i<newAttributes.size(); i++) {
+
+				SchemaField fieldDto = newAttributes.get(i);
+				
 				boolean isPresent = false;
 				for (Map<String, Object> field : schemaFields) {
-					if (field.containsKey(fieldDto.getName())) {
+					
+					if(field.get("name").equals(fieldDto.getName())) {
 						isPresent = true;
+						existingAttributesNames.add(fieldDto.getName());
 						break;
 					}
 				}
 				if (!isPresent)
 					newFieldFound = true;
 			}
+			// If No new schema attribute is found, RETURN
 			if (!newFieldFound) {
-				schemaResponseDTOAfter.setStatusCode(400);
-			}
-			for (SchemaFieldDTO fieldDto : newSolrFieldDTOs) {
-				if (!TableSchemaParser.validateSchemaField(fieldDto)) {
-					logger.debug("Validate SolrFieldDTO before updating the current schema- {}", schemaName);
-					schemaResponseDTOAfter.setStatusCode(400);
-					break;
+				tableSchemaResponseDTO.setStatusCode(400);
+				tableSchemaResponseDTO.setMessage("No new attributes found");
+				return tableSchemaResponseDTO;
+			} else {
+				if(!existingAttributesNames.isEmpty()) {
+					// REMOVE existing attributess from newAttributes list
+					for(String attributeName: existingAttributesNames) {
+						newAttributesHashMap.remove(attributeName);
+					}
 				}
-				if (fieldDto.isSortable()) {
-					fieldDto.setMultiValue(false); // For SortOnField UseCase MultiValue must be False
+			}
+			
+			if(newAttributesHashMap.isEmpty()) {
+				tableSchemaResponseDTO.setStatusCode(405);
+				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
+			} else {
+				for(Map.Entry<String, SchemaField> fieldDtoEntry: newAttributesHashMap.entrySet()) {
+					SchemaField fieldDto = fieldDtoEntry.getValue();
+					if (!TableSchemaParser.validateSchemaField(fieldDto)) {
+						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}", schemaName);
+						tableSchemaResponseDTO.setStatusCode(400);
+						break;
+					}
+					if (fieldDto.isSortable()) {
+						fieldDto.setMultiValue(false); // For SortOnField UseCase MultiValue must be False
+					}
+					errorCausingField = fieldDto.getName();
+					Map<String, Object> newField = new HashMap<>();
+					
+					// if partial search enabled
+					if(fieldDto.isPartialSearch()) {
+						Map<String, Object> fieldTypeAttributes = new HashMap<>();
+						// Add <partial-search> field-type if not present already
+						if(!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
+							FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
+							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
+							fieldTypeDef.setAttributes(fieldTypeAttributes);
+							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
+							
+							addFieldTypeRequest.process(solrClientActive);
+						} else
+							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+						
+						// Add <partial-search> fieldType to the field
+						newField.put("type", fieldTypeAttributes.get("name"));
+						// Since "partial search" is enabled on this field, docValues has to be disabled
+						fieldDto.setSortable(false);
+					} else {
+						newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
+						newField.put(DOCVALUES, fieldDto.isSortable());
+					}
 
+					newField.put("name", fieldDto.getName());
+					newField.put(REQUIRED, fieldDto.isRequired());
+					newField.put(STORED, fieldDto.isStorable());
+					newField.put(MULTIVALUED, fieldDto.isMultiValue());
+					newField.put(INDEXED, fieldDto.isFilterable());
+
+					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
+					addFieldResponse = addFieldRequest.process(solrClientActive);
+					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
-				errorCausingField = fieldDto.getName();
-				Map<String, Object> newField = new HashMap<>();
-				newField.put("name", fieldDto.getName());
-				newField.put("type", SchemaFieldType.fromObject(fieldDto.getType()));
-				newField.put(REQUIRED, fieldDto.isRequired());
-				newField.put(STORED, fieldDto.isStorable());
-				newField.put(MULTIVALUED, fieldDto.isMultiValue());
-				newField.put(INDEXED, fieldDto.isFilterable());
-				newField.put(DOCVALUES, fieldDto.isSortable());
-				SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
-				addFieldResponse = addFieldRequest.process(solrClient);
-				schemaResponseDTOAfter.setStatusCode(200);
+				tableSchemaResponseDTO.setStatusCode(200);
+				tableSchemaResponseDTO.setMessage("New attributes are added successfully");
+			}
 
-				schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
-			}
-			tableSchemaResponseDTO.setStatusCode(200);
-			tableSchemaResponseDTO.setMessage("Schema is created successfully");
-			logger.debug("Logging newly added fields' responses--");
-			for (Object field : schemaResponseAddFields) {
-				logger.debug("### Added Field Response : {}", field);
-			}
 		} catch (SolrServerException | IOException e) {
-			schemaResponseDTOAfter.setStatusCode(400);
-			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
-		} catch (SolrException e) {
-			schemaResponseDTOAfter.setStatusCode(400);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
-			logger.error(SOLR_EXCEPTION_MSG + " So schema fields can't be found/deleted!",
-					newTableSchemaDTO.getTableName());
-			logger.debug(e.toString());
+			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(e.toString());
+		} catch (SolrException e) {
+			tableSchemaResponseDTO.setStatusCode(400);
+			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
+			
+			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.info(e.toString());
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return tableSchemaResponseDTO;
 	}
 
+
 	@Override
-	public ResponseDTO updateSchemaAttributes(TableSchemaDTO newTableSchemaDTO) {
-		logger.debug("Update Solr Schema");
+	public Response updateSchemaAttributes(TableSchema newTableSchemaDTO) {
+		logger.info("Update Table Schema");
 
 		SchemaRequest schemaRequest = new SchemaRequest();
-		HttpSolrClient solrClientUpdate = solrAPIAdapter.getSolrClientWithTable(solrURL,
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
 				newTableSchemaDTO.getTableName());
-		ResponseDTO apiResponseDTO = new ResponseDTO();
+		
+		Response apiResponseDTO = new Response();
 
-		TableSchemaDTO schemaResponseDTOBefore = new TableSchemaDTO();
-		TableSchemaDTO schemaResponseDTOAfter = new TableSchemaDTO();
+		Response schemaResponseDTOBefore = new Response();
+		Response schemaResponseDTOAfter = new Response();
 
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = schemaRequest.process(solrClientUpdate);
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			
 			schemaResponseDTOBefore.setStatusCode(200);
 
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			int numOfFields = schemaFields.size();
-			logger.debug("Total number of fields: {}", numOfFields);
+			logger.info("Total number of fields: {}", numOfFields);
 
 			// Get all fields from incoming(from req Body) schemaDTO
-			SchemaFieldDTO[] newSchemaFields = newTableSchemaDTO.getAttributes().toArray(new SchemaFieldDTO[0]);
+			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
-			// Validate Solr Schema Fields
+			
+			// Validate Table Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if (validationEntry.containsKey(VALIDATED)) {
 				Object validatedFields = validationEntry.get(VALIDATED);
 				if (validatedFields.equals(false))
-					throw new SolrSchemaValidationException("Target Schema Fields validation falied!");
+					throw new SolrSchemaValidationException("Target Schema Fields validation failed!");
 			}
 
-			int totalUpdatesRequired = newSchemaFields.length;
+			int totalUpdatesRequired = newSchemaFields.size();
 
 			// Update Schema Logic
 			UpdateResponse updateFieldsResponse;
@@ -507,135 +797,327 @@ public class ManageTableService implements ManageTableServicePort {
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
 				errorCausingField = (String) currField.get("name");
-				// Pass all fieldAttributes to be updated
+				// Pass the fieldAttribute to be updated	
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
-				updateFieldsResponse = updateFieldsRequest.process(solrClientUpdate);
+				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
 
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
 				updatedFields++;
-				logger.debug("Field- {} is successfully updated", currField.get("name"));
+				logger.info("Field- {} is successfully updated", currField.get("name"));
 			}
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			// Compare required Vs Updated Fields
-			logger.debug("Total field updates required in the current schema: {}", totalUpdatesRequired);
-			logger.debug("Total fields updated in the current schema: {}", updatedFields);
+			logger.info("Total field updates required in the current schema: {}", totalUpdatesRequired);
+			logger.info("Total fields updated in the current schema: {}", updatedFields);
 
 		} catch (SolrServerException | IOException e) {
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (NullPointerException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
-			apiResponseDTO.setResponseStatusCode(200);
-			apiResponseDTO.setResponseMessage(SCHEMA_UPDATE_SUCCESS);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			logger.error("Null value detected!", e);
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (SolrException e) {
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Schema could not be updated");
-			logger.error(SOLR_EXCEPTION_MSG + " So schema fields can't be found/deleted!",
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Schema could not be updated");
+			logger.error(SOLR_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName());
-			logger.debug(e.toString());
+			logger.error(e.toString());
 		} catch (SolrSchemaValidationException e) {
-			apiResponseDTO.setResponseStatusCode(400);
-			apiResponseDTO.setResponseMessage("Schema could not be updated");
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error("Error Message: {}", e.getMessage());
-			logger.debug(e.toString());
+			logger.error(e.toString());
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
 		return apiResponseDTO;
 	}
-
+	
+	
+	
 	@Override
-	public TableSchemaDTO getTableSchema(String tableName) {
-		logger.debug("Getting table schema");
+	public Response addAliasTable(String tableOriginalName, String tableAlias) {
+		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
+		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
 
-		solrClient = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
-		SchemaRequest schemaRequest = new SchemaRequest();
-
-		TableSchemaDTO tableSchemaResponseDTO = new TableSchemaDTO();
-
-		String schemaName = "";
-		String errorCausingField = null;
-		String payloadOperation = "SchemaRequest";
+		Response apiResponseDTO = new Response();
 		try {
-			SchemaResponse schemaResponse = schemaRequest.process(solrClient);
-			logger.debug("Get request has been processed. Setting status code = 200");
-			tableSchemaResponseDTO.setStatusCode(200);
-
-			SchemaRepresentation schemaRepresentation = schemaResponse.getSchemaRepresentation();
-			schemaName = schemaRepresentation.getName();
-			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-			int numOfFields = schemaFields.size();
-			SchemaFieldDTO[] solrSchemaFieldDTOs = new SchemaFieldDTO[numOfFields];
-			logger.debug("Total number of fields: {}", numOfFields);
-
-			int schemaFieldIdx = 0;
-			for (Map<String, Object> f : schemaFields) {
-
-				// Prepare the SolrFieldDTO
-				SchemaFieldDTO solrFieldDTO = new SchemaFieldDTO();
-				solrFieldDTO.setName((String) f.get("name"));
-
-				// Parse Field Type Object(String) to Enum
-				String fieldTypeObj = (String) f.get("type");
-				String solrFieldType = SchemaFieldType.fromObject(fieldTypeObj);
-
-				solrFieldDTO.setType(solrFieldType);
-				TableSchemaParser.setFieldsToDefaults(solrFieldDTO);
-				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
-				solrSchemaFieldDTOs[schemaFieldIdx] = solrFieldDTO;
-				schemaFieldIdx++;
-			}
-			logger.debug("Total fields stored in attributes array: {}", schemaFieldIdx);
-
-			// prepare response dto
-			tableSchemaResponseDTO.setSchemaName(schemaName);
-			tableSchemaResponseDTO.setTableName(tableName);
-			tableSchemaResponseDTO.setAttributes(Arrays.asList(solrSchemaFieldDTOs));
-			tableSchemaResponseDTO.setStatusCode(200);
-			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
-		} catch (SolrServerException | IOException e) {
-			tableSchemaResponseDTO.setStatusCode(400);
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.debug(e.toString());
-		} catch (SolrException e) {
-			tableSchemaResponseDTO.setStatusCode(400);
-			logger.error(SOLR_EXCEPTION_MSG, tableName);
-			logger.debug(e.toString());
-		}
-		return tableSchemaResponseDTO;
-	}
-
-	@Override
-	public Map<Object, Object> getTableDetails(String tableName) {
-		solrClient = solrAPIAdapter.getSolrClient(solrURL);
-
-		Map<Object, Object> finalResponseMap = new HashMap<>();
-
-		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
-
-		CollectionAdminResponse response = null;
-
-		try {
-			response = clusterStatus.process(solrClient);
+			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+			request.process(solrClientActive);
+			apiResponseDTO.setStatusCode(200);
+			apiResponseDTO.setMessage(
+					"Successfully renamed Solr Collection: " + tableOriginalName + " to " + tableAlias);
 		} catch (Exception e) {
 			logger.error(e.toString());
-			finalResponseMap.put("Error", "Error connecting to cluster.");
-			return finalResponseMap;
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO
+					.setMessage("Unable to rename Solr Collection: " + tableOriginalName + ". Exception.");
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
-
-		Map<Object, Object> responseAsMap = response.getResponse().asMap(20);
-		Map<Object, Object> clusterResponse = (Map<Object, Object>) responseAsMap.get("cluster");
-		Map<Object, Object> collections = (Map<Object, Object>) clusterResponse.get("collections");
-
-		if (collections.containsKey(tableName)) {
-			finalResponseMap = (Map<Object, Object>) collections.get(tableName);
-		} else {
-			finalResponseMap.put("Error", "Invalid table name.");
-			return finalResponseMap;
-		}
-
-		return finalResponseMap;
+		return apiResponseDTO;
 	}
+	
+	
+	@Override
+	public Response deleteConfigSet(String configSetName) {
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
+
+		Response apiResponseDTO = new Response();
+		configSetRequest.setMethod(METHOD.DELETE);
+		configSetRequest.setConfigSetName(configSetName);
+		try {
+			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+			configSetRequest.process(solrClientActive);
+			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
+		} catch (Exception e) {
+			apiResponseDTO.setMessage("ConfigSet could not be deleted");
+			apiResponseDTO.setStatusCode(401);
+			logger.error("Error occured while deleting Config set. Exception: ", e);
+		} finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		return apiResponseDTO;
+	}
+	
+	
+	// Table schema deletion
+	public void checkForSchemaSoftDeletion(
+			int clientId, 
+			String tableName, 
+			List<SchemaField> schemaColumns) {
+		
+		List<SchemaField> existingSchemaAttributes
+			= getTableSchema(tableName+"_"+clientId).getData().getColumns();
+		
+		for(SchemaField existingSchemaAttribute : existingSchemaAttributes) {
+			
+			String exsitingSchemaName = existingSchemaAttribute.getName();
+			boolean isContains = ManageTableUtil.checkIfListContainsSchemaColumn(schemaColumns, existingSchemaAttribute);
+			
+			if(!(exsitingSchemaName.equalsIgnoreCase("_nest_path_")
+					|| exsitingSchemaName.equalsIgnoreCase("_root_")
+					|| exsitingSchemaName.equalsIgnoreCase("_text_") 
+					|| exsitingSchemaName.equalsIgnoreCase("_version_") 
+					|| exsitingSchemaName.equalsIgnoreCase("id"))
+					&& !isContains) {	
+				initializeSchemaDeletion(clientId, tableName , existingSchemaAttribute.getName());
+			}
+		}
+			
+	}
+	
+	
+	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
+		  File file=new File(deleteSchemaAttributesFilePath+".txt");
+		  try(FileWriter fw = new FileWriter(file, true);
+				   BufferedWriter bw = new BufferedWriter(fw)) {
+			  String newRecord = String.format(
+					  "%d %18s %20s %25s",
+					  clientId,
+					  tableName,
+					  formatter.format(Calendar.getInstance().getTime()),columnName);
+		      bw.write(newRecord);
+		      bw.newLine();
+		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
+		  } catch (IOException e) {
+			logger.error("Error While Intializing Deletion for Schema :{} ",columnName);
+		}
+	}
+
+	
+	// Soft Delete Table Schema Info Retrieval
+	public List<String> readSchemaInfoFromSchemaDeleteManager(
+			int clientId, String tableName) {
+		List<String> deletedSchemaAttributes = new ArrayList<>();
+		
+		try (FileReader fr = new FileReader(deleteSchemaAttributesFilePath+".txt")) {
+		    BufferedReader br = new BufferedReader(fr);
+			int lineNumber = 0;
+			String currentDeleteRecordLine;
+			while ((currentDeleteRecordLine = br.readLine()) != null) {
+				if (lineNumber > 0) {
+					String[] currentRecordData = currentDeleteRecordLine.split("\\s+");				
+					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
+							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
+						deletedSchemaAttributes.add(currentRecordData[4]);
+						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[4]);
+					}
+				}
+				lineNumber++;
+			}
+			
+		} catch (Exception e) {
+			logger.error("Soft Delete SchemaInfo could not be retrieved");
+			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
+		}
+		
+		return deletedSchemaAttributes;
+	}
+
+	
+	public void checkForSchemaDeletion() {
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".txt");
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath+".Temptxt");
+		int lineNumber = 0;
+		int schemaDeleteRecordCount = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
+				PrintWriter pw = new PrintWriter(new FileWriter(newSchemaFile))) {
+			String currentSchemaDeleteRecord;
+			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					long diff = checkDatesDifference(currentSchemaDeleteRecord);
+					if (diff < schemaDeleteDuration) {
+						pw.println(currentSchemaDeleteRecord);
+					} else {
+						if (performSchemaDeletion(currentSchemaDeleteRecord.split(" "))) {
+							schemaDeleteRecordCount++;
+
+						} else {
+							pw.println(currentSchemaDeleteRecord);
+						}
+					}
+				} else {
+					pw.println(currentSchemaDeleteRecord);
+				}
+				lineNumber++;
+			}
+			pw.flush();
+			makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
+		} catch (IOException exception) {
+			logger.error("Error While Performing Schema Deletion ", exception);
+		}
+	}
+	 
+	
+	public long checkDatesDifference(String currentSchemaDeleteRecord) {
+		try{
+	    String[] data =  currentSchemaDeleteRecord.split(" ");
+		StringBuilder date = new StringBuilder();
+		date.append(data[10]+" "+data[11]);
+        Date requestDate = formatter.parse(date.toString());
+        Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
+        long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
+	    return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		}catch(Exception e) {
+			logger.error("Error!",e);
+			return 0;
+		}
+	}
+	
+	
+	public boolean performSchemaDeletion(String[] schemaDeleteData) {
+		String columnName = schemaDeleteData[schemaDeleteData.length-1];
+		String tableName = schemaDeleteData[7];
+		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
+				tableName);
+		try {
+			SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
+			UpdateResponse deleteFieldResponse = deleteFieldRequest.process(solrClientActive);
+			if(deleteFieldResponse.getStatus() == 200) {
+				logger.debug("Schema {} Succesfully Deleted ",columnName);
+				return true;
+			}else {
+				logger.debug("Schema {} Deletion Failed ",columnName);
+				return false;
+			}	
+		}catch(Exception e) {
+			logger.error("Exception Occured While Performing Deletion for Schema {} "+columnName,e);
+			return false;
+		}
+	}
+	
+	
+	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
+		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".txt");
+		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
+		     checkTableDeletionStatus(schemaDeleteRecordCount);
+		  }
+	}
+	
+	
+	public boolean checkTableDeletionStatus(int schemaDeleteRecordCount) {
+		if(schemaDeleteRecordCount >0) {
+        	logger.debug("Total Number of Schema's Found and Deleted: {}",schemaDeleteRecordCount);
+        	return true;
+	     }
+	     else {
+	      	logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
+	      	return false;
+	      }
+	}
+	
+	@Override
+	public boolean checkIfTableNameisValid(String tableName) {
+		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+	      Matcher matcher = pattern.matcher(tableName);
+	      return matcher.find();
+	}
+	
+	
+	// Partial Search Field Type
+	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
+		final String FIELD_TYPE_CLASS = "class";
+		final String FIELD_TYPE_NAME = "name";
+		
+		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, "partial_search");
+		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
+
+		Map<String, Object> analyzerObject = new HashMap<>();
+		// Prepare charFilters
+		Map<String, Object> charFilter = new HashMap<>();
+		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
+		charFilter.put("replacement", "$1$1");
+		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
+		// Prepare tokenizer
+		Map<String, Object> tokenizerObject = new HashMap<>();
+		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
+		// Prepare filters
+		Map<String, Object> filterObject1 = new HashMap<>();
+		Map<String, Object> filterObject2 = new HashMap<>();
+		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
+		filterObject1.put("preserveOriginal", "0");
+		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
+		filterObject2.put("maxGramSize", "25");
+		filterObject2.put("minGramSize", "3");
+		Map<String, Object> filtersObject = new HashMap<>();
+		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		// Add charFilters, tokenizer & filters to analyzer
+		analyzerObject.put("charFilters", Arrays.asList(charFilter));
+		analyzerObject.put("tokenizer", tokenizerObject);
+		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		
+		Object analyzerFinalObject = analyzerObject;
+		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
+		
+		return partialSearchFieldTypeAttrs;
+	}
+	
+	
+	public boolean isPartialSearchFieldTypePresent(String tableName) {		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
+				solrURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+		try {
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+			
+			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
+		} catch (Exception e) {
+			logger.debug("Schema Field Types couldn't be retrieved");
+		}finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		return false;
+	}
+	 
 }

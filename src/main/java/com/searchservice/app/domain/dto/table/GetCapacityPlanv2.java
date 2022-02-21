@@ -16,13 +16,13 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetCapacityPlanDTOv2 implements VersionedObjectMapper {
+public class GetCapacityPlanv2 implements VersionedObjectMapper {
 
 	private int statusCode;
 	private String message;
     private List<CapacityPlanProperties.Plan> plans;
 
-    public GetCapacityPlanDTOv2(List<CapacityPlanProperties.Plan> plans) {
+    public GetCapacityPlanv2(List<CapacityPlanProperties.Plan> plans) {
         this.plans = plans;
     }
 

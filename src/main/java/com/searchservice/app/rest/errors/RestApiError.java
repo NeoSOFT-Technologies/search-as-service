@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 public class RestApiError {
-
+       private int statusCode;
 	   private HttpStatus status;
 	   private String message;
 	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
@@ -21,21 +21,24 @@ public class RestApiError {
 	       timestamp = LocalDateTime.now();
 	   }
 
-	   RestApiError(HttpStatus status) {
+	   RestApiError(HttpStatus status,int statusCode) {
 	       this();
-	       this.status = status;
+	       this.statusCode=status.value();
+	       this.status=status;
 	       this.message = "Unexpected Exception";
 	   }
 	   
 	   RestApiError(HttpStatus status, String message) {
 	       this();
-	       this.status = status;
+           this.statusCode=status.value();
+           this.status=status;
 	       this.message = message;
 	   }
 
 	   RestApiError(HttpStatus status, Throwable ex) {
 	       this();
-	       this.status = status;
+           this.statusCode=status.value();
+           this.status=status;
 	       this.message = ex.getLocalizedMessage();
 	   }
 	}

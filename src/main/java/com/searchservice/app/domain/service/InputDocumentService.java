@@ -1,86 +1,120 @@
 package com.searchservice.app.domain.service;
 
-import java.util.Map;
 
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponseDTO;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
-
+	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
+	
 	@Value("${base-solr-url}")
 	private String baseSolrUrl;
 
-	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
+	private String servicename = "Input_Document_Service";
 
-	private ThrottlerResponseDTO extracted(ThrottlerResponseDTO responseDTO, Exception e, Exception e1) {
-		log.error("Exception: {} Exception: {}", e, e1);
-
-		String message = "Invalid input JSON array of document.";
-		log.debug(message);
-		responseDTO.setResponseMessage(message);
-		responseDTO.setStatusCode(400);
-		return responseDTO;
+	private String username = "Username";
+	
+	@Autowired
+	public final ManageTableServicePort manageTableServicePort;
+	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
+		this.manageTableServicePort = manageTableServicePort;
 	}
+	
+	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
-	private void extracted(ThrottlerResponseDTO responseDTO,
+		String timestamp = LoggerUtils.utcTime().toString();
+		loggersDTO.setNameofmethod(nameofCurrMethod);
+		loggersDTO.setTimestamp(timestamp);
+		loggersDTO.setServicename(servicename);
+		loggersDTO.setUsername(username);
+	}
+	
+	private void extracted(ThrottlerResponse responseDTO,
 			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
-			responseDTO.setResponseMessage("Successfully Added!");
+			responseDTO.setMessage("Successfully Added!");
 			responseDTO.setStatusCode(200);
 		} else {
-			responseDTO.setResponseMessage(response.getMessage());
+			responseDTO.setMessage(response.getMessage());
 			responseDTO.setStatusCode(400);
 		}
 	}
 
-	private UploadDocumentUtil extracted(String collectionName, String payload) {
+	private UploadDocumentUtil extracted(String tableName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
 		uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
-		uploadDocumentUtil.setCollectionName(collectionName);
+		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);
 		return uploadDocumentUtil;
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocuments(String collectionName, String payload) {
+	public ThrottlerResponse addDocuments(String tableName, String payload,LoggersDTO loggersDTO) {
+		log.debug(" Add Documents");
 
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+		
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
-		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
-
+		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
+		
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+		LoggerUtils.printlogger(loggersDTO,false,false);
+        
 		return responseDTO;
 
 	}
 
 	@Override
-	public ThrottlerResponseDTO addDocument(String collectionName, String payload) {
-		ThrottlerResponseDTO responseDTO = new ThrottlerResponseDTO();
+	public ThrottlerResponse addDocument(String tableName, String payload,LoggersDTO loggersDTO) {
+		log.debug(" Add Document");
+
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+		
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		requestMethod(loggersDTO,nameofCurrMethod);
+		LoggerUtils.printlogger(loggersDTO,true,false);
+		
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMA ARE
 		// STRUCTURALLY CORRECT
 
-		UploadDocumentUtil uploadDocumentUtil = extracted(collectionName, payload);
+		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
 
 		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
-
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+		LoggerUtils.printlogger(loggersDTO,false,false);
+  
 		return responseDTO;
 	}
 
