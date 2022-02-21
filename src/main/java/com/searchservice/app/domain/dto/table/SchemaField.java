@@ -25,6 +25,7 @@ public class SchemaField implements VersionedObjectMapper {
 	boolean isStorable;
 	boolean isMultiValue;
 	boolean isSortable;
+	boolean isPartialSearch;
 	
 	@Override
 	public VersionedObjectMapper toVersion(int version) {

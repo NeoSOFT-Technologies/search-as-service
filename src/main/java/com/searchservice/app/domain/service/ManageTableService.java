@@ -6,11 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
@@ -80,7 +80,6 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String SOLR_EXCEPTION_MSG = "The table - {} is Not Found in the Solr Cloud!";
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
-	private static final String SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG = "Schema attributes could not be added to the table!";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -88,6 +87,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
+	private static final String PARTIAL_SEARCH = "partial_search";
     private static final String DEFAULT_CONFIGSET = "_default";
     private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
@@ -693,16 +693,38 @@ public class ManageTableService implements ManageTableServicePort {
 					}
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
+					
+					// if partial search enabled
+					if(fieldDto.isPartialSearch()) {
+						Map<String, Object> fieldTypeAttributes = new HashMap<>();
+						// Add <partial-search> field-type if not present already
+						if(!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
+							FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
+							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
+							fieldTypeDef.setAttributes(fieldTypeAttributes);
+							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
+							
+							addFieldTypeRequest.process(solrClientActive);
+						} else
+							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+						
+						// Add <partial-search> fieldType to the field
+						newField.put("type", fieldTypeAttributes.get("name"));
+						// Since "partial search" is enabled on this field, docValues has to be disabled
+						fieldDto.setSortable(false);
+						//newField.put(DOCVALUES, fieldDto.isSortable());
+					} else {
+						newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
+						newField.put(DOCVALUES, fieldDto.isSortable());
+					}
 					newField.put("name", fieldDto.getName());
-					newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
 					newField.put(INDEXED, fieldDto.isFilterable());
-					newField.put(DOCVALUES, fieldDto.isSortable());
+					
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 					addFieldResponse = addFieldRequest.process(solrClientActive);
-					
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
 				tableSchemaResponseDTO.setStatusCode(200);
@@ -711,14 +733,14 @@ public class ManageTableService implements ManageTableServicePort {
 
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
+			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.error(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
 			
-			logger.error(SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
@@ -1036,6 +1058,65 @@ public class ManageTableService implements ManageTableServicePort {
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();
+	}
+	
+	
+	// Partial Search Field Type
+	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
+		final String FIELD_TYPE_CLASS = "class";
+		final String FIELD_TYPE_NAME = "name";
+		
+		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, "partial_search");
+		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
+
+		Map<String, Object> analyzerObject = new HashMap<>();
+		// Prepare charFilters
+		Map<String, Object> charFilter = new HashMap<>();
+		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
+		charFilter.put("replacement", "$1$1");
+		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
+		// Prepare tokenizer
+		Map<String, Object> tokenizerObject = new HashMap<>();
+		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
+		// Prepare filters
+		Map<String, Object> filterObject1 = new HashMap<>();
+		Map<String, Object> filterObject2 = new HashMap<>();
+		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
+		filterObject1.put("preserveOriginal", "0");
+		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
+		filterObject2.put("maxGramSize", "25");
+		filterObject2.put("minGramSize", "3");
+		Map<String, Object> filtersObject = new HashMap<>();
+		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		// Add charFilters, tokenizer & filters to analyzer
+		analyzerObject.put("charFilters", Arrays.asList(charFilter));
+		analyzerObject.put("tokenizer", tokenizerObject);
+		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		
+		Object analyzerFinalObject = analyzerObject;
+		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
+		
+		return partialSearchFieldTypeAttrs;
+	}
+	
+	
+	public boolean isPartialSearchFieldTypePresent(String tableName) {		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
+				solrURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+		try {
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+			
+			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		return false;
 	}
 	 
 }
