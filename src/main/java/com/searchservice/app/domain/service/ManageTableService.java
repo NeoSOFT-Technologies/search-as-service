@@ -1113,7 +1113,7 @@ public class ManageTableService implements ManageTableServicePort {
 			
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.debug("Schema Field Types couldn't be retrieved");
 		}finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
