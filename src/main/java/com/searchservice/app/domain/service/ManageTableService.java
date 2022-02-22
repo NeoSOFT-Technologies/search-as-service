@@ -946,8 +946,8 @@ public class ManageTableService implements ManageTableServicePort {
 					String[] currentRecordData = currentDeleteRecordLine.split(",");				
 					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
 							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
-						deletedSchemaAttributes.add(currentRecordData[4]);
-						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[4]);
+						deletedSchemaAttributes.add(currentRecordData[3]);
+						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[3]);
 					}
 				}
 				lineNumber++;
