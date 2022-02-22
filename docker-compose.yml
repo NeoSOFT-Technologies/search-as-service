@@ -13,8 +13,8 @@ services:
     container_name: ssi-container
     ports:
       - "8081:8081"
-#    volumes:
-#      - ./docker-container-data/DeletedRecordFiles:/usr/app/DeletedRecordFiles
+    volumes:
+      - ./docker-container-data/DeletedRecordFiles:/usr/app/DeletedRecordFiles
     environment:
       - SOLR_CONTAINER_NAME=solr1-container
     networks:
