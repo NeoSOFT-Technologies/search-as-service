@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -588,9 +586,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			apiResponseDTO.setStatusCode(400);
-			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
-			return apiResponseDTO;
+//			apiResponseDTO.setStatusCode(400);
+//			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
+			throw new BadRequestOccurredException(400, "Invalid SKU: "+ manageTableDTO.getSku());
+//			return apiResponseDTO;
 		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
