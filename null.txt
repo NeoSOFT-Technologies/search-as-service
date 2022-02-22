@@ -12,3 +12,8 @@
 1   TestTable_10_101   16-2-2022 06:01:24
 1   TestTable_10_101   17-2-2022 05:25:58
 1   TestTable_10_101   17-2-2022 05:28:35
+<<<<<<< HEAD
+1   TestTable_10_101   21-2-2022 05:11:57
+=======
+1   TestTable_10_101   21-2-2022 12:06:58
+>>>>>>> origin/S10-US-3186-Existing_file_Condition-YC

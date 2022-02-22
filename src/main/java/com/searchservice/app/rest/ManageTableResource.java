@@ -1,8 +1,6 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,5 +266,6 @@ public class ManageTableResource {
         } else {
             throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
         }
+        
     }
 }
