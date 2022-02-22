@@ -52,7 +52,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "/get-capacity-plans")
+    @Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.")
     public ResponseEntity<GetCapacityPlan> capacityPlans() {
         log.debug("Get capacity plans");
 
@@ -76,7 +76,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/{tenantId}")
-    @Operation(summary = "/all-tables summary", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> getTables(@PathVariable int tenantId) {
 
         log.debug("Get all tables");
@@ -104,7 +104,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<TableSchemav2> getTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Get table info");
 
@@ -136,7 +136,7 @@ public class ManageTableResource {
     }
 
     @PostMapping("/{tenantId}")
-    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
 
@@ -171,7 +171,7 @@ public class ManageTableResource {
         	}
 
     @DeleteMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> deleteTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Delete table");
 
@@ -202,7 +202,7 @@ public class ManageTableResource {
     }
 
     @PutMapping("/restore/{tenantId}/{tableName}")
-    @Operation(summary = "/restore-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> undoTable(@PathVariable int tenantId, @PathVariable String tableName) {
         String tableNameForMessage = tableName;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -224,7 +224,7 @@ public class ManageTableResource {
     }
 
     @PutMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> updateTableSchema(
             @PathVariable int tenantId, @PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");

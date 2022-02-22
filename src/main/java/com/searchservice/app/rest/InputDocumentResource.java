@@ -53,7 +53,7 @@ public class InputDocumentResource {
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
     @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> documents(
 										@PathVariable int tenantId,
 							    		@PathVariable String tableName,
@@ -90,7 +90,7 @@ public class InputDocumentResource {
 
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> document(
 										@PathVariable int tenantId,
 							    		@PathVariable String tableName,
