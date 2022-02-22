@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.InputDocumentService;
 
@@ -27,7 +28,7 @@ class InputDocumentResourceTest {
 	int statusCode=0;
 	String name;
 	String message="";
-	int clientid = 101;
+	int tenantId = 101;
 	String tableName = "book";
 	String expectedGetResponse = "{\r\n" + "  \"statusCode\": 200,\r\n" + "  \"name\": \"book\",\r\n"
 			+ "  \"message\": \"Successfully Added!\"\r\n" + "}";
@@ -42,10 +43,14 @@ class InputDocumentResourceTest {
 
 	@MockBean
 	InputDocumentService inputDocumentService;
+	
+	@MockBean
+	ManageTableServicePort manageTableServicePort;
 
 	public void setMockitoSucccessResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
+		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
 		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
@@ -61,7 +66,7 @@ class InputDocumentResourceTest {
 	void testinputdocs() throws Exception {
 		ThrottlerResponse inpDocsResponseDTO=new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + clientid + "/" + tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(inpDocsResponseDTO)))
 				.andExpect(status().isOk());
@@ -71,7 +76,7 @@ class InputDocumentResourceTest {
 	void testinputdoc() throws Exception {
 		ThrottlerResponse inpDocResponseDTO=new ThrottlerResponse(statusCode, message);
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + clientid + "/" + tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(inpDocResponseDTO)))
 				.andExpect(status().isOk());

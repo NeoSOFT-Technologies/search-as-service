@@ -30,8 +30,8 @@ import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
-@RestController
-@RequestMapping("${base-url.api-endpoint.versioned-home}" + "/manage/table")
+//@RestController
+//@RequestMapping("${base-url.api-endpoint.versioned-home}" + "/manage/table")
 public class VersionedManageTableResource {
 	private String servicename = "Versioned_Manage_Table_Resource";
 
@@ -76,9 +76,9 @@ public class VersionedManageTableResource {
         return getCapacityPlanDTO;
     }
 
-    @GetMapping("/{clientid}")
+    @GetMapping("/{tenantId}")
     @Operation(summary = "/all-tables", security = @SecurityRequirement(name = "bearerAuth"))
-    public Response getTables(@PathVariable int clientId) {
+    public Response getTables(@PathVariable int tenantId) {
         log.debug("Get all tables");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -88,7 +88,7 @@ public class VersionedManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
-        Response getListItemsResponseDTO = manageTableServicePort.getTables(clientId,loggersDTO);
+        Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId,loggersDTO);
 
         successMethod(nameofCurrMethod, loggersDTO);
         
@@ -103,9 +103,9 @@ public class VersionedManageTableResource {
         }
     }
 
-    @GetMapping("/{clientid}/{tableName}")
+    @GetMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
-    public TableSchemav2 getTable(@PathVariable int clientid, @PathVariable String tableName) {
+    public TableSchemav2 getTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Get table info");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -115,7 +115,7 @@ public class VersionedManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		
-        tableName = tableName + "_" + clientid;
+        tableName = tableName + "_" + tenantId;
         if(tableDeleteServicePort.isTableUnderDeletion(tableName))
 	     {
 	        throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
@@ -167,9 +167,9 @@ public class VersionedManageTableResource {
         }
     }
 
-    @DeleteMapping("/{clientid}/{tableName}")
+    @DeleteMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public Response deleteTable(@PathVariable String tableName, @PathVariable int clientid) {
+    public Response deleteTable(@PathVariable String tableName, @PathVariable int tenantId) {
         log.debug("Delete table");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -179,11 +179,11 @@ public class VersionedManageTableResource {
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		String tableNameForMessage = tableName;
-        tableName = tableName + "_" + clientid;
+        tableName = tableName + "_" + tenantId;
         if(!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
  		   successMethod(nameofCurrMethod, loggersDTO);	
  		if(tableDeleteServicePort.checkTableExistensce(tableName)) {
- 		    Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientid, tableName,loggersDTO);
+ 		    Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(tenantId, tableName,loggersDTO);
  		    if (apiResponseDTO.getStatusCode() == 200) {
  		    	LoggerUtils.printlogger(loggersDTO, false, false);
  			 return apiResponseDTO;
@@ -193,16 +193,16 @@ public class VersionedManageTableResource {
  			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
  		   }
  		}else {
- 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+clientid+" Does Not Exist");
+ 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+tenantId+" Does Not Exist");
  		}}else {
- 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+clientid+" is Already Under Deletion");
+ 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+tenantId+" is Already Under Deletion");
  		}
  	}	
  	
 
-    @PutMapping("/restore/{clientid}/{tableName}")
+    @PutMapping("/restore/{tenantId}/{tableName}")
 	@Operation(summary = "/restore-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int clientid)
+	public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int tenantId)
 	{	
         log.debug("Restore Table Delete");
         String tableNameForMessage = tableName;

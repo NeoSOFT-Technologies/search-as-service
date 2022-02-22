@@ -26,8 +26,8 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
-@RestController
-@RequestMapping("${base-url.api-endpoint.versioned-home}")
+//@RestController
+//@RequestMapping("${base-url.api-endpoint.versioned-home}")
 public class VersionedInputDocumentResource {
 	private String servicename = "Versioned_Input_Document_Resource";
 
@@ -55,11 +55,11 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setTimestamp(timestamp);
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-    @PostMapping("/ingest-nrt/{clientid}/{tableName}")
+    @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ThrottlerResponse documents(
 						    		@PathVariable String tableName, 
-						    		@PathVariable int clientid, 
+						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload){
 
         log.debug("Solr documents add");
@@ -78,7 +78,7 @@ public class VersionedInputDocumentResource {
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         
-        tableName = tableName+"_"+clientid;
+        tableName = tableName+"_"+tenantId;
         Instant start = Instant.now();
         ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
         Instant end = Instant.now();
@@ -103,11 +103,11 @@ public class VersionedInputDocumentResource {
     
     
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-	@PostMapping("/ingest/{clientid}/{tableName}")
+	@PostMapping("/ingest/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ThrottlerResponse document(
 						    		@PathVariable String tableName, 
-						    		@PathVariable int clientid, 
+						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload) {
 
         log.info("Solr documents add");
@@ -127,7 +127,7 @@ public class VersionedInputDocumentResource {
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
         
-        tableName = tableName+"_"+clientid;
+        tableName = tableName+"_"+tenantId;
         Instant start = Instant.now();
         ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
         Instant end = Instant.now();
@@ -153,7 +153,7 @@ public class VersionedInputDocumentResource {
     // Rate Limiter(Throttler) FALLBACK method
 	public ThrottlerResponse documentInjectionRateLimiterFallback(
 			String tableName, 
-			int clientid, 
+			int tenantId, 
 			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);

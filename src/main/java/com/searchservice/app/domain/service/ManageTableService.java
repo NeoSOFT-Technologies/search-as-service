@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
@@ -78,7 +80,6 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String SOLR_EXCEPTION_MSG = "The table - {} is Not Found in the Solr Cloud!";
 	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
-	private static final String SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG = "Schema attributes could not be added to the table!";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -86,8 +87,10 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
+	private static final String PARTIAL_SEARCH = "partial_search";
     private static final String DEFAULT_CONFIGSET = "_default";
     private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
+    private static final String FILE_CREATE_ERROR="Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-solr-url}")
@@ -291,7 +294,6 @@ public class ManageTableService implements ManageTableServicePort {
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
 
-
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
 
@@ -459,7 +461,7 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
 		
-		// READ from SchemaDeleteRecord.txt and exclude the deleted attributes
+		// READ from SchemaDeleteRecord.csv and exclude the deleted attributes
 		List<String> deletedSchemaAttributesNames = readSchemaInfoFromSchemaDeleteManager(
 				clientId, tableName);
 
@@ -510,7 +512,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 				// Parse Field Type Object(String) to Enum
 				String solrFieldType = SchemaFieldType.fromSolrFieldTypeToStandardDataType(
-						(String) f.get("type"));
+						(String) f.get("type"), f.get(MULTIVALUED));
 
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
@@ -669,15 +671,17 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchemaResponseDTO.setMessage("No new attributes found");
 				return tableSchemaResponseDTO;
 			} else {
-				// REMOVE existing attributess from newAttributes list
-				for(String attributeName: existingAttributesNames) {
-					newAttributesHashMap.remove(attributeName);
+				if(!existingAttributesNames.isEmpty()) {
+					// REMOVE existing attributess from newAttributes list
+					for(String attributeName: existingAttributesNames) {
+						newAttributesHashMap.remove(attributeName);
+					}
 				}
 			}
 			
 			if(newAttributesHashMap.isEmpty()) {
 				tableSchemaResponseDTO.setStatusCode(405);
-				tableSchemaResponseDTO.setMessage("Add attributes operation NOT ALLOWED");
+				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
 			} else {
 				for(Map.Entry<String, SchemaField> fieldDtoEntry: newAttributesHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
@@ -691,16 +695,38 @@ public class ManageTableService implements ManageTableServicePort {
 					}
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
+					
+					// if partial search enabled
+					if(fieldDto.isPartialSearch()) {
+						Map<String, Object> fieldTypeAttributes = new HashMap<>();
+						// Add <partial-search> field-type if not present already
+						if(!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
+							FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
+							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
+							fieldTypeDef.setAttributes(fieldTypeAttributes);
+							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
+							
+							addFieldTypeRequest.process(solrClientActive);
+						} else
+							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+						
+						// Add <partial-search> fieldType to the field
+						newField.put("type", fieldTypeAttributes.get("name"));
+						// Since "partial search" is enabled on this field, docValues has to be disabled
+						fieldDto.setSortable(false);
+					} else {
+						newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
+						newField.put(DOCVALUES, fieldDto.isSortable());
+					}
+
 					newField.put("name", fieldDto.getName());
-					newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 					newField.put(REQUIRED, fieldDto.isRequired());
 					newField.put(STORED, fieldDto.isStorable());
 					newField.put(MULTIVALUED, fieldDto.isMultiValue());
 					newField.put(INDEXED, fieldDto.isFilterable());
-					newField.put(DOCVALUES, fieldDto.isSortable());
+
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 					addFieldResponse = addFieldRequest.process(solrClientActive);
-					
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
 				tableSchemaResponseDTO.setStatusCode(200);
@@ -709,14 +735,14 @@ public class ManageTableService implements ManageTableServicePort {
 
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
+			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
 			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.error(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
 			
-			logger.error(SOLR_ADD_ATTRIBUTES_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
@@ -890,14 +916,12 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void initializeSchemaDeletion(int clientId, String tableName,String columnName) {
-		  File file=new File(deleteSchemaAttributesFilePath+".txt");
+		  File file=new File(deleteSchemaAttributesFilePath+".csv");
+		  checkIfSchemaFileExist(file);
 		  try(FileWriter fw = new FileWriter(file, true);
 				   BufferedWriter bw = new BufferedWriter(fw)) {
-			  String newRecord = String.format(
-					  "%d %18s %20s %25s",
-					  clientId,
-					  tableName,
-					  formatter.format(Calendar.getInstance().getTime()),columnName);
+			  String newRecord = clientId+","+tableName+","+
+				   formatter.format(Calendar.getInstance().getTime())+","+columnName;
 		      bw.write(newRecord);
 		      bw.newLine();
 		      logger.debug("Schema {} Succesfully Initialized For Deletion ",columnName);
@@ -911,18 +935,19 @@ public class ManageTableService implements ManageTableServicePort {
 	public List<String> readSchemaInfoFromSchemaDeleteManager(
 			int clientId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
-		
-		try (FileReader fr = new FileReader(deleteSchemaAttributesFilePath+".txt")) {
+		File file = new File(deleteSchemaAttributesFilePath+".csv");
+		checkIfSchemaFileExist(file);
+		try (FileReader fr = new FileReader(file)) {
 		    BufferedReader br = new BufferedReader(fr);
 			int lineNumber = 0;
 			String currentDeleteRecordLine;
 			while ((currentDeleteRecordLine = br.readLine()) != null) {
 				if (lineNumber > 0) {
-					String[] currentRecordData = currentDeleteRecordLine.split("\\s+");				
+					String[] currentRecordData = currentDeleteRecordLine.split(",");				
 					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(clientId))
 							&&	currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
-						deletedSchemaAttributes.add(currentRecordData[4]);
-						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[4]);
+						deletedSchemaAttributes.add(currentRecordData[3]);
+						logger.debug("Column {} was requested to be deleted, so skipping it", currentRecordData[3]);
 					}
 				}
 				lineNumber++;
@@ -938,8 +963,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	
 	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".txt");
-		File newSchemaFile = new File(deleteSchemaAttributesFilePath+".Temptxt");
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath+".csv");
+		checkIfSchemaFileExist(existingSchemaFile);
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath+"Temp"+".csv");
 		int lineNumber = 0;
 		int schemaDeleteRecordCount = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
@@ -951,7 +977,7 @@ public class ManageTableService implements ManageTableServicePort {
 					if (diff < schemaDeleteDuration) {
 						pw.println(currentSchemaDeleteRecord);
 					} else {
-						if (performSchemaDeletion(currentSchemaDeleteRecord.split(" "))) {
+						if (performSchemaDeletion(currentSchemaDeleteRecord)){
 							schemaDeleteRecordCount++;
 
 						} else {
@@ -973,10 +999,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	public long checkDatesDifference(String currentSchemaDeleteRecord) {
 		try{
-	    String[] data =  currentSchemaDeleteRecord.split(" ");
-		StringBuilder date = new StringBuilder();
-		date.append(data[10]+" "+data[11]);
-        Date requestDate = formatter.parse(date.toString());
+		String date = currentSchemaDeleteRecord.split(",")[2];
+        Date requestDate = formatter.parse(date);
         Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
         long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
 	    return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
@@ -987,9 +1011,9 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 	
 	
-	public boolean performSchemaDeletion(String[] schemaDeleteData) {
-		String columnName = schemaDeleteData[schemaDeleteData.length-1];
-		String tableName = schemaDeleteData[7];
+	public boolean performSchemaDeletion(String schemaDeleteData) {
+		String columnName = schemaDeleteData.split(",")[3];
+		String tableName = schemaDeleteData.split(",")[1];
 		
 		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
 				tableName);
@@ -1011,7 +1035,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile,int schemaDeleteRecordCount) {
-		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".txt");
+		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath+".csv");
+		 checkIfSchemaFileExist(schemaDeleteRecordFile);
 		  if(existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile )) {
 		     checkTableDeletionStatus(schemaDeleteRecordCount);
 		  }
@@ -1034,6 +1059,82 @@ public class ManageTableService implements ManageTableServicePort {
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();
+	}
+		
+	// Partial Search Field Type
+	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
+		final String FIELD_TYPE_CLASS = "class";
+		final String FIELD_TYPE_NAME = "name";
+		
+		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, "partial_search");
+		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
+
+		Map<String, Object> analyzerObject = new HashMap<>();
+		// Prepare charFilters
+		Map<String, Object> charFilter = new HashMap<>();
+		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
+		charFilter.put("replacement", "$1$1");
+		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
+		// Prepare tokenizer
+		Map<String, Object> tokenizerObject = new HashMap<>();
+		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
+		// Prepare filters
+		Map<String, Object> filterObject1 = new HashMap<>();
+		Map<String, Object> filterObject2 = new HashMap<>();
+		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
+		filterObject1.put("preserveOriginal", "0");
+		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
+		filterObject2.put("maxGramSize", "25");
+		filterObject2.put("minGramSize", "3");
+		Map<String, Object> filtersObject = new HashMap<>();
+		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		// Add charFilters, tokenizer & filters to analyzer
+		analyzerObject.put("charFilters", Arrays.asList(charFilter));
+		analyzerObject.put("tokenizer", tokenizerObject);
+		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		
+		Object analyzerFinalObject = analyzerObject;
+		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
+		
+		return partialSearchFieldTypeAttrs;
+	}
+	
+	
+	public boolean isPartialSearchFieldTypePresent(String tableName) {		
+		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
+				solrURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+		try {
+			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+			
+			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
+		} catch (Exception e) {
+			logger.debug("Schema Field Types couldn't be retrieved");
+		}finally {
+			SolrUtil.closeSolrClientConnection(solrClientActive);
+		}
+		return false;
+	}
+	
+	public boolean checkIfSchemaFileExist(File file) {
+		if(!file.exists()) {
+			try {
+				boolean createFile = file.createNewFile();
+				if(createFile) {
+					logger.debug("File With Name: {} Created Succesfully",file.getName());
+				}
+				return true;
+			} catch (IOException e) {
+                logger.error(FILE_CREATE_ERROR,file.getName(),e);
+                return false;
+			}
+		}
+		else {
+			return false;
+		}
 	}
 	 
 }
