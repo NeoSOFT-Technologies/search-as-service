@@ -24,11 +24,11 @@ ENV SOFT_DELETE_DIR=DeletedRecordFiles
 
 RUN mkdir $APP_HOME/$SOFT_DELETE_DIR
 RUN chmod 777 $APP_HOME/$SOFT_DELETE_DIR
-RUN touch $APP_HOME/$SOFT_DELETE_DIR/TableDeleteRecord.txt
-RUN touch $APP_HOME/$SOFT_DELETE_DIR/SchemaDeleteRecord.txt
+RUN touch $APP_HOME/$SOFT_DELETE_DIR/TableDeleteRecord.csv
+RUN touch $APP_HOME/$SOFT_DELETE_DIR/SchemaDeleteRecord.csv
 
 
 #API Port
-EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT exec java -jar ${ARTIFACT_NAME}

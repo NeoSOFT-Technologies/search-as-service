@@ -15,7 +15,7 @@ spring:
         - dev
 
 server:
-  port: 8080
+  port: 8081
   
   
 #================================================================
@@ -90,7 +90,7 @@ capacity-plan:
 
 #================================================================
 # Throttler configurations
-base-app-url: http://localhost:8080
+base-app-url: http://localhost:8081
 throttler:
   maxRequestSizeLimiter:
     maxAllowedRequestSizeNRT: 10kB

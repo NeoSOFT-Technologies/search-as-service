@@ -12,7 +12,7 @@ services:
     image: neosoftcoe/search-service-ingress:latest
     container_name: ssi-container
     ports:
-      - "8080:8080"
+      - "8081:8081"
 #    volumes:
 #      - ./docker-container-data/DeletedRecordFiles:/usr/app/DeletedRecordFiles
     environment:
