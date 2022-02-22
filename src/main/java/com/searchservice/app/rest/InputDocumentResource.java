@@ -52,11 +52,11 @@ public class InputDocumentResource {
 		loggersDTO.setTimestamp(timestamp);
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-    @PostMapping("/ingest-nrt/{clientid}/{tableName}")
+    @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> documents(
 							    		@PathVariable String tableName, 
-							    		@PathVariable int clientid, 
+							    		@PathVariable int tenantId,
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
@@ -78,22 +78,22 @@ public class InputDocumentResource {
         			.body(documentInjectionThrottlerResponse);
     	
         // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        tableName = tableName+"_"+clientid;
+        tableName = tableName+"_"+tenantId;
         if(manageTableServicePort.isTableExists(tableName)) {
         	 successMethod(nameofCurrMethod, loggersDTO);
         	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
         }else {
-          return documentInjectWithInvalidTableName(tableName.split("_")[0],clientid);	
-        }
+			return documentInjectWithInvalidTableName(tableName.split("_")[0], tenantId);
+		}
     }
     
 
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-	@PostMapping("/ingest/{clientid}/{tableName}")
+	@PostMapping("/ingest/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> document(
 							    		@PathVariable String tableName, 
-							    		@PathVariable int clientid, 
+							    		@PathVariable int tenantId,
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
@@ -113,17 +113,17 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
-		tableName = tableName+"_"+clientid;
+		tableName = tableName+"_"+tenantId;
 		 if(documentInjectionThrottlerResponse.getStatusCode() == 406)
 	        	return ResponseEntity
 	        			.status(HttpStatus.NOT_ACCEPTABLE)
 	        			.body(documentInjectionThrottlerResponse);
-	    	
+
 	        // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 	      if(manageTableServicePort.isTableExists(tableName)) {
 	       	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
 	      }else {
-	         return documentInjectWithInvalidTableName(tableName.split("_")[0],clientid);	
+	         return documentInjectWithInvalidTableName(tableName.split("_")[0],tenantId);
 	      }
     }
 
@@ -131,7 +131,7 @@ public class InputDocumentResource {
     // Rate Limiter(Throttler) FALLBACK method
 	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(
 			String tableName, 
-			int clientid, 
+			int tenantId,
 			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
@@ -164,13 +164,13 @@ public class InputDocumentResource {
 	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	        }
 	}
-	
+
 	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(String tableName,int clientid){
 		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
 		documentInjectionThrottlerResponse.setStatusCode(400);
     	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
-	
-	
+
+
 }

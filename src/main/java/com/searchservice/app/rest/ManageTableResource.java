@@ -26,6 +26,8 @@ import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+
+import ch.qos.logback.classic.db.names.TableName;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -82,9 +84,9 @@ public class ManageTableResource {
         return loggersDTO;
     }
 
-    @GetMapping("/{clientId}")
+    @GetMapping("/{tenantId}")
     @Operation(summary = "/all-tables summary", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> getTables(@PathVariable int clientId) {
+    public ResponseEntity<Response> getTables(@PathVariable int tenantId) {
 
         log.debug("Get all tables");
 
@@ -92,7 +94,7 @@ public class ManageTableResource {
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        Response getListItemsResponseDTO = manageTableServicePort.getTables(clientId, loggersDTO);
+        Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId, loggersDTO);
 
         successMethod(nameofCurrMethod, loggersDTO);
 
@@ -110,21 +112,21 @@ public class ManageTableResource {
         }
     }
 
-    @GetMapping("/{clientId}/{tableName}")
+    @GetMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<TableSchemav2> getTable(@PathVariable int clientId, @PathVariable String tableName) {
+    public ResponseEntity<TableSchemav2> getTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Get table info");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + clientId)) {	
+        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {	
             throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
         } else {
 
             // GET tableSchema
-            TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(clientId, tableName);
+            TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 
             successMethod(nameofCurrMethod, loggersDTO);
 
@@ -142,51 +144,56 @@ public class ManageTableResource {
         }
     }
 
-    @PostMapping("/{clientId}")
+    @PostMapping("/{tenantId}")
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> createTable(@PathVariable int clientId, @RequestBody ManageTable manageTableDTO) {
+    public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
+        
         if(manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
         	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
              LoggerUtils.printlogger(loggersDTO, false, true);
              throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
         }else {
-        manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + clientId);    
-        
-        Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
+        	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName() + "_" + tenantId)) {
+        		 throw new BadRequestOccurredException(400, "Table With Same Name "+manageTableDTO.getTableName()+" is Marked For Deletion");
+               } 
+        	  else {
+        		  manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);            	               	       
+      	        Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
+      	        successMethod(nameofCurrMethod, loggersDTO);
+      	        if (apiResponseDTO.getStatusCode() == 200) {
+      	            LoggerUtils.printlogger(loggersDTO, false, false);
+      	            apiResponseDTO.setMessage("Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
+      	            return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+      	        } else {
+      	            log.info("Table could not be created: {}", apiResponseDTO);
+      	            LoggerUtils.printlogger(loggersDTO, false, true);
+      	            throw new BadRequestOccurredException(400, "REST operation could not be performed");
+      	        }
+        	   }
+        	    }
+        		
+        	}
 
-        successMethod(nameofCurrMethod, loggersDTO);
-
-        if (apiResponseDTO.getStatusCode() == 200) {
-            LoggerUtils.printlogger(loggersDTO, false, false);
-            apiResponseDTO.setMessage("Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-        } else {
-            log.info("Table could not be created: {}", apiResponseDTO);
-            LoggerUtils.printlogger(loggersDTO, false, true);
-            throw new BadRequestOccurredException(400, "REST operation could not be performed");
-        }}
-    }
-
-    @DeleteMapping("/{clientId}/{tableName}")
+    @DeleteMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> deleteTable(@PathVariable String tableName, @PathVariable int clientId) {
+    public ResponseEntity<Response> deleteTable(@PathVariable String tableName, @PathVariable int tenantId) {
         log.debug("Delete table");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        tableName = tableName + "_" + clientId;
+        tableName = tableName + "_" + tenantId;
         if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
             successMethod(nameofCurrMethod, loggersDTO);
             if (tableDeleteServicePort.checkTableExistensce(tableName)) {
 
-                Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(clientId, tableName, loggersDTO);
+                Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(tenantId, tableName, loggersDTO);
                 if (apiResponseDTO.getStatusCode() == 200) {
                     LoggerUtils.printlogger(loggersDTO, false, false);
                     return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -196,22 +203,22 @@ public class ManageTableResource {
                     throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
                 }
             } else {
-                throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + clientId + " Does Not Exist");
+                throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + tenantId + " Does Not Exist");
             }
         } else {
-            throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + clientId + " is Already Under Deletion");
+            throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + tenantId + " is Already Under Deletion");
         }
     }
 
-    @PutMapping("/restore/{clientid}/{tableName}")
+    @PutMapping("/restore/{tenantId}/{tableName}")
     @Operation(summary = "/restore-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int clientid) {
+    public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int tenantId) {
         String tableNameForMessage = tableName;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        tableName = tableName + "_" + clientid;
+        tableName = tableName + "_" + tenantId;
         Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(tableName, loggersDTO);
         successMethod(nameofCurrMethod, loggersDTO);
 
@@ -225,10 +232,10 @@ public class ManageTableResource {
         }
     }
 
-    @PutMapping("/{clientId}/{tableName}")
+    @PutMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> updateTableSchema(
-    		@PathVariable String tableName, @PathVariable int clientId, @RequestBody TableSchema newTableSchemaDTO) {
+    		@PathVariable String tableName, @PathVariable int tenantId, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
@@ -238,13 +245,13 @@ public class ManageTableResource {
         LoggerUtils.printlogger(loggersDTO, true, false);
         loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-        tableName = tableName + "_" + clientId;
+        tableName = tableName + "_" + tenantId;
 
         if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
             newTableSchemaDTO.setTableName(tableName);
 
             Response apiResponseDTO = manageTableServicePort.updateTableSchema(
-            		clientId, tableName.split("_")[0], newTableSchemaDTO, loggersDTO);
+            		tenantId, tableName.split("_")[0], newTableSchemaDTO, loggersDTO);
 
             successMethod(nameofCurrMethod, loggersDTO);
 
