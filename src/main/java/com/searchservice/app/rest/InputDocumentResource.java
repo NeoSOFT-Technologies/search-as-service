@@ -83,7 +83,7 @@ public class InputDocumentResource {
         	 successMethod(nameofCurrMethod, loggersDTO);
         	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
         }else {
-			return documentInjectWithInvalidTableName(tableName.split("_")[0], tenantId);
+			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
     }
     
@@ -123,15 +123,15 @@ public class InputDocumentResource {
 	      if(manageTableServicePort.isTableExists(tableName)) {
 	       	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
 	      }else {
-	         return documentInjectWithInvalidTableName(tableName.split("_")[0],tenantId);
+	         return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 	      }
     }
 
 
     // Rate Limiter(Throttler) FALLBACK method
 	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(
-			String tableName, 
 			int tenantId,
+			String tableName,
 			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
@@ -165,10 +165,10 @@ public class InputDocumentResource {
 	        }
 	}
 
-	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(String tableName,int clientid){
+	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
 		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
 		documentInjectionThrottlerResponse.setStatusCode(400);
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+tenantId+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
