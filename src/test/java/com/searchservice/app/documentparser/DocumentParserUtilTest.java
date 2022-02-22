@@ -1,17 +1,17 @@
 package com.searchservice.app.documentparser;
 
 
-import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+
+import com.searchservice.app.IntegrationTest;
+import com.searchservice.app.domain.utils.DocumentParserUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc

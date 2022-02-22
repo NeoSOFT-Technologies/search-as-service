@@ -1,11 +1,16 @@
 package com.searchservice.app.domain.utils;
 
-import com.squareup.okhttp.*;
-import lombok.Data;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+
+import lombok.Data;
 
 @Data
 public class UploadDocumentUtil {

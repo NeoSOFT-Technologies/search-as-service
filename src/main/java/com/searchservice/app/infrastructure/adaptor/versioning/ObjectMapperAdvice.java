@@ -1,5 +1,7 @@
 package com.searchservice.app.infrastructure.adaptor.versioning;
 
+import static java.lang.Integer.parseInt;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -14,8 +16,6 @@ import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static java.lang.Integer.parseInt;
 
 
 @RestControllerAdvice

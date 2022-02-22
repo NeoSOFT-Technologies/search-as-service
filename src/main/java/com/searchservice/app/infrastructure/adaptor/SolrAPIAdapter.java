@@ -1,10 +1,11 @@
 package com.searchservice.app.infrastructure.adaptor;
 
-import com.searchservice.app.domain.port.spi.SolrAPIPort;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.searchservice.app.domain.port.spi.SolrAPIPort;
 
 @Service
 public class SolrAPIAdapter implements SolrAPIPort {

@@ -2,7 +2,6 @@ package com.searchservice.app.rest.errors;
 
 import java.time.LocalDateTime;
 
-
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;

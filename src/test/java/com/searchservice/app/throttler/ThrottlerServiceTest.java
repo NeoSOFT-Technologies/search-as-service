@@ -1,9 +1,7 @@
 package com.searchservice.app.throttler;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
-import com.searchservice.app.domain.port.api.ThrottlerServicePort;
-import com.searchservice.app.domain.service.ThrottlerService;
-import com.searchservice.app.domain.utils.ThrottlerUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +17,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
+import com.searchservice.app.domain.port.api.ThrottlerServicePort;
+import com.searchservice.app.domain.service.ThrottlerService;
+import com.searchservice.app.domain.utils.ThrottlerUtils;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

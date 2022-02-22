@@ -585,7 +585,6 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 
 		if (selectedCapacityPlan == null) {
-			// INVALD SKU
 //			apiResponseDTO.setStatusCode(400);
 //			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
 			throw new BadRequestOccurredException(400, "Invalid SKU: "+ manageTableDTO.getSku());
