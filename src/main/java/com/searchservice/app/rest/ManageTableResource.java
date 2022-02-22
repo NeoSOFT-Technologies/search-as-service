@@ -1,19 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -26,10 +12,15 @@ import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
-
-import ch.qos.logback.classic.db.names.TableName;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}" + "/manage/table")
@@ -181,7 +172,7 @@ public class ManageTableResource {
 
     @DeleteMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> deleteTable(@PathVariable String tableName, @PathVariable int tenantId) {
+    public ResponseEntity<Response> deleteTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Delete table");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -212,7 +203,7 @@ public class ManageTableResource {
 
     @PutMapping("/restore/{tenantId}/{tableName}")
     @Operation(summary = "/restore-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int tenantId) {
+    public ResponseEntity<Response> undoTable(@PathVariable int tenantId, @PathVariable String tableName) {
         String tableNameForMessage = tableName;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
@@ -235,7 +226,7 @@ public class ManageTableResource {
     @PutMapping("/{tenantId}/{tableName}")
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> updateTableSchema(
-    		@PathVariable String tableName, @PathVariable int tenantId, @RequestBody TableSchema newTableSchemaDTO) {
+            @PathVariable int tenantId, @PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 

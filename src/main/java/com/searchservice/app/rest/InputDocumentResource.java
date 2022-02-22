@@ -55,8 +55,8 @@ public class InputDocumentResource {
     @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> documents(
-							    		@PathVariable String tableName, 
-							    		@PathVariable int tenantId,
+										@PathVariable int tenantId,
+							    		@PathVariable String tableName,
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
@@ -92,8 +92,8 @@ public class InputDocumentResource {
 	@PostMapping("/ingest/{tenantId}/{tableName}")
     @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> document(
-							    		@PathVariable String tableName, 
-							    		@PathVariable int tenantId,
+										@PathVariable int tenantId,
+							    		@PathVariable String tableName,
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
