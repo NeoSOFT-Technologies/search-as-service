@@ -1,15 +1,18 @@
 
 package com.searchservice.app.domain.service;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
+import com.searchservice.app.domain.utils.LoggerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,21 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.utils.LoggerUtils;
-
 @Service
 @Transactional
-public class TableDeleteService implements TableDeleteServicePort{
+public class TableDeleteService implements TableDeleteServicePort {
 
 	@Value("${table-delete-file.path}")
 	String deleteRecordFilePath;
