@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
@@ -63,6 +66,8 @@ public class VersionedInputDocumentResource {
 						    		@RequestBody String payload){
 
         log.debug("Solr documents add");
+        if(!isValidJsonArray(payload))
+        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
@@ -111,6 +116,8 @@ public class VersionedInputDocumentResource {
 						    		@RequestBody String payload) {
 
         log.info("Solr documents add");
+        if(!isValidJsonArray(payload))
+        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
@@ -165,5 +172,21 @@ public class VersionedInputDocumentResource {
 		//retry the request after given timeoutDuration
 		return rateLimitResponseDTO;
 	}
+	
+	public boolean isValidJsonArray(String jsonString) {
+	    boolean valid = true;
+	    try{ 
+	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
+	    			|| !jsonString.trim().endsWith("]"))
+	    		return false;
+	    	ObjectMapper objectMapper = new ObjectMapper();
+	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	        objectMapper.readTree(jsonString);
+	    } catch(JsonProcessingException ex){
+	        valid = false;
+	    }
+	    return valid;
+}
 
 }
