@@ -1031,6 +1031,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public boolean checkIfTableNameisValid(String tableName) {
+		if(null == tableName || tableName.isBlank() || tableName.isEmpty())
+			throw new NullPointerOccurredException(404, "Provide valid Table Name");
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();

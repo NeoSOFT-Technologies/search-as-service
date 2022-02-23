@@ -87,24 +87,28 @@ public class RestControllerAdvice {
 		if(exception.getCause() instanceof UnrecognizedPropertyException) {
 			UnrecognizedPropertyException ex = (UnrecognizedPropertyException)exception.getCause();
 			fieldName = ex.getPropertyName();
+			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Unrecognized Field : "+fieldName));
 		}else if(exception.getCause() instanceof InvalidFormatException) {
-			String targetType = "";
+			//String targetType = "";
 			InvalidFormatException ex = (InvalidFormatException)exception.getCause();
 			if (ex.getPath() != null && !ex.getPath().isEmpty()) {
 		        JsonMappingException.Reference path = ex.getPath().get(ex.getPath().size() - 1);
 		       fieldName = (null != path)?path.getFieldName():"";
 		    }
 			String value = (null != ex.getValue())?ex.getValue().toString():"";
-			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field name : "+fieldName+" is not expected as : "+value));
+			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field : "+fieldName+" is not expected as : "+value));
 			//targetType = ex.getTargetType().getName();
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
 			if(ex.getCause() instanceof BadRequestOccurredException) {
 				BadRequestOccurredException exc = (BadRequestOccurredException)ex.getCause();
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
-			}
+			}else
+				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Provide valid JSON Input"));
+		}else {
+			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Provide valid JSON Input"));
 		}
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Unrecognized Field : "+fieldName));
+		//return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Unrecognized Field : "+fieldName));
 	}
 	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)

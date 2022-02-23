@@ -148,7 +148,8 @@ public class ManageTableResource {
     @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> createTable(@PathVariable int clientId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
-
+        if(null == manageTableDTO.getColumns() || manageTableDTO.getColumns().isEmpty())
+        	throw new BadRequestOccurredException(400, "Provide atleast one Column");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
