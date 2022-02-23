@@ -1,23 +1,19 @@
 
-spring:
-  application:
-    name: basicSample
-    data:
-    solr:
-      host: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr/
-      repositories:
-        enabled: false
+server:
+  port: 8081
 
+spring:
   profiles:
     active: dev
     group:
       dev:
         - dev
 
-server:
-  port: 8081
-  
-  
+#================================================================
+#Solr Configurations
+base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
+#================================================================
+
 #================================================================
 #Logger
 logging:
@@ -35,7 +31,9 @@ logging:
     org.springframework.web: "error"
     org.hibernate: "error"
     org: "error"
-  
+#================================================================
+
+
 #================================================================
 #Swagger
 springdoc:
@@ -43,12 +41,6 @@ springdoc:
     disable-swagger-default-url: true
   documentation:
     auto-startup: false
-#================================================================
-
-
-#================================================================
-#Solr Configurations
-base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 #================================================================
 
 
@@ -90,12 +82,10 @@ capacity-plan:
 
 #================================================================
 # Throttler configurations
-base-app-url: http://localhost:8081
 throttler:
   maxRequestSizeLimiter:
     maxAllowedRequestSizeNRT: 10kB
     maxAllowedRequestSizeBatch: 100kB
-  test-app-url: http://localhost:2020
 resilience4j.ratelimiter:
   instances:
     documentInjectionRateLimitThrottler:
@@ -141,33 +131,22 @@ base-url:
 saas-ms:
   request-header:
     api-version: X-Api-Version
-
 #================================================================
 
 
+#================================================================
 #TableSoftDelete File Path
-
 table-delete-file:
     path: DeletedRecordFiles/TableDeleteRecord
-    
- #================================================================
- 
- #CollectionDeleteDuration
  
 table-delete-duration:
       days: 15
-      
+#================================================================
+
 
 #=================================================================
 #UpdateTable configurations
 table-schema-attributes:
   delete-file-path: DeletedRecordFiles/SchemaDeleteRecord
   days: 15
-  
-schema-delete-record:
-  formatter:
-    table-name: 18
-    request-time: 20
-    column-name: 25
-  
 #=================================================================
