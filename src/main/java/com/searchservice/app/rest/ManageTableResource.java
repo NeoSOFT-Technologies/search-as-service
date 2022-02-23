@@ -1,19 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -26,10 +12,15 @@ import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
-
-import ch.qos.logback.classic.db.names.TableName;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}" + "/manage/table")
@@ -61,7 +52,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "/get-capacity-plans")
+    @Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.")
     public ResponseEntity<GetCapacityPlan> capacityPlans() {
         log.debug("Get capacity plans");
 
@@ -85,7 +76,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/{tenantId}")
-    @Operation(summary = "/all-tables summary", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> getTables(@PathVariable int tenantId) {
 
         log.debug("Get all tables");
@@ -113,7 +104,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/get-table-info", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<TableSchemav2> getTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Get table info");
 
@@ -145,7 +136,7 @@ public class ManageTableResource {
     }
 
     @PostMapping("/{tenantId}")
-    @Operation(summary = "/create-table", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
 
@@ -180,8 +171,8 @@ public class ManageTableResource {
         	}
 
     @DeleteMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/delete-table", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> deleteTable(@PathVariable String tableName, @PathVariable int tenantId) {
+    @Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Response> deleteTable(@PathVariable int tenantId, @PathVariable String tableName) {
         log.debug("Delete table");
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -211,8 +202,8 @@ public class ManageTableResource {
     }
 
     @PutMapping("/restore/{tenantId}/{tableName}")
-    @Operation(summary = "/restore-table-delete", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Response> undoTable(@PathVariable String tableName, @PathVariable int tenantId) {
+    @Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Response> undoTable(@PathVariable int tenantId, @PathVariable String tableName) {
         String tableNameForMessage = tableName;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
@@ -233,9 +224,9 @@ public class ManageTableResource {
     }
 
     @PutMapping("/{tenantId}/{tableName}")
-    @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> updateTableSchema(
-    		@PathVariable String tableName, @PathVariable int tenantId, @RequestBody TableSchema newTableSchemaDTO) {
+            @PathVariable int tenantId, @PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
         log.debug("Solr schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 

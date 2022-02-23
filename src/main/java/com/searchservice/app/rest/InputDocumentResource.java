@@ -53,10 +53,10 @@ public class InputDocumentResource {
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
     @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> documents(
-							    		@PathVariable String tableName, 
-							    		@PathVariable int tenantId,
+										@PathVariable int tenantId,
+							    		@PathVariable String tableName,
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
@@ -83,17 +83,17 @@ public class InputDocumentResource {
         	 successMethod(nameofCurrMethod, loggersDTO);
         	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
         }else {
-			return documentInjectWithInvalidTableName(tableName.split("_")[0], tenantId);
+			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
     }
     
 
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ThrottlerResponse> document(
-							    		@PathVariable String tableName, 
-							    		@PathVariable int tenantId,
+										@PathVariable int tenantId,
+							    		@PathVariable String tableName,
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
@@ -123,15 +123,15 @@ public class InputDocumentResource {
 	      if(manageTableServicePort.isTableExists(tableName)) {
 	       	return performDocumentInjection(tableName,payload,documentInjectionThrottlerResponse,loggersDTO);
 	      }else {
-	         return documentInjectWithInvalidTableName(tableName.split("_")[0],tenantId);
+	         return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 	      }
     }
 
 
     // Rate Limiter(Throttler) FALLBACK method
 	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(
-			String tableName, 
 			int tenantId,
+			String tableName,
 			String payload, 
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
@@ -165,10 +165,10 @@ public class InputDocumentResource {
 	        }
 	}
 
-	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(String tableName,int clientid){
+	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
 		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
 		documentInjectionThrottlerResponse.setStatusCode(400);
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+clientid+" Does Not Exist");
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+tenantId+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
