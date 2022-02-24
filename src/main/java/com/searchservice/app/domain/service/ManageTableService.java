@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -173,10 +174,19 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			CollectionAdminResponse response = request.process(solrClientActive);
 
+			List<String> data = new ArrayList<>();
 			getListItemsResponseDTO
 					.setData(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),clientId));
+			data = getListItemsResponseDTO.getData();
+			
+			data = data.stream().map(datalist -> datalist.split("_"+clientId)[0])
+				    .collect(Collectors.toList());
+			
+			getListItemsResponseDTO.setData(data);
+			getListItemsResponseDTO.setName(nameofCurrMethod);
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+			
 
 			LoggerUtils.printlogger(loggersDTO,false,false);
 
