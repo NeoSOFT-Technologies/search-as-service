@@ -43,31 +43,26 @@ capacity-plan:
       name: Basic
       replicas: 1
       shards: 1
-      storage: 2
 
     - sku: S1
       name: Standard
       replicas: 2
       shards: 2
-      storage: 32
 
     - sku: S2
       name: Standard
       replicas: 2
       shards: 3
-      storage: 32
 
     - sku: S3
       name: Standard
       replicas: 3
       shards: 7
-      Storage: 32
 
     - sku: P
       name: Premium
       replicas: 3
       shards: 5
-      storage: 2
 #================================================================
 
 
