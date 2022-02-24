@@ -173,10 +173,20 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			CollectionAdminResponse response = request.process(solrClientActive);
 
+			List<String> data = new ArrayList<>();
 			getListItemsResponseDTO
 					.setData(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),clientId));
+			data = getListItemsResponseDTO.getData();
+			List<String> datalist = new ArrayList<>();
+			for(int i=0;i<data.size();i++) {
+				String collectionname= data.get(i).replaceAll("_"+clientId,"");
+				datalist.add(collectionname);
+			}
+			getListItemsResponseDTO.setData(datalist);
+			getListItemsResponseDTO.setName(nameofCurrMethod);
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+			
 
 			LoggerUtils.printlogger(loggersDTO,false,false);
 
