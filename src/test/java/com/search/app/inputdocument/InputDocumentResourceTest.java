@@ -68,7 +68,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-				.content(TestUtil.convertObjectToJsonBytes(inpDocsResponseDTO)))
+				.content(inputString))
 				.andExpect(status().isOk());
 	}
 
@@ -78,7 +78,7 @@ class InputDocumentResourceTest {
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(TestUtil.convertObjectToJsonBytes(inpDocResponseDTO)))
+				.content(inputString))
 				.andExpect(status().isOk());
 	}
 }
