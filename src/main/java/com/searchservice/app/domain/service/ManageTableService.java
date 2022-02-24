@@ -588,9 +588,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			apiResponseDTO.setStatusCode(400);
-			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
-			return apiResponseDTO;
+			throw new BadRequestOccurredException(400, "Invalid SKU: "+ manageTableDTO.getSku());
+//			apiResponseDTO.setStatusCode(400);
+//			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
+//			return apiResponseDTO;
 		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
@@ -1056,6 +1057,8 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public boolean checkIfTableNameisValid(String tableName) {
+		if(null == tableName || tableName.isBlank() || tableName.isEmpty())
+			throw new NullPointerOccurredException(404, "Provide valid Table Name");
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();
