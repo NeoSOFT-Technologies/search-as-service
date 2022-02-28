@@ -1,9 +1,17 @@
 package com.searchservice.app.rest;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.time.Instant;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
@@ -17,14 +25,6 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
-import java.time.Instant;
 
 //@RestController
 //@RequestMapping("${base-url.api-endpoint.versioned-home}")
@@ -172,21 +172,5 @@ public class VersionedInputDocumentResource {
 		//retry the request after given timeoutDuration
 		return rateLimitResponseDTO;
 	}
-	
-//	public boolean isValidJsonArray(String jsonString) {
-//	    boolean valid = true;
-//	    try{ 
-//	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
-//	    			|| !jsonString.trim().endsWith("]"))
-//	    		return false;
-//	    	ObjectMapper objectMapper = new ObjectMapper();
-//	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-//	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-//	        objectMapper.readTree(jsonString);
-//	    } catch(JsonProcessingException ex){
-//	        valid = false;
-//	    }
-//	    return valid;
-//	}
 
 }

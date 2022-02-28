@@ -1,9 +1,21 @@
 package com.searchservice.app.rest;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.time.Instant;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
@@ -17,16 +29,6 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
-import java.time.Instant;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}")
@@ -183,21 +185,5 @@ public class InputDocumentResource {
     	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+tenantId+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
-
-//	public boolean isValidJsonArray(String jsonString) {
-//	    boolean valid = true;
-//	    try{ 
-//	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
-//	    			|| !jsonString.trim().endsWith("]"))
-//	    		return false;
-//	    	ObjectMapper objectMapper = new ObjectMapper();
-//	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-//	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-//	        objectMapper.readTree(jsonString);
-//	    } catch(JsonProcessingException ex){
-//	        valid = false;
-//	    }
-//	    return valid;
-//	}
 
 }
