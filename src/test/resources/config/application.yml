@@ -13,6 +13,9 @@ spring:
     group:
       dev:
         - dev
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
 
 server:
   port: 8080

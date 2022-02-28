@@ -1,5 +1,6 @@
 package com.searchservice.app.domain.utils;
 
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.squareup.okhttp.*;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -30,11 +31,13 @@ public class UploadDocumentUtil {
 				.addHeader("Content-Type", "application/json").build();
 
 		try {
-			// Response response =
-			client.newCall(request).execute();
-
-			return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
-
+			 Response response = client.newCall(request).execute();
+			 if(response.code() != 400) {
+				 return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
+			 }else {
+				 //return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
+				 throw new BadRequestOccurredException(400, "Document not uploaded!");
+			 }
 		} catch (IOException e) {
 			log.error(e.toString());
 

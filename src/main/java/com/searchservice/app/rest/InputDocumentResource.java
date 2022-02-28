@@ -1,26 +1,37 @@
 package com.searchservice.app.rest;
 
 
+import java.time.Duration;
+import java.time.Instant;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
+import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
-import java.time.Instant;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}")
@@ -29,6 +40,9 @@ public class InputDocumentResource {
 
 	private String username = "Username";
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
+    
+    @Autowired
+    InputDocumentService inputDocumentService;
 
     private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
@@ -60,6 +74,8 @@ public class InputDocumentResource {
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
+        if(!inputDocumentService.isValidJsonArray(payload))
+        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
@@ -97,7 +113,8 @@ public class InputDocumentResource {
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
-
+        if(!inputDocumentService.isValidJsonArray(payload))
+        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);
@@ -171,6 +188,4 @@ public class InputDocumentResource {
     	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+tenantId+" Does Not Exist");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
-
-
 }
