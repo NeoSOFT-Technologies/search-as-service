@@ -9,6 +9,7 @@ import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
+import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,9 @@ public class VersionedInputDocumentResource {
 	private String username = "Username";
 
     private final Logger log = LoggerFactory.getLogger(VersionedInputDocumentResource.class);
+    
+    @Autowired
+    InputDocumentService inputDocumentService;
 
     private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
@@ -61,7 +66,7 @@ public class VersionedInputDocumentResource {
 						    		@RequestBody String payload){
 
         log.debug("Solr documents add");
-        if(!isValidJsonArray(payload))
+        if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
@@ -111,7 +116,7 @@ public class VersionedInputDocumentResource {
 						    		@RequestBody String payload) {
 
         log.info("Solr documents add");
-        if(!isValidJsonArray(payload))
+        if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
@@ -168,20 +173,20 @@ public class VersionedInputDocumentResource {
 		return rateLimitResponseDTO;
 	}
 	
-	public boolean isValidJsonArray(String jsonString) {
-	    boolean valid = true;
-	    try{ 
-	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
-	    			|| !jsonString.trim().endsWith("]"))
-	    		return false;
-	    	ObjectMapper objectMapper = new ObjectMapper();
-	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-	        objectMapper.readTree(jsonString);
-	    } catch(JsonProcessingException ex){
-	        valid = false;
-	    }
-	    return valid;
-	}
+//	public boolean isValidJsonArray(String jsonString) {
+//	    boolean valid = true;
+//	    try{ 
+//	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
+//	    			|| !jsonString.trim().endsWith("]"))
+//	    		return false;
+//	    	ObjectMapper objectMapper = new ObjectMapper();
+//	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+//	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+//	        objectMapper.readTree(jsonString);
+//	    } catch(JsonProcessingException ex){
+//	        valid = false;
+//	    }
+//	    return valid;
+//	}
 
 }

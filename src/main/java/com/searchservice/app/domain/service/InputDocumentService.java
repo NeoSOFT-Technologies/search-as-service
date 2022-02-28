@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
@@ -116,6 +119,22 @@ public class InputDocumentService implements InputDocumentServicePort {
 		LoggerUtils.printlogger(loggersDTO,false,false);
   
 		return responseDTO;
+	}
+	
+	public boolean isValidJsonArray(String jsonString) {
+	    boolean valid = true;
+	    try{ 
+	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
+	    			|| !jsonString.trim().endsWith("]"))
+	    		return false;
+	    	ObjectMapper objectMapper = new ObjectMapper();
+	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	        objectMapper.readTree(jsonString);
+	    } catch(JsonProcessingException ex){
+	        valid = false;
+	    }
+	    return valid;
 	}
 
 }

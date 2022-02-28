@@ -9,6 +9,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
+import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,9 @@ public class InputDocumentResource {
 
 	private String username = "Username";
     private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
+    
+    @Autowired
+    InputDocumentService inputDocumentService;
 
     private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
@@ -64,7 +69,7 @@ public class InputDocumentResource {
 							    		@RequestBody String payload){
 
         log.debug("Solr documents add");
-        if(!isValidJsonArray(payload))
+        if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
@@ -103,7 +108,7 @@ public class InputDocumentResource {
 							    		@RequestBody String payload) {
 
         log.debug("Solr document add");
-        if(!isValidJsonArray(payload))
+        if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
@@ -179,20 +184,20 @@ public class InputDocumentResource {
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
-	public boolean isValidJsonArray(String jsonString) {
-	    boolean valid = true;
-	    try{ 
-	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
-	    			|| !jsonString.trim().endsWith("]"))
-	    		return false;
-	    	ObjectMapper objectMapper = new ObjectMapper();
-	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-	        objectMapper.readTree(jsonString);
-	    } catch(JsonProcessingException ex){
-	        valid = false;
-	    }
-	    return valid;
-}
+//	public boolean isValidJsonArray(String jsonString) {
+//	    boolean valid = true;
+//	    try{ 
+//	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
+//	    			|| !jsonString.trim().endsWith("]"))
+//	    		return false;
+//	    	ObjectMapper objectMapper = new ObjectMapper();
+//	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+//	    	//JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+//	        objectMapper.readTree(jsonString);
+//	    } catch(JsonProcessingException ex){
+//	        valid = false;
+//	    }
+//	    return valid;
+//	}
 
 }
