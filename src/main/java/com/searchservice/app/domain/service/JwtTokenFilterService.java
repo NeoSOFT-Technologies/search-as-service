@@ -1,6 +1,8 @@
 package com.searchservice.app.domain.service;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 //@Component
 public class JwtTokenFilterService extends OncePerRequestFilter{
 	
@@ -28,6 +32,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter{
 	private String client_Secret;
 	private RestTemplate restTemplate;
 	private final Logger log = LoggerFactory.getLogger(JwtTokenFilterService.class);
+	private ObjectMapper mapper = new ObjectMapper();
 	
 	public JwtTokenFilterService() {
 		super();
@@ -43,13 +48,15 @@ public class JwtTokenFilterService extends OncePerRequestFilter{
 	@Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
-	 
+		Map<String, Object> errorDetails = new HashMap<>();
       // Get authorization header and validate
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : "+header);
         if (null == header || header.isEmpty() || !header.startsWith("Bearer ")) {
-             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-             response.getWriter().write("The token is not valid");
+        	errorDetails.put("message", "Invalid token");
+	        response.setStatus(HttpStatus.FORBIDDEN.value());
+	        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+	        mapper.writeValue(response.getWriter(), errorDetails);
             return;
         }
 
@@ -57,8 +64,10 @@ public class JwtTokenFilterService extends OncePerRequestFilter{
         final String token = header.split(" ")[1].trim();
         log.info("[JwtTokenFilterService][doFilterInternal] Token Value : "+token);
         if (!validate(token)) {
-        	response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("The token is not valid");
+        	errorDetails.put("message", "Invalid token");
+	        response.setStatus(HttpStatus.FORBIDDEN.value());
+	        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+	        mapper.writeValue(response.getWriter(), errorDetails);
             return;
         }else {
         	chain.doFilter(request, response);
