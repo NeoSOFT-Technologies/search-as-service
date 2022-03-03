@@ -112,7 +112,7 @@ public class ManageTableResource {
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {	
+        if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {	
             throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
         } else {
 
@@ -150,7 +150,7 @@ public class ManageTableResource {
              LoggerUtils.printlogger(loggersDTO, false, true);
              throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
         }else {
-        	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName() + "_" + tenantId)) {
+        	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
         		 throw new BadRequestOccurredException(400, "Table With Same Name "+manageTableDTO.getTableName()+" is Marked For Deletion");
                } 
         	  else {
@@ -181,7 +181,7 @@ public class ManageTableResource {
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
         tableName = tableName + "_" + tenantId;
-        if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+        if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
             successMethod(nameofCurrMethod, loggersDTO);
             if (tableDeleteServicePort.checkTableExistensce(tableName)) {
 
@@ -239,7 +239,7 @@ public class ManageTableResource {
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         tableName = tableName + "_" + tenantId;
 
-        if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+        if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
             newTableSchemaDTO.setTableName(tableName);
 
             Response apiResponseDTO = manageTableServicePort.updateTableSchema(
