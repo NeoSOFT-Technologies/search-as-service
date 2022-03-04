@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
@@ -26,9 +23,8 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
+import com.searchservice.app.rest.errors.InvalidJsonInputOccurredException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -77,7 +73,7 @@ public class InputDocumentResource {
 
         log.debug("Solr documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());;
+        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
@@ -116,7 +112,7 @@ public class InputDocumentResource {
 
         log.debug("Solr document add");
         if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp);

@@ -1,5 +1,20 @@
 package com.searchservice.app.rest;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -13,19 +28,12 @@ import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.DeletionOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidColumnOccurredException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullColumnOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}" + "/manage/table")
@@ -33,8 +41,6 @@ public class ManageTableResource {
     private String servicename = "Manage_Table_Resource";
 
     private String username = "Username";
-    
-    private HttpStatusCode httpStatusCode;
 
     private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 

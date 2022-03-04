@@ -49,10 +49,6 @@ public class RestApiErrorHandling {
 	       this.message = message;
 	   }
 
-	public RestApiErrorHandling(int code, String messgae) {
-		this.statusCode=code;
-        this.message = message;
-	}
 	public int getStatusCode() {
 		return statusCode;
 	}

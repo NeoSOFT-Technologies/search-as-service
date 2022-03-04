@@ -52,6 +52,22 @@ public class RestControllerAdvice {
 				HttpStatusCode.NULL_COLUMN.getCode(), HttpStatusCode.NULL_COLUMN, exception.getExceptionMessage()),
 				HttpStatus.BAD_REQUEST);
 	}
+	@ExceptionHandler(InvalidJsonInputOccurredException.class)
+	public ResponseEntity<Object> handleInvalidJsonInput(InvalidJsonInputOccurredException exception) {
+
+		if(exception.getCause() instanceof InvalidJsonInputOccurredException) {
+			return new ResponseEntity<Object>(new RestApiErrorHandling(
+
+					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
+					HttpStatus.BAD_REQUEST);
+		}
+		else {
+			return new ResponseEntity<Object>(new RestApiErrorHandling(
+
+					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
+					HttpStatus.BAD_REQUEST);
+		}
+	}
 	@ExceptionHandler(DeletionOccurredException.class)
 	public ResponseEntity<Object> handledeletionprocess(DeletionOccurredException exception) {
 
@@ -139,7 +155,7 @@ public class RestControllerAdvice {
 					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);
 		}
-		//return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Unrecognized Field : "+fieldName));
+		
 	}
 	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
