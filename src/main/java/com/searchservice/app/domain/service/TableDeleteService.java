@@ -300,7 +300,7 @@ private String servicename = "Table_Delete_Service";
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
 					String currentTableName = st.split(",")[1];
-					tableUnderDeletionList.add(currentTableName);
+					tableUnderDeletionList.add(currentTableName.split("_")[0]);
 				}
 				lineNumber++;
 			}
