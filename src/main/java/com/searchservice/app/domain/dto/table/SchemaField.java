@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidColumnOccurredException;
+import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +40,7 @@ public class SchemaField implements VersionedObjectMapper {
 		if (value instanceof Boolean) {
             this.isFilterable = (Boolean) value;
         }else {
-        	throw new BadRequestOccurredException(400, "Value for Filterable is expected as : true/false");
+        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Filterable is expected as : true/false");
         }
 	}
 
@@ -45,7 +48,7 @@ public class SchemaField implements VersionedObjectMapper {
 		if (value instanceof Boolean) {
             this.isRequired = (Boolean) value;
         }else {
-        	throw new BadRequestOccurredException(400, "Value for Required is expected as : true/false");
+        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Required is expected as : true/false");
         }
 	}
 
@@ -55,7 +58,7 @@ public class SchemaField implements VersionedObjectMapper {
 		if (value instanceof Boolean) {
             this.isStorable = (Boolean) value;
         }else {
-        	throw new BadRequestOccurredException(400, "Value for Storable is expected as : true/false");
+        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Storable is expected as : true/false");
         }
 	}
 
@@ -65,7 +68,7 @@ public class SchemaField implements VersionedObjectMapper {
 		if (value instanceof Boolean) {
             this.isMultiValue = (Boolean) value;
         }else {
-        	throw new BadRequestOccurredException(400, "Value for MultiValue is expected as : true/false");
+        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for MultiValue is expected as : true/false");
         }
 	}
 
@@ -75,7 +78,7 @@ public class SchemaField implements VersionedObjectMapper {
 		if (value instanceof Boolean) {
             this.isSortable = (Boolean) value;
         }else {
-        	throw new BadRequestOccurredException(400, "Value for Sortable is expected as : true/false");
+        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Sortable is expected as : true/false");
         }
 	}
 }

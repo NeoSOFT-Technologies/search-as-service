@@ -62,7 +62,10 @@ import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
 import com.searchservice.app.rest.errors.SolrSchemaValidationException;
 
@@ -598,10 +601,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			throw new BadRequestOccurredException(400, "Invalid SKU: "+ manageTableDTO.getSku());
-//			apiResponseDTO.setStatusCode(400);
-//			apiResponseDTO.setMessage("Invalid SKU: " + manageTableDTO.getSku());
-//			return apiResponseDTO;
+			throw new InvalidSKUOccurredException(HttpStatusCode.INVALID_SKU_NAME.getCode(),HttpStatusCode.INVALID_SKU_NAME.getMessage()+" : "+ manageTableDTO.getSku());
 		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
@@ -1068,7 +1068,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public boolean checkIfTableNameisValid(String tableName) {
 		if(null == tableName || tableName.isBlank() || tableName.isEmpty())
-			throw new NullPointerOccurredException(404, "Provide valid Table Name");
+			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),"Provide valid Table Name");
 		  Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 	      Matcher matcher = pattern.matcher(tableName);
 	      return matcher.find();

@@ -124,8 +124,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public boolean isValidJsonArray(String jsonString) {
 	    boolean valid = true;
 	    try{ 
-	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[")
-	    			|| !jsonString.trim().endsWith("]"))
+	    	if(null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[{")
+	    			|| !jsonString.trim().endsWith("}]"))
 	    		return false;
 	    	ObjectMapper objectMapper = new ObjectMapper();
 	    	objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);

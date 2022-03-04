@@ -11,6 +11,11 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.DeletionOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidColumnOccurredException;
+import com.searchservice.app.rest.errors.InvalidInputOccurredException;
+import com.searchservice.app.rest.errors.NullColumnOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,6 +33,8 @@ public class ManageTableResource {
     private String servicename = "Manage_Table_Resource";
 
     private String username = "Username";
+    
+    private HttpStatusCode httpStatusCode;
 
     private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
@@ -113,7 +120,7 @@ public class ManageTableResource {
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
         if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {	
-            throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
+            throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
         } else {
 
             // GET tableSchema
@@ -140,7 +147,7 @@ public class ManageTableResource {
     public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
         if(null == manageTableDTO.getColumns() || manageTableDTO.getColumns().isEmpty())
-        	throw new BadRequestOccurredException(400, "Provide atleast one Column");
+        	throw new NullColumnOccurredException(HttpStatusCode.NULL_COLUMN.getCode(),HttpStatusCode.NULL_COLUMN.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
@@ -148,7 +155,7 @@ public class ManageTableResource {
         if(manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
         	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
              LoggerUtils.printlogger(loggersDTO, false, true);
-             throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
+             throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),"Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
         }else {
         	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName() + "_" + tenantId)) {
         		 throw new BadRequestOccurredException(400, "Table With Same Name "+manageTableDTO.getTableName()+" is Marked For Deletion");
@@ -164,7 +171,7 @@ public class ManageTableResource {
       	        } else {
       	            log.info("Table could not be created: {}", apiResponseDTO);
       	            LoggerUtils.printlogger(loggersDTO, false, true);
-      	            throw new BadRequestOccurredException(400, "REST operation could not be performed");
+      	            throw new BadRequestOccurredException(101, "REST operation could not be performed");
       	        }
         	   }
         	    }
@@ -256,7 +263,7 @@ public class ManageTableResource {
                 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
             }
         } else {
-            throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
+            throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
         }
         
     }

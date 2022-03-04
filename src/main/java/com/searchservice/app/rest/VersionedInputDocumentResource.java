@@ -20,6 +20,8 @@ import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -67,7 +69,7 @@ public class VersionedInputDocumentResource {
 
         log.debug("Solr documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
+        	throw new InvalidInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());;
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
@@ -117,7 +119,7 @@ public class VersionedInputDocumentResource {
 
         log.info("Solr documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new BadRequestOccurredException(400, "Provide valid Json Input");
+        	throw new InvalidInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
