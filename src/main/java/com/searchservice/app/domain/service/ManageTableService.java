@@ -215,7 +215,7 @@ public class ManageTableService implements ManageTableServicePort {
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
 		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
 				tableName, clientId, tableSchema);
-		
+		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream().filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
 		// tes
 		logger.info("returning resp from getCurrSchema ######");
 		

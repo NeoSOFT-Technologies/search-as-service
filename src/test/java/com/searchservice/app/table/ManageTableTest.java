@@ -30,7 +30,7 @@ import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
 @IntegrationTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class ManageTableTest {
 
     @Value("${base-url.api-endpoint.home}")

@@ -19,7 +19,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.InputDocumentService;
 
 @IntegrationTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class InputDocumentResourceTest {
 
 	// String apiEndpoint = "/api/v1";
