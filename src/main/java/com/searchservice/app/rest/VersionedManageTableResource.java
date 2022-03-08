@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -20,10 +19,12 @@ import com.searchservice.app.domain.dto.table.GetCapacityPlan;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.DeletionOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -117,7 +118,7 @@ public class VersionedManageTableResource {
         tableName = tableName + "_" + tenantId;
         if(tableDeleteServicePort.isTableUnderDeletion(tableName))
 	     {
-	        throw new BadRequestOccurredException(400, "Table "+tableName+" is Under Deletion Process");
+	        throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table "+tableName+" is Under Deletion Process");
 	     }
 	      else {
         // GET tableSchema
@@ -194,7 +195,7 @@ public class VersionedManageTableResource {
  		}else {
  			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+tenantId+" Does Not Exist");
  		}}else {
- 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+tenantId+" is Already Under Deletion");
+ 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table "+tableNameForMessage+" For Client ID "+tenantId+" is Already Under Deletion");
  		}
  	}	
  	
@@ -255,7 +256,7 @@ public class VersionedManageTableResource {
 				throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 			}
 		} else {
-			throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
+			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
 		}
 	}
 }

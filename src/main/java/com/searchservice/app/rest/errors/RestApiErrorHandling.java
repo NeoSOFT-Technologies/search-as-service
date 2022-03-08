@@ -2,36 +2,51 @@ package com.searchservice.app.rest.errors;
 
 import java.time.LocalDateTime;
 
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class RestApiError {
+
+public class RestApiErrorHandling {
        private int statusCode;
-	   private HttpStatus status;
+       private HttpStatusCode status;
 	   private String message;
-	 
 	   
 	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	   private LocalDateTime timestamp;
 
-	   private RestApiError() {
+	   private RestApiErrorHandling() {
 	       timestamp = LocalDateTime.now();
 	   }
-	   
-	   RestApiError(HttpStatus status, String message) {
+	   RestApiErrorHandling(HttpStatusCode status,int statusCode) {
 	       this();
-           this.statusCode=status.value();
+	       this.statusCode=status.getCode();
+	       this.status=status;
+	       this.message = "Unexpected Exception";
+	   }
+	   
+	   RestApiErrorHandling(HttpStatusCode status, String message) {
+	       this();
+           this.statusCode=status.getCode();
            this.status=status;
 	       this.message = message;
 	   }
-	   
-	   RestApiError(HttpStatus status, Throwable ex) {
+
+	   RestApiErrorHandling(HttpStatusCode status, Throwable ex) {
 	       this();
-           this.statusCode=status.value();
+           this.statusCode=status.getCode();
            this.status=status;
 	       this.message = ex.getLocalizedMessage();
+	   }
+	   
+	   RestApiErrorHandling(int statuscode, Throwable ex) {
+	       this();
+           this.statusCode=statuscode;
+	       this.message = ex.getLocalizedMessage();
+	   }
+	   
+	   RestApiErrorHandling(int statuscode, HttpStatusCode status,String message) {
+	       this();
+           this.statusCode=statuscode;
+           this.status=status;
+	       this.message = message;
 	   }
 
 	public int getStatusCode() {
@@ -42,11 +57,11 @@ public class RestApiError {
 		this.statusCode = statusCode;
 	}
 
-	public HttpStatus getStatus() {
+	public HttpStatusCode getStatus() {
 		return status;
 	}
 
-	public void setStatus(HttpStatus status) {
+	public void setStatus(HttpStatusCode status) {
 		this.status = status;
 	}
 

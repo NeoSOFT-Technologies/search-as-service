@@ -1,5 +1,20 @@
 package com.searchservice.app.rest;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -11,16 +26,14 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.DeletionOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidInputOccurredException;
+import com.searchservice.app.rest.errors.NullColumnOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}" + "/manage/table")
@@ -112,8 +125,9 @@ public class ManageTableResource {
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
-        if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {	
-            throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
+        if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {	
+            throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
+
         } else {
 
             // GET tableSchema
@@ -140,7 +154,7 @@ public class ManageTableResource {
     public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
         log.debug("Create table");
         if(null == manageTableDTO.getColumns() || manageTableDTO.getColumns().isEmpty())
-        	throw new BadRequestOccurredException(400, "Provide atleast one Column");
+        	throw new NullColumnOccurredException(HttpStatusCode.NULL_COLUMN.getCode(),HttpStatusCode.NULL_COLUMN.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
         String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
@@ -148,7 +162,7 @@ public class ManageTableResource {
         if(manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
         	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
              LoggerUtils.printlogger(loggersDTO, false, true);
-             throw new BadRequestOccurredException(400, "Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
+             throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),"Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
         }else {
         	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
         		 throw new BadRequestOccurredException(400, "Table With Same Name "+manageTableDTO.getTableName()+" is Marked For Deletion");
@@ -164,7 +178,7 @@ public class ManageTableResource {
       	        } else {
       	            log.info("Table could not be created: {}", apiResponseDTO);
       	            LoggerUtils.printlogger(loggersDTO, false, true);
-      	            throw new BadRequestOccurredException(400, "REST operation could not be performed");
+      	            throw new BadRequestOccurredException(101, "REST operation could not be performed");
       	        }
         	   }
         	    }
@@ -256,7 +270,7 @@ public class ManageTableResource {
                 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
             }
         } else {
-            throw new BadRequestOccurredException(400, "Table " + tableName + " is Under Deletion Process");
+            throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
         }
         
     }
