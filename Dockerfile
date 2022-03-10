@@ -27,7 +27,6 @@ RUN chmod 777 $APP_HOME/$SOFT_DELETE_DIR
 RUN touch $APP_HOME/$SOFT_DELETE_DIR/TableDeleteRecord.csv
 RUN touch $APP_HOME/$SOFT_DELETE_DIR/SchemaDeleteRecord.csv
 
-
 #API Port
 EXPOSE 8081
 
