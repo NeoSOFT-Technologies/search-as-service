@@ -1,0 +1,8 @@
+minikube start --driver=hyperv
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+minikube service --url search-service-ingress-service
+
+kubectl delete -f deployment.yaml -f service.yaml
