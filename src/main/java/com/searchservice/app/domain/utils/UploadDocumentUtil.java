@@ -13,17 +13,17 @@ public class UploadDocumentUtil {
 
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
-	private String baseSolrUrl;
+	private String baseSearchUrl;
 	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
-	public UploadDocumentSolrUtilRespnse commit() {
+	public UploadDocumentSearchUtilRespnse commit() {
 		
 		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType, content);
 
-		String url = baseSolrUrl + "/" + tableName + "/update?";
+		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 		log.debug("COMMIT");
 		
@@ -33,7 +33,7 @@ public class UploadDocumentUtil {
 		try {
 			 Response response = client.newCall(request).execute();
 			 if(response.code() != 400) {
-				 return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
+				 return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			 }else {
 				 //return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
 				 throw new BadRequestOccurredException(400, "Document not uploaded!");
@@ -41,13 +41,13 @@ public class UploadDocumentUtil {
 		} catch (IOException e) {
 			log.error(e.toString());
 
-			return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded! IOException.");
+			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
 
 		}
 
 	}
 
-	public UploadDocumentSolrUtilRespnse softcommit() {
+	public UploadDocumentSearchUtilRespnse softcommit() {
 
 		OkHttpClient client = new OkHttpClient();
 
@@ -55,7 +55,7 @@ public class UploadDocumentUtil {
 
 		RequestBody body = RequestBody.create(mediaType, content);
 
-		String url = baseSolrUrl + "/" + tableName + "/update?";
+		String url = baseSearchUrl + "/" + tableName + "/update?";
 
 		url += "softCommit=true";
 
@@ -68,23 +68,23 @@ public class UploadDocumentUtil {
 			// Response response =
 			client.newCall(request).execute();
 
-			return new UploadDocumentSolrUtilRespnse(true, "Document Added Successfully!");
+			return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 
 		} catch (IOException e) {
 			log.error(e.toString());
 
-			return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded! IOException.");
+			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
 
 		}
 
 	}
 
 	@Data
-	public static class UploadDocumentSolrUtilRespnse {
+	public static class UploadDocumentSearchUtilRespnse {
 		boolean isDocumentUploaded;
 		String message;
 
-		public UploadDocumentSolrUtilRespnse(boolean isDocumentUploaded, String message) {
+		public UploadDocumentSearchUtilRespnse(boolean isDocumentUploaded, String message) {
 			this.isDocumentUploaded = isDocumentUploaded;
 			this.message = message;
 		}

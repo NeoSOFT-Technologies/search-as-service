@@ -2,7 +2,7 @@ package com.searchservice.app.domain.utils;
 
 public class SchemaFieldType {
 
-    public static String fromStandardDataTypeToSolrFieldType(String dataType, boolean isMultivalue) {
+    public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
 
         switch (dataType.toLowerCase()) {
 
@@ -47,7 +47,7 @@ public class SchemaFieldType {
         }
     }
 
-    public static String fromSolrFieldTypeToStandardDataType(String fieldType, Object isMultivalue) {
+    public static String fromSearchFieldTypeToStandardDataType(String fieldType, Object isMultivalue) {
         switch (fieldType) {
             case "boolean":
             	return "boolean";

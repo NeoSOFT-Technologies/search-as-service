@@ -11,15 +11,15 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 @Configuration
 @EnableSolrRepositories(basePackages = "com.searchservice.app.infrastructure")
 @ComponentScan
-public class SolrConfig {
+public class SearchConfig {
 
-    @Bean
-    public SolrClient solrClient() {
+ /*   @Bean
+    public SolrClient searchClient() {
         return new HttpSolrClient.Builder("http://localhost:8983/solr").build();
     }
 
     @Bean
-    public SolrTemplate solrTemplate(SolrClient client) {
+    public SolrTemplate searchTemplate(SolrClient client) {
         return new SolrTemplate(client);
-    }
+    }*/
 }

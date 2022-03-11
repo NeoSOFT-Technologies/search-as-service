@@ -49,7 +49,7 @@ public class ManageTableUtil {
 	}
 	
 	
-	public static Map<Object, Object> getSolrClusterInfo(Object obj) {
+	public static Map<Object, Object> getSearchClusterInfo(Object obj) {
 
 		Map<Object, Object> resultMap = new HashMap<>();
 		if (obj instanceof HashMap<?, ?>) {

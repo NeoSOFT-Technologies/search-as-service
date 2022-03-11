@@ -39,9 +39,9 @@ class ManageTableTest {
     private int tenantId = 101;
 
 	String schemaName = "default-config";
-	SchemaField solr = new SchemaField("testField6","string", "mydefault", true, true, false, true, true, false);
-	//SchemaFieldDTO[] attributes = { solr };
-	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(solr));
+	SchemaField search = new SchemaField("testField6","string", "mydefault", true, true, false, true, true, false);
+	//SchemaFieldDTO[] attributes = { search };
+	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(search));
 	String expectedGetResponse = "{\n"
 			  +"\"tableName\": \"gettingstarted3\",\n"
 			  +"\"name\": \"default-config\",\n"

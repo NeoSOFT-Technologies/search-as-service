@@ -22,8 +22,8 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 public class InputDocumentService implements InputDocumentServicePort {
 	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
 	
-	@Value("${base-solr-url}")
-	private String baseSolrUrl;
+	@Value("${base-search-url}")
+	private String baseSearchUrl;
 
 	private String servicename = "Input_Document_Service";
 
@@ -45,7 +45,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 	
 	private void extracted(ThrottlerResponse responseDTO,
-			UploadDocumentUtil.UploadDocumentSolrUtilRespnse response) {
+			UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
 		if (response.isDocumentUploaded()) {
 			responseDTO.setMessage("Successfully Added!");
 			responseDTO.setStatusCode(200);
@@ -58,7 +58,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private UploadDocumentUtil extracted(String tableName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
-		uploadDocumentUtil.setBaseSolrUrl(baseSolrUrl);
+		uploadDocumentUtil.setBaseSearchUrl(baseSearchUrl);
 		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);
 		return uploadDocumentUtil;
@@ -82,7 +82,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
 		
-		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.commit();
+		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
 		String timestamp=LoggerUtils.utcTime().toString();
@@ -111,7 +111,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
 
-		UploadDocumentUtil.UploadDocumentSolrUtilRespnse response = uploadDocumentUtil.softcommit();
+		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
 		String timestamp=LoggerUtils.utcTime().toString();

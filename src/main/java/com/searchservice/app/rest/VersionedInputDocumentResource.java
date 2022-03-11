@@ -68,7 +68,7 @@ public class VersionedInputDocumentResource {
 						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload){
 
-        log.debug("Solr documents add");
+        log.debug("Search documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -118,7 +118,7 @@ public class VersionedInputDocumentResource {
 						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload) {
 
-        log.info("Solr documents add");
+        log.info("Search documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();

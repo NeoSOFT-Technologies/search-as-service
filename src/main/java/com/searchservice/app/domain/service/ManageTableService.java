@@ -56,10 +56,10 @@ import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
-import com.searchservice.app.domain.utils.SolrUtil;
+import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParser;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
-import com.searchservice.app.infrastructure.adaptor.SolrAPIAdapter;
+import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
@@ -81,8 +81,8 @@ import lombok.NoArgsConstructor;
 public class ManageTableService implements ManageTableServicePort {
 	private static final String TABLE_NOT_FOUND_MSG = "Table: %s, does not exist";
 	// Schema
-	private static final String SOLR_EXCEPTION_MSG = "The table - {} is Not Found in the Solr Cloud!";
-	private static final String SOLR_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
+	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
+	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
@@ -97,8 +97,8 @@ public class ManageTableService implements ManageTableServicePort {
     private static final String FILE_CREATE_ERROR="Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
-	@Value("${base-solr-url}")
-	private String solrURL;
+	@Value("${base-search-url}")
+	private String searchURL;
 	@Value("${basic-auth.username}")
 	private String basicAuthUsername;
 	@Value("${basic-auth.password}")
@@ -123,13 +123,13 @@ public class ManageTableService implements ManageTableServicePort {
 	CapacityPlanProperties capacityPlanProperties;
 
 	@Autowired
-	SolrAPIAdapter solrAPIAdapter;
-	HttpSolrClient solrClient;
+	SearchAPIAdapter searchAPIAdapter;
+	HttpSolrClient searchClient;
 
-	public ManageTableService(String solrUrl, SolrAPIAdapter solrAPIAdapter, HttpSolrClient solrClient) {
-		this.solrURL = solrUrl;
-		this.solrAPIAdapter = solrAPIAdapter;
-		this.solrClient = solrClient;
+	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient) {
+		this.searchURL = searchUrl;
+		this.searchAPIAdapter = searchAPIAdapter;
+		this.searchClient = searchClient;
 	}
 
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
@@ -167,7 +167,7 @@ public class ManageTableService implements ManageTableServicePort {
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 
 		Response getListItemsResponseDTO = new Response();
 
@@ -175,7 +175,7 @@ public class ManageTableService implements ManageTableServicePort {
         loggersDTO.setTimestamp(timestamp);
         
 		try {
-			CollectionAdminResponse response = request.process(solrClientActive);
+			CollectionAdminResponse response = request.process(searchClientActive);
 
 			List<String> data = new ArrayList<>();
 			getListItemsResponseDTO
@@ -200,7 +200,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			LoggerUtils.printlogger(loggersDTO,false,true);
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return getListItemsResponseDTO;
 	}
@@ -212,10 +212,10 @@ public class ManageTableService implements ManageTableServicePort {
 		if (!isTableExists(tableName + "_" + clientId))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
 
-		// GET tableSchema at solr cloud
+		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + clientId);
 		
-		// Compare tableSchema locally Vs. tableSchema at solr cloud
+		// Compare tableSchema locally Vs. tableSchema at Search cloud
 		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
 				tableName, clientId, tableSchema);
 		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream().filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
@@ -254,21 +254,21 @@ public class ManageTableService implements ManageTableServicePort {
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 		
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 
 		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
 		CollectionAdminResponse response = null;
 		try {
-			response = clusterStatus.process(solrClientActive);
+			response = clusterStatus.process(searchClientActive);
 		} catch (Exception e) {
 			logger.error(e.toString());
 			finalResponseMap.put("Error", "Error connecting to cluster.");
 			
 			return finalResponseMap;
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 
 		finalResponseMap = ManageTableUtil.getTableInfoFromClusterStatusResponseObject(
@@ -349,7 +349,7 @@ public class ManageTableService implements ManageTableServicePort {
 		// Delete table
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
-		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
+		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
 		Response apiResponseDTO = new Response();
 
@@ -359,8 +359,8 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			deleteAliasRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClientActive);
-			deleteAliasRequest.process(solrClientActive);
+			request.process(searchClientActive);
+			deleteAliasRequest.process(searchClientActive);
 
 			apiResponseDTO.setStatusCode(200);
 			LoggerUtils.printlogger(loggersDTO,false,false);
@@ -375,7 +375,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -426,12 +426,12 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public Response getConfigSets() {
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
 
 		Response getListItemsResponseDTO = new Response();
 		try {
-			ConfigSetAdminResponse configSetResponse = configSetRequest.process(solrClientActive);
+			ConfigSetAdminResponse configSetResponse = configSetRequest.process(searchClientActive);
 			NamedList<Object> configResponseObjects = configSetResponse.getResponse();
 			getListItemsResponseDTO
 					.setData(TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets")));
@@ -442,7 +442,7 @@ public class ManageTableService implements ManageTableServicePort {
 			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
 			logger.error("Error caused while retrieving configsets. Exception: ", e);
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return getListItemsResponseDTO;
 	}
@@ -451,16 +451,16 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public boolean isTableExists(String tableName) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		try {
-			CollectionAdminResponse response = request.process(solrClientActive);
+			CollectionAdminResponse response = request.process(searchClientActive);
 			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
 			throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 	}
 	
@@ -499,7 +499,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getTableSchema(String tableName) {
 		logger.info("Getting table schema");
 
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL, tableName);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 
 		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
@@ -507,7 +507,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String errorCausingField = null;
 		String payloadOperation = "SchemaRequest";
 		try {
-			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
 			logger.info("Get request has been processed. Setting status code = 200");
 			tableSchemaResponseDTO.setStatusCode(200);
 
@@ -524,7 +524,7 @@ public class ManageTableService implements ManageTableServicePort {
 				solrFieldDTO.setName((String) f.get("name"));
 
 				// Parse Field Type Object(String) to Enum
-				String solrFieldType = SchemaFieldType.fromSolrFieldTypeToStandardDataType(
+				String solrFieldType = SchemaFieldType.fromSearchFieldTypeToStandardDataType(
 						(String) f.get("type"), f.get(MULTIVALUED));
 
 				solrFieldDTO.setType(solrFieldType);
@@ -542,14 +542,14 @@ public class ManageTableService implements ManageTableServicePort {
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			logger.error(SOLR_EXCEPTION_MSG, tableName);
+			logger.error(SEARCH_EXCEPTION_MSG, tableName);
 			logger.info(e.toString());
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		
 		return tableSchemaResponseDTO;
@@ -558,7 +558,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public Response createConfigSet(ConfigSet configSetDTO) {
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.Create configSetRequest = new ConfigSetAdminRequest.Create();
 		Response apiResponseDTO = new Response();
 
@@ -572,14 +572,14 @@ public class ManageTableService implements ManageTableServicePort {
 			 * Authenticate in order to access @schema_designer API
 			 */
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			configSetRequest.process(solrClientActive);
+			configSetRequest.process(searchClientActive);
 			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be created");
 			apiResponseDTO.setStatusCode(400);
 			logger.error("Error caused while creating ConfigSet. Exception: ", e);
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -607,12 +607,12 @@ public class ManageTableService implements ManageTableServicePort {
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
 				manageTableDTO.getTableName(),
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
-		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
+		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClientActive);
+			request.process(searchClientActive);
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
@@ -621,7 +621,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO
 					.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -631,8 +631,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
 		logger.info("Add schema attributes");
 		
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
-				solrURL, newTableSchemaDTO.getTableName());
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(
+				searchURL, newTableSchemaDTO.getTableName());
 		
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
@@ -643,7 +643,7 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			// logic
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
 
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
@@ -717,7 +717,7 @@ public class ManageTableService implements ManageTableServicePort {
 							fieldTypeDef.setAttributes(fieldTypeAttributes);
 							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
 							
-							addFieldTypeRequest.process(solrClientActive);
+							addFieldTypeRequest.process(searchClientActive);
 						} else
 							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
 						
@@ -726,7 +726,7 @@ public class ManageTableService implements ManageTableServicePort {
 						// Since "partial search" is enabled on this field, docValues has to be disabled
 						fieldDto.setSortable(false);
 					} else {
-						newField.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
+						newField.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 						newField.put(DOCVALUES, fieldDto.isSortable());
 					}
 
@@ -737,7 +737,7 @@ public class ManageTableService implements ManageTableServicePort {
 					newField.put(INDEXED, fieldDto.isFilterable());
 
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
-					addFieldResponse = addFieldRequest.process(solrClientActive);
+					addFieldResponse = addFieldRequest.process(searchClientActive);
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
 				tableSchemaResponseDTO.setStatusCode(200);
@@ -747,16 +747,16 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrServerException | IOException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.error(e.toString());
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
 			
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return tableSchemaResponseDTO;
 	}
@@ -767,7 +767,7 @@ public class ManageTableService implements ManageTableServicePort {
 		logger.info("Update Table Schema");
 
 		SchemaRequest schemaRequest = new SchemaRequest();
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
 		
 		Response apiResponseDTO = new Response();
@@ -779,7 +779,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String payloadOperation = "";
 		try {
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
 			
 			schemaResponseDTOBefore.setStatusCode(200);
 
@@ -811,7 +811,7 @@ public class ManageTableService implements ManageTableServicePort {
 				errorCausingField = (String) currField.get("name");
 				// Pass the fieldAttribute to be updated	
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
-				updateFieldsResponse = updateFieldsRequest.process(solrClientActive);
+				updateFieldsResponse = updateFieldsRequest.process(searchClientActive);
 				schemaResponseDTOAfter.setStatusCode(200);
 
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
@@ -825,7 +825,7 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.info("Total fields updated in the current schema: {}", updatedFields);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(SOLR_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
+			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.error(e.toString());
 		} catch (NullPointerException e) {
 			schemaResponseDTOAfter.setStatusCode(400);
@@ -836,7 +836,7 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrException e) {
 			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO.setMessage("Schema could not be updated");
-			logger.error(SOLR_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
+			logger.error(SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName());
 			logger.error(e.toString());
 		} catch (SolrSchemaValidationException e) {
@@ -845,7 +845,7 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.error("Error Message: {}", e.getMessage());
 			logger.error(e.toString());
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -855,12 +855,12 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response addAliasTable(String tableOriginalName, String tableAlias) {
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
-		HttpSolrClient solrClientActive = new HttpSolrClient.Builder(solrURL).build();
+		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
 		Response apiResponseDTO = new Response();
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			request.process(solrClientActive);
+			request.process(searchClientActive);
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage(
 					"Successfully renamed Solr Collection: " + tableOriginalName + " to " + tableAlias);
@@ -870,7 +870,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO
 					.setMessage("Unable to rename Solr Collection: " + tableOriginalName + ". Exception.");
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -878,7 +878,7 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	@Override
 	public Response deleteConfigSet(String configSetName) {
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClient(solrURL);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
 
 		Response apiResponseDTO = new Response();
@@ -886,14 +886,14 @@ public class ManageTableService implements ManageTableServicePort {
 		configSetRequest.setConfigSetName(configSetName);
 		try {
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			configSetRequest.process(solrClientActive);
+			configSetRequest.process(searchClientActive);
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be deleted");
 			apiResponseDTO.setStatusCode(401);
 			logger.error("Error occured while deleting Config set. Exception: ", e);
 		} finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
@@ -1026,11 +1026,11 @@ public class ManageTableService implements ManageTableServicePort {
 		String columnName = schemaDeleteData.split(",")[3];
 		String tableName = schemaDeleteData.split(",")[1];
 		
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(solrURL,
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				tableName);
 		try {
 			SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
-			UpdateResponse deleteFieldResponse = deleteFieldRequest.process(solrClientActive);
+			UpdateResponse deleteFieldResponse = deleteFieldRequest.process(searchClientActive);
 			if(deleteFieldResponse.getStatus() == 200) {
 				logger.debug("Schema {} Succesfully Deleted ",columnName);
 				return true;
@@ -1116,18 +1116,18 @@ public class ManageTableService implements ManageTableServicePort {
 	
 	
 	public boolean isPartialSearchFieldTypePresent(String tableName) {		
-		HttpSolrClient solrClientActive = solrAPIAdapter.getSolrClientWithTable(
-				solrURL, tableName);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(
+				searchURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		try {
-			SchemaResponse schemaResponse = schemaRequest.process(solrClientActive);
+			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
 			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
 			
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
 			logger.debug("Schema Field Types couldn't be retrieved");
 		}finally {
-			SolrUtil.closeSolrClientConnection(solrClientActive);
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return false;
 	}
