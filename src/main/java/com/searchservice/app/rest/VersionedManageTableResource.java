@@ -231,7 +231,7 @@ public class VersionedManageTableResource {
     @Operation(summary = "/update-table-schema", security = @SecurityRequirement(name = "bearerAuth"))
     public Response updateTableSchema(
     		@PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
-        log.debug("Solr schema update");
+        log.debug("Search schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
 

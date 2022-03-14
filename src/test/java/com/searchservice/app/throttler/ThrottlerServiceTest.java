@@ -117,7 +117,7 @@ class ThrottlerServiceTest {
 	@Test
 	@DisplayName("Testing Rate Limiter Throttler Service")
 	void testDataInjectionRateLimiter() {
-		logger.info("Solr data injection rate limiter test case getting executed..");
+		logger.info("Search data injection rate limiter test case getting executed..");
 		ThrottlerResponse receivedResponse;
 		
 		logger.debug("Expecting status code: {}", 429);
@@ -132,7 +132,7 @@ class ThrottlerServiceTest {
 	@Test
 	@DisplayName("Testing Max Request Size Limiter Throttler Service")
 	void testDataInjectionRequestSizeLimiter() {	
-		logger.info("Solr data injection max request size limiter test case getting executed..");
+		logger.info("Search data injection max request size limiter test case getting executed..");
 		ThrottlerResponse receivedMRSResponse;
 		
 		// When Request data size limit is not exceeded

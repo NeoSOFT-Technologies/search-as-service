@@ -1,7 +1,7 @@
 
 #================================================================
-#Solr Configurations
-base-solr-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
+#Search Configurations
+base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 #================================================================
 
 
@@ -88,7 +88,7 @@ resilience4j.ratelimiter:
       registerHealthIndicator: true
 
 throttle-service:
-  solr:
+  search:
     data-injection: documentInjectionRateLimitThrottler
   test: defaultRateLimitThrottler
 #================================================================
@@ -98,7 +98,7 @@ throttle-service:
 # ConfigSet Configurations
 base-configset: _default
 
-# Solr authentication(basicAuth) credentials
+# Search authentication(basicAuth) credentials
 basic-auth:
   username: solr
   password: SolrRocks

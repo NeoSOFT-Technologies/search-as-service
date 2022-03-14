@@ -71,7 +71,7 @@ public class InputDocumentResource {
 							    		@PathVariable String tableName,
 							    		@RequestBody String payload){
 
-        log.debug("Solr documents add");
+        log.debug("Search documents add");
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -110,7 +110,7 @@ public class InputDocumentResource {
 							    		@PathVariable String tableName,
 							    		@RequestBody String payload) {
 
-        log.debug("Solr document add");
+        log.debug("Search document add");
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();

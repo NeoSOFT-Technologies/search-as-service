@@ -242,7 +242,7 @@ public class ManageTableResource {
     @Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Response> updateTableSchema(
             @PathVariable int tenantId, @PathVariable String tableName, @RequestBody TableSchema newTableSchemaDTO) {
-        log.debug("Solr schema update");
+        log.debug("Search schema update");
         log.debug("Received Schema as in Request Body: {}", newTableSchemaDTO);
 
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();

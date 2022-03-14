@@ -8,13 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class SolrUtil {
+public class SearchUtil {
 	
-	private SolrUtil() {}
+	private SearchUtil() {}
 	
-	public static void closeSolrClientConnection(HttpSolrClient solrClient) {
+	public static void closeSearchClientConnection(HttpSolrClient searchClient) {
 		try {
-			solrClient.close();
+			searchClient.close();
 		} catch (IOException e) {
 			log.debug(e.getMessage());
 		}

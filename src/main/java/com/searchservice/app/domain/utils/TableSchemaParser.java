@@ -32,7 +32,7 @@ public class TableSchemaParser {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
 		for(SchemaField fieldDto: tableSchemaDTO.getColumns()) {
-			logger.info("Validate SolrFieldDTO before parsing it");
+			logger.info("Validate SearchFieldDTO before parsing it");
 			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
 				logger.info("{} field couldn't be validated", fieldDto);
@@ -43,7 +43,7 @@ public class TableSchemaParser {
 			if(isFieldUnchangeable(fieldDto.getName()))
 				continue;
 			fieldDtoMap.put("name", fieldDto.getName());
-			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSolrFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 			fieldDtoMap.put(STORED, fieldDto.isStorable());
 			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
 			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
@@ -58,18 +58,18 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static boolean validateSchemaField(SchemaField solrFieldDTO) {
-		logger.info("Validate schema field: {}", solrFieldDTO);
+	public static boolean validateSchemaField(SchemaField searchFieldDTO) {
+		logger.info("Validate schema field: {}", searchFieldDTO);
 		
-		solrFieldDTO.setDefault_(DEFAULT);
+		searchFieldDTO.setDefault_(DEFAULT);
 		
 		boolean fieldValidated = true;
-		String fieldName = solrFieldDTO.getName();
-		String fieldType = solrFieldDTO.getType();
+		String fieldName = searchFieldDTO.getName();
+		String fieldType = searchFieldDTO.getType();
 		
 		// If DOCVALUES == TRUE(=> SORTABLE == TRUE), then MULTIVALUED = FALSE
-		if(solrFieldDTO.isSortable())
-			solrFieldDTO.setMultiValue(false);
+		if(searchFieldDTO.isSortable())
+			searchFieldDTO.setMultiValue(false);
 		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
@@ -77,7 +77,7 @@ public class TableSchemaParser {
 		} else if(fieldType == null) {
 			fieldValidated = false;
 			logger.info("Invalid/Empty schema field type received: {}", fieldType);
-		} else if(!validateSchemaFieldBooleanAttributes(solrFieldDTO)) {
+		} else if(!validateSchemaFieldBooleanAttributes(searchFieldDTO)) {
 			fieldValidated = false;
 			logger.info("Invalid/Empty schema field boolean attributes received");
 		}
@@ -85,24 +85,24 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static boolean validateSchemaFieldBooleanAttributes(SchemaField solrFieldDTO) {
-		logger.info("Validate schema field boolean attributes: {}", solrFieldDTO);
+	public static boolean validateSchemaFieldBooleanAttributes(SchemaField searchFieldDTO) {
+		logger.info("Validate schema field boolean attributes: {}", searchFieldDTO);
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
-		if(!solrFieldDTO.isRequired() && solrFieldDTO.isRequired()) {
+		if(!searchFieldDTO.isRequired() && searchFieldDTO.isRequired()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = REQUIRED;
-		} else if(!solrFieldDTO.isFilterable() && solrFieldDTO.isFilterable()) {
+		} else if(!searchFieldDTO.isFilterable() && searchFieldDTO.isFilterable()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = INDEXED;
-		} else if(!solrFieldDTO.isMultiValue() && solrFieldDTO.isMultiValue()) {
+		} else if(!searchFieldDTO.isMultiValue() && searchFieldDTO.isMultiValue()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = "multValued";
-		} else if(!solrFieldDTO.isStorable() && solrFieldDTO.isStorable()) {
+		} else if(!searchFieldDTO.isStorable() && searchFieldDTO.isStorable()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = STORED;
-		} else if(!solrFieldDTO.isSortable() && solrFieldDTO.isSortable()) {
+		} else if(!searchFieldDTO.isSortable() && searchFieldDTO.isSortable()) {
 			fieldAttributesValidated = false;
 			invalidAttribute = DOCVALUES;
 		}
@@ -121,35 +121,35 @@ public class TableSchemaParser {
 	}
 	
 	
-	public static void setFieldsToDefaults(SchemaField solrFieldDTO) {
-		solrFieldDTO.setFilterable(false);
-		solrFieldDTO.setMultiValue(false);
-		solrFieldDTO.setDefault_("mydefault");
-		solrFieldDTO.setRequired(false);
-		solrFieldDTO.setSortable(false);
-		solrFieldDTO.setStorable(true);
+	public static void setFieldsToDefaults(SchemaField searchFieldDTO) {
+		searchFieldDTO.setFilterable(false);
+		searchFieldDTO.setMultiValue(false);
+		searchFieldDTO.setDefault_("mydefault");
+		searchFieldDTO.setRequired(false);
+		searchFieldDTO.setSortable(false);
+		searchFieldDTO.setStorable(true);
 	}
 	
 	
-	public static void setFieldsAsPerTheSchema(SchemaField solrFieldDTO, Map<String, Object> schemaField) {
+	public static void setFieldsAsPerTheSchema(SchemaField searchFieldDTO, Map<String, Object> schemaField) {
 		
 		// testing
 		logger.info("current schema Field @@@@@@ {}", schemaField);
 		
 		if(schemaField.containsKey(INDEXED))
-			solrFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
+			searchFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))
-			solrFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
+			searchFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
 		if(schemaField.containsKey(DEFAULT))
-			solrFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
+			searchFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
 		if(schemaField.containsKey(REQUIRED))
-			solrFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
+			searchFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
 		if(schemaField.containsKey(DOCVALUES))
-			solrFieldDTO.setSortable((boolean)schemaField.get(DOCVALUES));
+			searchFieldDTO.setSortable((boolean)schemaField.get(DOCVALUES));
 		if(schemaField.containsKey(STORED))
-			solrFieldDTO.setStorable((boolean)schemaField.get(STORED));
+			searchFieldDTO.setStorable((boolean)schemaField.get(STORED));
 		if(schemaField.get("type").equals(PARTIAL_SEARCH)) {
-			solrFieldDTO.setPartialSearch(true);
+			searchFieldDTO.setPartialSearch(true);
 		}
 
 	}

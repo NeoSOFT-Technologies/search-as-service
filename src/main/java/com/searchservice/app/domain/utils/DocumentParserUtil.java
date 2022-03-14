@@ -18,8 +18,8 @@ import java.util.Map;
 
 public class DocumentParserUtil {
 
-    @Value("${base-solr-url}")
-    private String baseSolrUrl;
+    @Value("${base-search-url}")
+    private String baseSearchUrl;
 
     private static boolean isNumeric(String string) {
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
@@ -190,16 +190,16 @@ public class DocumentParserUtil {
         return new DocumentSatisfiesSchemaResponse(true,"Success!");
     }
 
-    public static Map<String,Map<String, Object>> getSchemaOfCollection(String baseSolrUrl, String collectionName)throws NullPointerException{
+    public static Map<String,Map<String, Object>> getSchemaOfCollection(String baseSearchUrl, String collectionName)throws NullPointerException{
 
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
 
-        SolrClient solrClient=new HttpSolrClient.Builder(baseSolrUrl+"/"+collectionName).build();
+        SolrClient searchClient=new HttpSolrClient.Builder(baseSearchUrl+"/"+collectionName).build();
 
         SchemaRequest schemaRequest = new SchemaRequest();
         SchemaResponse schemaResponse = null;
         try {
-            schemaResponse = schemaRequest.process(solrClient);
+            schemaResponse = schemaRequest.process(searchClient);
         } catch (Exception e) {        	
             log.error(e.toString());          
             return new HashMap<>();
@@ -210,7 +210,7 @@ public class DocumentParserUtil {
             schemaResponseFields = schemaResponse.getSchemaRepresentation().getFields();
         }
 
-        // Converting response schema from Solr to HashMap for quick access
+        // Converting response schema from Search to HashMap for quick access
         //Key contains the field name and value contains the object which has schema description of that key eg. multivalued etc
         Map<String,Map<String, Object>> schemaKeyValuePair=new HashMap<>();
         if (schemaResponseFields != null) {
