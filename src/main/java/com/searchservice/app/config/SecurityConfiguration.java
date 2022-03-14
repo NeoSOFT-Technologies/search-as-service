@@ -28,14 +28,16 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	@Value("${keycloak.realm}")
-	private String realm_name;
+	@Autowired KeycloakConfigProperties keycloakConfigProperties;
 	
-	@Value("${keycloak.resource}")
-	private String client_id;
-	
-	@Value("${keycloak.credentials.secret}")
-	private String client_Secret;
+//	@Value("${keycloak.realm}")
+//	private String realm_name;
+//	
+//	@Value("${keycloak.resource}")
+//	private String client_id;
+//	
+//	@Value("${keycloak.credentials.secret}")
+//	private String client_Secret;
 	
 // Register Keycloak as the Authentication Provider
     @Autowired
@@ -81,6 +83,6 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
                 .and();
         
         // Add JWT token filter
-       http = http.addFilterBefore(new JwtTokenFilterService(realm_name,client_id,client_Secret,restTemplate), UsernamePasswordAuthenticationFilter.class);
+       http = http.addFilterBefore(new JwtTokenFilterService(keycloakConfigProperties,restTemplate), UsernamePasswordAuthenticationFilter.class);
     }
 }

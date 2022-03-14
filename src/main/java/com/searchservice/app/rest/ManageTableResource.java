@@ -65,7 +65,7 @@ public class ManageTableResource {
     }
 
     @GetMapping("/capacity-plans")
-    @Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.")
+    @Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<GetCapacityPlan> capacityPlans() {
         log.debug("Get capacity plans");
 

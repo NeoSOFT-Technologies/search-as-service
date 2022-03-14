@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -38,9 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
@@ -67,6 +71,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
+import com.searchservice.app.rest.errors.RestApiErrorHandling;
 import com.searchservice.app.rest.errors.SolrSchemaValidationException;
 
 import lombok.AllArgsConstructor;
@@ -239,7 +244,8 @@ public class ManageTableService implements ManageTableServicePort {
         
 		if (!isTableExists(tableName))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
-		TableSchemav2 tableSchema = getTableSchema(tableName); 
+		TableSchemav2 tableSchema = getTableSchema(tableName);
+		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream().filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
 		LoggerUtils.printlogger(loggersDTO,false,false);
 		
 		return  tableSchema;
@@ -458,7 +464,10 @@ public class ManageTableService implements ManageTableServicePort {
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
-			throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
+			if((e instanceof SolrServerException) && (HttpHostConnectException)e.getCause() instanceof HttpHostConnectException)
+				throw new BadRequestOccurredException(503, "Could not connect to Solr server");
+			else
+				throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
 		} finally {
 			SolrUtil.closeSolrClientConnection(solrClientActive);
 		}
