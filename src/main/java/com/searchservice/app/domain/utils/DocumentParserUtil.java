@@ -24,7 +24,7 @@ public class DocumentParserUtil {
     private static boolean isNumeric(String string) {
         Logger log = LoggerFactory.getLogger(DocumentParserUtil.class);
 
-        log.debug("Parsing string: {}", string);
+       
 
         if(string == null || string.equals("")) {
             log.debug("String cannot be parsed, it is null or empty.");

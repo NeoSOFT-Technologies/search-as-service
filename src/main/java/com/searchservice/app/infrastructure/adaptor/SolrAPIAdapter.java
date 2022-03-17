@@ -1,3 +1,4 @@
+
 package com.searchservice.app.infrastructure.adaptor;
 
 import com.searchservice.app.domain.port.spi.SolrAPIPort;
@@ -12,14 +13,14 @@ public class SolrAPIAdapter implements SolrAPIPort {
 
 	@Override
 	public HttpSolrClient getSolrClient(String urlString) {
-		log.debug("Getting Solr Client");
+//		log.debug("Getting Solr Client");
 		
 		return new HttpSolrClient.Builder(urlString).build();
 	}
 	
 	@Override
 	public HttpSolrClient getSolrClientWithTable(String urlString, String tableName) {
-		log.debug("Getting Solr Client for given collection/table");
+//		log.debug("Getting Solr Client for given collection/table");
 		
 		return new HttpSolrClient.Builder(urlString+"/"+tableName).build();
 	}

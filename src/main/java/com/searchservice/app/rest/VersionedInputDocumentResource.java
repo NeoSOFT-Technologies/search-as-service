@@ -3,6 +3,8 @@ package com.searchservice.app.rest;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,16 +39,21 @@ public class VersionedInputDocumentResource {
     
     @Autowired
     InputDocumentService inputDocumentService;
+    
+    @Autowired
+    LoggerUtils loggerUtils;
 
+    private List<Object> listOfParameters;
     private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
     
     public final InputDocumentServicePort inputDocumentServicePort;
     public final ThrottlerServicePort throttlerServicePort;
     public VersionedInputDocumentResource(
     		InputDocumentServicePort inputDocumentServicePort, 
-    		ThrottlerServicePort throttlerServicePort) {
+    		ThrottlerServicePort throttlerServicePort, LoggerUtils loggerUtils) {
         this.inputDocumentServicePort = inputDocumentServicePort;
         this.throttlerServicePort = throttlerServicePort;
+        this.loggerUtils = loggerUtils;
     }
 
     private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -54,7 +61,7 @@ public class VersionedInputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
+		timestamp = loggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 	}
     @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
@@ -65,13 +72,17 @@ public class VersionedInputDocumentResource {
 						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload){
 
-        log.debug("Solr documents add");
+        listOfParameters = new ArrayList<Object>();
+        listOfParameters.add(tenantId);
+        listOfParameters.add(tableName);
+        listOfParameters.add(payload);
+        
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.printlogger(loggersDTO,true,false);
+		String timestamp = loggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp, listOfParameters);
+		loggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         
@@ -97,10 +108,10 @@ public class VersionedInputDocumentResource {
         successMethod(nameofCurrMethod, loggersDTO);
         
         if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.printlogger(loggersDTO, false, false);
+        	loggerUtils.printlogger(loggersDTO, false, false);
             return documentInjectionThrottlerResponse;
         }else{
-        	LoggerUtils.printlogger(loggersDTO, false, true);
+        	loggerUtils.printlogger(loggersDTO, false, true);
         	throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
         }
 
@@ -114,14 +125,17 @@ public class VersionedInputDocumentResource {
 						    		@PathVariable String tableName, 
 						    		@PathVariable int tenantId, 
 						    		@RequestBody String payload) {
-
-        log.info("Solr documents add");
+    	listOfParameters = new ArrayList<Object>();
+        listOfParameters.add(tenantId);
+        listOfParameters.add(tableName);
+        listOfParameters.add(payload);
+        
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new BadRequestOccurredException(400, "Provide valid Json Input");
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.printlogger(loggersDTO,true,false);
+		String timestamp = loggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp, listOfParameters);
+		loggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         
@@ -148,10 +162,10 @@ public class VersionedInputDocumentResource {
         successMethod(nameofCurrMethod, loggersDTO);
         
         if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.printlogger(loggersDTO, false, false);
+        	loggerUtils.printlogger(loggersDTO, false, false);
             return documentInjectionThrottlerResponse;
         }else{
-        	LoggerUtils.printlogger(loggersDTO, false, true);
+        	loggerUtils.printlogger(loggersDTO, false, true);
         	throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
         }
     }

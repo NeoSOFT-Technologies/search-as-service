@@ -32,10 +32,10 @@ public class TableSchemaParser {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
 		for(SchemaField fieldDto: tableSchemaDTO.getColumns()) {
-			logger.info("Validate SolrFieldDTO before parsing it");
+			
 			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
-				logger.info("{} field couldn't be validated", fieldDto);
+				
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
 				return schemaFieldsListOfMap;
@@ -59,7 +59,7 @@ public class TableSchemaParser {
 	
 	
 	public static boolean validateSchemaField(SchemaField solrFieldDTO) {
-		logger.info("Validate schema field: {}", solrFieldDTO);
+		
 		
 		solrFieldDTO.setDefault_(DEFAULT);
 		
@@ -86,7 +86,7 @@ public class TableSchemaParser {
 	
 	
 	public static boolean validateSchemaFieldBooleanAttributes(SchemaField solrFieldDTO) {
-		logger.info("Validate schema field boolean attributes: {}", solrFieldDTO);
+		
 		
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
@@ -133,8 +133,7 @@ public class TableSchemaParser {
 	
 	public static void setFieldsAsPerTheSchema(SchemaField solrFieldDTO, Map<String, Object> schemaField) {
 		
-		// testing
-		logger.info("current schema Field @@@@@@ {}", schemaField);
+		
 		
 		if(schemaField.containsKey(INDEXED))
 			solrFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
