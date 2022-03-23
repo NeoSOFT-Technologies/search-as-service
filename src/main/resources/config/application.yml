@@ -13,7 +13,8 @@ keycloak:
   credentials: 
     secret: EM2zUo5CTPiaTGRjEXzfuSc21tuin2qo
   resource: saas-ingress-microservice
-  auth-server-url: http://host.docker.internal:8080/auth
+  auth-server-url: http://localhost:8080/auth
+  #auth-server-url: http://host.docker.internal:8080/auth  #to run keycloak server via docker: temporary
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
