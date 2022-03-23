@@ -159,7 +159,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String timestamp=LoggerUtils.utcTime().toString();
         loggersDTO.setTimestamp(timestamp);
         LoggerUtils.printlogger(loggersDTO,false,false);
-		return new GetCapacityPlan(capacityPlans);
+		return new GetCapacityPlan(200,"Successfully retrieved all Capacity Plans",capacityPlans);
 	}
 
 	
