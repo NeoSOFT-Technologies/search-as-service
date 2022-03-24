@@ -4,7 +4,7 @@
 minikube start --driver=hyperv --memory=4gb
 
 3. Run any cluster configuration using ->
-kubectl apply -f kompose-1-solr-node-scaled-to-n-nodes-3-zk
+kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
 
 4. Check out the created resources using ->
 kubectl get deployments
@@ -15,7 +15,7 @@ kubectl get services
 minikube service --url solr-node-container
 
 6. Delete the applied cluster configuration using ->
-kubectl delete -f kompose-1-solr-node-scaled-to-n-nodes-3-zk
+kubectl delete -f 1-solr-node-scaled-to-n-nodes-3-zk
 
 7. Delete the cluster using ->
 minikube delete
