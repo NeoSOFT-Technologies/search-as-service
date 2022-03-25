@@ -24,7 +24,6 @@ public class TableSchemaParser {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
-	private static final String DEFAULT = "default";
 	private static final String PARTIAL_SEARCH = "partial_search";
 	
 	
@@ -60,8 +59,6 @@ public class TableSchemaParser {
 	
 	public static boolean validateSchemaField(SchemaField searchFieldDTO) {
 		logger.info("Validate schema field: {}", searchFieldDTO);
-		
-		searchFieldDTO.setDefault_(DEFAULT);
 		
 		boolean fieldValidated = true;
 		String fieldName = searchFieldDTO.getName();
@@ -124,7 +121,6 @@ public class TableSchemaParser {
 	public static void setFieldsToDefaults(SchemaField searchFieldDTO) {
 		searchFieldDTO.setFilterable(false);
 		searchFieldDTO.setMultiValue(false);
-		searchFieldDTO.setDefault_("mydefault");
 		searchFieldDTO.setRequired(false);
 		searchFieldDTO.setSortable(false);
 		searchFieldDTO.setStorable(true);
@@ -140,8 +136,6 @@ public class TableSchemaParser {
 			searchFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))
 			searchFieldDTO.setMultiValue((boolean)schemaField.get(MULTIVALUED));
-		if(schemaField.containsKey(DEFAULT))
-			searchFieldDTO.setDefault_((String)schemaField.get(DEFAULT));
 		if(schemaField.containsKey(REQUIRED))
 			searchFieldDTO.setRequired((boolean)schemaField.get(REQUIRED));
 		if(schemaField.containsKey(DOCVALUES))

@@ -191,7 +191,6 @@ public class ManageTableService implements ManageTableServicePort {
 				    .collect(Collectors.toList());
 			
 			getListItemsResponseDTO.setData(data);
-			getListItemsResponseDTO.setName(nameofCurrMethod);
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
 			

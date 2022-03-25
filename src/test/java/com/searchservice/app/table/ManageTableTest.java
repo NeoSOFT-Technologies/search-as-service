@@ -39,7 +39,7 @@ class ManageTableTest {
     private int tenantId = 101;
 
 	String schemaName = "default-config";
-	SchemaField search = new SchemaField("testField6","string", "mydefault", true, true, false, true, true, false);
+	SchemaField search = new SchemaField("testField6","string", true, true, false, true, true, false);
 	//SchemaFieldDTO[] attributes = { search };
 	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(search));
 	String expectedGetResponse = "{\n"
