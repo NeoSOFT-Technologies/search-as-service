@@ -1,4 +1,4 @@
-docker-container-data/*
+docker/docker-container-data/*
 
 # Eclipse Files
 .settings/

@@ -18,7 +18,7 @@ spring:
       fail-on-unknown-properties: true
 
 server:
-  port: 8080
+  port: 8081
   
   
 #================================================================
@@ -172,11 +172,11 @@ schema-delete-record:
 #=================================================================
 # Keycloak Server Configurations
 keycloak:
-  realm: demo_realm
+  realm: ${KEYCLOAK_REALM_NAME:Demo_Realm}
   credentials: 
-    secret: zf8GS1Lc2lCzIUULNIwyateNNFJrCxcj
-  resource: Ingress_Microservice
-  auth-server-url: http://localhost:8080/auth
+    secret: ${KEYCLOAK_CLIENT_SECRET:EM2zUo5CTPiaTGRjEXzfuSc21tuin2qo}
+  resource: ${KEYCLOAK_CLIENT_NAME:saas-ingress-microservice}
+  auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true

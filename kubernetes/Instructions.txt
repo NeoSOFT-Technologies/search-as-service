@@ -1,8 +1,23 @@
-minikube start --driver=hyperv
+1. Install Minikube, Kubernetes on the host machine
 
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+2. Create a cluster using ->
+minikube start --driver=hyperv --memory=4gb
 
-minikube service --url search-service-ingress-service
+3. Run any cluster configuration using ->
+kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
 
-kubectl delete -f deployment.yaml -f service.yaml
+4. Check out the created resources using ->
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+5. Expose the service to access the pod from the host machine using->
+minikube service --url solr-node-container
+
+6. Delete the applied cluster configuration using ->
+kubectl delete -f 1-solr-node-scaled-to-n-nodes-3-zk
+
+7. Delete the cluster using ->
+minikube delete
+
+
