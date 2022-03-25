@@ -928,7 +928,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
-
+			logger.error(e.toString());
 		}
 		return false;
 	}

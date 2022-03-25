@@ -54,7 +54,7 @@ public class SolrJAdapter {
 	public java.util.List<String> getCollectionAdminRequestList(int clientId) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
-		java.util.List<String> data = new ArrayList<String>();
+		java.util.List<String> data = new ArrayList<>();
 		try {
 			CollectionAdminResponse response = request.process(searchClientActive);
 
@@ -106,7 +106,7 @@ public class SolrJAdapter {
 	}
 
 	public java.util.List<String> getConfigSetFromSolrj() {
-		java.util.List<String> data = new ArrayList<String>();
+		java.util.List<String> data = new ArrayList<>();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
 		try {
@@ -122,7 +122,7 @@ public class SolrJAdapter {
 	}
 
 	public java.util.List<String> getAllTablesList() {
-		java.util.List<String> allTables = new ArrayList<String>();
+		java.util.List<String> allTables = new ArrayList<>();
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		try {
@@ -140,7 +140,7 @@ public class SolrJAdapter {
 	public java.util.List<Map<String, Object>> getSchemaFields(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
-		java.util.List<Map<String, Object>> schemaFields = new ArrayList<Map<String, Object>>();
+		java.util.List<Map<String, Object>> schemaFields = new ArrayList<>();
 		try {
 			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
 			schemaFields = schemaResponse.getSchemaRepresentation().getFields();
@@ -198,7 +198,7 @@ public class SolrJAdapter {
 				newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
 		schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-		List<Map<String, Object>> schemaFields = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> schemaFields = new ArrayList<>();
 
 		SchemaResponse schemaResponse;
 		try {
