@@ -21,9 +21,9 @@ services:
     environment:
       - SOLR_CONTAINER_NAME=solr1-container
       - KEYCLOAK_CONTAINER_NAME=keycloak-container
-      - KEYCLOAK_REALM_NAME=
-      - KEYCLOAK_CLIENT_NAME=
-      - KEYCLOAK_CLIENT_SECRET=
+      - KEYCLOAK_REALM_NAME=docker_realm
+      - KEYCLOAK_CLIENT_NAME=saas-ingress-microservice
+      - KEYCLOAK_CLIENT_SECRET=TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
     networks:
       - saas-network
     depends_on:
@@ -36,6 +36,10 @@ services:
       - "8082:8082"
     environment:
       - SOLR_CONTAINER_NAME=solr1-container
+      - KEYCLOAK_CONTAINER_NAME=keycloak-container
+      - KEYCLOAK_REALM_NAME=docker_realm
+      - KEYCLOAK_CLIENT_NAME=saas-ingress-microservice
+      - KEYCLOAK_CLIENT_SECRET=TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
     networks:
       - saas-network
     depends_on:

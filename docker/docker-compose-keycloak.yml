@@ -15,6 +15,8 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: password
+    networks:
+      - saas-network
 
   keycloak-container:
     image: quay.io/keycloak/keycloak:legacy
@@ -30,7 +32,12 @@ services:
       KEYCLOAK_PASSWORD: admin
       # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
       #JDBC_PARAMS: "ssl=true"
+    networks:
+      - saas-network
     ports:
       - 8080:8080
     depends_on:
       - postgres-keycloak-container
+
+networks:
+  saas-network:
