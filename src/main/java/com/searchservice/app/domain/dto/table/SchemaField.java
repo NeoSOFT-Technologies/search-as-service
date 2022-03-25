@@ -1,12 +1,9 @@
 package com.searchservice.app.domain.dto.table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidColumnOccurredException;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +19,6 @@ public class SchemaField implements VersionedObjectMapper {
 
 	String name;
 	String type;
-	@JsonIgnore
-	String default_;
 	boolean isRequired;
 	boolean isFilterable;
 	boolean isStorable;
@@ -54,7 +49,6 @@ public class SchemaField implements VersionedObjectMapper {
 
 
 	public void setStorable(Object value) {
-		//this.isStorable = isStorable;
 		if (value instanceof Boolean) {
             this.isStorable = (Boolean) value;
         }else {
@@ -64,7 +58,6 @@ public class SchemaField implements VersionedObjectMapper {
 
 
 	public void setMultiValue(Object value) {
-		//this.isMultiValue = isMultiValue;
 		if (value instanceof Boolean) {
             this.isMultiValue = (Boolean) value;
         }else {
@@ -74,7 +67,6 @@ public class SchemaField implements VersionedObjectMapper {
 
 
 	public void setSortable(Object value) {
-		//this.isSortable = isSortable;
 		if (value instanceof Boolean) {
             this.isSortable = (Boolean) value;
         }else {

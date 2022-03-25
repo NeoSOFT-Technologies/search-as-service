@@ -1,6 +1,5 @@
 # A docker-compose.yml to start a simple cluster with three ZooKeeper nodes and three Solr nodes.
 # Also it starts 2 Microservices, ingress & egress
-#
 # mkdir mycluster
 # cd mycluster
 # docker-compose up
