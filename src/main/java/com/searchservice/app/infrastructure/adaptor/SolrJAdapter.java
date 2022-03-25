@@ -60,7 +60,7 @@ public class SolrJAdapter {
 
 			data.addAll(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), clientId));
 
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -78,7 +78,7 @@ public class SolrJAdapter {
 			response = clusterStatus.process(searchClientActive);
 			finalResponseMap = ManageTableUtil
 					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -96,7 +96,7 @@ public class SolrJAdapter {
 			deleteAliasRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			request.process(searchClientActive);
 			deleteAliasRequest.process(searchClientActive);
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			logger.error("Exception occurred: ", e);
 			return false;
 		} finally {
@@ -113,8 +113,8 @@ public class SolrJAdapter {
 			ConfigSetAdminResponse configSetResponse = configSetRequest.process(searchClientActive);
 			NamedList<Object> configResponseObjects = configSetResponse.getResponse();
 			data = TypeCastingUtil.castToListOfStrings(configResponseObjects.get("configSets"));
-		} catch (Exception e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -128,7 +128,7 @@ public class SolrJAdapter {
 		try {
 			CollectionAdminResponse response = request.process(searchClientActive);
 			allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -146,8 +146,8 @@ public class SolrJAdapter {
 			schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 		}
 
-		catch (Exception e) {
-
+		catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -165,11 +165,8 @@ public class SolrJAdapter {
 
 		try {
 			configSetRequest.process(searchClientActive);
-		} catch (SolrServerException e) {
-
-			return false;
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
 			return false;
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -186,11 +183,8 @@ public class SolrJAdapter {
 		request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 		try {
 			request.process(searchClientActive);
-		} catch (SolrServerException e) {
-
-			return false;
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
 			return false;
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -211,10 +205,8 @@ public class SolrJAdapter {
 			schemaResponse = schemaRequest.process(searchClientActive);
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaFields = retrievedSchema.getFields();
-		} catch (SolrServerException e) {
-
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -229,10 +221,10 @@ public class SolrJAdapter {
 		SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
 		try {
 			addFieldTypeRequest.process(searchClientActive);
-		} catch (SolrServerException e) {
-
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 	}
 
@@ -244,10 +236,10 @@ public class SolrJAdapter {
 			addFieldResponse = addFieldRequest.process(searchClientActive);
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			schemaResponseAddFields.add(fildName, addFieldResponse.getResponse());
-		} catch (SolrServerException e) {
-
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 	}
 
@@ -258,15 +250,17 @@ public class SolrJAdapter {
 				newTableSchemaDTO.getTableName());
 		schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 		SchemaResponse schemaResponse = null;
+		List<Map<String, Object>> schemaFields = null;
 		try {
 			schemaResponse = schemaRequest.process(searchClientActive);
+			schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 
-		} catch (SolrServerException e) {
-
-		} catch (IOException e) {
-
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.toString());
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
-		List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
+
 		return schemaFields;
 	}
 
@@ -311,7 +305,7 @@ public class SolrJAdapter {
 			request.process(searchClientActive);
 			apiResponseDTO.setStatusCode(200);
 
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			apiResponseDTO.setStatusCode(400);
 			logger.error(e.toString());
 		} finally {
@@ -330,7 +324,7 @@ public class SolrJAdapter {
 		try {
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.process(searchClientActive);
-		} catch (Exception e) {
+		} catch (SolrServerException | IOException e) {
 			logger.error("Error occured while deleting Config set. Exception: ", e);
 			return false;
 		} finally {
@@ -338,33 +332,35 @@ public class SolrJAdapter {
 		}
 		return true;
 	}
-public int performSchemaDeletion(String columnName, String tableName) {
-	HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-	UpdateResponse deleteFieldResponse;
-	int status =400;
-	SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
-	try {
-	 deleteFieldResponse = deleteFieldRequest.process(searchClientActive);
-	 status = deleteFieldResponse.getStatus();
-	}catch(Exception e) {
-		logger.error("Exception Occured While Performing Deletion for Schema {} " + columnName, e);
+
+	public int performSchemaDeletion(String columnName, String tableName) {
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+		UpdateResponse deleteFieldResponse;
+		int status = 400;
+		SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
+		try {
+			deleteFieldResponse = deleteFieldRequest.process(searchClientActive);
+			status = deleteFieldResponse.getStatus();
+		} catch (SolrServerException | IOException e) {
+			logger.error("Exception Occured While Performing Deletion for Schema {} " + columnName, e);
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
+		}
+		return status;
 	}
-	return status;
-}
-public List<FieldTypeDefinition> isPartialSearchFieldInSolrj(String tableName){
-	HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-	SchemaRequest schemaRequest = new SchemaRequest();
-	List<FieldTypeDefinition> fieldTypes = null ;
-	try {
-	SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
-	 fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+
+	public List<FieldTypeDefinition> isPartialSearchFieldInSolrj(String tableName) {
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+		List<FieldTypeDefinition> fieldTypes = null;
+		try {
+			SchemaResponse schemaResponse = schemaRequest.process(searchClientActive);
+			fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+		} catch (SolrServerException | IOException e) {
+			logger.debug("Schema Field Types couldn't be retrieved");
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
+		}
+		return fieldTypes;
 	}
-	catch (Exception e) {
-		logger.debug("Schema Field Types couldn't be retrieved");
-	}
-	finally {
-		SearchUtil.closeSearchClientConnection(searchClientActive);
-	}
-	return fieldTypes;
-}
 }

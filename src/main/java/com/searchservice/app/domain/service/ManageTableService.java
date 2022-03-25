@@ -158,8 +158,6 @@ public class ManageTableService implements ManageTableServicePort {
 		requestMethod(loggersDTO, nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 
-		// CollectionAdminRequest.List
-
 		Response getListItemsResponseDTO = new Response();
 		java.util.List<String> data = solrjAdapter.getCollectionAdminRequestList(clientId);
 
@@ -197,7 +195,6 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchema);
 		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream()
 				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
-		// tes
 		logger.info("returning resp from getCurrSchema ######");
 
 		return schemaResponse;
@@ -312,7 +309,8 @@ public class ManageTableService implements ManageTableServicePort {
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 
-		if (solrjAdapter.deleteTableFromSolrj(tableName)) {
+		boolean response = solrjAdapter.deleteTableFromSolrj(tableName);
+		if (response) {
 
 			apiResponseDTO.setStatusCode(200);
 			LoggerUtils.printlogger(loggersDTO, false, false);
@@ -485,7 +483,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Response apiResponseDTO = new Response();
 
-		if (solrjAdapter.createConfigSetInSolrj(configSetDTO)) {
+		boolean response = solrjAdapter.createConfigSetInSolrj(configSetDTO);
+		if (response) {
 
 			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} else {
@@ -516,7 +515,8 @@ public class ManageTableService implements ManageTableServicePort {
 					HttpStatusCode.INVALID_SKU_NAME.getMessage() + " : " + manageTableDTO.getSku());
 		}
 
-		if (solrjAdapter.createTableInSolrj(manageTableDTO, selectedCapacityPlan)) {
+		boolean response = solrjAdapter.createTableInSolrj(manageTableDTO, selectedCapacityPlan);
+		if (response) {
 
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
@@ -533,23 +533,17 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Response tableSchemaResponseDTO = new Response();
 
-		// String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
-			// logic
 
-			// schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = solrjAdapter.addSchemaAttributesInSolrj(newTableSchemaDTO);
 
-			// Add new fields present in the Target Schema to the given collection/table
-			// schema
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
 			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
 			// ####### Add Schema Fields logic #######
-//			UpdateResponse addFieldResponse;
-//			NamedList<Object> schemaResponseAddFields = new NamedList<>();
+
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
 
@@ -591,7 +585,7 @@ public class ManageTableService implements ManageTableServicePort {
 				for (Map.Entry<String, SchemaField> fieldDtoEntry : newAttributesHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
 					if (!TableSchemaParser.validateSchemaField(fieldDto)) {
-						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}");
+
 						tableSchemaResponseDTO.setStatusCode(400);
 						break;
 					}
@@ -708,7 +702,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response addAliasTable(String tableOriginalName, String tableAlias) {
 
-		Response apiResponseDTO = new Response();
+		Response apiResponseDTO;
 
 		apiResponseDTO = solrjAdapter.addAliasTableInSolrj(tableOriginalName, tableAlias);
 		if (apiResponseDTO.getStatusCode() == 200) {
@@ -724,8 +718,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response deleteConfigSet(String configSetName) {
 
 		Response apiResponseDTO = new Response();
-
-		if (solrjAdapter.deleteConfigSetFromSolrj(configSetName)) {
+		boolean response = solrjAdapter.deleteConfigSetFromSolrj(configSetName);
+		if (response) {
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
 		} else {
 			apiResponseDTO.setMessage("ConfigSet could not be deleted");
