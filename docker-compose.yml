@@ -1,3 +1,5 @@
+# Start the docker-compose-keycloak.yml first before starting this docker-compose.yml
+#
 # A docker-compose.yml to start a simple cluster with three ZooKeeper nodes and three Solr nodes.
 # Also it starts 2 Microservices, ingress & egress
 #
@@ -6,6 +8,7 @@
 # docker-compose up
 
 version: '3.7'
+
 services:
 
   search-service-ingress:
@@ -17,6 +20,10 @@ services:
       - ./docker-container-data/DeletedRecordFiles:/usr/app/DeletedRecordFiles
     environment:
       - SOLR_CONTAINER_NAME=solr1-container
+      - KEYCLOAK_CONTAINER_NAME=keycloak-container
+      - KEYCLOAK_REALM_NAME=
+      - KEYCLOAK_CLIENT_NAME=
+      - KEYCLOAK_CLIENT_SECRET=
     networks:
       - saas-network
     depends_on:
