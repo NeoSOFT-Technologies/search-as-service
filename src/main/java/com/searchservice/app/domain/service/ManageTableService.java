@@ -24,6 +24,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
+import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.common.SolrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.TableSchemaParser;
+import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SolrJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -157,9 +159,11 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO, true, false);
-
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-		java.util.List<String> data = solrjAdapter.getCollectionAdminRequestList(clientId);
+		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(clientId,searchClientActive);
+		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), clientId);
+				
 
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + clientId)[0]).collect(Collectors.toList());
@@ -234,7 +238,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		try {
 
-			finalResponseMap = solrjAdapter.getTableFetailsFromSolrjCluster(tableName);
+			finalResponseMap = solrjAdapter.getTableDetailsFromSolrjCluster(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
 			finalResponseMap.put("Error", "Error connecting to cluster.");

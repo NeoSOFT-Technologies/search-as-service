@@ -51,25 +51,23 @@ public class SolrJAdapter {
 	@Value("${basic-auth.password}")
 	private String basicAuthPassword;
 
-	public java.util.List<String> getCollectionAdminRequestList(int clientId) {
+	public CollectionAdminResponse getCollectionAdminRequestList(int clientId, HttpSolrClient searchClientActive) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
-		java.util.List<String> data = new ArrayList<>();
-		try {
-			CollectionAdminResponse response = request.process(searchClientActive);
+		CollectionAdminResponse response = null;
 
-			data.addAll(TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), clientId));
+		try {
+			response = request.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
 			logger.error(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
-		return data;
+		return response;
 
 	}
 
-	public Map<Object, Object> getTableFetailsFromSolrjCluster(String tableName) {
+	public Map<Object, Object> getTableDetailsFromSolrjCluster(String tableName) {
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
