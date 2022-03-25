@@ -1,0 +1,45 @@
+2022-03-17 08:10:48.874 INFO  (main) [   ] o.e.j.u.log Logging initialized @14545ms to org.eclipse.jetty.util.log.Slf4jLog
+2022-03-17 08:10:52.376 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 11.0.14.1+1
+2022-03-17 08:10:52.442 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///opt/solr-8.11.1/server/contexts/] at interval 0
+2022-03-17 08:10:55.840 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2022-03-17 08:10:55.905 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2022-03-17 08:10:55.906 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2022-03-17 08:10:55.914 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 600000ms
+2022-03-17 08:10:56.614 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2022-03-17 08:10:56.725 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.11.1
+2022-03-17 08:10:56.726 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in cloud mode on port 8983
+2022-03-17 08:10:56.726 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /opt/solr
+2022-03-17 08:10:56.727 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2022-03-17T08:10:56.727048Z
+2022-03-17 08:10:56.945 INFO  (main) [   ] o.a.s.c.SolrPaths Using system property solr.solr.home: /var/solr/data
+2022-03-17 08:10:57.392 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-17 08:10:57.867 INFO  (zkConnectionManagerCallback-2-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-17 08:10:57.867 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-17 08:10:58.171 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Loading solr.xml from SolrHome (not found in ZooKeeper)
+2022-03-17 08:10:58.172 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/solr/data/solr.xml
+2022-03-17 08:10:58.909 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63, but no JMX reporters were configured - adding default JMX reporter.
+2022-03-17 08:11:03.615 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
+2022-03-17 08:11:05.568 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@3fbcfe81[provider=null,keyStore=null,trustStore=null]
+2022-03-17 08:11:05.569 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@3fbcfe81[provider=null,keyStore=null,trustStore=null]
+2022-03-17 08:11:08.040 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@45404d5[provider=null,keyStore=null,trustStore=null]
+2022-03-17 08:11:08.040 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@45404d5[provider=null,keyStore=null,trustStore=null]
+2022-03-17 08:11:08.358 INFO  (main) [   ] o.a.s.c.ZkContainer Zookeeper client=zoo1:2181,zoo2:2181,zoo3:2181
+2022-03-17 08:11:08.510 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-17 08:11:08.586 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-17 08:11:08.586 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-17 08:11:17.775 WARN  (main) [   ] o.a.s.c.ZkController Contents of zookeeper /security.json are world-readable; consider setting up ACLs as described in https://solr.apache.org/guide/zookeeper-access-control.html
+2022-03-17 08:11:18.258 INFO  (main) [   ] o.a.s.c.OverseerElectionContext I am going to be the leader 172.21.0.5:8983_solr
+2022-03-17 08:11:18.546 INFO  (main) [   ] o.a.s.c.Overseer Overseer (id=144115814198345730-172.21.0.5:8983_solr-n_0000000000) starting
+2022-03-17 08:11:19.034 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (0) -> (1)
+2022-03-17 08:11:19.671 INFO  (main) [   ] o.a.s.c.ZkController Publish node=172.21.0.5:8983_solr as DOWN
+2022-03-17 08:11:19.692 INFO  (OverseerStateUpdate-144115814198345730-172.21.0.5:8983_solr-n_0000000000) [   ] o.a.s.c.Overseer Starting to work on the main queue : 172.21.0.5:8983_solr
+2022-03-17 08:11:20.174 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient core cache for max 2147483647 cores with initial capacity of 1024
+2022-03-17 08:11:20.233 INFO  (main) [   ] o.a.s.c.ZkController Register node as live in ZooKeeper:/live_nodes/172.21.0.5:8983_solr
+2022-03-17 08:11:20.425 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (1) -> (2)
+2022-03-17 08:11:21.096 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (2) -> (3)
+2022-03-17 08:11:21.126 INFO  (main) [   ] o.a.s.p.PackageLoader /packages.json updated to version -1
+2022-03-17 08:11:21.322 WARN  (main) [   ] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2022-03-17 08:11:24.126 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2022-03-17 08:11:25.150 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-17 08:11:25.156 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-17 08:11:25.160 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-17 08:11:25.877 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 0 core definitions underneath /var/solr/data

@@ -1,0 +1,76 @@
+2022-03-22 11:02:05.618 INFO  (main) [   ] o.e.j.u.log Logging initialized @20791ms to org.eclipse.jetty.util.log.Slf4jLog
+2022-03-22 11:02:10.968 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 11.0.14.1+1
+2022-03-22 11:02:11.087 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///opt/solr-8.11.1/server/contexts/] at interval 0
+2022-03-22 11:02:17.448 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2022-03-22 11:02:17.641 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2022-03-22 11:02:17.642 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2022-03-22 11:02:17.681 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 600000ms
+2022-03-22 11:02:18.565 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2022-03-22 11:02:18.605 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.11.1
+2022-03-22 11:02:18.607 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in cloud mode on port 8983
+2022-03-22 11:02:18.607 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /opt/solr
+2022-03-22 11:02:18.607 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2022-03-22T11:02:18.607852Z
+2022-03-22 11:02:19.144 INFO  (main) [   ] o.a.s.c.SolrPaths Using system property solr.solr.home: /var/solr/data
+2022-03-22 11:02:20.151 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 11:02:20.898 INFO  (zkConnectionManagerCallback-2-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 11:02:20.900 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 11:02:21.533 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Loading solr.xml from SolrHome (not found in ZooKeeper)
+2022-03-22 11:02:21.533 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/solr/data/solr.xml
+2022-03-22 11:02:22.253 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63, but no JMX reporters were configured - adding default JMX reporter.
+2022-03-22 11:02:29.883 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
+2022-03-22 11:02:31.687 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@51d9b06c[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:31.688 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@51d9b06c[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:35.660 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@6ecdbab8[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:35.660 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@6ecdbab8[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:36.256 INFO  (main) [   ] o.a.s.c.ZkContainer Zookeeper client=zoo1:2181,zoo2:2181,zoo3:2181
+2022-03-22 11:02:36.382 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 11:02:37.292 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 11:02:37.293 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 11:02:38.181 WARN  (main) [   ] o.a.s.c.ZkController Contents of zookeeper /security.json are world-readable; consider setting up ACLs as described in https://solr.apache.org/guide/zookeeper-access-control.html
+2022-03-22 11:02:39.088 INFO  (main) [   ] o.a.s.c.OverseerElectionContext I am going to be the leader 172.25.0.7:8983_solr
+2022-03-22 11:02:39.288 INFO  (main) [   ] o.a.s.c.Overseer Overseer (id=216179081736749056-172.25.0.7:8983_solr-n_0000000003) starting
+2022-03-22 11:02:39.930 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (0) -> (1)
+2022-03-22 11:02:40.708 INFO  (main) [   ] o.a.s.c.ZkController Publish node=172.25.0.7:8983_solr as DOWN
+2022-03-22 11:02:40.814 INFO  (OverseerStateUpdate-216179081736749056-172.25.0.7:8983_solr-n_0000000003) [   ] o.a.s.c.Overseer Starting to work on the main queue : 172.25.0.7:8983_solr
+2022-03-22 11:02:41.056 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient core cache for max 2147483647 cores with initial capacity of 1024
+2022-03-22 11:02:41.434 INFO  (main) [   ] o.a.s.c.ZkController Register node as live in ZooKeeper:/live_nodes/172.25.0.7:8983_solr
+2022-03-22 11:02:41.719 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (1) -> (2)
+2022-03-22 11:02:42.281 INFO  (main) [   ] o.a.s.p.PackageLoader /packages.json updated to version -1
+2022-03-22 11:02:42.574 WARN  (main) [   ] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2022-03-22 11:02:43.494 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (2) -> (3)
+2022-03-22 11:02:46.142 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2022-03-22 11:02:47.245 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:47.246 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:47.272 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:48.044 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 0 core definitions underneath /var/solr/data
+2022-03-22 11:02:49.345 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@b40bb6e{/solr,file:///opt/solr-8.11.1/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr-8.11.1/server/solr-webapp/webapp}
+2022-03-22 11:02:49.508 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@3f390d63{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 11:02:49.508 INFO  (main) [   ] o.e.j.s.Server Started @64688ms
+2022-03-22 11:19:35.184 WARN  (main-SendThread(zoo3:2181)) [   ] o.a.z.ClientCnxn Session 0x30005babeca0000 for sever zoo3/172.25.0.2:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException. => EndOfStreamException: Unable to read additional data from server sessionid 0x30005babeca0000, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77)
+org.apache.zookeeper.ClientCnxn$EndOfStreamException: Unable to read additional data from server sessionid 0x30005babeca0000, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77) ~[?:?]
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350) ~[?:?]
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1275) ~[?:?]
+2022-03-22 11:19:35.601 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager Watcher org.apache.solr.common.cloud.ConnectionManager@71cf2bc7 name: ZooKeeperConnection Watcher:zoo1:2181,zoo2:2181,zoo3:2181 got event WatchedEvent state:Disconnected type:None path:null path: null type: None
+2022-03-22 11:19:35.634 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has disconnected
+2022-03-22 11:19:36.277 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 12:10:48.772 INFO  (JettyShutdownThread) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@3f390d63{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 12:10:48.790 INFO  (JettyShutdownThread) [   ] o.e.j.s.session node0 Stopped scavenging
+2022-03-22 12:10:48.986 INFO  (JettyShutdownThread) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=2008666311
+2022-03-22 12:10:48.995 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Remove node as live in ZooKeeper:/live_nodes/172.25.0.7:8983_solr
+2022-03-22 12:10:49.751 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish this node as DOWN...
+2022-03-22 12:10:49.751 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish node=172.25.0.7:8983_solr as DOWN
+2022-03-22 12:10:51.060 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
+2022-03-22 12:10:51.072 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@16736040: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node/com.codahale.metrics.MetricRegistry@73d2f13f
+2022-03-22 12:10:51.274 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
+2022-03-22 12:10:51.275 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@4997552e: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm/com.codahale.metrics.MetricRegistry@4271c63d
+2022-03-22 12:10:51.290 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
+2022-03-22 12:10:51.300 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@7bcecef6: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty/com.codahale.metrics.MetricRegistry@33fbf721
+2022-03-22 12:10:51.311 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.cluster tag=null
+2022-03-22 12:10:51.392 INFO  (closeThreadPool-29-thread-2) [   ] o.a.s.c.Overseer Overseer (id=216179081736749056-172.25.0.7:8983_solr-n_0000000003) closing
+2022-03-22 12:10:51.398 INFO  (OverseerStateUpdate-216179081736749056-172.25.0.7:8983_solr-n_0000000003) [   ] o.a.s.c.Overseer Overseer Loop exiting : 172.25.0.7:8983_solr
+2022-03-22 12:10:51.495 INFO  (OverseerAutoScalingTriggerThread-216179081736749056-172.25.0.7:8983_solr-n_0000000003) [   ] o.a.s.c.a.OverseerTriggerThread OverseerTriggerThread woken up but we are closed, exiting.
+2022-03-22 12:10:51.663 INFO  (closeThreadPool-29-thread-1) [   ] o.a.s.c.Overseer Overseer (id=216179081736749056-172.25.0.7:8983_solr-n_0000000003) closing
+2022-03-22 12:10:51.836 INFO  (JettyShutdownThread) [   ] o.a.s.c.Overseer Overseer (id=216179081736749056-172.25.0.7:8983_solr-n_0000000003) closing
+2022-03-22 12:10:52.111 INFO  (JettyShutdownThread) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@b40bb6e{/solr,null,STOPPED}{/opt/solr-8.11.1/server/solr-webapp/webapp}

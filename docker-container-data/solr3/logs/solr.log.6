@@ -1,0 +1,140 @@
+2022-03-22 11:02:05.647 INFO  (main) [   ] o.e.j.u.log Logging initialized @20767ms to org.eclipse.jetty.util.log.Slf4jLog
+2022-03-22 11:02:10.901 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 11.0.14.1+1
+2022-03-22 11:02:11.038 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///opt/solr-8.11.1/server/contexts/] at interval 0
+2022-03-22 11:02:17.596 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2022-03-22 11:02:17.733 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2022-03-22 11:02:17.734 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2022-03-22 11:02:17.819 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 600000ms
+2022-03-22 11:02:18.557 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2022-03-22 11:02:18.602 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.11.1
+2022-03-22 11:02:18.609 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in cloud mode on port 8983
+2022-03-22 11:02:18.609 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /opt/solr
+2022-03-22 11:02:18.609 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2022-03-22T11:02:18.609776Z
+2022-03-22 11:02:19.095 INFO  (main) [   ] o.a.s.c.SolrPaths Using system property solr.solr.home: /var/solr/data
+2022-03-22 11:02:19.948 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 11:02:20.938 INFO  (zkConnectionManagerCallback-2-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 11:02:20.942 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 11:02:21.510 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Loading solr.xml from SolrHome (not found in ZooKeeper)
+2022-03-22 11:02:21.510 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/solr/data/solr.xml
+2022-03-22 11:02:22.381 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63, but no JMX reporters were configured - adding default JMX reporter.
+2022-03-22 11:02:33.419 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
+2022-03-22 11:02:36.680 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@3fbcfe81[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:36.711 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@3fbcfe81[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:40.032 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@45404d5[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:40.033 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@45404d5[provider=null,keyStore=null,trustStore=null]
+2022-03-22 11:02:40.715 INFO  (main) [   ] o.a.s.c.ZkContainer Zookeeper client=zoo1:2181,zoo2:2181,zoo3:2181
+2022-03-22 11:02:40.884 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 11:02:41.108 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 11:02:41.112 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 11:02:41.782 WARN  (main) [   ] o.a.s.c.ZkController Contents of zookeeper /security.json are world-readable; consider setting up ACLs as described in https://solr.apache.org/guide/zookeeper-access-control.html
+2022-03-22 11:02:42.180 INFO  (main) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (0) -> (2)
+2022-03-22 11:02:43.096 INFO  (main) [   ] o.a.s.c.ZkController Publish node=172.25.0.5:8983_solr as DOWN
+2022-03-22 11:02:43.246 INFO  (main) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient core cache for max 2147483647 cores with initial capacity of 1024
+2022-03-22 11:02:43.293 INFO  (main) [   ] o.a.s.c.ZkController Register node as live in ZooKeeper:/live_nodes/172.25.0.5:8983_solr
+2022-03-22 11:02:43.493 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (2) -> (3)
+2022-03-22 11:02:43.902 INFO  (main) [   ] o.a.s.p.PackageLoader /packages.json updated to version -1
+2022-03-22 11:02:44.152 WARN  (main) [   ] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2022-03-22 11:02:47.622 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2022-03-22 11:02:48.827 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:48.864 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:48.892 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 11:02:49.605 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 3 core definitions underneath /var/solr/data
+2022-03-22 11:02:49.607 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [tableJmtest3_911_shard1_replica_n1, tableJmtest4_202_shard1_replica_n1, tableJmtest4_911_shard1_replica_n1]
+2022-03-22 11:02:49.822 INFO  (coreLoadExecutor-21-thread-3-processing-n:172.25.0.5:8983_solr) [c:tableJmtest4_911 s:shard1 r:core_node2 x:tableJmtest4_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/tableJmtest4_911/state.json is deleted, stop watching children
+2022-03-22 11:02:49.844 INFO  (coreLoadExecutor-21-thread-2-processing-n:172.25.0.5:8983_solr) [c:tableJmtest4_202 s:shard1 r:core_node2 x:tableJmtest4_202_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/tableJmtest4_202/state.json is deleted, stop watching children
+2022-03-22 11:02:49.844 INFO  (coreLoadExecutor-21-thread-1-processing-n:172.25.0.5:8983_solr) [c:tableJmtest3_911 s:shard1 r:core_node2 x:tableJmtest3_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/tableJmtest3_911/state.json is deleted, stop watching children
+2022-03-22 11:02:50.548 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@5049d8b2{/solr,file:///opt/solr-8.11.1/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr-8.11.1/server/solr-webapp/webapp}
+2022-03-22 11:02:50.638 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@5a411614{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 11:02:50.639 INFO  (main) [   ] o.e.j.s.Server Started @65806ms
+2022-03-22 11:03:00.601 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 11:03:00.976 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 11:03:00.976 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 11:19:33.550 WARN  (main-SendThread(zoo2:2181)) [   ] o.a.z.ClientCnxn Session 0x20005babeb10001 for sever zoo2/172.25.0.4:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException. => EndOfStreamException: Unable to read additional data from server sessionid 0x20005babeb10001, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77)
+org.apache.zookeeper.ClientCnxn$EndOfStreamException: Unable to read additional data from server sessionid 0x20005babeb10001, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77) ~[?:?]
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350) ~[?:?]
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1275) ~[?:?]
+2022-03-22 11:19:33.718 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager Watcher org.apache.solr.common.cloud.ConnectionManager@1a6cdc7 name: ZooKeeperConnection Watcher:zoo1:2181,zoo2:2181,zoo3:2181 got event WatchedEvent state:Disconnected type:None path:null path: null type: None
+2022-03-22 11:19:33.720 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has disconnected
+2022-03-22 11:19:34.760 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 11:19:35.086 WARN  (main-SendThread(zoo3:2181)) [   ] o.a.z.ClientCnxn Session 0x20005babeb10001 for sever zoo3/172.25.0.2:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException. => EndOfStreamException: Unable to read additional data from server sessionid 0x20005babeb10001, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77)
+org.apache.zookeeper.ClientCnxn$EndOfStreamException: Unable to read additional data from server sessionid 0x20005babeb10001, likely server has closed socket
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doIO(ClientCnxnSocketNIO.java:77) ~[?:?]
+	at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:350) ~[?:?]
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1275) ~[?:?]
+2022-03-22 11:19:35.207 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager Watcher org.apache.solr.common.cloud.ConnectionManager@1a6cdc7 name: ZooKeeperConnection Watcher:zoo1:2181,zoo2:2181,zoo3:2181 got event WatchedEvent state:Disconnected type:None path:null path: null type: None
+2022-03-22 11:19:35.207 WARN  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has disconnected
+2022-03-22 11:19:35.710 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 12:10:48.811 INFO  (JettyShutdownThread) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@5a411614{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 12:10:48.837 INFO  (JettyShutdownThread) [   ] o.e.j.s.session node0 Stopped scavenging
+2022-03-22 12:10:49.076 INFO  (JettyShutdownThread) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1956296628
+2022-03-22 12:10:49.086 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Remove node as live in ZooKeeper:/live_nodes/172.25.0.5:8983_solr
+2022-03-22 12:10:49.679 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish this node as DOWN...
+2022-03-22 12:10:49.679 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish node=172.25.0.5:8983_solr as DOWN
+2022-03-22 12:10:51.156 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
+2022-03-22 12:10:51.160 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@6fff46bf: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node/com.codahale.metrics.MetricRegistry@aff2954
+2022-03-22 12:10:51.398 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
+2022-03-22 12:10:51.404 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@64e1377c: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm/com.codahale.metrics.MetricRegistry@72b823ed
+2022-03-22 12:10:51.420 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
+2022-03-22 12:10:51.421 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@b0fd744: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty/com.codahale.metrics.MetricRegistry@ddbac27
+2022-03-22 12:10:51.449 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.cluster tag=null
+2022-03-22 12:10:52.278 INFO  (JettyShutdownThread) [   ] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@5049d8b2{/solr,null,STOPPED}{/opt/solr-8.11.1/server/solr-webapp/webapp}

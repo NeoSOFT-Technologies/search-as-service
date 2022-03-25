@@ -1,0 +1,291 @@
+2022-03-22 07:47:34.540 INFO  (main) [   ] o.e.j.u.log Logging initialized @22009ms to org.eclipse.jetty.util.log.Slf4jLog
+2022-03-22 07:47:37.056 INFO  (main) [   ] o.e.j.s.Server jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 11.0.14.1+1
+2022-03-22 07:47:37.286 INFO  (main) [   ] o.e.j.d.p.ScanningAppProvider Deployment monitor [file:///opt/solr-8.11.1/server/contexts/] at interval 0
+2022-03-22 07:47:40.446 INFO  (main) [   ] o.e.j.w.StandardDescriptorProcessor NO JSP Support for /solr, did not find org.apache.jasper.servlet.JspServlet
+2022-03-22 07:47:40.507 INFO  (main) [   ] o.e.j.s.session DefaultSessionIdManager workerName=node0
+2022-03-22 07:47:40.508 INFO  (main) [   ] o.e.j.s.session No SessionScavenger set, using defaults
+2022-03-22 07:47:40.527 INFO  (main) [   ] o.e.j.s.session node0 Scavenging every 660000ms
+2022-03-22 07:47:40.917 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2022-03-22 07:47:40.961 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter  ___      _       Welcome to Apache Solr™ version 8.11.1
+2022-03-22 07:47:40.962 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter / __| ___| |_ _   Starting in cloud mode on port 8983
+2022-03-22 07:47:40.963 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter \__ \/ _ \ | '_|  Install dir: /opt/solr
+2022-03-22 07:47:40.966 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter |___/\___/_|_|    Start time: 2022-03-22T07:47:40.966322Z
+2022-03-22 07:47:41.208 INFO  (main) [   ] o.a.s.c.SolrPaths Using system property solr.solr.home: /var/solr/data
+2022-03-22 07:47:41.455 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 07:47:41.763 INFO  (zkConnectionManagerCallback-2-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 07:47:41.763 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 07:47:42.007 INFO  (main) [   ] o.a.s.s.SolrDispatchFilter Loading solr.xml from SolrHome (not found in ZooKeeper)
+2022-03-22 07:47:42.007 INFO  (main) [   ] o.a.s.c.SolrXmlConfig Loading container configuration from /var/solr/data/solr.xml
+2022-03-22 07:47:42.838 INFO  (main) [   ] o.a.s.c.SolrXmlConfig MBean server found: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63, but no JMX reporters were configured - adding default JMX reporter.
+2022-03-22 07:47:46.304 INFO  (main) [   ] o.a.s.h.c.HttpShardHandlerFactory Host whitelist initialized: WhitelistHostChecker [whitelistHosts=null, whitelistHostCheckingEnabled=true]
+2022-03-22 07:47:47.144 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@7f5eae0f[provider=null,keyStore=null,trustStore=null]
+2022-03-22 07:47:47.145 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@7f5eae0f[provider=null,keyStore=null,trustStore=null]
+2022-03-22 07:47:48.437 WARN  (main) [   ] o.e.j.u.s.S.config Trusting all certificates configured for Client@5555ffcf[provider=null,keyStore=null,trustStore=null]
+2022-03-22 07:47:48.437 WARN  (main) [   ] o.e.j.u.s.S.config No Client EndPointIdentificationAlgorithm configured for Client@5555ffcf[provider=null,keyStore=null,trustStore=null]
+2022-03-22 07:47:48.783 INFO  (main) [   ] o.a.s.c.ZkContainer Zookeeper client=zoo1:2181,zoo2:2181,zoo3:2181
+2022-03-22 07:47:48.919 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Waiting for client to connect to ZooKeeper
+2022-03-22 07:47:48.973 INFO  (zkConnectionManagerCallback-13-thread-1) [   ] o.a.s.c.c.ConnectionManager zkClient has connected
+2022-03-22 07:47:48.984 INFO  (main) [   ] o.a.s.c.c.ConnectionManager Client is connected to ZooKeeper
+2022-03-22 07:47:49.374 WARN  (main) [   ] o.a.s.c.ZkController Contents of zookeeper /security.json are world-readable; consider setting up ACLs as described in https://solr.apache.org/guide/zookeeper-access-control.html
+2022-03-22 07:47:49.995 INFO  (main) [   ] o.a.s.c.OverseerElectionContext I am going to be the leader 172.25.0.5:8983_solr
+2022-03-22 07:47:50.048 INFO  (main) [   ] o.a.s.c.Overseer Overseer (id=72063129792413698-172.25.0.5:8983_solr-n_0000000000) starting
+2022-03-22 07:47:50.691 INFO  (main) [   ] o.a.s.c.ZkController Register node as live in ZooKeeper:/live_nodes/172.25.0.5:8983_solr
+2022-03-22 07:47:50.719 INFO  (OverseerStateUpdate-72063129792413698-172.25.0.5:8983_solr-n_0000000000) [   ] o.a.s.c.Overseer Starting to work on the main queue : 172.25.0.5:8983_solr
+2022-03-22 07:47:51.059 INFO  (OverseerStateUpdate-72063129792413698-172.25.0.5:8983_solr-n_0000000000) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (0) -> (1)
+2022-03-22 07:47:51.341 INFO  (main) [   ] o.a.s.p.PackageLoader /packages.json updated to version -1
+2022-03-22 07:47:51.501 WARN  (main) [   ] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2022-03-22 07:47:51.733 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (1) -> (2)
+2022-03-22 07:47:53.645 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (2) -> (3)
+2022-03-22 07:47:53.773 INFO  (main) [   ] o.a.s.h.a.MetricsHistoryHandler No .system collection, keeping metrics history in memory.
+2022-03-22 07:47:54.350 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.node' (registry 'solr.node') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 07:47:54.355 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jvm' (registry 'solr.jvm') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 07:47:54.372 INFO  (main) [   ] o.a.s.m.r.SolrJmxReporter JMX monitoring for 'solr.jetty' (registry 'solr.jetty') enabled at server: com.sun.jmx.mbeanserver.JmxMBeanServer@25be7b63
+2022-03-22 07:47:54.919 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Found 11 core definitions underneath /var/solr/data
+2022-03-22 07:47:54.920 INFO  (main) [   ] o.a.s.c.CorePropertiesLocator Cores are: [createTableJmtest1_911_shard1_replica_n1, createTableJmtest2_911_shard1_replica_n1, createTableJmtest4_911_shard1_replica_n1, createTableJmtest5_911_shard1_replica_n1, jmdemo1_911_shard1_replica_n1, stringtable1_911_shard1_replica_n1, tableJmtest1_911_shard1_replica_n1, tableJmtest3_202_shard1_replica_n1, tableJmtest3_911_shard1_replica_n1, tableJmtest4_202_shard1_replica_n1, tableJmtest4_911_shard1_replica_n1]
+2022-03-22 07:47:54.999 INFO  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient core cache for max 2147483647 cores with initial capacity of 1024
+2022-03-22 07:47:55.163 INFO  (coreLoadExecutor-25-thread-2-processing-n:172.25.0.5:8983_solr) [c:createTableJmtest2_911 s:shard1 r:core_node2 x:createTableJmtest2_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/createTableJmtest2_911/state.json is deleted, stop watching children
+2022-03-22 07:47:55.170 INFO  (coreLoadExecutor-25-thread-1-processing-n:172.25.0.5:8983_solr) [c:createTableJmtest1_911 s:shard1 r:core_node2 x:createTableJmtest1_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/createTableJmtest1_911/state.json is deleted, stop watching children
+2022-03-22 07:47:55.203 INFO  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [c:createTableJmtest4_911 s:shard1 r:core_node2 x:createTableJmtest4_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/createTableJmtest4_911/state.json is deleted, stop watching children
+2022-03-22 07:47:55.685 INFO  (main) [   ] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@5049d8b2{/solr,file:///opt/solr-8.11.1/server/solr-webapp/webapp/,AVAILABLE}{/opt/solr-8.11.1/server/solr-webapp/webapp}
+2022-03-22 07:47:55.805 INFO  (main) [   ] o.e.j.s.AbstractConnector Started ServerConnector@5a411614{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 07:47:55.806 INFO  (main) [   ] o.e.j.s.Server Started @43307ms
+2022-03-22 07:48:05.574 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:05.584 INFO  (coreLoadExecutor-25-thread-1-processing-n:172.25.0.5:8983_solr) [c:createTableJmtest5_911 s:shard1 r:core_node2 x:createTableJmtest5_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/createTableJmtest5_911/state.json is deleted, stop watching children
+2022-03-22 07:48:05.709 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:05.711 INFO  (coreLoadExecutor-25-thread-2-processing-n:172.25.0.5:8983_solr) [c:jmdemo1_911 s:shard1 r:core_node2 x:jmdemo1_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/jmdemo1_911/state.json is deleted, stop watching children
+2022-03-22 07:48:05.747 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:05.769 INFO  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [c:stringtable1_911 s:shard1 r:core_node2 x:stringtable1_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/stringtable1_911/state.json is deleted, stop watching children
+2022-03-22 07:48:16.323 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:16.340 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:16.380 INFO  (coreLoadExecutor-25-thread-1-processing-n:172.25.0.5:8983_solr) [c:tableJmtest1_911 s:shard1 r:core_node2 x:tableJmtest1_911_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/tableJmtest1_911/state.json is deleted, stop watching children
+2022-03-22 07:48:16.383 INFO  (coreLoadExecutor-25-thread-2-processing-n:172.25.0.5:8983_solr) [c:tableJmtest3_202 s:shard1 r:core_node2 x:tableJmtest3_202_shard1_replica_n1] o.a.s.c.c.ZkStateReader /collections/tableJmtest3_202/state.json is deleted, stop watching children
+2022-03-22 07:48:16.825 INFO  (JettyShutdownThread) [   ] o.e.j.s.AbstractConnector Stopped ServerConnector@5a411614{HTTP/1.1, (http/1.1, h2c)}{0.0.0.0:8983}
+2022-03-22 07:48:16.826 INFO  (JettyShutdownThread) [   ] o.e.j.s.session node0 Stopped scavenging
+2022-03-22 07:48:16.865 INFO  (JettyShutdownThread) [   ] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1956296628
+2022-03-22 07:48:16.865 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Remove node as live in ZooKeeper:/live_nodes/172.25.0.5:8983_solr
+2022-03-22 07:48:16.964 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:16.964 WARN  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.SolrCores Tried to remove core tableJmtest3_911_shard1_replica_n1 from pendingCoreOps and it wasn't there. 
+2022-03-22 07:48:16.964 WARN  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.SolrCores Tried to remove core tableJmtest4_202_shard1_replica_n1 from pendingCoreOps and it wasn't there. 
+2022-03-22 07:48:16.964 WARN  (coreLoadExecutor-25-thread-3-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.SolrCores Tried to remove core tableJmtest4_911_shard1_replica_n1 from pendingCoreOps and it wasn't there. 
+2022-03-22 07:48:16.965 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish this node as DOWN...
+2022-03-22 07:48:16.965 INFO  (JettyShutdownThread) [   ] o.a.s.c.ZkController Publish node=172.25.0.5:8983_solr as DOWN
+2022-03-22 07:48:17.376 INFO  (zkCallback-12-thread-1) [   ] o.a.s.c.c.ZkStateReader Updated live nodes from ZooKeeper... (3) -> (2)
+2022-03-22 07:48:26.497 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:26.579 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.cloud.ZkController$NotInClusterStateException: coreNodeName core_node2 does not exist in shard shard1, ignore the exception if the replica was deleted
+	at org.apache.solr.cloud.ZkController.checkStateInZk(ZkController.java:1946) ~[?:?]
+	at org.apache.solr.cloud.ZkController.preRegister(ZkController.java:1843) ~[?:?]
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1443) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:26.579 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1435) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:26.579 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1435) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:26.579 ERROR (coreContainerWorkExecutor-4-thread-1-processing-n:172.25.0.5:8983_solr) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup => java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.base/java.util.concurrent.FutureTask.report(Unknown Source)
+java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at java.util.concurrent.FutureTask.report(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.get(Unknown Source) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$12(CoreContainer.java:902) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedRunnable.run(InstrumentedExecutorService.java:180) ~[metrics-core-4.1.5.jar:4.1.5]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[?:?]
+	at java.util.concurrent.FutureTask.run(Unknown Source) ~[?:?]
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:218) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[?:?]
+	at java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: org.apache.solr.common.SolrException: Solr has been shutdown.
+	at org.apache.solr.core.CoreContainer.createFromDescriptor(CoreContainer.java:1435) ~[?:?]
+	at org.apache.solr.core.CoreContainer.lambda$load$11(CoreContainer.java:873) ~[?:?]
+	at com.codahale.metrics.InstrumentedExecutorService$InstrumentedCallable.call(InstrumentedExecutorService.java:202) ~[metrics-core-4.1.5.jar:4.1.5]
+	... 5 more
+2022-03-22 07:48:26.585 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
+2022-03-22 07:48:26.586 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@6fff46bf: rootName = null, domain = solr.node, service url = null, agent id = null] for registry solr.node/com.codahale.metrics.MetricRegistry@292665ec
+2022-03-22 07:48:26.631 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
+2022-03-22 07:48:26.632 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@64e1377c: rootName = null, domain = solr.jvm, service url = null, agent id = null] for registry solr.jvm/com.codahale.metrics.MetricRegistry@771d6fe1
+2022-03-22 07:48:26.665 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
+2022-03-22 07:48:26.665 INFO  (JettyShutdownThread) [   ] o.a.s.m.r.SolrJmxReporter Closing reporter [org.apache.solr.metrics.reporters.SolrJmxReporter@b0fd744: rootName = null, domain = solr.jetty, service url = null, agent id = null] for registry solr.jetty/com.codahale.metrics.MetricRegistry@ae666a9
+2022-03-22 07:48:26.680 INFO  (JettyShutdownThread) [   ] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.cluster tag=null
+2022-03-22 07:48:26.696 INFO  (closeThreadPool-29-thread-2) [   ] o.a.s.c.Overseer Overseer (id=72063129792413698-172.25.0.5:8983_solr-n_0000000000) closing
+2022-03-22 07:48:26.697 INFO  (OverseerStateUpdate-72063129792413698-172.25.0.5:8983_solr-n_0000000000) [   ] o.a.s.c.Overseer Overseer Loop exiting : 172.25.0.5:8983_solr
+2022-03-22 07:48:26.700 INFO  (OverseerAutoScalingTriggerThread-72063129792413698-172.25.0.5:8983_solr-n_0000000000) [   ] o.a.s.c.a.OverseerTriggerThread OverseerTriggerThread woken up but we are closed, exiting.
+2022-03-22 07:48:26.755 INFO  (closeThreadPool-29-thread-1) [   ] o.a.s.c.Overseer Overseer (id=72063129792413698-172.25.0.5:8983_solr-n_0000000000) closing
