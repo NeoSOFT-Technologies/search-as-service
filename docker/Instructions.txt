@@ -1,0 +1,16 @@
+#RUN KEYCLOAK SERVER
+docker-compose -f docker-compose-keycloak.yml pull
+docker-compose -f docker-compose-keycloak.yml up
+
+#CREATE REALM, CLIENT & USER USING KEYCLOAK DASHBOARD AT PORT 8080
+#ADD THE CREDENTIALS IN "docker-compose.yml" ENVIRONMENT VARIABLES OF INGRESS AND EGRESS CONTAINERS
+
+docker-compose -f docker-compose-keycloak.yml down
+
+============================================================
+
+#RUN SOLR, INGRESS & EGRESS APPLICATIONS
+docker-compose pull
+docker-compose up
+
+docker-compose down
