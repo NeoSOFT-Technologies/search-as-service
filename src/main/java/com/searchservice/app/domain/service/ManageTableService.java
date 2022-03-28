@@ -144,12 +144,11 @@ public class ManageTableService implements ManageTableServicePort {
 		requestMethod(loggersDTO, nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO, true, false);
 
-		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
-		LoggerUtils.printlogger(loggersDTO, false, false);
-		return new GetCapacityPlan(capacityPlans);
+		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();		
+		String timestamp=LoggerUtils.utcTime().toString();
+        loggersDTO.setTimestamp(timestamp);
+        LoggerUtils.printlogger(loggersDTO,false,false);
+		return new GetCapacityPlan(200,"Successfully retrieved all Capacity Plans",capacityPlans);
 	}
 
 	@Override
