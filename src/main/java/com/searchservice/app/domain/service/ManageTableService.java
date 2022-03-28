@@ -89,22 +89,46 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
+	
 	@Value("${base-search-url}")
-	private String searchURL;
+	private String searchNonStatic;
 	@Value("${basic-auth.username}")
-	private String basicAuthUsername;
+	private String basicAuthUsernameNonStatic;
 	@Value("${basic-auth.password}")
-	private String basicAuthPassword;
+	private String basicAuthPasswordNonStatic;
+	
 	// ConfigSet
 	@Value("${base-configset}")
-	private String baseConfigSet;
-
+	private String baseConfigSetNonStatic;
+	
 	// UPDATE Table
 	@Value("${table-schema-attributes.delete-file-path}")
-	String deleteSchemaAttributesFilePath;
-
+	private String deleteSchemaAttributesFilePathNonStatic;
 	@Value("${table-schema-attributes.days}")
-	long schemaDeleteDuration;
+	private long schemaDeleteDurationNonStatic;
+	
+	// Init configurations
+	private static String searchURL;
+	private static String basicAuthUsername;
+	private static String basicAuthPassword;
+	private static String baseConfigSet;
+	private static String deleteSchemaAttributesFilePath;
+	private static long schemaDeleteDuration;
+	
+	@Autowired
+	public ManageTableService(
+			@Value("${base-search-url}") String solrURLNonStatic, 
+			@Value("${basic-auth.username}") String basicAuthUsernameNonStatic, 
+			@Value("${basic-auth.password}") String basicAuthPasswordNonStatic, 
+			@Value("${table-schema-attributes.delete-file-path}") String deleteSchemaAttributesFilePathNonStatic, 
+			@Value("${table-schema-attributes.days}") long schemaDeleteDurationNonStatic) {
+		
+		searchURL = solrURLNonStatic;
+		basicAuthUsername = basicAuthUsernameNonStatic;
+		basicAuthPassword = basicAuthPasswordNonStatic;
+		deleteSchemaAttributesFilePath = deleteSchemaAttributesFilePathNonStatic;
+		schemaDeleteDuration = schemaDeleteDurationNonStatic;
+	}
 
 	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 
@@ -162,6 +186,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
 		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(clientId,searchClientActive);
 		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), clientId);
+		System.out.println("Data" +data);
 				
 
 		try {

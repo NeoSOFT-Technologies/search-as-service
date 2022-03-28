@@ -6,8 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.searchservice.app.rest.VersionedInputDocumentResource;
-import com.searchservice.app.rest.VersionedManageTableResource;
+
 
 import lombok.Data;
 
@@ -32,9 +31,7 @@ public class MapperVersioningUtil {
 	private static List<Class<?>> versioned = new ArrayList<>();
 	public static List<Class<?>> getAllVersionedResources() {
 		versioned.addAll(
-				Arrays.asList(
-						VersionedManageTableResource.class, 
-						VersionedInputDocumentResource.class));
+				Arrays.asList());
 		
 		return versioned;
 	}
