@@ -120,12 +120,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Autowired
 	LoggerUtils Loggerutils;
-	
 
 	@Autowired
 	SolrJAdapter solrjAdapter;
 
-	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient,LoggerUtils Loggerutils,SolrJAdapter solrjAdapter) {
+	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient,
+			LoggerUtils Loggerutils, SolrJAdapter solrjAdapter) {
 		this.searchURL = searchUrl;
 		this.searchAPIAdapter = searchAPIAdapter;
 		this.searchClient = searchClient;
@@ -145,7 +145,6 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public GetCapacityPlan capacityPlans(LoggersDTO loggersDTO) {
 
-
 		logger.debug("capacity Plans");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
@@ -153,38 +152,32 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Loggerutils.printlogger(loggersDTO, true, false);
 
-
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
-
-
 		String timestamp = Loggerutils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		Loggerutils.printlogger(loggersDTO, false, false);
-		return new GetCapacityPlan(capacityPlans);
+		return new GetCapacityPlan(200, "Successfully retrieved all Capacity Plans", capacityPlans);
+
 	}
 
 	@Override
 	public Response getTables(int clientId, LoggersDTO loggersDTO) {
-
 
 		logger.debug("get Tables");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		Loggerutils.printlogger(loggersDTO, true, false);
 
 		Response getListItemsResponseDTO = new Response();
-		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(clientId,searchClientActive);
-		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), clientId);
-				
-
+		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(clientId, searchClientActive);
+		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+				clientId);
 
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + clientId)[0]).collect(Collectors.toList());
-
 
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
@@ -193,7 +186,6 @@ public class ManageTableService implements ManageTableServicePort {
 			String timestamp = Loggerutils.utcTime().toString();
 			loggersDTO.setTimestamp(timestamp);
 
-
 			Loggerutils.printlogger(loggersDTO, false, false);
 
 		} catch (Exception e) {
@@ -201,9 +193,8 @@ public class ManageTableService implements ManageTableServicePort {
 			getListItemsResponseDTO.setStatusCode(400);
 			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
 
-
 			Loggerutils.printlogger(loggersDTO, false, true);
-		} 
+		}
 
 		return getListItemsResponseDTO;
 	}
@@ -221,17 +212,15 @@ public class ManageTableService implements ManageTableServicePort {
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + clientId);
 
-
 		// Compare tableSchema locally Vs. tableSchema at Search cloud
 		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(tableName, clientId,
 				tableSchema);
 		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream()
 				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
-		
+
 		String timestamp = Loggerutils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		Loggerutils.printlogger(loggersDTO, false, false);
-
 
 		return schemaResponse;
 	}
@@ -258,8 +247,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		return tableSchema;
 	}
-
-
 
 	@Override
 	public Map<Object, Object> getTableDetails(String tableName, LoggersDTO loggersDTO) {
@@ -301,13 +288,11 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Loggerutils.printlogger(loggersDTO, true, false);
 
-
 		if (isTableExists(manageTableDTO.getTableName()))
 			throw new BadRequestOccurredException(400, manageTableDTO.getTableName() + " table already exists");
 
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
-
 
 		String timestamp = Loggerutils.utcTime().toString();
 
@@ -328,7 +313,6 @@ public class ManageTableService implements ManageTableServicePort {
 			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 
-
 			Loggerutils.printlogger(loggersDTO, false, false);
 		} else if (apiResponseDTO.getStatusCode() == 400) {
 			Loggerutils.printlogger(loggersDTO, false, true);
@@ -345,7 +329,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Loggerutils.printlogger(loggersDTO, true, false);
 
-
 		if (!isTableExists(tableName))
 			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 
@@ -353,20 +336,17 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Response apiResponseDTO = new Response();
 
-
-String timestamp = Loggerutils.utcTime().toString();
-loggersDTO.setTimestamp(timestamp);
+		String timestamp = Loggerutils.utcTime().toString();
+		loggersDTO.setTimestamp(timestamp);
 
 		boolean response = solrjAdapter.deleteTableFromSolrj(tableName);
 		if (response) {
-
 
 			apiResponseDTO.setStatusCode(200);
 
 			Loggerutils.printlogger(loggersDTO, false, false);
 
 			apiResponseDTO.setMessage("Table: " + tableName + ", is successfully deleted");
-
 
 		} else {
 
@@ -401,12 +381,10 @@ loggersDTO.setTimestamp(timestamp);
 
 		logger.info("New attributes addition response: {}", apiResponseDTO.getMessage());
 
-
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
 
 		logger.info("Existing attributes update response: {}", apiResponseDTO.getMessage());
-
 
 		String timestamp = Loggerutils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
@@ -503,9 +481,6 @@ loggersDTO.setTimestamp(timestamp);
 			List<SchemaField> solrSchemaFieldDTOs = new ArrayList<>();
 			logger.info("Total number of fields: {}", numOfFields);
 
-
-			
-
 			for (Map<String, Object> f : schemaFields) {
 
 				// Prepare the SolrFieldDTO
@@ -515,15 +490,13 @@ loggersDTO.setTimestamp(timestamp);
 				// Parse Field Type Object(String) to Enum
 
 				String solrFieldType = SchemaFieldType.fromSearchFieldTypeToStandardDataType((String) f.get("type"),
-					f.get(MULTIVALUED));
+						f.get(MULTIVALUED));
 
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParser.setFieldsAsPerTheSchema(solrFieldDTO, f);
 				solrSchemaFieldDTOs.add(solrFieldDTO);
 
 			}
-
-
 
 			// prepare response dto
 			data.setTableName(tableName.split("_")[0]);
@@ -578,7 +551,6 @@ loggersDTO.setTimestamp(timestamp);
 					HttpStatusCode.INVALID_SKU_NAME.getMessage() + " : " + manageTableDTO.getSku());
 
 		}
-
 
 		boolean response = solrjAdapter.createTableInSolrj(manageTableDTO, selectedCapacityPlan);
 		if (response) {
@@ -703,7 +675,6 @@ loggersDTO.setTimestamp(timestamp);
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table " + e.getMessage());
 
-
 			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		}
@@ -742,7 +713,6 @@ loggersDTO.setTimestamp(timestamp);
 
 			// Update Schema Logic
 
-
 			Response schemaResponseDTOAfter = solrjAdapter.updateSchemaLogic(newTableSchemaDTO, targetSchemafields);
 			if (schemaResponseDTOAfter.getStatusCode() == 200) {
 				apiResponseDTO.setStatusCode(200);
@@ -774,7 +744,6 @@ loggersDTO.setTimestamp(timestamp);
 
 	@Override
 	public Response addAliasTable(String tableOriginalName, String tableAlias) {
-
 
 		Response apiResponseDTO;
 
@@ -1001,7 +970,6 @@ loggersDTO.setTimestamp(timestamp);
 
 	public boolean isPartialSearchFieldTypePresent(String tableName) {
 		try {
-
 
 			List<FieldTypeDefinition> fieldTypes = solrjAdapter.isPartialSearchFieldInSolrj(tableName);
 
