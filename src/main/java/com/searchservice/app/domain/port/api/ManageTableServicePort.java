@@ -22,7 +22,7 @@ public interface ManageTableServicePort {
 	// GET request
 	GetCapacityPlan capacityPlans(LoggersDTO loggersDTO);
 	Response getTables(int clientid,LoggersDTO loggersDTO);
-	TableSchemav2 getCurrentTableSchema(int clientId, String tableName);
+	TableSchemav2 getCurrentTableSchema(int clientId, String tableName, LoggersDTO loggersDTO);
 
 	// CREATE requests
 	Response createTableIfNotPresent(ManageTable manageTableDTO,LoggersDTO loggersDTO);

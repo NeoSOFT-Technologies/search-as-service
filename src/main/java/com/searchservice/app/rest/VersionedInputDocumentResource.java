@@ -1,8 +1,9 @@
 package com.searchservice.app.rest;
 
-
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.InvalidJsonInputOccurredException;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -36,135 +36,146 @@ public class VersionedInputDocumentResource {
 
 	private String username = "Username";
 
-    private final Logger log = LoggerFactory.getLogger(VersionedInputDocumentResource.class);
-    
-    @Autowired
-    InputDocumentService inputDocumentService;
+	private final Logger log = LoggerFactory.getLogger(VersionedInputDocumentResource.class);
 
-    private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
-    
-    public final InputDocumentServicePort inputDocumentServicePort;
-    public final ThrottlerServicePort throttlerServicePort;
-    public VersionedInputDocumentResource(
-    		InputDocumentServicePort inputDocumentServicePort, 
-    		ThrottlerServicePort throttlerServicePort) {
-        this.inputDocumentServicePort = inputDocumentServicePort;
-        this.throttlerServicePort = throttlerServicePort;
-    }
+	@Autowired
+	InputDocumentService inputDocumentService;
 
-    private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
+	@Autowired
+	LoggerUtils loggerUtils;
+
+	private List<Object> listOfParameters;
+	private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
+
+	public final InputDocumentServicePort inputDocumentServicePort;
+	public final ThrottlerServicePort throttlerServicePort;
+
+	public VersionedInputDocumentResource(InputDocumentServicePort inputDocumentServicePort,
+			ThrottlerServicePort throttlerServicePort, LoggerUtils loggerUtils) {
+		this.inputDocumentServicePort = inputDocumentServicePort;
+		this.throttlerServicePort = throttlerServicePort;
+		this.loggerUtils = loggerUtils;
+	}
+
+	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
 		String timestamp;
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
+		timestamp = loggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 	}
-    @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-    @PostMapping("/ingest-nrt/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ThrottlerResponse documents(
-						    		@PathVariable String tableName, 
-						    		@PathVariable int tenantId, 
-						    		@RequestBody String payload){
 
-        log.debug("Search documents add");
-        if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-        String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.printlogger(loggersDTO,true,false);
+	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
+	@PostMapping("/ingest-nrt/{tenantId}/{tableName}")
+	@Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ThrottlerResponse documents(@PathVariable String tableName, @PathVariable int tenantId,
+			@RequestBody String payload) {
+
+		listOfParameters = new ArrayList<Object>();
+		listOfParameters.add(tenantId);
+		listOfParameters.add(tableName);
+		listOfParameters.add(payload);
+
+		if (!inputDocumentService.isValidJsonArray(payload))
+			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = loggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
+				listOfParameters);
+		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-        
-        // Apply RequestSizeLimiting Throttler on payload before service the request
-    	ThrottlerResponse documentInjectionThrottlerResponse
-    		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, true);
-        if(documentInjectionThrottlerResponse.getStatusCode() == 406)
-        	return documentInjectionThrottlerResponse;
-    	
-        // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        
-        tableName = tableName+"_"+tenantId;
-        Instant start = Instant.now();
-        ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,loggersDTO);
-        Instant end = Instant.now();
-        Duration timeElapsed = Duration.between(start, end);
-        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
-        log.info(result);
 
-        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
-        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+		// Apply RequestSizeLimiting Throttler on payload before service the request
+		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
+				.documentInjectionRequestSizeLimiter(payload, true);
+		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+			return documentInjectionThrottlerResponse;
 
-        successMethod(nameofCurrMethod, loggersDTO);
-        
-        if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.printlogger(loggersDTO, false, false);
-            return documentInjectionThrottlerResponse;
-        }else{
-        	LoggerUtils.printlogger(loggersDTO, false, true);
-        	throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
-        }
+		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
-    }
-    
-    
-    @RateLimiter(name=DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
+		tableName = tableName + "_" + tenantId;
+		Instant start = Instant.now();
+		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,
+				loggersDTO);
+		Instant end = Instant.now();
+		Duration timeElapsed = Duration.between(start, end);
+		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
+		log.info(result);
+
+		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
+		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+
+		successMethod(nameofCurrMethod, loggersDTO);
+
+		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
+			loggerUtils.printlogger(loggersDTO, false, false);
+			return documentInjectionThrottlerResponse;
+		} else {
+			loggerUtils.printlogger(loggersDTO, false, true);
+			throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
+		}
+
+	}
+
+	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tenantId}/{tableName}")
-    @Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ThrottlerResponse document(
-						    		@PathVariable String tableName, 
-						    		@PathVariable int tenantId, 
-						    		@RequestBody String payload) {
+	@Operation(summary = "/ For add documents we have to pass the tableName and isNRT and it will return statusCode and message.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ThrottlerResponse document(@PathVariable String tableName, @PathVariable int tenantId,
+			@RequestBody String payload) {
 
-        log.info("Search documents add");
-        if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-        String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp);
-		LoggerUtils.printlogger(loggersDTO,true,false);
+		listOfParameters = new ArrayList<Object>();
+		listOfParameters.add(tenantId);
+		listOfParameters.add(tableName);
+		listOfParameters.add(payload);
+
+		if (!inputDocumentService.isValidJsonArray(payload))
+			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
+		String timestamp = loggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
+				listOfParameters);
+		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-        
-        // Apply RequestSizeLimiting Throttler on payload before service the request
-    	ThrottlerResponse documentInjectionThrottlerResponse
-    		= throttlerServicePort.documentInjectionRequestSizeLimiter(payload, false);
-    	
-        if(documentInjectionThrottlerResponse.getStatusCode() == 406)
-        	return documentInjectionThrottlerResponse;
-    	
-        // Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-        
-        tableName = tableName+"_"+tenantId;
-        Instant start = Instant.now();
-        ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,loggersDTO);
-        Instant end = Instant.now();
-        Duration timeElapsed = Duration.between(start, end);
-        String result="Time taken: "+timeElapsed.toMillis()+" milliseconds";
-        log.info(result);
 
-        documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
-        documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+		// Apply RequestSizeLimiting Throttler on payload before service the request
+		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
+				.documentInjectionRequestSizeLimiter(payload, false);
 
-        successMethod(nameofCurrMethod, loggersDTO);
-        
-        if(documentInjectionThrottlerResponse.getStatusCode()==200){
-        	LoggerUtils.printlogger(loggersDTO, false, false);
-            return documentInjectionThrottlerResponse;
-        }else{
-        	LoggerUtils.printlogger(loggersDTO, false, true);
-        	throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
-        }
-    }
-	
-	
-    // Rate Limiter(Throttler) FALLBACK method
-	public ThrottlerResponse documentInjectionRateLimiterFallback(
-			String tableName, 
-			int tenantId, 
-			String payload, 
+		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+			return documentInjectionThrottlerResponse;
+
+		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
+
+		tableName = tableName + "_" + tenantId;
+		Instant start = Instant.now();
+		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocument(tableName, payload,
+				loggersDTO);
+		Instant end = Instant.now();
+		Duration timeElapsed = Duration.between(start, end);
+		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
+		log.info(result);
+
+		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
+		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+
+		successMethod(nameofCurrMethod, loggersDTO);
+
+		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
+			loggerUtils.printlogger(loggersDTO, false, false);
+			return documentInjectionThrottlerResponse;
+		} else {
+			loggerUtils.printlogger(loggersDTO, false, true);
+			throw new BadRequestOccurredException(400, ResponseMessages.BAD_REQUEST_MSG);
+		}
+	}
+
+	// Rate Limiter(Throttler) FALLBACK method
+	public ThrottlerResponse documentInjectionRateLimiterFallback(String tableName, int tenantId, String payload,
 			RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
@@ -172,7 +183,7 @@ public class VersionedInputDocumentResource {
 		ThrottlerResponse rateLimitResponseDTO = throttlerServicePort.documentInjectionRateLimiter();
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("Retry-after:", rateLimitResponseDTO.getRequestTimeoutDuration());
-		//retry the request after given timeoutDuration
+		// retry the request after given timeoutDuration
 		return rateLimitResponseDTO;
 	}
 

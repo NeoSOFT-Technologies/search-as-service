@@ -17,4 +17,5 @@ public class LoggersDTO {
 	private String timestamp;
 	private String nameofmethod;
 	private List<Object> listOfParameters;
+
 }
