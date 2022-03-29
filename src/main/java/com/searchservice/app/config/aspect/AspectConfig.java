@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
 
 @Aspect
 @Configuration
@@ -30,9 +28,8 @@ public class AspectConfig {
 	private Logger log = LoggerFactory.getLogger(AspectConfig.class);
 
 	@Around(value = "execution(* com.searchservice.app.domain.utils.LoggerUtils.printlogger(..))")
-	public Object logStatementForLogger(ProceedingJoinPoint joinpoint) throws Throwable {
+	public Object logStatementForLogger(ProceedingJoinPoint joinpoint) {
 
-		Object obj = joinpoint.proceed();
 		LoggersDTO dto = (LoggersDTO) joinpoint.getArgs()[0];
 		if (joinpoint.getArgs()[1].toString().contains("true")) {
 			log.info(
@@ -56,7 +53,7 @@ public class AspectConfig {
 	}
 
 	public List<Object> itrateParameters(JoinPoint joinPoint) {
-		List<Object> list = new ArrayList<Object>();
+		List<Object> list = new ArrayList<>();
 		for (int i = 0; i < joinPoint.getArgs().length; i++) {
 			list.add(joinPoint.getArgs()[i]);
 		}
@@ -66,26 +63,15 @@ public class AspectConfig {
 
 	@AfterReturning(value = "execution(* com.searchservice.app.rest.*.*(..))", returning = "response")
 	public void logStatementAfter(JoinPoint joinPoint, ResponseEntity<Response> response) {
-		log.info("Complete Execution of " + joinPoint.getSignature().getName() + " with response " + response);
+		log.info("Complete Execution of {}  with response {} ", joinPoint.getSignature().getName(), response);
 
-	}
-
-	@AfterReturning(value = "execution(* com.searchservice.app.rest.*.*(..))", returning = "response")
-	public void logStatementAfterforCapacityPlan(JoinPoint joinPoint, ResponseEntity<GetCapacityPlan> response) {
-		log.info("Complete Execution of " + joinPoint.getSignature().getName() + " with response " + response);
-
-	}
-
-	@AfterReturning(value = "execution(* com.searchservice.app.rest.*.*(..))", returning = "response")
-	public void logStatementAfterforgetTable(JoinPoint joinPoint, ResponseEntity<TableSchemav2> response) {
-		log.info("Complete Execution of " + joinPoint.getSignature().getName() + " with response " + response);
 	}
 
 	@AfterReturning(value = "execution(* com.searchservice.app.domain.service.TableDeleteService.performTableDeletion(..))", returning = "status")
 	public void logStatementForperformTableDeletion(JoinPoint joinPoint, boolean status) {
 		String tableName = joinPoint.getArgs()[1].toString().substring(0,
 				joinPoint.getArgs()[1].toString().lastIndexOf("_"));
-		if (status == true) {
+		if (status) {
 			log.info("Successfully Deleted Table : {}", tableName);
 		} else {
 			log.info("Failure While Deleting Table: {}", tableName);
@@ -95,7 +81,7 @@ public class AspectConfig {
 	@AfterReturning(value = "execution(* com.searchservice.app.domain.service.TableDeleteService.checkTableDeletionStatus(..))", returning = "status")
 	public void logStatementForcheckTableDeletionStatus(JoinPoint joinPoint, boolean status) {
 
-		if (status == true) {
+		if (status) {
 			log.info("Total Number of Tables Found and Deleted: {}", joinPoint.getArgs()[0]);
 		} else {
 			log.info("No Records Were Found and Deleted With Request More Or Equal To 15 days");

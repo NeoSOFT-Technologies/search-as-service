@@ -28,6 +28,7 @@ import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
+import com.searchservice.app.domain.utils.LoggerUtils;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -37,7 +38,8 @@ class ManageTableTest {
 	private String apiEndpoint;
     private String tableName ="automatedTestCollection";
     private int tenantId = 101;
-
+	@MockBean
+	private LoggerUtils loggerUtils;
 	String schemaName = "default-config";
 	SchemaField search = new SchemaField("testField6","string", true, true, false, true, true, false);
 	//SchemaFieldDTO[] attributes = { search };

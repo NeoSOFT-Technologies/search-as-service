@@ -29,9 +29,7 @@ public class LoggerUtils {
 
 	InetAddress ip;
 
-	private LoggerUtils() {
-
-	}
+	
 
 	public LoggersDTO getRequestLoggingInfo(String servicename, String username, String nameofmethod, String timestamp,
 			List<Object> listOfParameters) {
@@ -57,7 +55,7 @@ public class LoggerUtils {
 
 	}
 
-	public void printlogger(LoggersDTO loggersDTO, boolean isStart, boolean isFailed) {
+	public  void printlogger(LoggersDTO loggersDTO, boolean isStart, boolean isFailed) {
 //		if (isFailed) {
 //
 //			logger.debug(
@@ -79,7 +77,7 @@ public class LoggerUtils {
 //		}
 	}
 
-	public DateTime utcTime() {
+	public static DateTime utcTime() {
 		DateTime now = new DateTime(); // Gives the default time zone.
 		return now.toDateTime(DateTimeZone.UTC);
 	}

@@ -62,7 +62,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -77,7 +77,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		loggerUtils.printlogger(loggersDTO, true, false);
 
 		Response deleteRecordInsertionResponse = new Response();
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		String actualTableName = "";
 		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
@@ -125,7 +125,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		File newFile = new File(deleteRecordFilePath + "Temp.txt");
 		int lineNumber = 0;
 		int delRecordCount = 0;
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 
 		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
@@ -176,7 +176,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		requestMethod(loggersDTO, nameofCurrMethod);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		Response performUndoDeleteResponse = new Response();
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		if (tableName != null) {
 			loggerUtils.printlogger(loggersDTO, false, false);
@@ -246,11 +246,10 @@ public class TableDeleteService implements TableDeleteServicePort {
 		String tableName = tableRecord.split(",")[1];
 		Response tableDeleteResponse = manageTableServicePort.deleteTable(tableName, loggersDTO);
 
-		if (tableDeleteResponse.getStatusCode() == 200) {
+		if(tableDeleteResponse.getStatusCode() == 200) {
 			return true;
-		} else {
-			return false;
-		}
+		} 
+		return false;
 	}
 
 	public Response getUndoDeleteResponse(int undoRecordNumber, String tableName) {
