@@ -46,7 +46,7 @@ public class InputDocumentResource {
 
 	@Autowired
 	LoggerUtils loggerUtils;
-
+	
 	private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
 
 	public final InputDocumentServicePort inputDocumentServicePort;
@@ -54,10 +54,11 @@ public class InputDocumentResource {
 	public final ManageTableServicePort manageTableServicePort;
 
 	public InputDocumentResource(InputDocumentServicePort inputDocumentServicePort,
-			ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort) {
+			ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
 		this.inputDocumentServicePort = inputDocumentServicePort;
 		this.throttlerServicePort = throttlerServicePort;
 		this.manageTableServicePort = manageTableServicePort;
+		this.loggerUtils = loggerUtils;
 	}
 
 	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -65,7 +66,7 @@ public class InputDocumentResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = loggerUtils.utcTime().toString();
+		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 	}
 
@@ -84,8 +85,8 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp,listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp,listOfParameters);
 		loggerUtils.printlogger(loggersDTO,true,false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
@@ -125,8 +126,8 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
         if(!inputDocumentService.isValidJsonArray(payload))
         	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());

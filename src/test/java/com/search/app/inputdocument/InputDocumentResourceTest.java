@@ -1,7 +1,9 @@
+
 package com.search.app.inputdocument;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.InputDocumentService;
+import com.searchservice.app.domain.utils.LoggerUtils;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -41,6 +44,7 @@ class InputDocumentResourceTest {
 	@Autowired
 	private MockMvc restAMockMvc;
 
+	
 	@MockBean
 	InputDocumentService inputDocumentService;
 	

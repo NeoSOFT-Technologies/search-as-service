@@ -129,18 +129,18 @@ public class ManageTableService implements ManageTableServicePort {
 	HttpSolrClient searchClient;
 
 	@Autowired
-	LoggerUtils Loggerutils;
+	LoggerUtils loggerUtils;
 
 	@Autowired
 	SolrJAdapter solrjAdapter;
 
 	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient,
-			LoggerUtils Loggerutils, SolrJAdapter solrjAdapter) {
+		 SolrJAdapter solrjAdapter,LoggerUtils loggerUtils) {
 		this.searchURL = searchUrl;
 		this.searchAPIAdapter = searchAPIAdapter;
 		this.searchClient = searchClient;
-		this.Loggerutils = Loggerutils;
 		this.solrjAdapter = solrjAdapter;
+		this.loggerUtils = loggerUtils;
 	}
 
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
@@ -160,12 +160,12 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
-		Loggerutils.printlogger(loggersDTO, false, false);
+		loggerUtils.printlogger(loggersDTO, false, false);
 		return new GetCapacityPlan(200, "Successfully retrieved all Capacity Plans", capacityPlans);
 
 	}
@@ -179,7 +179,7 @@ public class ManageTableService implements ManageTableServicePort {
 		requestMethod(loggersDTO, nameofCurrMethod);
 
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		Response getListItemsResponseDTO = new Response();
 
@@ -198,14 +198,14 @@ public class ManageTableService implements ManageTableServicePort {
 			String timestamp = LoggerUtils.utcTime().toString();
 			loggersDTO.setTimestamp(timestamp);
 
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(400);
 			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
 
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 		}
 
 		return getListItemsResponseDTO;
@@ -216,7 +216,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		if (!isTableExists(tableName + "_" + clientId))
 			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName));
@@ -232,7 +232,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
-		Loggerutils.printlogger(loggersDTO, false, false);
+		loggerUtils.printlogger(loggersDTO, false, false);
 
 		return schemaResponse;
 	}
@@ -243,7 +243,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		String timestamp = LoggerUtils.utcTime().toString();
 
@@ -255,7 +255,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
 				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
-		Loggerutils.printlogger(loggersDTO, false, false);
+		loggerUtils.printlogger(loggersDTO, false, false);
 
 		return tableSchema;
 	}
@@ -265,7 +265,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 
@@ -287,11 +287,11 @@ public class ManageTableService implements ManageTableServicePort {
 		if (!finalResponseMap.containsKey("tableDetails") || finalResponseMap.get("tableDetails") == null) {
 			finalResponseMap = new HashMap<>();
 			finalResponseMap.put("Error", "Invalid table name provided.");
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 			return finalResponseMap;
 		} else {
 
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 			return finalResponseMap;
 		}
 	}
@@ -302,7 +302,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		if (isTableExists(manageTableDTO.getTableName()))
 			throw new BadRequestOccurredException(400, manageTableDTO.getTableName() + " table already exists");
@@ -329,9 +329,9 @@ public class ManageTableService implements ManageTableServicePort {
 			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 		} else if (apiResponseDTO.getStatusCode() == 400) {
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 
 		}
 		return apiResponseDTO;
@@ -343,7 +343,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		if (!isTableExists(tableName))
 			throw new ContentNotFoundException(404, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
@@ -360,7 +360,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			apiResponseDTO.setStatusCode(200);
 
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 
 			apiResponseDTO.setMessage("Table: " + tableName + ", is successfully deleted");
 
@@ -368,7 +368,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			apiResponseDTO.setStatusCode(400);
 
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 
 			apiResponseDTO.setMessage("Unable to delete table: " + tableName);
 		}
@@ -382,7 +382,7 @@ public class ManageTableService implements ManageTableServicePort {
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
 		requestMethod(loggersDTO, nameofCurrMethod);
 
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 
 		Response apiResponseDTO = new Response();
 
@@ -402,10 +402,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 		logger.info("Existing attributes update response: {}", apiResponseDTO.getMessage());
 
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 
-		Loggerutils.printlogger(loggersDTO, false, false);
+		loggerUtils.printlogger(loggersDTO, false, false);
 
 		return apiResponseDTO;
 	}

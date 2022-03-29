@@ -44,14 +44,14 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Autowired
 	LoggerUtils loggerUtils;
-
 	private String servicename = "Table_Delete_Service";
 
 	private String username = "Username";
 
-	public TableDeleteService(ManageTableServicePort manageTableServicePort, LoggerUtils loggerUtils) {
+	public TableDeleteService(ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
 		this.manageTableServicePort = manageTableServicePort;
 		this.loggerUtils = loggerUtils;
+		
 	}
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -35,14 +35,15 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Autowired
 	LoggerUtils loggerUtils;
 
-	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
+	public InputDocumentService(ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.loggerUtils = loggerUtils;
 
 	}
 
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod(nameofCurrMethod);
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename(servicename);
@@ -89,7 +90,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		loggerUtils.printlogger(loggersDTO, false, false);
 
@@ -117,7 +118,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
-		String timestamp = loggerUtils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 		loggerUtils.printlogger(loggersDTO, false, false);
 

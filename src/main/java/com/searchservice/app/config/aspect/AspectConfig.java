@@ -27,7 +27,7 @@ public class AspectConfig {
 	 */
 	private Logger log = LoggerFactory.getLogger(AspectConfig.class);
 
-	@Around(value = "execution(* com.searchservice.app.domain.utils.LoggerUtils.printlogger(..))")
+	@Around(value = "execution( * com.searchservice.app.domain.utils.LoggerUtils.printlogger(..))")
 	public Object logStatementForLogger(ProceedingJoinPoint joinpoint) {
 
 		LoggersDTO dto = (LoggersDTO) joinpoint.getArgs()[0];

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,7 @@ class ManageTableTest {
 	private String apiEndpoint;
     private String tableName ="automatedTestCollection";
     private int tenantId = 101;
-	@MockBean
-	private LoggerUtils loggerUtils;
+	
 	String schemaName = "default-config";
 	SchemaField search = new SchemaField("testField6","string", true, true, false, true, true, false);
 	//SchemaFieldDTO[] attributes = { search };

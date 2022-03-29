@@ -21,17 +21,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class LoggerUtils {
 	private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
-	CorrelationID correlationid = new CorrelationID();
+	static CorrelationID correlationid = new CorrelationID();
 
-	ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-	String cid;
-	String ipaddress;
+	static ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+	static String cid;
+	static String ipaddress;
 
-	InetAddress ip;
+	static InetAddress ip;
 
 	
 
-	public LoggersDTO getRequestLoggingInfo(String servicename, String username, String nameofmethod, String timestamp,
+	public static LoggersDTO getRequestLoggingInfo(String servicename, String username, String nameofmethod, String timestamp,
 			List<Object> listOfParameters) {
 
 		LoggersDTO loggersDTO = new LoggersDTO();

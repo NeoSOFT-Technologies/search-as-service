@@ -51,13 +51,15 @@ public class VersionedManageTableResource {
 
 	@Autowired
 	LoggerUtils loggerUtils;
+	
 
 	private List<Object> listOfParameters;
 	public VersionedManageTableResource(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort, LoggerUtils loggerUtils) {
+			TableDeleteServicePort tableDeleteServicePort,LoggerUtils loggerUtils) {
 		this.manageTableServicePort = manageTableServicePort;
 		this.tableDeleteServicePort = tableDeleteServicePort;
 		this.loggerUtils = loggerUtils;
+		
 	}
 
 	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -65,7 +67,7 @@ public class VersionedManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = loggerUtils.utcTime().toString();
+		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 	}
 
@@ -74,8 +76,8 @@ public class VersionedManageTableResource {
 	public GetCapacityPlan capacityPlans() {
 		
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
@@ -95,8 +97,8 @@ public class VersionedManageTableResource {
         listOfParameters.add(tenantId);
         
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
@@ -122,8 +124,8 @@ public class VersionedManageTableResource {
 		log.debug("Get table info");
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
 				listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -160,8 +162,8 @@ public class VersionedManageTableResource {
 		listOfParameters = new ArrayList<Object>();
         listOfParameters.add(manageTableDTO);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
@@ -191,8 +193,8 @@ public class VersionedManageTableResource {
 
 
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
@@ -228,8 +230,8 @@ public class VersionedManageTableResource {
         listOfParameters.add(tableName);
 		String tableNameForMessage = tableName;
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
@@ -256,8 +258,8 @@ public class VersionedManageTableResource {
         listOfParameters.add(tableName);
         listOfParameters.add(newTableSchemaDTO);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = loggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = loggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp, listOfParameters);
 		loggerUtils.printlogger(loggersDTO, true, false);
 
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());

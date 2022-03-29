@@ -52,18 +52,20 @@ public class ManageTableResource {
 	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
+	@Autowired
+	LoggerUtils loggerUtils;
+	
 	private List<Object> listOfParameters;
 	
-	@Autowired
-	LoggerUtils Loggerutils;
+	
 	@Autowired
 	TableDeleteServicePort tableDeleteServicePort;
 
 	public ManageTableResource(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort, LoggerUtils Loggerutils) {
+			TableDeleteServicePort tableDeleteServicePort, LoggerUtils loggerUtils) {
 		this.manageTableServicePort = manageTableServicePort;
 		this.tableDeleteServicePort = tableDeleteServicePort;
-		this.Loggerutils = Loggerutils;
+		this.loggerUtils = loggerUtils;
 	}
 
 	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
@@ -71,7 +73,7 @@ public class ManageTableResource {
 		loggersDTO.setServicename(servicename);
 		loggersDTO.setUsername(username);
 		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = Loggerutils.utcTime().toString();
+		timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setTimestamp(timestamp);
 	}
 
@@ -82,20 +84,20 @@ public class ManageTableResource {
         log.debug("Get capacity plans");
 		listOfParameters = new ArrayList<>();
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
 		GetCapacityPlan getCapacityPlanDTO = manageTableServicePort.capacityPlans(loggersDTO);
 
 		successMethod(nameofCurrMethod, loggersDTO);
-		Loggerutils.printlogger(loggersDTO, false, false);
+		loggerUtils.printlogger(loggersDTO, false, false);
 		return ResponseEntity.status(HttpStatus.OK).body(getCapacityPlanDTO);
 	}
 
 	private LoggersDTO logGen(String nameofCurrMethod, String timestamp) {
-		LoggersDTO loggersDTO = Loggerutils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
 				listOfParameters);
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		return loggersDTO;
@@ -108,7 +110,7 @@ public class ManageTableResource {
 		listOfParameters = new ArrayList<Object>();
 		listOfParameters.add(tenantId);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId, loggersDTO);
@@ -118,13 +120,13 @@ public class ManageTableResource {
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
 			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 			throw new BadRequestOccurredException(400, ResponseMessages.DEFAULT_EXCEPTION_MSG);
 		}
 	}
@@ -138,7 +140,7 @@ public class ManageTableResource {
 		listOfParameters.add(tenantId);
 		listOfParameters.add(tableName);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
         if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {	
@@ -156,11 +158,11 @@ public class ManageTableResource {
 				throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
 
 			if (tableInfoResponseDTO.getStatusCode() == 200) {
-				Loggerutils.printlogger(loggersDTO, false, false);
+				loggerUtils.printlogger(loggersDTO, false, false);
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
-				Loggerutils.printlogger(loggersDTO, false, true);
+				loggerUtils.printlogger(loggersDTO, false, true);
 				throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
 			}
 		}
@@ -177,12 +179,12 @@ public class ManageTableResource {
         if(null == manageTableDTO.getColumns() || manageTableDTO.getColumns().isEmpty())
         	throw new NullColumnOccurredException(HttpStatusCode.NULL_COLUMN.getCode(),HttpStatusCode.NULL_COLUMN.getMessage());
         String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-        String timestamp = Loggerutils.utcTime().toString();
+        String timestamp = LoggerUtils.utcTime().toString();
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
         
         if(manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
         	 log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
-             Loggerutils.printlogger(loggersDTO, false, true);
+        	 loggerUtils.printlogger(loggersDTO, false, true);
              throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),"Creating Table Failed , as Invalid Table Name "+manageTableDTO.getTableName()+" is Provided");
         }else {
         	if(tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
@@ -193,12 +195,12 @@ public class ManageTableResource {
       	        Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO, loggersDTO);
       	        successMethod(nameofCurrMethod, loggersDTO);
       	        if (apiResponseDTO.getStatusCode() == 200) {
-      	            Loggerutils.printlogger(loggersDTO, false, false);
+      	        	loggerUtils.printlogger(loggersDTO, false, false);
       	            apiResponseDTO.setMessage("Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
       	            return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
       	        } else {
       	            log.info("Table could not be created: {}", apiResponseDTO);
-      	            Loggerutils.printlogger(loggersDTO, false, true);
+      	          loggerUtils.printlogger(loggersDTO, false, true);
       	            throw new BadRequestOccurredException(101, "REST operation could not be performed");
       	        }
         	   }
@@ -215,7 +217,7 @@ public class ManageTableResource {
 		listOfParameters.add(tenantId);
 		listOfParameters.add(tableName);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
 		tableName = tableName + "_" + tenantId;
@@ -225,11 +227,11 @@ public class ManageTableResource {
 
 				Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(tenantId, tableName, loggersDTO);
 				if (apiResponseDTO.getStatusCode() == 200) {
-					Loggerutils.printlogger(loggersDTO, false, false);
+					loggerUtils.printlogger(loggersDTO, false, false);
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
 					log.debug("Exception occurred: {}", apiResponseDTO);
-					Loggerutils.printlogger(loggersDTO, false, true);
+					loggerUtils.printlogger(loggersDTO, false, true);
 					throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 				}
 			} else {
@@ -251,7 +253,7 @@ public class ManageTableResource {
 		listOfParameters.add(tableName);
 		String tableNameForMessage = tableName;
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
+		String timestamp = LoggerUtils.utcTime().toString();
 		LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
 		tableName = tableName + "_" + tenantId;
@@ -259,10 +261,10 @@ public class ManageTableResource {
 		successMethod(nameofCurrMethod, loggersDTO);
 
 		if (apiResponseDTO.getStatusCode() == 200) {
-			Loggerutils.printlogger(loggersDTO, false, false);
+			loggerUtils.printlogger(loggersDTO, false, false);
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 		} else {
-			Loggerutils.printlogger(loggersDTO, false, true);
+			loggerUtils.printlogger(loggersDTO, false, true);
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
 			throw new BadRequestOccurredException(400, tableNameForMessage + " is not available for restoring");
 		}
@@ -278,10 +280,10 @@ public class ManageTableResource {
 		listOfParameters.add(tableName);
 		listOfParameters.add(newTableSchemaDTO);
 		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = Loggerutils.utcTime().toString();
-		LoggersDTO loggersDTO = Loggerutils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
+		String timestamp = LoggerUtils.utcTime().toString();
+		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,
 				listOfParameters);
-		Loggerutils.printlogger(loggersDTO, true, false);
+		loggerUtils.printlogger(loggersDTO, true, false);
 		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
 		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
 		tableName = tableName + "_" + tenantId;
@@ -295,11 +297,11 @@ public class ManageTableResource {
 			successMethod(nameofCurrMethod, loggersDTO);
 
 	           if (apiResponseDTO.getStatusCode() == 200) {
-	                Loggerutils.printlogger(loggersDTO, false, false);
+	        	   loggerUtils.printlogger(loggersDTO, false, false);
 	                apiResponseDTO.setMessage("Table is updated successfully");
 	                return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 	            } else {
-	                Loggerutils.printlogger(loggersDTO, false, true);
+	            	loggerUtils.printlogger(loggersDTO, false, true);
 	                throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 	            }
 	        } else {
