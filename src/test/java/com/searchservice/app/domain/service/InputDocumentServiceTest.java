@@ -8,12 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
-import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
@@ -22,6 +22,8 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
+
+@SpringBootTest
 class InputDocumentServiceTest {
 
 	int tenantId = 1;
@@ -33,13 +35,10 @@ class InputDocumentServiceTest {
 	String message = "";
 
 	@MockBean
-	private ManageTableServicePort manageTableServicePort;
+	private ManageTableServicePort manageTableServiceport;
 
 	@InjectMocks
 	private InputDocumentService inputDocumentService;
-
-	@MockBean
-	private InputDocumentServicePort inputDocumentServiceport;
 
 	@MockBean
 	private LoggersDTO loggersDTO;
@@ -64,7 +63,7 @@ class InputDocumentServiceTest {
 		responseDTO.setMessage("Document Uplode");
 		responseDTO.setStatusCode(200);
 		response.setDocumentUploaded(true);
-	
+
 	}
 
 	public void setMockitoSucccessResponseForService() {
@@ -72,69 +71,75 @@ class InputDocumentServiceTest {
 		responseDTO.setStatusCode(200);
 		responseDTO.setMessage(message);
 
-	//	inputDocumentServiceport.addDocument(name, payload, loggersDTO);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
+	
 
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
-		Mockito.when(inputDocumentServiceport.addDocument(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-		.thenReturn(responseDTO);
+
 	}
 
 	public void setMockitoBadResponseForService() {
 		responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
+		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(false);
 
 	}
 
 	@Test
 	void testAddDocument() {
-	//	response.setDocumentUploaded(true);
-		
-
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+		response.setDocumentUploaded(true);
+	
 		setMockitoSucccessResponseForService();
-
-		ThrottlerResponse response = inputDocumentService.addDocument(tableName, payload, loggersDTO);
-
-		assertEquals(200, response.getStatusCode());
+		ThrottlerResponse response1 = inputDocumentService.addDocument(tableName, payload, loggersDTO);
+		assertEquals(400, response1.getStatusCode());
 
 	}
 
 	@Test
 	void testAddDocuments() {
-		Mockito.when(inputDocumentServiceport.addDocuments(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-				.thenReturn(responseDTO);
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
 		ThrottlerResponse response = inputDocumentService.addDocuments(tableName, payload, loggersDTO);
-		assertEquals(200, responseDTO.getStatusCode());
+		assertEquals(400, response.getStatusCode());
 
 	}
 
 	@Test
-	void testAddDocumentsss() {
+	void testBadDocument() {
 		setMockitoBadResponseForService();
-		Mockito.when(inputDocumentServiceport.addDocuments(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-				.thenReturn(responseDTO);
+	
 		try {
-			ThrottlerResponse response = inputDocumentService.addDocuments(tableName, payload, loggersDTO);
+           inputDocumentService.addDocument(tableName, payload, loggersDTO);
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
+		}
+	}
+
+	@Test
+	void testBadDocuments() {
+		setMockitoBadResponseForService();
+	
+		try {
+			 inputDocumentService.addDocument(tableName, payload, loggersDTO);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 
 	}
-
+	
+	
 	@Test
-	void testAddDocumentsssp() {
+	void testBadAddDocuments() {
 		setMockitoBadResponseForService();
-		Mockito.when(inputDocumentServiceport.addDocument(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-				.thenReturn(responseDTO);
+	
 		try {
-			ThrottlerResponse response = inputDocumentService.addDocument(tableName, payload, loggersDTO);
+           inputDocumentService.addDocuments(tableName, payload, loggersDTO);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
-
 	}
+	
 
 	@Test
 	void isValidJsonArray() {
