@@ -175,8 +175,6 @@ public class SolrJAdapter {
 			addFieldTypeRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
 			logger.error(e.toString());
-		} finally {
-			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 	}
 

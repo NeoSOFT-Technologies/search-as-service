@@ -654,8 +654,7 @@ public class ManageTableService implements ManageTableServicePort {
 							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
 							fieldTypeDef.setAttributes(fieldTypeAttributes);
 							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
-							
-							addFieldTypeRequest.process(searchClientActive);
+							solrjAdapter.addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
 						} else
 							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
 						
@@ -682,12 +681,7 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchemaResponseDTO.setMessage("New attributes are added successfully");
 			}
 
-		} catch (SolrServerException | IOException e) {
-			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table");
-			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.error(e.toString());
-		} catch (SolrException e) {
+		}  catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
 			
