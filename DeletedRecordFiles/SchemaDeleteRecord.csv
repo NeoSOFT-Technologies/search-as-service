@@ -1,1 +1,22 @@
 TenantID,TableName,RequestTime,ColumnName
+101,automatedTestCollection,28-3-2022 05:40:24,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 05:44:48,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 06:45:14,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 06:56:45,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 07:09:56,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 07:24:26,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 07:36:45,http://localhost:8983/solr
+101,automatedTestCollection,28-3-2022 07:38:48,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 09:21:31,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 01:13:27,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 01:33:46,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 02:34:04,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 02:46:52,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 03:01:20,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 03:26:08,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 03:39:11,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 03:56:00,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 04:04:59,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 06:13:37,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 06:25:16,http://localhost:8983/solr
+101,automatedTestCollection,29-3-2022 06:31:37,http://localhost:8983/solr

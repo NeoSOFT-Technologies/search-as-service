@@ -274,4 +274,9 @@ public class ManageTableResource {
         }
         
     }
+    @GetMapping("/configSets")
+    @Operation(summary = "Test", security = @SecurityRequirement(name = "bearerAuth"))
+    public Response getConfigSets(){
+    	return manageTableServicePort.getConfigSets();
+    }
 }

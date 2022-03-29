@@ -9,7 +9,7 @@ spring:
       fail-on-unknown-properties: true
  # Keycloak Server Configurations
 keycloak:
-  realm: ${KEYCLOAK_REALM_NAME:om_Realm}
+  realm: ${KEYCLOAK_REALM_NAME:om_realm}
   credentials: 
     secret: ${KEYCLOAK_CLIENT_SECRET:iPn1q8Fx93tzOqujgBMwSnFsR6EyWhEd}
   resource: ${KEYCLOAK_CLIENT_NAME:search-as-service}
