@@ -481,6 +481,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 			SchemaResponse schemaResponse = solrjAdapter.getSchemaFields(searchClientActive);
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
+			System.out.println("sssss>>> "+schemaFields);
 			tableSchemaResponseDTO.setStatusCode(200);
 			int numOfFields = schemaFields.size();
 			List<SchemaField> solrSchemaFieldDTOs = new ArrayList<>();
@@ -603,7 +604,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// logic
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			SchemaResponse schemaResponse = solrjAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
-            
+           System.out.println("ssssssssssssssssssssss"+schemaResponse);
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
@@ -696,6 +697,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 					addFieldResponse = solrjAdapter.addFieldRequestInSolrj(addFieldRequest, searchClientActive);
+					System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+addFieldResponse);
 					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
 				}
 				tableSchemaResponseDTO.setStatusCode(200);

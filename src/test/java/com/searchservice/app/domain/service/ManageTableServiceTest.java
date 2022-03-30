@@ -13,6 +13,7 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
+import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,12 +89,13 @@ class ManageTableServiceTest  {
 	List<SchemaField> list = new ArrayList<SchemaField>();
 	SchemaField schemaField = new SchemaField();
 	ConfigSet configSetDTO = new ConfigSet();
+	UpdateResponse updatedResponse =  new UpdateResponse();
 	Response responseDTO = new Response();
 	
 	
 	public void setMockitoBadResponseForService() {
 		
-		
+
 		
 		collectionAdminResponse.setElapsedTime(5);
 		collectionAdminResponse.setRequestUrl(searchUrl);
@@ -107,6 +109,7 @@ class ManageTableServiceTest  {
 	
 	
 	public void setMockitoSuccessResponseForService() {
+	
 		
 		responseDTO.setStatusCode(200);
 		responseDTO.setMessage("Testing");
@@ -175,13 +178,23 @@ class ManageTableServiceTest  {
 		collectionAdminResponse.setElapsedTime(5);
 		collectionAdminResponse.setRequestUrl(searchUrl);
 		collectionAdminResponse.setResponse(test());
+		schemaResponse.setElapsedTime(3);
+		schemaResponse.setRequestUrl(searchUrl);
+		schemaResponse.setResponse(test2());
+		updatedResponse.setResponse(test3());
 		List<String> tableList = new ArrayList<String>();
 		tableList.add(tableName);
+		tableSchema.setStatusCode(200);
+		tableSchema.setMessage("Testing");
+		tableSchema.setData(tableSchemav2Data);
 		Mockito.when(solrJAdapter.getCollectionAdminRequestList( solrClient)).thenReturn(collectionAdminResponse);
 	//	Mockito.when(solrJAdapter.createTableInSolrj(null, solrClient)
-	//	Mockito.when(solrJAdapter.getAllTablesList()).thenReturn(tableList);
+	     
 			Mockito.when(solrJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
-		//Mockito.when(solrJAdapter.addAliasTableInSolrj(tableName, "AutomatedTesting")).thenReturn(aliasTableResponse);
+	
+			Mockito.when(solrJAdapter.addSchemaAttributesInSolrj(Mockito.any(),Mockito.any())).thenReturn(schemaResponse);
+			Mockito.when(solrJAdapter.addFieldRequestInSolrj(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
+			Mockito.when(solrJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		
 	}
 
@@ -207,7 +220,7 @@ class ManageTableServiceTest  {
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename("servicename");
 		loggersDTO.setUsername("username");
-
+	
 	}
 
 
@@ -236,14 +249,9 @@ class ManageTableServiceTest  {
 
 	@Test
 	void testGetTableSchemaIfPresent() {
-
-		try {
-
-			manageTableService.getTableSchemaIfPresent(tableName, new LoggersDTO());
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
+		setMockitoSuccessResponseForService();
+		TableSchemav2 tableSchemaResponse =	manageTableService.getTableSchemaIfPresent(tableName, new LoggersDTO());
+			assertEquals(200, tableSchemaResponse.getStatusCode());
 	}
 
 	@Test
@@ -308,13 +316,10 @@ class ManageTableServiceTest  {
 
 	@Test
 	void getTableSchema() {
+		setMockitoSuccessResponseForService();
 
-		try {
-			manageTableService.getTableSchema(tableName);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
+		TableSchemav2 tableSchemaResponseDTO =manageTableService.getTableSchema(tableName);
+		assertEquals(200, tableSchemaResponseDTO.getStatusCode());
 	}
 
 	@Test
@@ -420,6 +425,16 @@ class ManageTableServiceTest  {
 
 	}
 
+	
+	
+	@Test
+	 void getCurrentTableSchema() {
+		
+		setMockitoSuccessResponseForService();
+		TableSchemav2 getCurrentTableSchema= manageTableService.getCurrentTableSchema(tenantId, tableName);
+		assertEquals(200, getCurrentTableSchema.getStatusCode());
+	}
+	
 	@Test
 	void createTable() {
 		
@@ -430,43 +445,23 @@ class ManageTableServiceTest  {
 
 	@Test
 	void createTableIfNotPresent() {
+		
+		
 		setMockitoSuccessResponseForService();
-//		Response response = manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
-//		assertEquals(200, response.getStatusCode());
-		try {
-			manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
+		System.out.println("Ssss> "+schemaResponse.getResponse());
+		Response se=	manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
+				assertEquals(200, se.getStatusCode());
 		}
-	}
+
 
 	@Test
 	void addSchemaAttributes() {
-
-//
-	//	newTableSchemaDTO.setSchemaName("table");
-		
-	//	newTableSchemaDTO.setTableDetails(finalResponseMap);
-//		newTableSchemaDTO.setTableName(tableName);
-//
-//		schemaRequest.setBasicAuthCredentials(tableName, "abcd");
-//		schemaRequest.setBasePath(searchUrl);
-//			schemaField.setFilterable(true);
-//		schemaField.setMultiValue(true);
-//		schemaField.setName("ok");
-//		schemaField.setPartialSearch(true);
-//		schemaField.setRequired(true);
-//		schemaField.setSortable(true);
-//		schemaField.setStorable(true);
-//		schemaField.setType("string");
-//		list.add(schemaField);
-//		newTableSchemaDTO.setColumns(list);
 
 	setMockitoSuccessResponseForService();
 			
 		
 		Response rs=	manageTableService.addSchemaAttributes(newTableSchemaDTO);
-		assertEquals(400, rs.getStatusCode());
+		assertEquals(200, rs.getStatusCode());
 			System.out.println("sssssssssssssssssssssssss"+rs);
 	}
 
@@ -521,6 +516,7 @@ class ManageTableServiceTest  {
 	public NamedList<Object> test(){
 		List<String> testing = new ArrayList<String>();
 		testing.add(tableName);
+		testing.add(tableName+"_"+tenantId);
 		testing.add("Testing_101");
 		 NamedList<Object> lst = new NamedList<Object>();
 		  lst.add("collections", testing);
@@ -536,5 +532,62 @@ class ManageTableServiceTest  {
 		  return lst;
 		}
 	
+	public NamedList<Object> test3(){
+		NamedList<Object> nl1 = new NamedList<Object>();
+		List<NamedList<Object>> lst1 = new ArrayList<>();
+		nl1.add("status","0");
+		nl1.add("QTime","4055");
+		lst1.add(nl1);
+		NamedList<Object> nl2 = new NamedList<Object>();
+		nl2.add("responseHeader", lst1);
+		return nl2;
+		}
 	
+	public NamedList<Object> test2(){
+		Map<String,Object> map1 = new HashMap<>();
+		NamedList<Object> nl1 = new NamedList<Object>();
+		NamedList<Object> nl2 = new NamedList<Object>();
+		NamedList<Object> nl3 = new NamedList<Object>();
+		NamedList<Object> nl4 = new NamedList<Object>();
+		List<NamedList<Object>> lst1 = new ArrayList<>();
+		List<NamedList<Object>> lst2 = new ArrayList<>();
+		List<NamedList<Object>> lst3 = new ArrayList<>();
+		List<NamedList<Object>> lst4 = new ArrayList<>();
+		nl1.add("name","_nest_path");
+		nl1.add("type","_nest_path");
+		nl2.add("name","*_txt_en_split_tight");
+		nl2.add("type","text_en_splitting_tight");
+		nl2.add("indexed","true");
+		nl2.add("stored","true");
+		nl3.add("name","*_txt_en_split_tight");
+		nl3.add("type","text_en_splitting_tight");
+		nl3.add("indexed","true");
+		nl3.add("stored","true");
+		nl3.add("class","solr.NestPathField");
+		nl3.add("maxCharsForDocValues","-1");
+		nl3.add("multiValued","false");
+		nl4.add("source", "name");
+		nl4.add("dest", "name_str");
+		nl4.add("maxChars", "256");
+		map1.put("name","default_config");
+		map1.put("version", 1.6f);
+		map1.put("uniqueKey", "id");
+		lst1.add(nl1);
+		lst2.add(nl2);
+		lst3.add(nl3);
+		lst4.add(nl4);
+		map1.put("fields",lst1);
+		map1.put("dynamicFields",lst2);
+		map1.put("fieldTypes",lst3);
+		map1.put("copyFields",lst4);
+		 NamedList<Object> lst = new NamedList<Object>();
+		  lst.add("schema", map1);
+		  return lst;
+		}
+     //{responseHeader={status=0,QTime=4055}}
+	// copyFields=[{source=name,dest=name_str,maxChars=256}, {source=type,dest=type_str,maxChars=256}]}}
+	//schema={name=default-config, version=1.6, uniqueKey=id, fieldTypes=[{name=_nest_path_,class=solr.NestPathField,maxCharsForDocValues=-1,omitNorms=true,omitTermFreqAndPositions=true,stored=false,multiValued=false}
+	//{name=_nest_path_,type=_nest_path_}
+	//{name=*_txt_en_split_tight,type=text_en_splitting_tight,indexed=true,stored=true}
+	//{name=_nest_path_,class=solr.NestPathField,maxCharsForDocValues=-1,omitNorms=true,omitTermFreqAndPositions=true,stored=false,multiValued=false}
 }
