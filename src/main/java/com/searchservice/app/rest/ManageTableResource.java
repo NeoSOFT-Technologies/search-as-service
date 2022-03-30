@@ -31,6 +31,8 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullColumnOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.TableNotFoundException;
+import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -209,10 +211,10 @@ public class ManageTableResource {
                     throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
                 }
             } else {
-                throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + tenantId + " Does Not Exist");
+                throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Tenant ID " + tenantId + " Does Not Exist");
             }
         } else {
-            throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Client ID " + tenantId + " is Already Under Deletion");
+            throw new BadRequestOccurredException(400, "Table " + tableName.split("_")[0] + " For Tenant ID " + tenantId + " is Already Under Deletion");
         }
     }
 
@@ -225,6 +227,7 @@ public class ManageTableResource {
         LoggersDTO loggersDTO = logGen(nameofCurrMethod, timestamp);
 
         tableName = tableName + "_" + tenantId;
+        if(tableDeleteServicePort.isTableUnderDeletion(tableNameForMessage)) {
         Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(tableName, loggersDTO);
         successMethod(nameofCurrMethod, loggersDTO);
 
@@ -234,7 +237,11 @@ public class ManageTableResource {
         } else {
             LoggerUtils.printlogger(loggersDTO, false, true);
             log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
-            throw new BadRequestOccurredException(400, tableNameForMessage + " is not available for restoring");
+            throw new BadRequestOccurredException(400, "Error While Perforing Restoring for Table: "+tableNameForMessage);
+        }
+        }else {
+        	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
+        			"Table "+tableNameForMessage+" is Not Under Deletion");
         }
     }
 
@@ -252,7 +259,10 @@ public class ManageTableResource {
         loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
         loggersDTO.setIpaddress(loggersDTO.getIpaddress());
         tableName = tableName + "_" + tenantId;
-
+        if(!manageTableServicePort.isTableExists(tableName)) {
+        	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),"Table "+tableName.split("_")[0]+ 
+        			" having TenantID: "+tableName.split("_")[1]+" Not Found");
+        }else {
         if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
             newTableSchemaDTO.setTableName(tableName);
 
@@ -272,6 +282,6 @@ public class ManageTableResource {
         } else {
             throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table " + tableName + " is Under Deletion Process");
         }
-        
+        }
     }
 }

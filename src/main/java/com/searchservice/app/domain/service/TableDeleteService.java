@@ -93,7 +93,7 @@ private String servicename = "Table_Delete_Service";
 		}else {
 			  logger.debug(TABLE_DELETE_INITIALIZE_ERROR_MSG ,actualTableName);
 			  deleteRecordInsertionResponse.setStatusCode(400);
-			  deleteRecordInsertionResponse.setMessage("Invalid Client ID or Table Name Provided");
+			  deleteRecordInsertionResponse.setMessage("Invalid Tenant ID or Table Name Provided");
 		}
 		  return deleteRecordInsertionResponse;
 	}

@@ -103,10 +103,6 @@ class ManageTableTest {
    
         GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
         
-        Response unodDeleteResponseDTO = new Response();
-        unodDeleteResponseDTO.setStatusCode(200);
-        unodDeleteResponseDTO.setMessage("Testing");
-
         Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.deleteTable(Mockito.any(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(),Mockito.any(),Mockito.any())).thenReturn(responseDTO);
@@ -120,12 +116,23 @@ class ManageTableTest {
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Random message","Data is returned");
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
-        Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+      
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
         Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
+        Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
+        Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
     }
+    
+   public void setundoDeleteSuccessResponse() {
+	   Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
 
+       Response unodDeleteResponseDTO = new Response();
+       unodDeleteResponseDTO.setStatusCode(200);
+       unodDeleteResponseDTO.setMessage("Testing");
+       Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
+
+   }
     public void setMockitoBadResponseForService() {
     	Response responseDTO = new Response();
         responseDTO.setStatusCode(400);
@@ -152,13 +159,14 @@ class ManageTableTest {
         Mockito.when(manageTableService.getTables(Mockito.anyInt(),Mockito.any())).thenReturn(getTablesResponseDTO);
 //        Mockito.when(manageTableService.getTableSchemaIfPresent(Mockito.any())).thenReturn(tableSchemaResponseDTO);
         Mockito.when(manageTableService.capacityPlans(Mockito.any())).thenReturn(capacityPlanResponseDTO);
-        
+        Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(false);
         Map<Object, Object> finalResponseMap= new HashMap<>();
         finalResponseMap.put("Error","Error connecting to cluster.");
         Mockito.when(manageTableService.getTableDetails(Mockito.any(),Mockito.any())).thenReturn(finalResponseMap);
         Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString(),Mockito.any())).thenReturn(unodDeleteResponseDTO);
         Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString(),Mockito.any())).thenReturn(responseDTO);
         Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+        Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         
        
     }
@@ -320,7 +328,7 @@ class ManageTableTest {
     	Response undoDeleteTableDTO=new Response();
     	
     	//Testing Undo Table Delete For Valid Table
-    	setMockitoSuccessResponseForService();
+    	setundoDeleteSuccessResponse();
 		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ tenantId +"/"+ tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))

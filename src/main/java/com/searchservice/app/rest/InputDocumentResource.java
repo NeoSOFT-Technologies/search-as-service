@@ -182,8 +182,8 @@ public class InputDocumentResource {
 
 	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
 		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
-		documentInjectionThrottlerResponse.setStatusCode(400);
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Client ID: "+tenantId+" Does Not Exist");
+		documentInjectionThrottlerResponse.setStatusCode(HttpStatusCode.TABLE_NOT_FOUND.getCode());
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+" Not Found");
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 }

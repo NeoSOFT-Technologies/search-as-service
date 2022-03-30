@@ -34,7 +34,24 @@ public class RestControllerAdvice {
 				HttpStatusCode.INVALID_TABLE_NAME.getCode(), HttpStatusCode.INVALID_TABLE_NAME,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(TableNotFoundException.class)
+	public ResponseEntity<Object> handleTableNotFound(TableNotFoundException exception) {
 
+		return new ResponseEntity<Object>(new RestApiErrorHandling(
+
+				HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(TableNotUnderDeletionException.class)
+	public ResponseEntity<Object> handleTableNotUnderDeletion(TableNotUnderDeletionException exception) {
+
+		return new ResponseEntity<Object>(new RestApiErrorHandling(
+
+				HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(), HttpStatusCode.TABLE_NOT_UNDER_DELETION,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+	}
 	@ExceptionHandler(InvalidSKUOccurredException.class)
 	public ResponseEntity<Object> handleInvalidSKU(InvalidSKUOccurredException exception) {
 

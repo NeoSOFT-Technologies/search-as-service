@@ -35,10 +35,10 @@ import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 
 @Service
-public class SolrJAdapter {
+public class SearchJAdapter {
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
-	private final Logger logger = LoggerFactory.getLogger(SolrJAdapter.class);
+	private final Logger logger = LoggerFactory.getLogger(SearchJAdapter.class);
 	@Autowired
 	SearchAPIAdapter searchAPIAdapter;
 	HttpSolrClient searchClient;
@@ -51,7 +51,7 @@ public class SolrJAdapter {
 	@Value("${basic-auth.password}")
 	private String basicAuthPassword;
 
-	public CollectionAdminResponse getCollectionAdminRequestList(int clientId, HttpSolrClient searchClientActive) {
+	public CollectionAdminResponse getCollectionAdminRequestList(int tenantId, HttpSolrClient searchClientActive) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		CollectionAdminResponse response = null;
 
@@ -67,7 +67,7 @@ public class SolrJAdapter {
 
 	}
 
-	public Map<Object, Object> getTableDetailsFromSolrjCluster(String tableName) {
+	public Map<Object, Object> getTableDetailsFromSearchjCluster(String tableName) {
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
@@ -85,7 +85,7 @@ public class SolrJAdapter {
 		return finalResponseMap;
 	}
 
-	public Boolean deleteTableFromSolrj(String tableName) {
+	public Boolean deleteTableFromSearchj(String tableName) {
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
 		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
@@ -103,7 +103,7 @@ public class SolrJAdapter {
 		return true;
 	}
 
-	public java.util.List<String> getConfigSetFromSolrj() {
+	public java.util.List<String> getConfigSetFromSearchj() {
 		java.util.List<String> data = new ArrayList<>();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
@@ -153,7 +153,7 @@ public class SolrJAdapter {
 		return schemaFields;
 	}
 
-	public Boolean createConfigSetInSolrj(ConfigSet configSetDTO) {
+	public Boolean createConfigSetInSearchj(ConfigSet configSetDTO) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.Create configSetRequest = new ConfigSetAdminRequest.Create();
 		configSetRequest.setBaseConfigSetName(configSetDTO.getBaseConfigSetName());
@@ -172,7 +172,7 @@ public class SolrJAdapter {
 		return true;
 	}
 
-	public Boolean createTableInSolrj(ManageTable manageTableDTO, CapacityPlanProperties.Plan selectedCapacityPlan) {
+	public Boolean createTableInSearchj(ManageTable manageTableDTO, CapacityPlanProperties.Plan selectedCapacityPlan) {
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
@@ -191,7 +191,7 @@ public class SolrJAdapter {
 
 	}
 
-	public List<Map<String, Object>> addSchemaAttributesInSolrj(TableSchema newTableSchemaDTO) {
+	public List<Map<String, Object>> addSchemaAttributesInSearchj(TableSchema newTableSchemaDTO) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
 		SchemaRequest schemaRequest = new SchemaRequest();
@@ -226,7 +226,7 @@ public class SolrJAdapter {
 		}
 	}
 
-	public void addFieldRequestInSolrj(Map<String, Object> newField, String fildName, String tableName) {
+	public void addFieldRequestInSearchj(Map<String, Object> newField, String fildName, String tableName) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
 		UpdateResponse addFieldResponse;
@@ -241,7 +241,7 @@ public class SolrJAdapter {
 		}
 	}
 
-	public List<Map<String, Object>> updateSchemaAttributesInSolrj(TableSchema newTableSchemaDTO) {
+	public List<Map<String, Object>> updateSchemaAttributesInSearchj(TableSchema newTableSchemaDTO) {
 
 		SchemaRequest schemaRequest = new SchemaRequest();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
@@ -294,7 +294,7 @@ public class SolrJAdapter {
 
 	}
 
-	public Response addAliasTableInSolrj(String tableOriginalName, String tableAlias) {
+	public Response addAliasTableInSearchj(String tableOriginalName, String tableAlias) {
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
@@ -312,7 +312,7 @@ public class SolrJAdapter {
 		return apiResponseDTO;
 	}
 
-	public Boolean deleteConfigSetFromSolrj(String configSetName) {
+	public Boolean deleteConfigSetFromSearchj(String configSetName) {
 
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
@@ -347,7 +347,7 @@ public class SolrJAdapter {
 		return status;
 	}
 
-	public List<FieldTypeDefinition> isPartialSearchFieldInSolrj(String tableName) {
+	public List<FieldTypeDefinition> isPartialSearchFieldInSearchj(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		List<FieldTypeDefinition> fieldTypes = null;

@@ -11,7 +11,7 @@ import com.searchservice.app.domain.dto.logger.LoggersDTO;
 @Component
 public interface TableDeleteServicePort {
 	    //Initializing Table for Deletion
-		public Response initializeTableDelete(int clientId,String tableName,LoggersDTO loggersDTO);
+		public Response initializeTableDelete(int tenantId,String tableName,LoggersDTO loggersDTO);
 		
 		//Scheduler to Check For Table to Deleted With More or Equal to 15days Request Time
 		public int checkDeletionofTable(LoggersDTO loggersDTO);

@@ -21,15 +21,15 @@ public interface ManageTableServicePort {
 	 */
 	// GET request
 	GetCapacityPlan capacityPlans(LoggersDTO loggersDTO);
-	Response getTables(int clientid,LoggersDTO loggersDTO);
-	TableSchemav2 getCurrentTableSchema(int clientId, String tableName);
+	Response getTables(int tenantid,LoggersDTO loggersDTO);
+	TableSchemav2 getCurrentTableSchema(int tenantId, String tableName);
 
 	// CREATE requests
 	Response createTableIfNotPresent(ManageTable manageTableDTO,LoggersDTO loggersDTO);
 	// DELETE requests
 	Response deleteTable(String tableName,LoggersDTO loggersDTO);
 	// UPDATE requests
-	Response updateTableSchema(int clientId, String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO);
+	Response updateTableSchema(int tenantId, String tableName, TableSchema tableSchemaDTO,LoggersDTO loggersDTO);
     
     
     /*
@@ -49,7 +49,7 @@ public interface ManageTableServicePort {
 	Response deleteConfigSet(String configSetName);
     // UPDATE Table additional methods
     TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(
-    		String tableName, int clientId, TableSchemav2 tableSchema);
+    		String tableName, int tenantId, TableSchemav2 tableSchema);
     boolean checkIfTableNameisValid(String tableName);
  
 }

@@ -193,9 +193,9 @@ public class VersionedManageTableResource {
  			 throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
  		   }
  		}else {
- 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Client ID "+tenantId+" Does Not Exist");
+ 			throw new BadRequestOccurredException(400, "Table "+tableNameForMessage+" For Tenant ID "+tenantId+" Does Not Exist");
  		}}else {
- 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table "+tableNameForMessage+" For Client ID "+tenantId+" is Already Under Deletion");
+ 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), "Table "+tableNameForMessage+" For Tenant ID "+tenantId+" is Already Under Deletion");
  		}
  	}	
  	
