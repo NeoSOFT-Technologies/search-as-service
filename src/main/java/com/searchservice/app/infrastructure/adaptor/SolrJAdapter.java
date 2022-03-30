@@ -1,6 +1,7 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
@@ -17,9 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.searchservice.app.domain.utils.SearchUtil;
 
-
 @Service
 public class SolrJAdapter {
+
 	private final Logger logger = LoggerFactory.getLogger(SolrJAdapter.class);
 	@Autowired
 	SearchAPIAdapter searchAPIAdapter;

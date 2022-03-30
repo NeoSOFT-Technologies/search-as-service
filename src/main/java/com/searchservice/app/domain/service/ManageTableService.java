@@ -171,9 +171,9 @@ public class ManageTableService implements ManageTableServicePort {
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-		CollectionAdminResponse response = searchjAdapter.getCollectionAdminRequestList(searchClientActive);
-		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"), tenantId);
-				
+		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(searchClientActive);
+		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+				clientId);
 
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
@@ -510,7 +510,6 @@ public class ManageTableService implements ManageTableServicePort {
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 
 			searchjAdapter.createConfigSetInSolrj(configSetRequest, searchClientActive);
-
 			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be created");
@@ -519,6 +518,7 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		return apiResponseDTO;
 	}
+
 
 	@Override
 	public Response createTable(ManageTable manageTableDTO) {
@@ -547,7 +547,9 @@ public class ManageTableService implements ManageTableServicePort {
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+
 			searchjAdapter.createTableInSolrj(request, searchClientActive);
+
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
@@ -561,9 +563,13 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	
+	
 	@Override
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
+
 logger.info("Add schema attributes");
+
 		
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(
 				searchURL, newTableSchemaDTO.getTableName());
@@ -577,8 +583,8 @@ logger.info("Add schema attributes");
 		try {
 			// logic
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = searchjAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
 
+			SchemaResponse schemaResponse = searchjAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
@@ -735,6 +741,7 @@ logger.info("Add schema attributes");
 			for (Map<String, Object> currField : targetSchemafields) {
 				// Pass the fieldAttribute to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
+
 				updateFieldsResponse = searchjAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
 				schemaResponseDTOAfter.setStatusCode(200);
 
@@ -777,7 +784,9 @@ logger.info("Add schema attributes");
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		try {
 			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
+
 			searchjAdapter.addAliasTableInSolrj(searchClientActive, request);
+
 			apiResponseDTO.setStatusCode(200);
 		} catch (Exception e) {
 			apiResponseDTO.setStatusCode(400);
@@ -802,7 +811,9 @@ logger.info("Add schema attributes");
 			configSetRequest.setMethod(METHOD.DELETE);
 			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.setConfigSetName(configSetName);
+
 			searchjAdapter.deleteConfigSetFromSolrj(searchClientActive, configSetRequest);
+
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be deleted");
@@ -927,7 +938,9 @@ logger.info("Add schema attributes");
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest.DeleteField deleteFieldRequest = new SchemaRequest.DeleteField(columnName);
 		try {
+
 			UpdateResponse response = searchjAdapter.performSchemaDeletion(searchClientActive, deleteFieldRequest);
+
 			int schemaDeletionStatus = response.getStatus();
 
 			if (schemaDeletionStatus == 200) {
@@ -1015,6 +1028,7 @@ logger.info("Add schema attributes");
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		SchemaRequest schemaRequest = new SchemaRequest();
 		try {
+
 			SchemaResponse schemaResponse = searchjAdapter.isPartialSearchFieldInSolrj(searchClientActive, schemaRequest);
 			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
 
