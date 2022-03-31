@@ -2,8 +2,6 @@ package com.searchservice.app.rest;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
-import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidJsonInputOccurredException;
 
@@ -35,18 +31,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RestController
 @RequestMapping("${base-url.api-endpoint.home}")
 public class InputDocumentResource {
-	private String servicename = "Input_Document_Resource";
 
-	private String username = "Username";
 	private final Logger log = LoggerFactory.getLogger(InputDocumentResource.class);
-	private List<Object> listOfParameters;
-	
+
 	@Autowired
 	InputDocumentService inputDocumentService;
 
-	@Autowired
-	LoggerUtils loggerUtils;
-	
 	private static final String DOCUMENT_INJECTION_THROTTLER_SERVICE = "documentInjectionRateLimitThrottler";
 
 	public final InputDocumentServicePort inputDocumentServicePort;
@@ -54,57 +44,36 @@ public class InputDocumentResource {
 	public final ManageTableServicePort manageTableServicePort;
 
 	public InputDocumentResource(InputDocumentServicePort inputDocumentServicePort,
-			ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
+			ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort) {
 		this.inputDocumentServicePort = inputDocumentServicePort;
 		this.throttlerServicePort = throttlerServicePort;
 		this.manageTableServicePort = manageTableServicePort;
-		this.loggerUtils = loggerUtils;
+
 	}
 
-	private void successMethod(String nameofCurrMethod, LoggersDTO loggersDTO) {
-		String timestamp;
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
-	}
+	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
+	@PostMapping("/ingest-nrt/{tenantId}/{tableName}")
+	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @PathVariable String tableName,
+			@RequestBody String payload) {
 
-
-@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-@PostMapping("/ingest-nrt/{tenantId}/{tableName}")
-@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
-public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @PathVariable String tableName,
-		@RequestBody String payload) {
-	listOfParameters = new ArrayList<Object>();
-	log.debug("Solr documents add");
-	listOfParameters.add(tenantId);
-	listOfParameters.add(tableName);
-	listOfParameters.add(payload);
-        log.debug("Search documents add");
-        if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-        String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username,nameofCurrMethod,timestamp,listOfParameters);
-		loggerUtils.printlogger(loggersDTO,true,false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
-		loggersDTO.setListOfParameters(loggersDTO.getListOfParameters());
+		
+		if (!inputDocumentService.isValidJsonArray(payload))
+			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, true);
 
-		successMethod(nameofCurrMethod, loggersDTO);
 		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		tableName = tableName + "_" + tenantId;
 		if (manageTableServicePort.isTableExists(tableName)) {
-			successMethod(nameofCurrMethod, loggersDTO);
-			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse, loggersDTO);
+
+			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
@@ -112,25 +81,15 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
 
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tenantId}/{tableName}")
-    @Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ThrottlerResponse> document(
-										@PathVariable int tenantId,
-							    		@PathVariable String tableName,
-							    		@RequestBody String payload) {
+	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<ThrottlerResponse> document(@PathVariable int tenantId, @PathVariable String tableName,
+			@RequestBody String payload) {
 
-        log.debug("Search document add");
-        listOfParameters = new ArrayList<Object>();
-		listOfParameters.add(tenantId);
-		listOfParameters.add(tableName);
-		listOfParameters.add(payload);
-        if(!inputDocumentService.isValidJsonArray(payload))
-        	throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-        String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		String timestamp = LoggerUtils.utcTime().toString();
-		LoggersDTO loggersDTO = LoggerUtils.getRequestLoggingInfo(servicename, username, nameofCurrMethod, timestamp,listOfParameters);
-		loggerUtils.printlogger(loggersDTO, true, false);
-		loggersDTO.setCorrelationid(loggersDTO.getCorrelationid());
-		loggersDTO.setIpaddress(loggersDTO.getIpaddress());
+	
+
+		if (!inputDocumentService.isValidJsonArray(payload))
+			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
@@ -146,7 +105,7 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		if (manageTableServicePort.isTableExists(tableName)) {
-			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse, loggersDTO);
+			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
@@ -168,10 +127,9 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
 	}
 
 	public ResponseEntity<ThrottlerResponse> performDocumentInjection(String tableName, String payload,
-			ThrottlerResponse documentInjectionThrottlerResponse, LoggersDTO loggersDTO) {
+			ThrottlerResponse documentInjectionThrottlerResponse) {
 		Instant start = Instant.now();
-		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload,
-				loggersDTO);
+		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
 		Instant end = Instant.now();
 		Duration timeElapsed = Duration.between(start, end);
 		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
@@ -179,10 +137,10 @@ public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
 		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
-			loggerUtils.printlogger(loggersDTO, false, false);
+
 			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
 		} else {
-			loggerUtils.printlogger(loggersDTO, false, true);
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 		}
 	}

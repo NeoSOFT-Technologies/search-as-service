@@ -42,8 +42,7 @@ public class UserService implements UserServicePort {
 
 	@Override
 	public Response getToken(String userName, String password) {
-		log.info("userName : {}", userName);
-		log.info("password : {}", password);
+		
 		if (userName.isBlank() || userName.isEmpty() || password.isBlank() || password.isEmpty()) {
 			return createResponse(ERROR, "username and password must bot be blank.", 400);
 		}

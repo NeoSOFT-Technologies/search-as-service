@@ -1,8 +1,6 @@
 
 package com.searchservice.app.domain.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,44 +8,25 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.utils.LoggerUtils;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
-	private final Logger log = LoggerFactory.getLogger(InputDocumentService.class);
+	
 
 	@Value("${base-search-url}")
 	private String baseSearchUrl;
 
-	private String servicename = "Input_Document_Service";
-
-	private String username = "Username";
-
 	@Autowired
 	public final ManageTableServicePort manageTableServicePort;
 
-	@Autowired
-	LoggerUtils loggerUtils;
-
-	public InputDocumentService(ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
+	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
-		this.loggerUtils = loggerUtils;
 
-	}
-
-	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
-
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
 	}
 
 	private void extracted(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
@@ -71,14 +50,10 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponse addDocuments(String tableName, String payload, LoggersDTO loggersDTO) {
+	public ThrottlerResponse addDocuments(String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
-
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
-		loggerUtils.printlogger(loggersDTO, true, false);
 
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
@@ -90,23 +65,16 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
 
 		extracted(responseDTO, response);
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
-		loggerUtils.printlogger(loggersDTO, false, false);
 
 		return responseDTO;
 
 	}
 
 	@Override
-	public ThrottlerResponse addDocument(String tableName, String payload, LoggersDTO loggersDTO) {
+	public ThrottlerResponse addDocument(String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
-
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
-		loggerUtils.printlogger(loggersDTO, true, false);
 
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
@@ -118,9 +86,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
 
 		extracted(responseDTO, response);
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
-		loggerUtils.printlogger(loggersDTO, false, false);
 
 		return responseDTO;
 	}

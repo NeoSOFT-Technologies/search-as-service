@@ -23,10 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.utils.LoggerUtils;
 
 @Service
 
@@ -42,16 +40,10 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
-	@Autowired
-	LoggerUtils loggerUtils;
-	private String servicename = "Table_Delete_Service";
-
-	private String username = "Username";
-
-	public TableDeleteService(ManageTableServicePort manageTableServicePort,LoggerUtils loggerUtils) {
+	
+	public TableDeleteService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
-		this.loggerUtils = loggerUtils;
-		
+
 	}
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -60,25 +52,11 @@ public class TableDeleteService implements TableDeleteServicePort {
 	private static final String TABLE_DELETE_UNDO_ERROR_MSG = "Undo Table Delete Failed , Invalid CLient ID Provided";
 	private static final String TABLE_FILE_CREATE_ERROR = "Error File Creating File {}";
 
-	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
-
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setNameofmethod(nameofCurrMethod);
-		loggersDTO.setTimestamp(timestamp);
-		loggersDTO.setServicename(servicename);
-		loggersDTO.setUsername(username);
-	}
-
 	@Override
-	public Response initializeTableDelete(int tenantId, String tableName, LoggersDTO loggersDTO) {
-
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
-		loggerUtils.printlogger(loggersDTO, true, false);
+	public Response initializeTableDelete(int tenantId, String tableName) {
 
 		Response deleteRecordInsertionResponse = new Response();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+
 		String actualTableName = "";
 		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
 			File file = new File(deleteRecordFilePath + ".csv");
@@ -89,24 +67,21 @@ public class TableDeleteService implements TableDeleteServicePort {
 						+ "\n";
 				fw.write(newRecord);
 				fw.flush();
-				fw.close();
+
 				deleteRecordInsertionResponse.setStatusCode(200);
 
-				loggerUtils.printlogger(loggersDTO, false, false);
 				deleteRecordInsertionResponse
 						.setMessage("Table:" + actualTableName + " Successfully Initialized For Deletion ");
-				fw.close();
-				bw.close();
+
 			} catch (Exception e) {
 				logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName, e);
 				deleteRecordInsertionResponse.setStatusCode(400);
-				loggerUtils.printlogger(loggersDTO, false, true);
 
 				deleteRecordInsertionResponse
 						.setMessage("Error While Initializing Deletion For Table: " + actualTableName);
 			}
 		} else {
-			// logger.debug(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName);
+			logger.debug(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName);
 			deleteRecordInsertionResponse.setStatusCode(400);
 			deleteRecordInsertionResponse.setMessage("Invalid Client ID or Table Name Provided");
 		}
@@ -114,19 +89,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public int checkDeletionofTable(LoggersDTO loggersDTO) {
-
-		
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
-		loggerUtils.printlogger(loggersDTO, true, false);
+	public int checkDeletionofTable() {
 
 		File existingFile = new File(deleteRecordFilePath + ".txt");
 		File newFile = new File(deleteRecordFilePath + "Temp.txt");
 		int lineNumber = 0;
 		int delRecordCount = 0;
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
 
 		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
 				PrintWriter pw = new PrintWriter(new FileWriter(newFile))) {
@@ -137,7 +105,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 					if (diff < tableDeleteDuration) {
 						pw.println(currentDeleteRecord);
 					} else {
-						if (performTableDeletion(currentDeleteRecord, loggersDTO)) {
+						if (performTableDeletion(currentDeleteRecord)) {
 							delRecordCount++;
 						} else {
 							pw.println(currentDeleteRecord);
@@ -149,15 +117,13 @@ public class TableDeleteService implements TableDeleteServicePort {
 				lineNumber++;
 			}
 			pw.flush();
-			pw.close();
-			br.close();
-			loggerUtils.printlogger(loggersDTO, false, false);
+
 			makeDeleteTableFileChangesForDelete(newFile, existingFile, delRecordCount);
 
 		} catch (IOException exception) {
 			logger.error("Error While Performing Table Deletion ", exception);
 			delRecordCount = -1;
-			loggerUtils.printlogger(loggersDTO, false, true);
+
 		}
 		return delRecordCount;
 	}
@@ -170,20 +136,16 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public Response undoTableDeleteRecord(String tableName, LoggersDTO loggersDTO) {
+	public Response undoTableDeleteRecord(String tableName) {
 
-		String nameofCurrMethod = new Throwable().getStackTrace()[0].getMethodName();
-		requestMethod(loggersDTO, nameofCurrMethod);
-		loggerUtils.printlogger(loggersDTO, true, false);
 		Response performUndoDeleteResponse = new Response();
-		String timestamp = LoggerUtils.utcTime().toString();
-		loggersDTO.setTimestamp(timestamp);
+
 		if (tableName != null) {
-			loggerUtils.printlogger(loggersDTO, false, false);
+
 			performUndoDeleteResponse = performUndoTableDeletion(tableName);
 		} else {
 			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
-			loggerUtils.printlogger(loggersDTO, false, true);
+
 			performUndoDeleteResponse.setStatusCode(400);
 			performUndoDeleteResponse.setMessage(TABLE_DELETE_UNDO_ERROR_MSG);
 		}
@@ -242,20 +204,20 @@ public class TableDeleteService implements TableDeleteServicePort {
 		return undoTableDeletionResponse;
 	}
 
-	public boolean performTableDeletion(String tableRecord, LoggersDTO loggersDTO) {
+	public boolean performTableDeletion(String tableRecord) {
 		String tableName = tableRecord.split(",")[1];
-		Response tableDeleteResponse = manageTableServicePort.deleteTable(tableName, loggersDTO);
+		Response tableDeleteResponse = manageTableServicePort.deleteTable(tableName);
 
-		if(tableDeleteResponse.getStatusCode() == 200) {
+		if (tableDeleteResponse.getStatusCode() == 200) {
 			return true;
-		} 
+		}
 		return false;
 	}
 
 	public Response getUndoDeleteResponse(int undoRecordNumber, String tableName) {
 		Response undoDeleteResponseDTO = new Response();
 		if (undoRecordNumber > 0) {
-			
+
 			undoDeleteResponseDTO.setStatusCode(200);
 			undoDeleteResponseDTO.setMessage("Restore Deletion of Table " + tableName + " Performed Successfully");
 		} else {
@@ -270,10 +232,10 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Override
 	public boolean checkTableDeletionStatus(int deleteRecordCount) {
 		if (deleteRecordCount > 0) {
-			
+
 			return true;
 		} else {
-			
+
 			return false;
 		}
 	}

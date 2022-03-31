@@ -1,64 +1,108 @@
 package com.searchservice.app.config.aspect;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.UUID;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.jboss.logging.MDC;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.logger.LoggersDTO;
+import com.searchservice.app.domain.dto.user.UserDTO;
 
 @Aspect
 @Configuration
 public class AspectConfig {
 
-	/*
-	 * 
-	 * Logging
-	 * 
-	 */
-	private Logger log = LoggerFactory.getLogger(AspectConfig.class);
+	private static Logger log = LoggerFactory.getLogger(AspectConfig.class);
 
-	@Around(value = "execution( * com.searchservice.app.domain.utils.LoggerUtils.printlogger(..))")
-	public Object logStatementForLogger(ProceedingJoinPoint joinpoint) {
+	private static final String STARTED_EXECUTION = "--------Started Request of Service Name : {}, Username : {}, CorrelationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
+	private static final String SUCCESSFUL_EXECUTION = "--------Successfully Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
+	private static final String CORRELATION_ID_LOG_VAR_NAME = "correlationId";
+	private static UserDTO user;
+	private static String ip;
 
-		LoggersDTO dto = (LoggersDTO) joinpoint.getArgs()[0];
-		if (joinpoint.getArgs()[1].toString().contains("true")) {
-			log.info(
-					"--------Started Request of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}, parameters : {}",
-					dto.getServicename(), dto.getUsername(), dto.getCorrelationid(), dto.getIpaddress(),
-					dto.getTimestamp(), dto.getNameofmethod(), dto.getListOfParameters());
-		} else if (joinpoint.getArgs()[2].toString().contains("true")) {
-			log.info(
-					"--------Failed Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
-					dto.getServicename(), dto.getUsername(), dto.getCorrelationid(), dto.getIpaddress(),
-					dto.getTimestamp(), dto.getNameofmethod());
-		} else {
-			log.info(
-					"--------Successfully Response of Service Name : {} , Username : {}, Corrlation Id : {}, IP Address : {}, TimeStamp : {}, Method name : {}",
-					dto.getServicename(), dto.getUsername(), dto.getCorrelationid(), dto.getIpaddress(),
-					dto.getTimestamp(), dto.getNameofmethod());
+	@Before(value = "execution(* com.searchservice.app.rest.UserResource.*(..))")
+	public static Object logStatementForRest(JoinPoint joinPoint) {
+		user = (UserDTO) joinPoint.getArgs()[0];
+		final String correlationId = generateUniqueCorrelationId();
+		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			log.error(e.toString());
 		}
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
 
-		return joinpoint;
+		return joinPoint;
 
 	}
 
-	public List<Object> itrateParameters(JoinPoint joinPoint) {
-		List<Object> list = new ArrayList<>();
-		for (int i = 0; i < joinPoint.getArgs().length; i++) {
-			list.add(joinPoint.getArgs()[i]);
-		}
-		return list;
+	@Before(value = "execution(* com.searchservice.app.rest.ManageTableResource.*(..))")
+	public void logStatementForManagetableResource(JoinPoint joinPoint) {
+		getCorrelationID(joinPoint);
 
+	}
+
+	@Before(value = "execution(* com.searchservice.app.rest.InputDocumentResource.*(..))")
+	public void logStatementForRest1(JoinPoint joinPoint) {
+		getCorrelationID(joinPoint);
+
+	}
+
+	@Before(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
+	public void logStatementForService(JoinPoint joinPoint) {
+
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
+
+	}
+
+	@After(value = "execution(* com.searchservice.app.rest.*.*(..))")
+	public void logStatementAfterRest(JoinPoint joinPoint) {
+
+		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
+		MDC.remove(CORRELATION_ID_LOG_VAR_NAME);
+	}
+
+	@After(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
+	public void logStatementAfterService(JoinPoint joinPoint) {
+		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
+
+	}
+
+	@AfterThrowing(value = "execution(* com.searchservice.app.rest.*.*(..))")
+	public void logStatementAfterThrowing(JoinPoint joinPoint) {
+		log.error(
+				"--------Failed Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, Parameters : {}",
+				joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), joinPoint.getArgs());
+	}
+
+	@AfterThrowing(value = "execution(* com.searchservice.app.domain.service.*.*(..))", throwing = "e")
+	public void logStatementForServiceAfterThrowing(JoinPoint joinPoint, Exception e) {
+		log.error(
+				"--------Failed Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, Parameters : {}",
+				joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), joinPoint.getArgs());
 	}
 
 	@AfterReturning(value = "execution(* com.searchservice.app.rest.*.*(..))", returning = "response")
@@ -98,6 +142,24 @@ public class AspectConfig {
 		} else {
 			log.info("Error While Initializing Deletion For Table: {}", tableName);
 		}
+
+	}
+
+	public static String generateUniqueCorrelationId() {
+		return UUID.randomUUID().toString();
+	}
+
+	public static DateTime utcTime() {
+		DateTime now = new DateTime(); // Gives the default time zone.
+		return now.toDateTime(DateTimeZone.UTC);
+	}
+
+	private void getCorrelationID(JoinPoint joinPoint) {
+		final String correlationId = generateUniqueCorrelationId();
+		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
 
 	}
 
