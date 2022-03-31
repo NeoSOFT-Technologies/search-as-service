@@ -194,6 +194,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
 		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(searchClientActive);
 
+
 		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
 				clientId);
 
@@ -546,6 +547,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+
 	@Override
 	public Response createTable(ManageTable manageTableDTO) {
 		logger.info("creating table..");
@@ -562,11 +564,14 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			throw new InvalidSKUOccurredException(HttpStatusCode.INVALID_SKU_NAME.getCode(),
-					HttpStatusCode.INVALID_SKU_NAME.getMessage() + " : " + manageTableDTO.getSku());
+			throw new InvalidSKUOccurredException(HttpStatusCode.INVALID_SKU_NAME.getCode(),HttpStatusCode.INVALID_SKU_NAME.getMessage()+" : "+ manageTableDTO.getSku());
 		}
 
-		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
+
+
+		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(
+				manageTableDTO.getTableName(),
+
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
 		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
@@ -579,19 +584,28 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (Exception e) {
 			logger.error(e.toString());
 			apiResponseDTO.setStatusCode(400);
-			apiResponseDTO.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
+
+			apiResponseDTO
+					.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
+
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 		return apiResponseDTO;
 	}
 
+	
+	
 	@Override
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
 		logger.info("Add schema attributes");
 
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
-				newTableSchemaDTO.getTableName());
+
+
+		
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(
+				searchURL, newTableSchemaDTO.getTableName());
+		
 
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
@@ -608,8 +622,8 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
 
-			// Add new fields present in the Target Schema to the given collection/table
-			// schema
+
+		
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
 			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 			logger.info("Target Schema attributes : {}", newAttributes);
@@ -618,14 +632,18 @@ public class ManageTableService implements ManageTableServicePort {
 			NamedList<Object> schemaResponseAddFields = new NamedList<>();
 			payloadOperation = "SchemaRequest.AddField";
 			boolean newFieldFound = false;
-
+			
 			List<String> existingAttributesNames = new ArrayList<>();
-			for (int i = 0; i < newAttributes.size(); i++) {
+			for(int i=0; i<newAttributes.size(); i++) {
 
 				SchemaField fieldDto = newAttributes.get(i);
+
+				
 				boolean isPresent = false;
 				for (Map<String, Object> field : schemaFields) {
-					if (field.get("name").equals(fieldDto.getName())) {
+					
+					if(field.get("name").equals(fieldDto.getName())) {
+
 						isPresent = true;
 						existingAttributesNames.add(fieldDto.getName());
 						break;
@@ -640,23 +658,24 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchemaResponseDTO.setMessage("No new attributes found");
 				return tableSchemaResponseDTO;
 			} else {
-				if (!existingAttributesNames.isEmpty()) {
+				if(!existingAttributesNames.isEmpty()) {
 					// REMOVE existing attributess from newAttributes list
-					for (String attributeName : existingAttributesNames) {
+					for(String attributeName: existingAttributesNames) {
 						newAttributesHashMap.remove(attributeName);
 					}
 				}
 			}
-
-			if (newAttributesHashMap.isEmpty()) {
+			
+			if(newAttributesHashMap.isEmpty()) {
 				tableSchemaResponseDTO.setStatusCode(405);
 				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
 			} else {
-				for (Map.Entry<String, SchemaField> fieldDtoEntry : newAttributesHashMap.entrySet()) {
+				for(Map.Entry<String, SchemaField> fieldDtoEntry: newAttributesHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
 					if (!TableSchemaParser.validateSchemaField(fieldDto)) {
-						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}",
-								schemaName);
+
+						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}", schemaName);
+
 						tableSchemaResponseDTO.setStatusCode(400);
 						break;
 					}
@@ -665,28 +684,28 @@ public class ManageTableService implements ManageTableServicePort {
 					}
 					errorCausingField = fieldDto.getName();
 					Map<String, Object> newField = new HashMap<>();
-
+					
 					// if partial search enabled
-					if (fieldDto.isPartialSearch()) {
+					if(fieldDto.isPartialSearch()) {
 						Map<String, Object> fieldTypeAttributes = new HashMap<>();
 						// Add <partial-search> field-type if not present already
-						if (!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
+
+						if(!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
 							FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
 							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
 							fieldTypeDef.setAttributes(fieldTypeAttributes);
-							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(
-									fieldTypeDef);
+							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(fieldTypeDef);
+
 							solrjAdapter.addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
 						} else
 							fieldTypeAttributes.put("name", PARTIAL_SEARCH);
-
+						
 						// Add <partial-search> fieldType to the field
 						newField.put("type", fieldTypeAttributes.get("name"));
 						// Since "partial search" is enabled on this field, docValues has to be disabled
 						fieldDto.setSortable(false);
 					} else {
-						newField.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),
-								fieldDto.isMultiValue()));
+						newField.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),fieldDto.isMultiValue()));
 						newField.put(DOCVALUES, fieldDto.isSortable());
 					}
 
@@ -705,10 +724,10 @@ public class ManageTableService implements ManageTableServicePort {
 				tableSchemaResponseDTO.setMessage("New attributes are added successfully");
 			}
 
-		} catch (SolrException e) {
+		}  catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
-			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table " + e.getMessage());
-
+			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table "+e.getMessage());
+			
 			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 			logger.info(e.toString());
 		} finally {
