@@ -1,4 +1,5 @@
 package com.searchservice.app.domain.service;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,18 +46,19 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 
 @SpringBootTest
-class ManageTableServiceTest  {
+class ManageTableServiceTest {
 
 	@Value("${base-search-url}")
-	String searchUrl ;
-	
+	String searchUrl;
+
 	@Value("${table-schema-attributes.delete-file-path}")
 	private String deleteSchemaAttributesFilePathNonStatic;
-	
+
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
 	HttpSolrClient solrClientWithTable = null;
@@ -74,19 +76,15 @@ class ManageTableServiceTest  {
 
 	@MockBean
 	CapacityPlanProperties capacityPlanProperties;
-	
+
 	@MockBean
 	SolrJAdapter solrJAdapter;
-	
+
 	@InjectMocks
 	ManageTableService manageTableService;
-	
+
 	@MockBean
 	SchemaRequest schemaRequest;
-	
-	
-	@MockBean
-	File mockedFile;
 
 	ManageTable manageTable = new ManageTable();
 
@@ -94,16 +92,15 @@ class ManageTableServiceTest  {
 
 	TableSchemav2 tableSchema = new TableSchemav2();
 	TableSchemav2Data tableSchemav2Data = new TableSchemav2Data();
-	SchemaResponse schemaResponse= new SchemaResponse();
+	SchemaResponse schemaResponse = new SchemaResponse();
 	ConfigSetAdminResponse configSetResponse = new ConfigSetAdminResponse();
 	CollectionAdminResponse collectionAdminResponse = new CollectionAdminResponse();
 	List<SchemaField> list = new ArrayList<SchemaField>();
 	SchemaField schemaField = new SchemaField();
 	ConfigSet configSetDTO = new ConfigSet();
-	UpdateResponse updatedResponse =  new UpdateResponse();
+	UpdateResponse updatedResponse = new UpdateResponse();
 	Response responseDTO = new Response();
-	
-	
+
 	public void setMockitoBadResponseForService() {
 
 		collectionAdminResponse.setElapsedTime(5);
@@ -116,7 +113,7 @@ class ManageTableServiceTest  {
 		manageTable.setColumns(null);
 		manageTable.setSku("B");
 		manageTable.setTableName("Testing_101");
-		List<CapacityPlanProperties.Plan> plan =new ArrayList<>();
+		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
 		newPlan.setName("Basic");
 		newPlan.setSku("B");
@@ -125,7 +122,7 @@ class ManageTableServiceTest  {
 		plan.add(newPlan);
 		Mockito.when(capacityPlanProperties.getPlans()).thenReturn(plan);
 	}
-	
+
 	public void setMockitoTableNotExist() {
 		collectionAdminResponse.setElapsedTime(5);
 		collectionAdminResponse.setRequestUrl(searchUrl);
@@ -134,7 +131,7 @@ class ManageTableServiceTest  {
 		manageTable.setColumns(null);
 		manageTable.setSku("B");
 		manageTable.setTableName("Testing_101");
-		List<CapacityPlanProperties.Plan> plan =new ArrayList<>();
+		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
 		newPlan.setName("Basic");
 		newPlan.setSku("B");
@@ -142,12 +139,11 @@ class ManageTableServiceTest  {
 		newPlan.setReplicas(1);
 		plan.add(newPlan);
 		Mockito.when(capacityPlanProperties.getPlans()).thenReturn(plan);
-		
+
 	}
-	
+
 	public void setMockitoSuccessResponseForService() {
-	
-		
+
 		responseDTO.setStatusCode(200);
 		responseDTO.setMessage("Testing");
 
@@ -167,26 +163,24 @@ class ManageTableServiceTest  {
 		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
 		tableSchemaResponseDTO.setMessage("Testting");
 		tableSchemaResponseDTO.setStatusCode(200);
-		
+
 		Response aliasTableResponse = new Response();
 		aliasTableResponse.setStatusCode(200);
-		
+
 		Response unodDeleteResponseDTO = new Response();
 		unodDeleteResponseDTO.setStatusCode(200);
 		unodDeleteResponseDTO.setMessage("Testing");
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
-		
-		finalResponseMap.put(" message", "Data is returned");
 
+		finalResponseMap.put(" message", "Data is returned");
 
 		newTableSchemaDTO.setSchemaName("table");
 		newTableSchemaDTO.setColumns(list);
 		newTableSchemaDTO.setTableDetails(finalResponseMap);
 		newTableSchemaDTO.setTableName(tableName);
 
-
-		// schemaField.setDefault_("");
+	
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
 		schemaField.setName("ok");
@@ -204,7 +198,7 @@ class ManageTableServiceTest  {
 		configSetDTO.setBaseConfigSetName("solrUrl");
 		configSetDTO.setConfigSetName("solrUrl");
 		tableSchemav2Data.setColumns(list);
-		List<CapacityPlanProperties.Plan> plan =new ArrayList<>();
+		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
 		newPlan.setName("Basic");
 		newPlan.setSku("B");
@@ -224,18 +218,17 @@ class ManageTableServiceTest  {
 		tableSchema.setStatusCode(200);
 		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
-		Mockito.when(solrJAdapter.getCollectionAdminRequestList( solrClient)).thenReturn(collectionAdminResponse);
-	//	Mockito.when(solrJAdapter.createTableInSolrj(null, solrClient)
-	     
-			Mockito.when(solrJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
+		Mockito.when(solrJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
 	
-			Mockito.when(solrJAdapter.addSchemaAttributesInSolrj(Mockito.any(),Mockito.any())).thenReturn(schemaResponse);
-			Mockito.when(solrJAdapter.addFieldRequestInSolrj(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
-			Mockito.when(solrJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
-		    Mockito.when(solrJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
-	
-//		    File mockedFile = Mockito.mock(new File(deleteSchemaAttributesFilePathNonStatic));
-//		    Mockito.when(mockedFile.exists()).thenReturn(true);
+
+		Mockito.when(solrJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
+
+		Mockito.when(solrJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(solrJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
+		Mockito.when(solrJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(solrJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
+
+
 	}
 
 	public void setUpTestClass() {
@@ -252,25 +245,25 @@ class ManageTableServiceTest  {
 				.thenReturn(solrClientWithTable);
 		configSetResponse.setResponse(test1());
 		Mockito.when(solrJAdapter.getConfigSetFromSolrj(solrClient)).thenReturn(configSetResponse);
-		
-	//	Mockito.when(schemaRequest.process(solrClient)).thenReturn(schemaResponse);
+
+	
 		String timestamp = LoggerUtils.utcTime().toString();
 		loggersDTO.setNameofmethod("nameofCurrMethod");
 		loggersDTO.setTimestamp(timestamp);
 		loggersDTO.setServicename("servicename");
 		loggersDTO.setUsername("username");
-			
+
 	}
 
 	void configErrorResponse() {
 		configSetResponse.setResponse(null);
 		Mockito.when(solrJAdapter.getConfigSetFromSolrj(Mockito.any())).thenReturn(configSetResponse);
 	}
-	
+
 	@Test
 	void configSetError() {
 		configErrorResponse();
-		assertEquals(400,manageTableService.getConfigSets().getStatusCode());
+		assertEquals(400, manageTableService.getConfigSets().getStatusCode());
 	}
 
 	@Test
@@ -288,92 +281,92 @@ class ManageTableServiceTest  {
 		assertEquals(200, resp.getStatusCode());
 
 	}
-	
+
 	@Test
 	void getSchemaNonExistingTable() {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.getCurrentTableSchema(tenantId, "InvalidTable");
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
 		}
 	}
-	
+
 	@Test
 	void deleteTableSuccess() {
 		setMockitoSuccessResponseForService();
 		Response rs = manageTableService.deleteTable(tableName, loggersDTO);
-		assertEquals(200,rs.getStatusCode());
+		assertEquals(200, rs.getStatusCode());
 	}
-	
+
 	@Test
 	void deleteNonExistingTable() {
 		setMockitoTableNotExist();
 		try {
-			manageTableService.deleteTable(tableName+"123", loggersDTO);
-		}catch(ContentNotFoundException e) {
-			assertEquals(404,e.getExceptionCode());
+			manageTableService.deleteTable(tableName + "123", loggersDTO);
+		} catch (ContentNotFoundException e) {
+			assertEquals(404, e.getExceptionCode());
 		}
 	}
-	
+
 	@Test
 	void testCapacityPlans() {
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
 		assertTrue(manageTableService.capacityPlans(loggersDTO).getPlans() != null);
 
-	} 
+	}
 
 	@Test
 	void getTableSchemaIfPresentNonExistingTable() {
 		setMockitoTableNotExist();
 		try {
-			manageTableService.getTableSchemaIfPresent("InvalidTable",loggersDTO);
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+			manageTableService.getTableSchemaIfPresent("InvalidTable", loggersDTO);
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
 		}
 	}
-	
+
 	@Test
 	void createTableIfNotPresentNonExistingTable() {
-		 setMockitoTableNotExist();
+		setMockitoTableNotExist();
 		try {
 			manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
 		}
 	}
-	
+
 	@Test
 	void createTableIfNotPresentNullColumns() {
 		setMockitoBadResponseForService();
 		try {
 			manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
 		}
 	}
-	
+
 	@Test
 	void testGetTableDetails() {
 		setMockitoSuccessResponseForService();
 		assertTrue(manageTableService.getTableDetails(tableName, loggersDTO) != null);
 
 	}
-	
+
 	@Test
-	void checkInvalidTableName(){
+	void checkInvalidTableName() {
 		try {
 			manageTableService.checkIfTableNameisValid("");
-		}catch(InvalidInputOccurredException e) {
-			assertEquals(101,e.getExceptioncode());
+		} catch (InvalidInputOccurredException e) {
+			assertEquals(101, e.getExceptioncode());
 		}
 	}
 
 	@Test
 	void testGetTableSchemaIfPresent() {
 		setMockitoSuccessResponseForService();
-		TableSchemav2 tableSchemaResponse =	manageTableService.getTableSchemaIfPresent(tableName, new LoggersDTO());
-			assertEquals(200, tableSchemaResponse.getStatusCode());
+		TableSchemav2 tableSchemaResponse = manageTableService.getTableSchemaIfPresent(tableName, new LoggersDTO());
+		assertEquals(200, tableSchemaResponse.getStatusCode());
 	}
 
 	@Test
@@ -402,21 +395,23 @@ class ManageTableServiceTest  {
 		boolean configSetExist = manageTableService.isConfigSetExists("_default");
 		assertTrue(configSetExist);
 	}
+
 	@Test
 	void isConfigSetDontExists() {
 		try {
-		  manageTableService.isConfigSetExists(null);
-		}catch(NullPointerOccurredException e) {
-			assertEquals(404,e.getExceptionCode());
+			manageTableService.isConfigSetExists(null);
+		} catch (NullPointerOccurredException e) {
+			assertEquals(404, e.getExceptionCode());
 		}
 	}
+
 	@Test
 	void addAliasTable() {
 
 		setMockitoSuccessResponseForService();
-		Response rs=	manageTableService.addAliasTable(tableName,"AutomatedTesting" );
+		Response rs = manageTableService.addAliasTable(tableName, "AutomatedTesting");
 		assertEquals(200, rs.getStatusCode());
-		}
+	}
 
 	@Test
 	void deleteConfigSet() {
@@ -431,7 +426,7 @@ class ManageTableServiceTest  {
 	@Test
 	void initializeSchemaDeletion() {
 
-		// setMockitoSuccessResponseForService();
+	
 		try {
 			manageTableService.initializeSchemaDeletion(tenantId, tableName, searchUrl);
 		} catch (BadRequestOccurredException e) {
@@ -443,14 +438,14 @@ class ManageTableServiceTest  {
 	void getTableSchema() {
 		setMockitoSuccessResponseForService();
 
-		TableSchemav2 tableSchemaResponseDTO =manageTableService.getTableSchema(tableName);
+		TableSchemav2 tableSchemaResponseDTO = manageTableService.getTableSchema(tableName);
 		assertEquals(200, tableSchemaResponseDTO.getStatusCode());
 	}
 
 	@Test
 	void checkIfTableNameisValid() {
 
-		// setMockitoSuccessResponseForService();
+
 		try {
 			manageTableService.checkIfTableNameisValid(tableName);
 		} catch (BadRequestOccurredException e) {
@@ -461,19 +456,19 @@ class ManageTableServiceTest  {
 	@Test
 	void deleteTable() {
 		// Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		 setMockitoSuccessResponseForService();
-		Response rs =manageTableService.deleteTable(tableName, loggersDTO);
+		setMockitoSuccessResponseForService();
+		Response rs = manageTableService.deleteTable(tableName, loggersDTO);
 		assertEquals(200, rs.getStatusCode());
-		}
-	
+	}
+
 	@Test
 	void deleteTableDonotExist() {
 		// Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		 setMockitoBadResponseForService();
-		 try {
-		Response rs= manageTableService.deleteTable("TestingTableDelete", loggersDTO);
-		 }catch(ContentNotFoundException e) {
-		assertEquals(404, e.getExceptionCode());
+		setMockitoBadResponseForService();
+		try {
+			manageTableService.deleteTable("TestingTableDelete", loggersDTO);
+		} catch (ContentNotFoundException e) {
+			assertEquals(404, e.getExceptionCode());
 		}
 	}
 
@@ -481,7 +476,7 @@ class ManageTableServiceTest  {
 	void compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema() {
 
 		tableSchema.setStatusCode(200);
-		tableSchema.setMessage("ssss");
+		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
 
 		setMockitoSuccessResponseForService();
@@ -496,7 +491,7 @@ class ManageTableServiceTest  {
 	@Test
 	void createConfigSet() {
 		setMockitoSuccessResponseForService();
-	//	ConfigSet configSetDTO = new ConfigSet();
+	
 		try {
 			manageTableService.createConfigSet(configSetDTO);
 		} catch (BadRequestOccurredException e) {
@@ -539,9 +534,6 @@ class ManageTableServiceTest  {
 	@Test
 	void updateSchemaAttributes() {
 
-		// Response s= manageTableService.updateSchemaAttributes(newTableSchemaDTO);
-		// System.out.println("sssssssssssssssssssssss"+s);
-
 		try {
 			manageTableService.updateSchemaAttributes(newTableSchemaDTO);
 		} catch (BadRequestOccurredException e) {
@@ -550,19 +542,17 @@ class ManageTableServiceTest  {
 
 	}
 
-	
-	
 	@Test
-	 void getCurrentTableSchema() {
-		
+	void getCurrentTableSchema() {
+
 		setMockitoSuccessResponseForService();
-		TableSchemav2 getCurrentTableSchema= manageTableService.getCurrentTableSchema(tenantId, tableName);
+		TableSchemav2 getCurrentTableSchema = manageTableService.getCurrentTableSchema(tenantId, tableName);
 		assertEquals(200, getCurrentTableSchema.getStatusCode());
 	}
-	
+
 	@Test
 	void createTable() {
-		
+
 		setMockitoSuccessResponseForService();
 		Response rs = manageTableService.createTable(manageTable);
 		assertEquals(200, rs.getStatusCode());
@@ -570,24 +560,21 @@ class ManageTableServiceTest  {
 
 	@Test
 	void createTableIfNotPresent() {
-		
-		
-		setMockitoSuccessResponseForService();
-		System.out.println("Ssss> "+schemaResponse.getResponse());
-		Response se=	manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
-				assertEquals(200, se.getStatusCode());
-		}
 
+		setMockitoSuccessResponseForService();
+
+		Response se = manageTableService.createTableIfNotPresent(manageTable, loggersDTO);
+		assertEquals(200, se.getStatusCode());
+	}
 
 	@Test
 	void addSchemaAttributes() {
 
-	setMockitoSuccessResponseForService();
-			
-		
-		Response rs=	manageTableService.addSchemaAttributes(newTableSchemaDTO);
+		setMockitoSuccessResponseForService();
+
+		Response rs = manageTableService.addSchemaAttributes(newTableSchemaDTO);
 		assertEquals(200, rs.getStatusCode());
-			System.out.println("sssssssssssssssssssssssss"+rs);
+
 	}
 
 	@Test
@@ -606,10 +593,10 @@ class ManageTableServiceTest  {
 		try {
 			manageTableService.checkForSchemaDeletion();
 		} catch (BadRequestOccurredException e) {
-			assertEquals(1,1);
-		} 
+			assertEquals(1, 1);
+		}
 	}
-	
+
 	@Test
 	void updateTableSchema() {
 		setMockitoSuccessResponseForService();
@@ -626,77 +613,77 @@ class ManageTableServiceTest  {
 		schemaField.setType("string");
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
-		Response rs=	manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO, loggersDTO);
-		assertEquals(200,rs.getStatusCode());
+		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO, loggersDTO);
+		assertEquals(200, rs.getStatusCode());
 	}
-	
+
 	@Test
 	void checkTableDeletionStatusTest() {
 		boolean b = manageTableService.checkTableDeletionStatus(0);
 		assertFalse(b);
 	}
+
 	@Test
 	void performSchemaDeletion() {
 		assertFalse(manageTableService.performSchemaDeletion("101,automatedTestCollection,14-3-2022 05:05:26,name"));
-	
-	
+
 	}
-	
-	
-	
+
 	@Test
 	void checkIfSchemaFileExist() {
-		boolean b =manageTableService.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic));
+		boolean b = manageTableService.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic));
 		assertFalse(b);
 
 	}
-	
+
 	@Test
 	void checkIfSchemaFileExistInvalid() {
-		boolean b =manageTableService.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic+"/Testing"));
+		boolean b = manageTableService
+				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic + "/Testing"));
 		assertFalse(b);
 
 	}
-	
-	public NamedList<Object> test(){
+
+	public NamedList<Object> test() {
 		List<String> testing = new ArrayList<String>();
 		testing.add(tableName);
-		testing.add(tableName+"_"+tenantId);
+		testing.add(tableName + "_" + tenantId);
 		testing.add("Testing_101");
-		 NamedList<Object> lst = new NamedList<Object>();
-		  lst.add("collections", testing);
-		  return lst;
-		}
-	
-	public NamedList<Object> emptyData(){
+		NamedList<Object> lst = new NamedList<Object>();
+		lst.add("collections", testing);
+		return lst;
+	}
+
+	public NamedList<Object> emptyData() {
 		List<String> testing = new ArrayList<String>();
-		testing.add("_"+tenantId);
-		 NamedList<Object> lst = new NamedList<Object>();
-		 lst.add("collections",testing);
-		  return lst;
-		}
-	public NamedList<Object> test1(){
+		testing.add("_" + tenantId);
+		NamedList<Object> lst = new NamedList<Object>();
+		lst.add("collections", testing);
+		return lst;
+	}
+
+	public NamedList<Object> test1() {
 		List<String> testing = new ArrayList<String>();
 		testing.add("_default");
 		testing.add("Product_1.AUTOCREATED");
-		 NamedList<Object> lst = new NamedList<Object>();
-		  lst.add("configSets", testing);
-		  return lst;
-		}
-	
-	public NamedList<Object> test3(){
+		NamedList<Object> lst = new NamedList<Object>();
+		lst.add("configSets", testing);
+		return lst;
+	}
+
+	public NamedList<Object> test3() {
 		NamedList<Object> nl1 = new NamedList<Object>();
 		List<NamedList<Object>> lst1 = new ArrayList<>();
-		nl1.add("status","0");
-		nl1.add("QTime","4055");
+		nl1.add("status", "0");
+		nl1.add("QTime", "4055");
 		lst1.add(nl1);
 		NamedList<Object> nl2 = new NamedList<Object>();
 		nl2.add("responseHeader", lst1);
 		return nl2;
-		}
-	
-	public NamedList<Object> test2(){
-		Map<String,Object> map1 = new HashMap<>();
+	}
+
+	public NamedList<Object> test2() {
+		Map<String, Object> map1 = new HashMap<>();
 		NamedList<Object> nl1 = new NamedList<Object>();
 		NamedList<Object> nl2 = new NamedList<Object>();
 		NamedList<Object> nl3 = new NamedList<Object>();
@@ -705,41 +692,36 @@ class ManageTableServiceTest  {
 		List<NamedList<Object>> lst2 = new ArrayList<>();
 		List<NamedList<Object>> lst3 = new ArrayList<>();
 		List<NamedList<Object>> lst4 = new ArrayList<>();
-		nl1.add("name","_nest_path");
-		nl1.add("type","_nest_path");
-		nl2.add("name","*_txt_en_split_tight");
-		nl2.add("type","text_en_splitting_tight");
-		nl2.add("indexed","true");
-		nl2.add("stored","true");
-		nl3.add("name","*_txt_en_split_tight");
-		nl3.add("type","text_en_splitting_tight");
-		nl3.add("indexed","true");
-		nl3.add("stored","true");
-		nl3.add("class","solr.NestPathField");
-		nl3.add("maxCharsForDocValues","-1");
-		nl3.add("multiValued","false");
+		nl1.add("name", "_nest_path");
+		nl1.add("type", "_nest_path");
+		nl2.add("name", "*_txt_en_split_tight");
+		nl2.add("type", "text_en_splitting_tight");
+		nl2.add("indexed", "true");
+		nl2.add("stored", "true");
+		nl3.add("name", "*_txt_en_split_tight");
+		nl3.add("type", "text_en_splitting_tight");
+		nl3.add("indexed", "true");
+		nl3.add("stored", "true");
+		nl3.add("class", "solr.NestPathField");
+		nl3.add("maxCharsForDocValues", "-1");
+		nl3.add("multiValued", "false");
 		nl4.add("source", "name");
 		nl4.add("dest", "name_str");
 		nl4.add("maxChars", "256");
-		map1.put("name","default_config");
+		map1.put("name", "default_config");
 		map1.put("version", 1.6f);
 		map1.put("uniqueKey", "id");
 		lst1.add(nl1);
 		lst2.add(nl2);
 		lst3.add(nl3);
 		lst4.add(nl4);
-		map1.put("fields",lst1);
-		map1.put("dynamicFields",lst2);
-		map1.put("fieldTypes",lst3);
-		map1.put("copyFields",lst4);
-		 NamedList<Object> lst = new NamedList<Object>();
-		  lst.add("schema", map1);
-		  return lst;
-		}
-     //{responseHeader={status=0,QTime=4055}}
-	// copyFields=[{source=name,dest=name_str,maxChars=256}, {source=type,dest=type_str,maxChars=256}]}}
-	//schema={name=default-config, version=1.6, uniqueKey=id, fieldTypes=[{name=_nest_path_,class=solr.NestPathField,maxCharsForDocValues=-1,omitNorms=true,omitTermFreqAndPositions=true,stored=false,multiValued=false}
-	//{name=_nest_path_,type=_nest_path_}
-	//{name=*_txt_en_split_tight,type=text_en_splitting_tight,indexed=true,stored=true}
-	//{name=_nest_path_,class=solr.NestPathField,maxCharsForDocValues=-1,omitNorms=true,omitTermFreqAndPositions=true,stored=false,multiValued=false}
+		map1.put("fields", lst1);
+		map1.put("dynamicFields", lst2);
+		map1.put("fieldTypes", lst3);
+		map1.put("copyFields", lst4);
+		NamedList<Object> lst = new NamedList<Object>();
+		lst.add("schema", map1);
+		return lst;
+	}
+
 }

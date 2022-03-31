@@ -139,7 +139,7 @@ private String servicename = "Table_Delete_Service";
 			   } catch (IOException exception) {
 				  logger.error("Error While Performing Table Deletion ",exception);
 				  delRecordCount=-1;
-				  System.out.println(exception.getMessage());
+			
 				  LoggerUtils.printlogger(loggersDTO,false,true);
 			} 
 		return delRecordCount;
@@ -233,7 +233,7 @@ private String servicename = "Table_Delete_Service";
 	public boolean performTableDeletion(String tableRecord,LoggersDTO loggersDTO) {
 		String tableName= tableRecord.split(",")[1];
 	    Response tableDeleteResponse  = manageTableServicePort.deleteTable(tableName,loggersDTO);
-        System.out.println("sss>"+tableDeleteResponse);
+       
 	    if(tableDeleteResponse.getStatusCode() == 200) {
 	    	logger.debug("Successfully Deleted Table : {}", tableName);
 	    	return true;
