@@ -629,12 +629,7 @@ class ManageTableServiceTest {
 
 	}
 
-	@Test
-	void checkIfSchemaFileExist() {
-		boolean b = manageTableService.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic));
-		assertFalse(b);
 
-	}
 
 	@Test
 	void checkIfSchemaFileExistInvalid() {
