@@ -171,9 +171,9 @@ public class ManageTableService implements ManageTableServicePort {
 		LoggerUtils.printlogger(loggersDTO, true, false);
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(searchClientActive);
+		CollectionAdminResponse response = searchjAdapter.getCollectionAdminRequestList(searchClientActive);
 		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
-				clientId);
+				tenantId);
 
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
