@@ -106,8 +106,8 @@ private String servicename = "Table_Delete_Service";
 		requestMethod(loggersDTO,nameofCurrMethod);
 		LoggerUtils.printlogger(loggersDTO,true,false);
 
-			File existingFile = new File(deleteRecordFilePath + ".txt");
-		    File newFile = new File(deleteRecordFilePath + "Temp.txt");
+			File existingFile = new File(deleteRecordFilePath + ".csv");
+		    File newFile = new File(deleteRecordFilePath + "Temp.csv");
 			int lineNumber = 0;
 			int delRecordCount=0;
 			String timestamp=LoggerUtils.utcTime().toString();
@@ -139,6 +139,7 @@ private String servicename = "Table_Delete_Service";
 			   } catch (IOException exception) {
 				  logger.error("Error While Performing Table Deletion ",exception);
 				  delRecordCount=-1;
+				  System.out.println(exception.getMessage());
 				  LoggerUtils.printlogger(loggersDTO,false,true);
 			} 
 		return delRecordCount;
@@ -232,7 +233,7 @@ private String servicename = "Table_Delete_Service";
 	public boolean performTableDeletion(String tableRecord,LoggersDTO loggersDTO) {
 		String tableName= tableRecord.split(",")[1];
 	    Response tableDeleteResponse  = manageTableServicePort.deleteTable(tableName,loggersDTO);
-
+        System.out.println("sss>"+tableDeleteResponse);
 	    if(tableDeleteResponse.getStatusCode() == 200) {
 	    	logger.debug("Successfully Deleted Table : {}", tableName);
 	    	return true;
@@ -275,6 +276,7 @@ private String servicename = "Table_Delete_Service";
 	public boolean checkTableExistensce(String tableName) {
 		return manageTableServicePort.isTableExists(tableName);
 	}
+	
 	@Override
 	public boolean isTableUnderDeletion(String tableName) {
 		boolean res=false;

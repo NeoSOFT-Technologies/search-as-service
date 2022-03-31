@@ -192,12 +192,14 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
 		CollectionAdminResponse response = solrjAdapter.getCollectionAdminRequestList(searchClientActive);
+		System.out.println(response.getResponse().get("collections"));
 		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
 				clientId);
-
+      
 		try {
+			
 			data = data.stream().map(datalist -> datalist.split("_" + clientId)[0]).collect(Collectors.toList());
-
+			  System.out.println("dat: >>>"+data);
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
@@ -623,10 +625,8 @@ public class ManageTableService implements ManageTableServicePort {
 			for(int i=0; i<newAttributes.size(); i++) {
 
 				SchemaField fieldDto = newAttributes.get(i);
-				
 				boolean isPresent = false;
 				for (Map<String, Object> field : schemaFields) {
-					
 					if(field.get("name").equals(fieldDto.getName())) {
 						isPresent = true;
 						existingAttributesNames.add(fieldDto.getName());
@@ -743,7 +743,7 @@ public class ManageTableService implements ManageTableServicePort {
 			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
-
+             System.out.println("Sss>> "+targetSchemafields);
 			// Validate Table Schema Fields
 			Map<String, Object> validationEntry = targetSchemafields.get(0);
 			if (validationEntry.containsKey(VALIDATED)) {
