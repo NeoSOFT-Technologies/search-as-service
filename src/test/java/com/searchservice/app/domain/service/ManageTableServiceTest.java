@@ -593,7 +593,7 @@ class ManageTableServiceTest {
 		try {
 			manageTableService.checkForSchemaDeletion();
 		} catch (BadRequestOccurredException e) {
-			assertEquals(1, 1);
+			assertEquals(400,e.getExceptionCode());
 		}
 	}
 
