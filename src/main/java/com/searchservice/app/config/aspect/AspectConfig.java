@@ -2,7 +2,6 @@ package com.searchservice.app.config.aspect;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.UUID;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -29,15 +28,14 @@ public class AspectConfig {
 
 	private static final String STARTED_EXECUTION = "--------Started Request of Service Name : {}, Username : {}, CorrelationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
 	private static final String SUCCESSFUL_EXECUTION = "--------Successfully Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
-	private static final String CORRELATION_ID_LOG_VAR_NAME = "correlationId";
+	private static final String CORRELATION_ID_LOG_VAR_NAME = "CID";
 	private static UserDTO user;
 	private static String ip;
 
 	@Before(value = "execution(* com.searchservice.app.rest.UserResource.*(..))")
 	public static Object logStatementForRest(JoinPoint joinPoint) {
 		user = (UserDTO) joinPoint.getArgs()[0];
-		final String correlationId = generateUniqueCorrelationId();
-		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
+
 		try {
 			ip = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
@@ -53,13 +51,17 @@ public class AspectConfig {
 
 	@Before(value = "execution(* com.searchservice.app.rest.ManageTableResource.*(..))")
 	public void logStatementForManagetableResource(JoinPoint joinPoint) {
-		getCorrelationID(joinPoint);
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
 
 	}
 
 	@Before(value = "execution(* com.searchservice.app.rest.InputDocumentResource.*(..))")
 	public void logStatementForRest1(JoinPoint joinPoint) {
-		getCorrelationID(joinPoint);
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				joinPoint.getArgs());
 
 	}
 
@@ -78,7 +80,7 @@ public class AspectConfig {
 		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
 				joinPoint.getArgs());
-		MDC.remove(CORRELATION_ID_LOG_VAR_NAME);
+
 	}
 
 	@After(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
@@ -145,22 +147,9 @@ public class AspectConfig {
 
 	}
 
-	public static String generateUniqueCorrelationId() {
-		return UUID.randomUUID().toString();
-	}
-
 	public static DateTime utcTime() {
 		DateTime now = new DateTime(); // Gives the default time zone.
 		return now.toDateTime(DateTimeZone.UTC);
-	}
-
-	private void getCorrelationID(JoinPoint joinPoint) {
-		final String correlationId = generateUniqueCorrelationId();
-		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
-		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user.getUserName(),
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
-				joinPoint.getArgs());
-
 	}
 
 }
