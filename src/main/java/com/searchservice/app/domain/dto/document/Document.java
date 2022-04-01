@@ -1,9 +1,7 @@
 package com.searchservice.app.domain.dto.document;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.domain.dto.table.SchemaField;
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,29 +15,24 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Document implements VersionedObjectMapper {
+public class Document {
 
 	String tableName;
 	String name;
 	SchemaField[] attributes;
 	int statusCode;
 
-
 	public Document(Document documentDTO) {
 		this.tableName = documentDTO.getTableName();
 		this.name = documentDTO.getName();
-		this.attributes= documentDTO.getAttributes();
+		this.attributes = documentDTO.getAttributes();
 		this.statusCode = documentDTO.getStatusCode();
 	}
-	
+
 	public Document(String tableName, String name, SchemaField[] attributes) {
 		this.tableName = tableName;
 		this.name = name;
 		this.attributes = attributes;
 	}
-	
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
+
 }
