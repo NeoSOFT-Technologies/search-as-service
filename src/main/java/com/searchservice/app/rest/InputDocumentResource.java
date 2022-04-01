@@ -1,8 +1,5 @@
 package com.searchservice.app.rest;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +54,6 @@ public class InputDocumentResource {
 	public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
-		
 		if (!inputDocumentService.isValidJsonArray(payload))
 			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
@@ -85,8 +81,6 @@ public class InputDocumentResource {
 	public ResponseEntity<ThrottlerResponse> document(@PathVariable int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
-	
-
 		if (!inputDocumentService.isValidJsonArray(payload))
 			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
@@ -112,7 +106,7 @@ public class InputDocumentResource {
 	}
 
 	// Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback( RequestNotPermitted exception) {
+	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
 		// prepare Rate Limiting Response DTO
@@ -128,7 +122,6 @@ public class InputDocumentResource {
 	public ResponseEntity<ThrottlerResponse> performDocumentInjection(String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
 		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
-
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
