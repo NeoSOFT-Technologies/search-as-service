@@ -267,6 +267,10 @@ class ManageTableServiceTest {
 		assertEquals(400, manageTableService.getConfigSets().getStatusCode());
 	}
 
+	
+	
+
+	
 	@Test
 	void getTablesInvalidData() {
 		setMockitoBadResponseForService();

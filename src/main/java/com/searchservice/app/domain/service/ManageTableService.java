@@ -138,6 +138,9 @@ public class ManageTableService implements ManageTableServicePort {
 		schemaDeleteDuration = schemaDeleteDurationNonStatic;
 	}
 
+	
+	
+	
 	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 
 	private String servicename = "Manage_Table_Service";
@@ -153,11 +156,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SolrJAdapter solrjAdapter;
 
-	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient) {
-		this.searchURL = searchUrl;
-		this.searchAPIAdapter = searchAPIAdapter;
-		this.searchClient = searchClient;
-	}
+
 
 	private void requestMethod(LoggersDTO loggersDTO, String nameofCurrMethod) {
 

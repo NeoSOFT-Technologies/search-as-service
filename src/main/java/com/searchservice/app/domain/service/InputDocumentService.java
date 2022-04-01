@@ -142,5 +142,5 @@ public class InputDocumentService implements InputDocumentServicePort {
 			valid = false;
 		}
 		return valid;
-   	}
+	}
 }
