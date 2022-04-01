@@ -20,4 +20,31 @@ kubectl delete -f 1-solr-node-scaled-to-n-nodes-3-zk
 7. Delete the cluster using ->
 minikube delete
 
+===================AUTOSCALING============================
+minikube start --driver=hyperv --memory=4gb --cpus 2 --kubernetes-version=v1.21.2 --extra-config=kubelet.housekeeping-interval=10s
 
+minikube start --driver=hyperv --memory=4gb --extra-config=kubelet.housekeeping-interval=10s
+
+minikube addons list
+minikube addons enable metrics-server
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+kubectl get deployment metrics-server -n kube-system
+
+kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
+
+kubectl get all
+
+minikube service --url solr-node-container
+
+kubectl get hpa
+
+#INCREASE LOAD
+
+kubectl top node
+
+kubectl top pods --all-namespaces
+
+minikube delete
+===============================================

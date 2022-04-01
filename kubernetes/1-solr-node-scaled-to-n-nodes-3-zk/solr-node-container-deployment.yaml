@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: solr-node-container
   name: solr-node-container
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: solr-node-container
@@ -26,11 +26,16 @@ spec:
         io.kompose.service: solr-node-container
     spec:
       containers:
-        - env:
+        - name: solr-node-container
+          image: solr:8.11.1
+          env:
             - name: ZK_HOST
               value: zoo1:2181, zoo2:2181, zoo3:2181
-          image: solr:8.11.1
-          name: solr-node-container
+          resources:
+            requests:
+              cpu: "400m"
+            limits:
+              cpu: "600m"
           ports:
             - containerPort: 8983
           volumeMounts:
