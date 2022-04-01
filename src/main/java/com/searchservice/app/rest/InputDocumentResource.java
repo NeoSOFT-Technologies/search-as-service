@@ -106,7 +106,8 @@ public class InputDocumentResource {
 	}
 
 	// Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(RequestNotPermitted exception) {
+	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(int tenantId, String tableName,
+			String payload, RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
 		// prepare Rate Limiting Response DTO
