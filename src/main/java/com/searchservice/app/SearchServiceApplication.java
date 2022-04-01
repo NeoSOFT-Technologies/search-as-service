@@ -23,13 +23,6 @@ public class SearchServiceApplication {
 	        return new KeycloakSpringBootConfigResolver();
 	    }
 		
-//		@Bean
-//		public FilterRegistrationBean<JwtTokenFilterService> jwtTokenFilter() {
-//		    FilterRegistrationBean<JwtTokenFilterService> registrationBean = new FilterRegistrationBean<>();
-//		    registrationBean.setFilter(new JwtTokenFilterService());
-//		    registrationBean.addUrlPatterns("/cacheschema/*","/api/*","/rabbit-mq/*","/throttle/*");
-//		    return registrationBean;
-//		}
-	// For Keycloak @END
+
 
 }

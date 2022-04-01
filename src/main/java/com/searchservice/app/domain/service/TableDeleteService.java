@@ -208,10 +208,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		String tableName = tableRecord.split(",")[1];
 		Response tableDeleteResponse = manageTableServicePort.deleteTable(tableName);
 
-		if (tableDeleteResponse.getStatusCode() == 200) {
-			return true;
-		}
-		return false;
+		return (tableDeleteResponse.getStatusCode() == 200);
 	}
 
 	public Response getUndoDeleteResponse(int undoRecordNumber, String tableName) {
@@ -231,15 +228,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Override
 	public boolean checkTableDeletionStatus(int deleteRecordCount) {
-		if (deleteRecordCount > 0) {
-
-			return true;
-		} else {
-
-			return false;
-		}
+	return (deleteRecordCount > 0);
 	}
-
 	@Override
 	public boolean checkTableExistensce(String tableName) {
 		return manageTableServicePort.isTableExists(tableName);

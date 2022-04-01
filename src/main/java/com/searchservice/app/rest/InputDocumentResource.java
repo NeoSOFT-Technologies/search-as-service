@@ -112,8 +112,7 @@ public class InputDocumentResource {
 	}
 
 	// Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(int tenantId, String tableName,
-			String payload, RequestNotPermitted exception) {
+	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback( RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
 		// prepare Rate Limiting Response DTO
@@ -128,11 +127,8 @@ public class InputDocumentResource {
 
 	public ResponseEntity<ThrottlerResponse> performDocumentInjection(String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
-		Instant start = Instant.now();
 		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
-		String result = "Time taken: " + timeElapsed.toMillis() + " milliseconds";
+
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
