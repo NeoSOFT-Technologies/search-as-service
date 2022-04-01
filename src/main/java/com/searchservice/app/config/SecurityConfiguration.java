@@ -34,7 +34,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 //	private String realm_name;
 //	
 //	@Value("${keycloak.resource}")
-//	private String client_id;
+//	private String tenant_id;
 //	
 //	@Value("${keycloak.credentials.secret}")
 //	private String client_Secret;

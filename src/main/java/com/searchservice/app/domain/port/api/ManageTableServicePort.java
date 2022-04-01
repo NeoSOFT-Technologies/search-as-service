@@ -18,11 +18,12 @@ public interface ManageTableServicePort {
 	 * CRUD operations for managing tables
 	 */
 	// GET request
+
 	GetCapacityPlan capacityPlans();
 
-	Response getTables(int clientid);
+	Response getTables(int tenantId);
 
-	TableSchemav2 getCurrentTableSchema(int clientId, String tableName);
+	TableSchemav2 getCurrentTableSchema(int tenantId, String tableName);
 
 	// CREATE requests
 	Response createTableIfNotPresent(ManageTable manageTableDTO);
@@ -31,7 +32,7 @@ public interface ManageTableServicePort {
 	Response deleteTable(String tableName);
 
 	// UPDATE requests
-	Response updateTableSchema(int clientId, String tableName, TableSchema tableSchemaDTO);
+	Response updateTableSchema(int tenantId, String tableName, TableSchema tableSchemaDTO);
 
 	/*
 	 * Auxiliary TableServices
@@ -61,7 +62,7 @@ public interface ManageTableServicePort {
 	Response deleteConfigSet(String configSetName);
 
 	// UPDATE Table additional methods
-	TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int clientId,
+	TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
 			TableSchemav2 tableSchema);
 
 	boolean checkIfTableNameisValid(String tableName);

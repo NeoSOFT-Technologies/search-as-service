@@ -106,6 +106,8 @@ class ManageTableTest {
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
+		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
+        Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
 	}
 
 	public void setMockitoBadResponseForService() {
@@ -143,11 +145,8 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+		
 
-	}
-
-	public void setMockitoForTableUnderDeletion() {
-		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
 	}
 
 	@Test
@@ -277,21 +276,22 @@ class ManageTableTest {
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
 	}
+	public void setMockitoForTableUnderDeletion() {
+		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
+	}
 
 	@Test
-	void testUndoDeleteTable() throws Exception {
-
-		Response undoDeleteTableDTO = new Response();
-
-		// Testing Undo Table Delete For Valid Table
-		setMockitoSuccessResponseForService();
-		restAMockMvc.perform(
-				MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" + "/restore/" + tenantId + "/" + tableName)
-						.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-						.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
-				.andExpect(status().isOk());
-
-		// Testing Undo Table Delete For Invalid Table
+	void testUndoDeleteTable() throws Exception {    	
+    	Response undoDeleteTableDTO=new Response();
+    	
+    	//Testing Undo Table Delete For Valid Table
+    	setMockitoForTableUnderDeletion(); 
+		restAMockMvc.perform(MockMvcRequestBuilders.put(apiEndpoint + "/manage/table" +"/restore/"+ tenantId +"/"+ tableName)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(undoDeleteTableDTO)))
+		.andExpect(status().isOk());
+		
+		//Testing Undo Table Delete For Invalid Table
 		setMockitoBadResponseForService();
 		restAMockMvc
 				.perform(MockMvcRequestBuilders

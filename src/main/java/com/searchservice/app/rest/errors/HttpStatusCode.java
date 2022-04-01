@@ -14,9 +14,13 @@ public enum HttpStatusCode {
 	
 	UNRECOGNIZED_FIELD(106,"check sequence of fields or field name"),
 	
-	UNDER_DELETION_PROCESS(107,"under deletion process");
+	UNDER_DELETION_PROCESS(107,"under deletion process"),
 	
+	TABLE_NOT_FOUND(108, "table does not exist"),
+	
+	TABLE_NOT_UNDER_DELETION(109, "table not under deletion");
 		
+	
 	private int code;
 	private String message;
 	

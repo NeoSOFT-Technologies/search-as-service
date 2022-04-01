@@ -56,7 +56,6 @@ public class TableDeleteService implements TableDeleteServicePort {
 	public Response initializeTableDelete(int tenantId, String tableName) {
 
 		Response deleteRecordInsertionResponse = new Response();
-
 		String actualTableName = "";
 		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
 			File file = new File(deleteRecordFilePath + ".csv");
@@ -91,8 +90,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Override
 	public int checkDeletionofTable() {
 
-		File existingFile = new File(deleteRecordFilePath + ".txt");
-		File newFile = new File(deleteRecordFilePath + "Temp.txt");
+		File existingFile = new File(deleteRecordFilePath + ".csv");
+		File newFile = new File(deleteRecordFilePath + "Temp.csv");
 		int lineNumber = 0;
 		int delRecordCount = 0;
 

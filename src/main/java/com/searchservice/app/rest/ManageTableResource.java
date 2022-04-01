@@ -29,6 +29,8 @@ import com.searchservice.app.rest.errors.DeletionOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.TableNotFoundException;
+import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -174,6 +176,7 @@ public class ManageTableResource {
 		String tableNameForMessage = tableName;
 
 		tableName = tableName + "_" + tenantId;
+		 if(tableDeleteServicePort.isTableUnderDeletion(tableNameForMessage)) {
 		Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(tableName);
 
 		if (apiResponseDTO.getStatusCode() == 200) {
@@ -183,7 +186,10 @@ public class ManageTableResource {
 
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
 			throw new BadRequestOccurredException(400, tableNameForMessage + " is not available for restoring");
-		}
+		}}else {
+        	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
+        			TABLE+tableNameForMessage+" is Not Under Deletion");
+        }
 	}
 
 	@PutMapping("/{tenantId}/{tableName}")
@@ -192,7 +198,10 @@ public class ManageTableResource {
 			@RequestBody TableSchema newTableSchemaDTO) {
 
 		tableName = tableName + "_" + tenantId;
-
+		if(!manageTableServicePort.isTableExists(tableName)) {
+        	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),TABLE+tableName.split("_")[0]+ 
+        			" having TenantID: "+tableName.split("_")[1]+" Not Found");
+        }else {
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
 			newTableSchemaDTO.setTableName(tableName);
 
@@ -211,6 +220,6 @@ public class ManageTableResource {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
 					TABLE + tableName + " is Under Deletion Process");
 		}
-
+        }
 	}
 }
