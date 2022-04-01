@@ -1,6 +1,8 @@
 package com.searchservice.app.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,6 +127,7 @@ class InputDocumentServiceTest {
 		}
 
 	}
+	
 
 	@Test
 	void testBadAddDocuments() {
@@ -138,13 +141,16 @@ class InputDocumentServiceTest {
 	}
 
 	@Test
-	void isValidJsonArray() {
+	void isValidJsonArrayFailure() {
+		boolean b = inputDocumentService.isValidJsonArray(message);
+		assertFalse(b);
 
-		try {
-			boolean b = inputDocumentService.isValidJsonArray(message);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
+	}
+
+	@Test
+	void isValidJsonArraySuccess() {
+		boolean b = inputDocumentService.isValidJsonArray(payload);
+		assertTrue(b);
 
 	}
 

@@ -25,14 +25,14 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Value("${base-search-url}")
 	private String searchNonStatic;
 	// Init configurations
-	private static String searchURL;
+	private  static String searchURL;
 
 	@Autowired
 	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
 
 		searchURL = solrURLNonStatic;
 	}
-
+    
 	private String servicename = "Input_Document_Service";
 
 	private String username = "Username";
@@ -137,11 +137,10 @@ public class InputDocumentService implements InputDocumentServicePort {
 				return false;
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-			// JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 			objectMapper.readTree(jsonString);
 		} catch (JsonProcessingException ex) {
 			valid = false;
 		}
 		return valid;
-	}
+   	}
 }

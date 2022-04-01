@@ -2,6 +2,7 @@ package com.searchservice.app.domain.service;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -312,7 +313,7 @@ class ManageTableServiceTest {
 	@Test
 	void testCapacityPlans() {
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
-		assertTrue(manageTableService.capacityPlans(loggersDTO).getPlans() != null);
+		assertNotNull(manageTableService.capacityPlans(loggersDTO).getPlans());
 
 	}
 
@@ -349,7 +350,7 @@ class ManageTableServiceTest {
 	@Test
 	void testGetTableDetails() {
 		setMockitoSuccessResponseForService();
-		assertTrue(manageTableService.getTableDetails(tableName, loggersDTO) != null);
+		assertNotNull(manageTableService.getTableDetails(tableName, loggersDTO));
 
 	}
 
