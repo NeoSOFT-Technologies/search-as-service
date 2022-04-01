@@ -1,7 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,12 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConfigSet implements VersionedObjectMapper {
+public class ConfigSet {
 	String baseConfigSetName;
 	String configSetName;
-	
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
+
 }

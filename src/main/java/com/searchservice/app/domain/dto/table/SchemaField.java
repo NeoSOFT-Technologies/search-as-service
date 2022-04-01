@@ -1,7 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidColumnOccurredException;
 
@@ -15,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SchemaField implements VersionedObjectMapper {
+public class SchemaField {
 
 	String name;
 	String type;
@@ -25,52 +24,49 @@ public class SchemaField implements VersionedObjectMapper {
 	boolean isMultiValue;
 	boolean isSortable;
 	boolean isPartialSearch;
-	
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
-	
+
 	public void setFilterable(Object value) {
 		if (value instanceof Boolean) {
-            this.isFilterable = (Boolean) value;
-        }else {
-        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Filterable is expected as : true/false");
-        }
+			this.isFilterable = (Boolean) value;
+		} else {
+			throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
+					"Value for Filterable is expected as : true/false");
+		}
 	}
 
 	public void setRequired(Object value) {
 		if (value instanceof Boolean) {
-            this.isRequired = (Boolean) value;
-        }else {
-        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Required is expected as : true/false");
-        }
+			this.isRequired = (Boolean) value;
+		} else {
+			throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
+					"Value for Required is expected as : true/false");
+		}
 	}
-
 
 	public void setStorable(Object value) {
 		if (value instanceof Boolean) {
-            this.isStorable = (Boolean) value;
-        }else {
-        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Storable is expected as : true/false");
-        }
+			this.isStorable = (Boolean) value;
+		} else {
+			throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
+					"Value for Storable is expected as : true/false");
+		}
 	}
-
 
 	public void setMultiValue(Object value) {
 		if (value instanceof Boolean) {
-            this.isMultiValue = (Boolean) value;
-        }else {
-        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for MultiValue is expected as : true/false");
-        }
+			this.isMultiValue = (Boolean) value;
+		} else {
+			throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
+					"Value for MultiValue is expected as : true/false");
+		}
 	}
-
 
 	public void setSortable(Object value) {
 		if (value instanceof Boolean) {
-            this.isSortable = (Boolean) value;
-        }else {
-        	throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), "Value for Sortable is expected as : true/false");
-        }
+			this.isSortable = (Boolean) value;
+		} else {
+			throw new InvalidColumnOccurredException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
+					"Value for Sortable is expected as : true/false");
+		}
 	}
 }

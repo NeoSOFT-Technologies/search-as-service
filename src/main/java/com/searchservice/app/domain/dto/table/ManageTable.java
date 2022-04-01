@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.infrastructure.adaptor.versioning.VersionedObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ManageTable implements VersionedObjectMapper {
+public class ManageTable {
 
 	private String tableName;
 	private String sku;
@@ -25,24 +24,20 @@ public class ManageTable implements VersionedObjectMapper {
 	private List<SchemaField> columns;
 	@JsonIgnore
 	private String tableNewName;
-	
+
 	public ManageTable(ManageTable manageTableDTO) {
 		this.tableName = manageTableDTO.getTableName();
 		this.sku = manageTableDTO.getSku();
-		this.schemaName=manageTableDTO.getSchemaName();
-		this.columns=manageTableDTO.getColumns();
+		this.schemaName = manageTableDTO.getSchemaName();
+		this.columns = manageTableDTO.getColumns();
 		this.tableNewName = manageTableDTO.tableNewName;
 	}
-	
-	public ManageTable(String tableName, String sku ,String schemaName, List<SchemaField> columns) {
+
+	public ManageTable(String tableName, String sku, String schemaName, List<SchemaField> columns) {
 		this.tableName = tableName;
 		this.sku = sku;
 		this.schemaName = schemaName;
 		this.columns = columns;
 	}
-	
-	@Override
-	public VersionedObjectMapper toVersion(int version) {
-		return this;
-	}
+
 }

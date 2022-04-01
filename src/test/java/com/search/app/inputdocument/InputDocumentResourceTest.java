@@ -1,7 +1,9 @@
+
 package com.search.app.inputdocument;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
+import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
 
 @IntegrationTest
-@AutoConfigureMockMvc(addFilters = false)
+@Disabled
 class InputDocumentResourceTest {
 
 	// String apiEndpoint = "/api/v1";
@@ -41,6 +42,7 @@ class InputDocumentResourceTest {
 	@Autowired
 	private MockMvc restAMockMvc;
 
+	
 	@MockBean
 	InputDocumentService inputDocumentService;
 	
@@ -51,21 +53,21 @@ class InputDocumentResourceTest {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
 	}
 
 	public void setMockitoBadResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
 	@Test
 	void testinputdocs() throws Exception {
-		ThrottlerResponse inpDocsResponseDTO=new ThrottlerResponse(statusCode, message);
+		
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
@@ -75,11 +77,10 @@ class InputDocumentResourceTest {
 
 	@Test
 	void testinputdoc() throws Exception {
-		ThrottlerResponse inpDocResponseDTO=new ThrottlerResponse(statusCode, message);
+	
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + tenantId + "/" + tableName)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(inputString))
-				.andExpect(status().isOk());
+				.content(inputString)).andExpect(status().isOk());
 	}
 }

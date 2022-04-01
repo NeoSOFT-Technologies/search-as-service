@@ -31,10 +31,12 @@ public class TableSchemaParser {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 		
 		for(SchemaField fieldDto: tableSchemaDTO.getColumns()) {
+
 			logger.info("Validate SearchFieldDTO before parsing it");
+
 			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if(!validateSchemaField(fieldDto)) {
-				logger.info("{} field couldn't be validated", fieldDto);
+				
 				fieldDtoMap = new HashMap<>();
 				fieldDtoMap.put(VALIDATED, false);
 				return schemaFieldsListOfMap;
@@ -57,8 +59,10 @@ public class TableSchemaParser {
 	}
 	
 	
+
 	public static boolean validateSchemaField(SchemaField searchFieldDTO) {
 		logger.info("Validate schema field: {}", searchFieldDTO);
+
 		
 		boolean fieldValidated = true;
 		String fieldName = searchFieldDTO.getName();
@@ -82,9 +86,10 @@ public class TableSchemaParser {
 	}
 	
 	
+
 	public static boolean validateSchemaFieldBooleanAttributes(SchemaField searchFieldDTO) {
 		logger.info("Validate schema field boolean attributes: {}", searchFieldDTO);
-		
+
 		boolean fieldAttributesValidated = true;
 		String invalidAttribute = "";
 		if(!searchFieldDTO.isRequired() && searchFieldDTO.isRequired()) {
@@ -129,8 +134,7 @@ public class TableSchemaParser {
 	
 	public static void setFieldsAsPerTheSchema(SchemaField searchFieldDTO, Map<String, Object> schemaField) {
 		
-		// testing
-		logger.info("current schema Field @@@@@@ {}", schemaField);
+		
 		
 		if(schemaField.containsKey(INDEXED))
 			searchFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));

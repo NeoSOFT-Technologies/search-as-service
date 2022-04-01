@@ -1,12 +1,18 @@
 package com.searchservice.app.domain.utils;
 
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.squareup.okhttp.*;
-import lombok.Data;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import lombok.Data;
 
 @Data
 public class UploadDocumentUtil {
@@ -18,26 +24,26 @@ public class UploadDocumentUtil {
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
 	public UploadDocumentSearchUtilRespnse commit() {
-		
+
 		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
-		log.debug("COMMIT");
-		
+
 		Request request = new Request.Builder().url(url).method("POST", body)
 				.addHeader("Content-Type", "application/json").build();
 
 		try {
-			 Response response = client.newCall(request).execute();
-			 if(response.code() != 400) {
-				 return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
-			 }else {
-				 //return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
-				 throw new BadRequestOccurredException(400, "Document not uploaded!");
-			 }
+
+			Response response = client.newCall(request).execute();
+			if (response.code() != 400) {
+				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+			} else {
+				// return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
+				throw new BadRequestOccurredException(400, "Document not uploaded!");
+			}
 		} catch (IOException e) {
 			log.error(e.toString());
 
