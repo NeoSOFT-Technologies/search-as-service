@@ -19,10 +19,18 @@ public class InputDocumentService implements InputDocumentServicePort {
 	
 
 	@Value("${base-search-url}")
-	private String baseSearchUrl;
+	private String searchNonStatic;
+	// Init configurations
+	private  static String searchURL;
 
 	@Autowired
-	public final ManageTableServicePort manageTableServicePort;
+	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
+
+		searchURL = solrURLNonStatic;
+	}
+
+	@Autowired
+	public  ManageTableServicePort manageTableServicePort;
 
 	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
@@ -43,7 +51,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	private UploadDocumentUtil extracted(String tableName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
-		uploadDocumentUtil.setBaseSearchUrl(baseSearchUrl);
+		uploadDocumentUtil.setBaseSearchUrl(searchURL);
 		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);
 		return uploadDocumentUtil;
