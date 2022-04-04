@@ -43,19 +43,17 @@ public class ManageTableResource {
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 	private static final String TABLE = "Table ";
-	@Autowired
-	ManageTableServicePort manageTableServicePort;
 
-	@Autowired
-	TableDeleteServicePort tableDeleteServicePort;
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort) {
-		this.manageTableServicePort = manageTableServicePort;
-		this.tableDeleteServicePort = tableDeleteServicePort;
+	private ManageTableServicePort manageTableServicePort;
 
-	}
+    private TableDeleteServicePort tableDeleteServicePort;
 
+    public ManageTableResource(ManageTableServicePort manageTableServicePort, TableDeleteServicePort tableDeleteServicePort) {
+        this.manageTableServicePort = manageTableServicePort;
+        this.tableDeleteServicePort = tableDeleteServicePort;
+    }
+	
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<GetCapacityPlan> capacityPlans() {

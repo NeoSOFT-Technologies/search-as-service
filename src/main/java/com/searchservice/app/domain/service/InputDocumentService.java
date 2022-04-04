@@ -30,7 +30,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Autowired
-	public  ManageTableServicePort manageTableServicePort;
+   public  ManageTableServicePort manageTableServicePort;
 
 	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;

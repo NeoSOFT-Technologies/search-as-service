@@ -9,10 +9,10 @@ spring:
       fail-on-unknown-properties: true
  # Keycloak Server Configurations
 keycloak:
-  realm: ${KEYCLOAK_REALM_NAME:Demo_Realm}
+  realm: ${KEYCLOAK_REALM_NAME:om_realm}
   credentials: 
-    secret: ${KEYCLOAK_CLIENT_SECRET:EM2zUo5CTPiaTGRjEXzfuSc21tuin2qo}
-  resource: ${KEYCLOAK_CLIENT_NAME:saas-ingress-microservice}
+    secret: ${KEYCLOAK_CLIENT_SECRET:iPn1q8Fx93tzOqujgBMwSnFsR6EyWhEd}
+  resource: ${KEYCLOAK_CLIENT_NAME:search-as-service}
   auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
   ssl-required: external
   public-client: false

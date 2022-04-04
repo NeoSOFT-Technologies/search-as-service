@@ -3,11 +3,11 @@ package com.search.app.inputdocument;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,7 +19,7 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
 
 @IntegrationTest
-@Disabled
+@AutoConfigureMockMvc(addFilters = false)
 class InputDocumentResourceTest {
 
 	// String apiEndpoint = "/api/v1";
@@ -38,12 +38,14 @@ class InputDocumentResourceTest {
 
 	String inputString = "[{\"shares\":20000,\"manufacture\":\"warren buffet\",\"website\":\"flipkart.com\",\"color\":\"blue\",\"author\":\"dhanashree\",\"id\":24}]";
 
-	@Autowired
-	private MockMvc restAMockMvc;
+    @Autowired
+        MockMvc restAMockMvc;
 
 	
 	@MockBean
 	InputDocumentService inputDocumentService;
+	
+
 	
 	@MockBean
 	ManageTableServicePort manageTableServicePort;
@@ -82,4 +84,17 @@ class InputDocumentResourceTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(inputString)).andExpect(status().isOk());
 	}
+	
+	
+	@Test
+	void documentInjectWithInvalidTableName() {
+		setMockitoSucccessResponseForService();
+		
+		
+	}
+	
+	
+
+	
+	
 }
