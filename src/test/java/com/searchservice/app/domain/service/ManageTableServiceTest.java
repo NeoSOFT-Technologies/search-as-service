@@ -1,7 +1,7 @@
 package com.searchservice.app.domain.service;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +42,6 @@ import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SolrJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
@@ -67,8 +66,6 @@ class ManageTableServiceTest {
 
 	@MockBean
 	SearchAPIAdapter solrApiAdapterMocked;
-
-	
 
 	@MockBean
 	SearchUtil solrUtilMocked;
@@ -179,7 +176,6 @@ class ManageTableServiceTest {
 		newTableSchemaDTO.setTableDetails(finalResponseMap);
 		newTableSchemaDTO.setTableName(tableName);
 
-	
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
 		schemaField.setName("ok");
@@ -218,7 +214,6 @@ class ManageTableServiceTest {
 		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
 		Mockito.when(solrJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
-	
 
 		Mockito.when(solrJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
 
@@ -226,7 +221,6 @@ class ManageTableServiceTest {
 		Mockito.when(solrJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(solrJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(solrJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
-
 
 	}
 
@@ -245,9 +239,6 @@ class ManageTableServiceTest {
 		configSetResponse.setResponse(test1());
 		Mockito.when(solrJAdapter.getConfigSetFromSolrj(solrClient)).thenReturn(configSetResponse);
 
-	
-	
-
 	}
 
 	void configErrorResponse() {
@@ -261,10 +252,6 @@ class ManageTableServiceTest {
 		assertEquals(400, manageTableService.getConfigSets().getStatusCode());
 	}
 
-	
-	
-
-	
 	@Test
 	void getTablesInvalidData() {
 		setMockitoBadResponseForService();
@@ -425,7 +412,6 @@ class ManageTableServiceTest {
 	@Test
 	void initializeSchemaDeletion() {
 
-	
 		try {
 			manageTableService.initializeSchemaDeletion(tenantId, tableName, searchUrl);
 		} catch (BadRequestOccurredException e) {
@@ -443,7 +429,6 @@ class ManageTableServiceTest {
 
 	@Test
 	void checkIfTableNameisValid() {
-
 
 		try {
 			manageTableService.checkIfTableNameisValid(tableName);
@@ -479,7 +464,7 @@ class ManageTableServiceTest {
 	@Test
 	void createConfigSet() {
 		setMockitoSuccessResponseForService();
-	
+
 		try {
 			manageTableService.createConfigSet(configSetDTO);
 		} catch (BadRequestOccurredException e) {
@@ -581,7 +566,7 @@ class ManageTableServiceTest {
 		try {
 			manageTableService.checkForSchemaDeletion();
 		} catch (BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+			assertEquals(400, e.getExceptionCode());
 		}
 	}
 
@@ -616,8 +601,6 @@ class ManageTableServiceTest {
 		assertFalse(manageTableService.performSchemaDeletion("101,automatedTestCollection,14-3-2022 05:05:26,name"));
 
 	}
-
-
 
 	@Test
 	void checkIfSchemaFileExistInvalid() {

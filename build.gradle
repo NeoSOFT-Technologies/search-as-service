@@ -102,9 +102,7 @@ dependencies {
 	//JSON
 	implementation group: 'org.json', name: 'json', version: '20200518'
 
-	//RabbitMQ
-	implementation "org.springframework.boot:spring-boot-starter-amqp"
-	testImplementation group: 'org.springframework.amqp', name: 'spring-rabbit-test', version: '1.6.0.RELEASE'
+
 
 	// Rate Limiter
 	// https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot2

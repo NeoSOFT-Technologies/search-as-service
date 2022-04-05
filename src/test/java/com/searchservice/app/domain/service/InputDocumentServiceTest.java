@@ -39,8 +39,6 @@ class InputDocumentServiceTest {
 	@InjectMocks
 	private InputDocumentService inputDocumentService;
 
-
-
 	private ThrottlerResponse responseDTO;
 
 	@MockBean
@@ -62,9 +60,9 @@ class InputDocumentServiceTest {
 		responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
 		responseDTO.setMessage(message);
-
+		response.setDocumentUploaded(true);
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
-
+		Mockito.when(uploadDocumentUtil.commit()).thenReturn(response);
 	}
 
 	public void setMockitoBadResponseForService() {
@@ -77,9 +75,8 @@ class InputDocumentServiceTest {
 	@Test
 	void testAddDocument() {
 		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
-		response.setDocumentUploaded(true);
-
-		setMockitoSucccessResponseForService();
+		//setMockitoSucccessResponseForService();
+		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
 		ThrottlerResponse response1 = inputDocumentService.addDocument(tableName, payload);
 		assertEquals(400, response1.getStatusCode());
 
