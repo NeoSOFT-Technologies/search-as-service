@@ -15,3 +15,4 @@ TenantID,TableName,RequestTime,ColumnName
 101,automatedTestCollection,05-4-2022 11:37:21,http://localhost:8983/solr
 101,automatedTestCollection,05-4-2022 11:40:44,http://localhost:8983/solr
 101,automatedTestCollection,05-4-2022 12:00:21,http://localhost:8983/solr
+101,automatedTestCollection,05-4-2022 01:46:42,http://localhost:8983/solr

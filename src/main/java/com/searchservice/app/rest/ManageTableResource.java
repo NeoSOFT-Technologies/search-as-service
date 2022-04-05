@@ -1,6 +1,7 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,4 +220,13 @@ public class ManageTableResource {
 		}
         }
 	}
+	
+	
+	@GetMapping("/test/{tableName}")
+	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	public Map<Object, Object> getTableDetails( @PathVariable String tableName) {
+		return manageTableServicePort.getTableDetails(tableName);
+		
+	}
+	
 }
