@@ -220,13 +220,6 @@ public class ManageTableResource {
 		}
         }
 	}
-	
-	
-	@GetMapping("/test/{tableName}")
-	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public Map<Object, Object> getTableDetails( @PathVariable String tableName) {
-		return manageTableServicePort.getTableDetails(tableName);
-		
-	}
+
 	
 }

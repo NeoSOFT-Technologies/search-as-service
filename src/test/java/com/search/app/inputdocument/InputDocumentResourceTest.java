@@ -86,12 +86,7 @@ class InputDocumentResourceTest {
 	}
 	
 	
-	@Test
-	void documentInjectWithInvalidTableName() {
-		setMockitoSucccessResponseForService();
-		
-		
-	}
+
 	
 	
 

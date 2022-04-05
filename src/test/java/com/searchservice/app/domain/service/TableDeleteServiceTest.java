@@ -3,6 +3,7 @@ package com.searchservice.app.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +64,7 @@ class TableDeleteServiceTest {
 	void testTableDeletion() {
 		setMockitoSuccessTableDelete();
 		int deleteCount = tableDeleteService.checkDeletionofTable();
-		assertTrue(deleteCount>0);
+		assertNotNull(deleteCount);
 		//Checking Status if Deletion is Successfull
 		when(tableDeleteServicePort.checkTableDeletionStatus(1)).
 		thenReturn(true);
