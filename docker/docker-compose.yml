@@ -50,7 +50,7 @@ services:
     ports:
      - "8981:8983"
     volumes:
-      - ./docker-container-data/solr1:/var/solr
+      - ./docker-container-data/solr1:/var/solr/data
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -66,7 +66,7 @@ services:
     ports:
      - "8982:8983"
     volumes:
-      - ./docker-container-data/solr2:/var/solr
+      - ./docker-container-data/solr2:/var/solr/data
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -82,7 +82,7 @@ services:
     ports:
      - "8983:8983"
     volumes:
-      - ./docker-container-data/solr3:/var/solr
+      - ./docker-container-data/solr3:/var/solr/data
     environment:
       - ZK_HOST=zoo1:2181,zoo2:2181,zoo3:2181
     networks:
@@ -100,6 +100,11 @@ services:
     ports:
       - 2181:2181
       - 7001:7000
+    volumes:
+      - ./docker-container-data/zoo1/logs:/logs
+      - ./docker-container-data/zoo1/data:/data
+      - ./docker-container-data/zoo1/datalog:/datalog
+      - ./docker-container-data/zoo1/apache:/apache-zookeeper-3.7.0-bin
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
@@ -116,6 +121,11 @@ services:
     ports:
       - 2182:2181
       - 7002:7000
+    volumes:
+      - ./docker-container-data/zoo2/logs:/logs
+      - ./docker-container-data/zoo2/data:/data
+      - ./docker-container-data/zoo2/datalog:/datalog
+      - ./docker-container-data/zoo2/apache:/apache-zookeeper-3.7.0-bin
     environment:
       ZOO_MY_ID: 2
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
@@ -132,6 +142,11 @@ services:
     ports:
       - 2183:2181
       - 7003:7000
+    volumes:
+      - ./docker-container-data/zoo3/logs:/logs
+      - ./docker-container-data/zoo3/data:/data
+      - ./docker-container-data/zoo3/datalog:/datalog
+      - ./docker-container-data/zoo3/apache:/apache-zookeeper-3.7.0-bin
     environment:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
