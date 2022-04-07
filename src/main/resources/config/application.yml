@@ -17,3 +17,6 @@ keycloak:
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
+  
+  
+base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr

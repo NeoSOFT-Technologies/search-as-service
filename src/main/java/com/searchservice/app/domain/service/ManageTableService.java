@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +60,6 @@ import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SolrJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.ContentNotFoundException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
@@ -129,7 +127,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Autowired
 	SolrJAdapter searchjAdapter;
-
+	
+	
 	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient,
 			SolrJAdapter searchjAdapter) 
 	{
@@ -515,7 +514,6 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
 
-		
 
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
@@ -600,9 +598,9 @@ public class ManageTableService implements ManageTableServicePort {
 						Map<String, Object> fieldTypeAttributes = new HashMap<>();
 						// Add <partial-search> field-type if not present already
 
-						if (!isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
+						if (!searchjAdapter.isPartialSearchFieldTypePresent(newTableSchemaDTO.getTableName())) {
 							FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
-							fieldTypeAttributes = getFieldTypeAttributesForPartialSearch();
+							fieldTypeAttributes = TableSchemaParser.getFieldTypeAttributesForPartialSearch();
 							fieldTypeDef.setAttributes(fieldTypeAttributes);
 							SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(
 									fieldTypeDef);
@@ -640,9 +638,7 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrException e) {
 			tableSchemaResponseDTO.setStatusCode(400);
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table " + e.getMessage());
-
 			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
-			logger.info(e.toString());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -658,19 +654,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 		Response apiResponseDTO = new Response();
 
-		Response schemaResponseDTOBefore = new Response();
-		Response schemaResponseDTOAfter = new Response();
-
 		try {
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = searchjAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
-
-			schemaResponseDTOBefore.setStatusCode(200);
-
-			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
-			int numOfFields = schemaFields.size();
-			logger.info("Total number of fields: {}", numOfFields);
-
+			searchjAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
+			
 			// Get all fields from incoming(from req Body) schemaDTO
 			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
 			List<Map<String, Object>> targetSchemafields = TableSchemaParser
@@ -692,10 +679,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
+				
 				// Pass the fieldAttribute to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = searchjAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
-				schemaResponseDTOAfter.setStatusCode(200);
 
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
 				updatedFields++;
@@ -705,26 +692,25 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			// Compare required Vs Updated Fields
 
-			logger.info("Total field updates required in the current schema: {}", totalUpdatesRequired);
-			logger.info("Total fields updated in the current schema: {}", updatedFields);
+			logger.debug("Total field updates required in the current schema: {}", totalUpdatesRequired);
+			logger.debug("Total fields updated in the current schema: {}", updatedFields);
 
+			
 		} catch (NullPointerException e) {
-			schemaResponseDTOAfter.setStatusCode(400);
-			apiResponseDTO.setStatusCode(200);
-			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
+			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setMessage("Schema could not be updated successfully");
 			logger.error("Null value detected!", e);
-			logger.error(e.toString());
 		} catch (SolrException e) {
 			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO.setMessage("Schema could not be updated");
-			logger.error(SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
-					newTableSchemaDTO.getTableName());
-			logger.error(e.toString());
+			logger.error(
+					SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
+					newTableSchemaDTO.getTableName(), 
+					e.getMessage());
 		} catch (SolrSchemaValidationException e) {
 			apiResponseDTO.setStatusCode(400);
 			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error("Error Message: {}", e.getMessage());
-			logger.error(e.toString());
 		}
 		return apiResponseDTO;
 	}
@@ -876,7 +862,7 @@ public class ManageTableService implements ManageTableServicePort {
 			long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
 			return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
-			logger.error("Error!", e);
+			logger.error("Error!", e.getMessage());
 			return 0;
 		}
 	}
@@ -934,62 +920,6 @@ public class ManageTableService implements ManageTableServicePort {
 		Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 		Matcher matcher = pattern.matcher(tableName);
 		return matcher.find();
-	}
-
-	// Partial Search Field Type
-	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
-		final String FIELD_TYPE_CLASS = "class";
-		final String FIELD_TYPE_NAME = "name";
-
-		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
-		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
-		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, "partial_search");
-		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
-
-		Map<String, Object> analyzerObject = new HashMap<>();
-		// Prepare charFilters
-		Map<String, Object> charFilter = new HashMap<>();
-		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
-		charFilter.put("replacement", "$1$1");
-		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
-		// Prepare tokenizer
-		Map<String, Object> tokenizerObject = new HashMap<>();
-		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
-		// Prepare filters
-		Map<String, Object> filterObject1 = new HashMap<>();
-		Map<String, Object> filterObject2 = new HashMap<>();
-		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
-		filterObject1.put("preserveOriginal", "0");
-		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
-		filterObject2.put("maxGramSize", "25");
-		filterObject2.put("minGramSize", "3");
-		Map<String, Object> filtersObject = new HashMap<>();
-		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
-		// Add charFilters, tokenizer & filters to analyzer
-		analyzerObject.put("charFilters", Arrays.asList(charFilter));
-		analyzerObject.put("tokenizer", tokenizerObject);
-		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
-
-		Object analyzerFinalObject = analyzerObject;
-		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
-
-		return partialSearchFieldTypeAttrs;
-	}
-
-	public boolean isPartialSearchFieldTypePresent(String tableName) {
-
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-		SchemaRequest schemaRequest = new SchemaRequest();
-
-		try {
-			SchemaResponse schemaResponse = searchjAdapter.isPartialSearchFieldInSolrj(searchClientActive, schemaRequest);
-			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
-
-			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
-		} catch (Exception e) {
-			logger.error(e.toString());
-		}
-		return false;
 	}
 
 	public boolean checkIfSchemaFileExist(File file) {

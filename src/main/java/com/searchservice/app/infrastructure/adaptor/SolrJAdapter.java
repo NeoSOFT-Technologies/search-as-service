@@ -1,11 +1,14 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
@@ -15,15 +18,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.utils.SearchUtil;
+import com.searchservice.app.domain.utils.TableSchemaParser;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Service
+@Transactional
+@Component
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SolrJAdapter {
 
+	private static final String PARTIAL_SEARCH = "partial_search";
+	
 	private final Logger logger = LoggerFactory.getLogger(SolrJAdapter.class);
 	@Autowired
-	SearchAPIAdapter searchAPIAdapter;
+	SearchAPIAdapter searchAPIAdapter = new SearchAPIAdapter();
 	HttpSolrClient searchClient;
 
 	@Value("${base-search-url}")
@@ -42,7 +61,7 @@ public class SolrJAdapter {
 			response = request.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -58,7 +77,7 @@ public class SolrJAdapter {
 		try {
 			response = clusterStatus.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -76,7 +95,7 @@ public class SolrJAdapter {
 			request.process(searchClientActive);
 			deleteAliasRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
-			logger.error("Exception occurred: ", e);
+			logger.error(e.getMessage());
 			return false;
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
@@ -92,7 +111,7 @@ public class SolrJAdapter {
 			configSetResponse = configSetRequest.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -106,7 +125,7 @@ public class SolrJAdapter {
 			response = request.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -124,7 +143,7 @@ public class SolrJAdapter {
 		}
 
 		catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -138,7 +157,7 @@ public class SolrJAdapter {
 		try {
 			configSetRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -149,7 +168,7 @@ public class SolrJAdapter {
 		try {
 			request.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 
 		} 
 
@@ -162,7 +181,7 @@ public class SolrJAdapter {
 			schemaResponse = schemaRequest.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		}
 
 		return schemaResponse;
@@ -173,7 +192,7 @@ public class SolrJAdapter {
 		try {
 			addFieldTypeRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -185,7 +204,7 @@ public class SolrJAdapter {
 			addFieldResponse = addFieldRequest.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} 
 		return addFieldResponse;
 	}
@@ -199,7 +218,7 @@ public class SolrJAdapter {
 //			schemaResponse = schemaRequest.process(searchClientActive);
 //
 //		} catch (SolrServerException | IOException e) {
-//			logger.error(e.toString());
+//			logger.error(e.getMessage());
 //		} finally {
 //			SearchUtil.closeSearchClientConnection(searchClientActive);
 //		}
@@ -215,7 +234,7 @@ public class SolrJAdapter {
 			updateFieldsResponse = updateFieldsRequest.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		}
 		return updateFieldsResponse;
 
@@ -227,7 +246,7 @@ public class SolrJAdapter {
 			request.process(searchClientActive);
 
 		} catch (SolrServerException | IOException e) {
-			logger.error(e.toString());
+			logger.error(e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -268,7 +287,6 @@ public class SolrJAdapter {
 		SchemaResponse schemaResponse = null;
 		try {
 			schemaResponse = schemaRequest.process(searchClientActive);
-
 		} catch (SolrServerException | IOException e) {
 			logger.debug("Schema Field Types couldn't be retrieved");
 		} finally {
@@ -276,4 +294,38 @@ public class SolrJAdapter {
 		}
 		return schemaResponse;
 	}
+	
+	public boolean isPartialSearchFieldTypePresent(String tableName) {
+		
+		searchURL = "http://localhost:8983/solr";
+
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+		SchemaRequest schemaRequest = new SchemaRequest();
+		
+		try {
+			SchemaResponse schemaResponse = isPartialSearchFieldInSolrj(searchClientActive, schemaRequest);
+			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
+			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return false;
+	}
+	
+	
+	public void createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO, Map<String, Object> fieldTypeAttributes) {
+		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
+			FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
+			fieldTypeAttributes = TableSchemaParser.getFieldTypeAttributesForPartialSearch();
+			fieldTypeDef.setAttributes(fieldTypeAttributes);
+			SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(
+					fieldTypeDef);
+			HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
+					tableSchemaDTO.getTableName());
+			addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
+
+		} else
+			fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+	}
+	
 }
