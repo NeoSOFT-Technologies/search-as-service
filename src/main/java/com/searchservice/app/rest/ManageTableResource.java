@@ -31,7 +31,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -44,9 +44,9 @@ public class ManageTableResource {
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 	private static final String TABLE = "Table ";
 
-
+         @Autowired
 	private ManageTableServicePort manageTableServicePort;
-
+    @Autowired
     private TableDeleteServicePort tableDeleteServicePort;
 
     public ManageTableResource(ManageTableServicePort manageTableServicePort, TableDeleteServicePort tableDeleteServicePort) {
