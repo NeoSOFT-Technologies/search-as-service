@@ -26,11 +26,13 @@ import com.searchservice.app.infrastructure.adaptor.SolrJAdapter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Service
 @Transactional
 @Component
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class TableSchemaParser {
 	
@@ -47,17 +49,17 @@ public class TableSchemaParser {
 	@Value("${base-search-url}")
 	public String searchURL;
 	
-//	@Autowired
-	SolrJAdapter searchjAdapter = new SolrJAdapter();
+	@Autowired
+	SolrJAdapter searchjAdapter;
+//	SolrJAdapter searchjAdapter = new SolrJAdapter();
 	
 	@Autowired
 	SearchAPIAdapter searchAPIAdapter;
 
-	public TableSchemaParser(SolrJAdapter searchjAdapter) {
+	public TableSchemaParser(SolrJAdapter searchjAdapter, SearchAPIAdapter searchAPIAdapter) {
 		this.searchjAdapter = searchjAdapter;
+		this.searchAPIAdapter = searchAPIAdapter;
 	}
-	
-	public TableSchemaParser() {};
 	
 	
 	public static  List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
