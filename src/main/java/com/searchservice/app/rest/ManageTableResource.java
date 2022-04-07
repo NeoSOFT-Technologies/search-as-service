@@ -1,10 +1,10 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +31,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -43,19 +43,17 @@ public class ManageTableResource {
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 	private static final String TABLE = "Table ";
-	@Autowired
-	ManageTableServicePort manageTableServicePort;
 
-	@Autowired
-	TableDeleteServicePort tableDeleteServicePort;
+         @Autowired
+	private ManageTableServicePort manageTableServicePort;
+    @Autowired
+    private TableDeleteServicePort tableDeleteServicePort;
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort) {
-		this.manageTableServicePort = manageTableServicePort;
-		this.tableDeleteServicePort = tableDeleteServicePort;
-
-	}
-
+    public ManageTableResource(ManageTableServicePort manageTableServicePort, TableDeleteServicePort tableDeleteServicePort) {
+        this.manageTableServicePort = manageTableServicePort;
+        this.tableDeleteServicePort = tableDeleteServicePort;
+    }
+	
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<GetCapacityPlan> capacityPlans() {
@@ -222,4 +220,6 @@ public class ManageTableResource {
 		}
         }
 	}
+
+	
 }

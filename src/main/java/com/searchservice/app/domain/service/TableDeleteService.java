@@ -179,6 +179,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			while ((currentDeleteRecordLine = br.readLine()) != null) {
 				if (lineNumber > 0) {
 					String[] currentRecordData = currentDeleteRecordLine.split(",");
+
 					if (!currentRecordData[1].equalsIgnoreCase(tableName)) {
 						pw.println(currentDeleteRecordLine);
 					} else {
