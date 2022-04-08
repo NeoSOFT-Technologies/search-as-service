@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev #prod
+    active: dev #prod #default
   jackson:
     deserialization:
       fail-on-unknown-properties: true
@@ -17,6 +17,3 @@ keycloak:
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
-  
-  
-base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr

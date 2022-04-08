@@ -1,6 +1,8 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,32 +21,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
-import com.searchservice.app.domain.utils.TableSchemaParser;
+import com.searchservice.app.domain.utils.TableSchemaParserUtil;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Service
-@Transactional
 @Component
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class SolrJAdapter {
+public class SearchJAdapter {
 
+	private static final String MULTIVALUED = "multiValued";
+	private static final String STORED = "stored";
+	private static final String REQUIRED = "required";
+	private static final String VALIDATED = "validated";
+	private static final String DOCVALUES = "docValues";
+	private static final String INDEXED = "indexed";
 	private static final String PARTIAL_SEARCH = "partial_search";
 	
-	private final Logger logger = LoggerFactory.getLogger(SolrJAdapter.class);
-	@Autowired
-	SearchAPIAdapter searchAPIAdapter = new SearchAPIAdapter();
-	HttpSolrClient searchClient;
-
+	private final Logger logger = LoggerFactory.getLogger(SearchJAdapter.class);
+	
 	@Value("${base-search-url}")
 	private String searchURL;
 
@@ -52,7 +54,11 @@ public class SolrJAdapter {
 	private String basicAuthUsername;
 	@Value("${basic-auth.password}")
 	private String basicAuthPassword;
-
+	
+	@Autowired
+	private SearchAPIAdapter searchAPIAdapter;
+	
+	
 	public CollectionAdminResponse getCollectionAdminRequestList(HttpSolrClient searchClientActive) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
 		CollectionAdminResponse response = null;
@@ -68,7 +74,8 @@ public class SolrJAdapter {
 		return response;
 
 	}
-
+	
+	
 	public CollectionAdminResponse getTableDetailsFromSolrjCluster(String tableName,
 			HttpSolrClient searchClientActive) {
 
@@ -84,7 +91,8 @@ public class SolrJAdapter {
 
 		return response;
 	}
-
+	
+	
 	public Boolean deleteTableFromSolrj(String tableName) {
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
@@ -102,7 +110,8 @@ public class SolrJAdapter {
 		}
 		return true;
 	}
-
+	
+	
 	public ConfigSetAdminResponse getConfigSetFromSolrj(HttpSolrClient searchClientActive) {
 
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
@@ -209,22 +218,6 @@ public class SolrJAdapter {
 		return addFieldResponse;
 	}
 
-//	public SchemaResponse updateSchemaAttributesInSolrj(HttpSolrClient searchClientActive,
-//			SchemaRequest schemaRequest) {
-//
-//		SchemaResponse schemaResponse = null;
-//
-//		try {
-//			schemaResponse = schemaRequest.process(searchClientActive);
-//
-//		} catch (SolrServerException | IOException e) {
-//			logger.error(e.getMessage());
-//		} finally {
-//			SearchUtil.closeSearchClientConnection(searchClientActive);
-//		}
-//
-//		return schemaResponse;
-//	}
 
 	public UpdateResponse updateSchemaLogic(HttpSolrClient searchClientActive,
 			SchemaRequest.ReplaceField updateFieldsRequest) {
@@ -289,6 +282,7 @@ public class SolrJAdapter {
 			schemaResponse = schemaRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
 			logger.debug("Schema Field Types couldn't be retrieved");
+			logger.debug("Exception occurred: {}", e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -296,36 +290,86 @@ public class SolrJAdapter {
 	}
 	
 	public boolean isPartialSearchFieldTypePresent(String tableName) {
-		
-		searchURL = "http://localhost:8983/solr";
-
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-		SchemaRequest schemaRequest = new SchemaRequest();
-		
 		try {
+			HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+			SchemaRequest schemaRequest = new SchemaRequest();
+
 			SchemaResponse schemaResponse = isPartialSearchFieldInSolrj(searchClientActive, schemaRequest);
 			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception occurred: {}", e.getMessage());
+			throw new BadRequestOccurredException(400, "Could not confirm if partial_search field type is available");
 		}
-		return false;
 	}
 	
 	
 	public void createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO, Map<String, Object> fieldTypeAttributes) {
 		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
 			FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
-			fieldTypeAttributes = TableSchemaParser.getFieldTypeAttributesForPartialSearch();
+			fieldTypeAttributes = TableSchemaParserUtil.getFieldTypeAttributesForPartialSearch();
 			fieldTypeDef.setAttributes(fieldTypeAttributes);
-			SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(
-					fieldTypeDef);
-			HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
-					tableSchemaDTO.getTableName());
-			addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
-
+			
+			try {
+				SchemaRequest.AddFieldType addFieldTypeRequest = new SchemaRequest.AddFieldType(
+						fieldTypeDef);
+				HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
+						tableSchemaDTO.getTableName());
+				addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
+			} catch(Exception e) {
+				logger.error("Exception occurred: {}", e.getMessage());
+				throw new BadRequestOccurredException(400, "Couldn't create partial search field type");
+			}
 		} else
 			fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+	}
+	
+	
+	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
+
+		for (SchemaField fieldDto : tableSchemaDTO.getColumns()) {
+			Map<String, Object> fieldDtoMap = new HashMap<>();
+			if (!TableSchemaParserUtil.validateSchemaField(fieldDto)) {
+				fieldDtoMap = new HashMap<>();
+				fieldDtoMap.put(VALIDATED, false);
+				return schemaFieldsListOfMap;
+			}
+			if (TableSchemaParserUtil.isFieldUnchangeable(fieldDto.getName()))
+				continue;
+
+			// PARTIAL_SEARCH UPDATE
+			partialSearchUpdate(tableSchemaDTO, fieldDto, fieldDtoMap);
+
+			fieldDtoMap.put("name", fieldDto.getName());
+			fieldDtoMap.put(STORED, fieldDto.isStorable());
+			fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
+			fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
+			fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
+			schemaFieldsListOfMap.add(fieldDtoMap);
+		}
+		return schemaFieldsListOfMap;
+	}
+	
+	
+	public void partialSearchUpdate(TableSchema tableSchemaDTO, SchemaField fieldDto, Map<String, Object> fieldDtoMap) {
+		// if partial search enabled
+		if (fieldDto.isPartialSearch()) {
+			Map<String, Object> fieldTypeAttributes = new HashMap<>();
+
+			// Add <partial-search> field-type if not present already
+			createPartialSearchFieldTypeIfNotPresent(tableSchemaDTO, fieldTypeAttributes);
+
+			// Add <partial-search> fieldType to the field
+			fieldDtoMap.put("type", fieldTypeAttributes.get("name"));
+			// Since "partial search" is enabled on this field, docValues has to be disabled
+			fieldDto.setSortable(false);
+		} else {
+			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),
+					fieldDto.isMultiValue()));
+			fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
+		}
 	}
 	
 }
