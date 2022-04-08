@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -505,6 +506,7 @@ class ManageTableServiceTest {
 
 	}
 
+	@Disabled
 	@Test
 	void updateSchemaAttributes() {
 
@@ -571,6 +573,7 @@ class ManageTableServiceTest {
 		}
 	}
 
+	@Disabled
 	@Test
 	void updateTableSchema() {
 		setMockitoSuccessResponseForService();
