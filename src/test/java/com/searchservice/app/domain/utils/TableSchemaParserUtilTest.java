@@ -16,10 +16,10 @@ import com.searchservice.app.domain.dto.table.SchemaField;
 @ExtendWith(SpringExtension.class)
 
 @SpringBootTest
-class TableSchemaParserTest{
+class TableSchemaParserUtilTest{
 
 	@InjectMocks
-	TableSchemaParser tableSchemaParser;
+	TableSchemaParserUtil tableSchemaParser;
 	
 	SchemaField schemaFieldDTO;
 	
@@ -31,21 +31,21 @@ class TableSchemaParserTest{
 	@Test
 	void validateSchemaInvalidName() {
 		schemaFieldDTO.setName("");
-		assertFalse(TableSchemaParser.validateSchemaField(schemaFieldDTO));
+		assertFalse(TableSchemaParserUtil.validateSchemaField(schemaFieldDTO));
 	}
 	
 	@Test
 	void validateSchemaInvalidType() {
 		schemaFieldDTO.setName("fname");
 		schemaFieldDTO.setType(null);
-		assertFalse(TableSchemaParser.validateSchemaField(schemaFieldDTO));
+		assertFalse(TableSchemaParserUtil.validateSchemaField(schemaFieldDTO));
 	}
 	
 	@Test
 	void validateSchemaInvalidRequired() {
 		schemaFieldDTO.setName("fname");
 		schemaFieldDTO.setType("string");
-		TableSchemaParser.validateSchemaField(schemaFieldDTO);
+		TableSchemaParserUtil.validateSchemaField(schemaFieldDTO);
 	}
 	
 }
