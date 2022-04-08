@@ -25,7 +25,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
-import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
@@ -90,28 +89,54 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
-	private static final String PARTIAL_SEARCH = "partial_search";
 	private static final String DEFAULT_CONFIGSET = "_default";
 	private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-search-url}")
-	private String searchURL;
+
+	private String searchNonStatic;
 	@Value("${basic-auth.username}")
-	private String basicAuthUsername;
+
+	private String basicAuthUsernameNonStatic;
 	@Value("${basic-auth.password}")
-	private String basicAuthPassword;
+
+	private String basicAuthPasswordNonStatic;
+
 	// ConfigSet
 	@Value("${base-configset}")
-	private String baseConfigSet;
+
+	private String baseConfigSetNonStatic;
 
 	// UPDATE Table
 	@Value("${table-schema-attributes.delete-file-path}")
-	String deleteSchemaAttributesFilePath;
 
+	private String deleteSchemaAttributesFilePathNonStatic;
 	@Value("${table-schema-attributes.days}")
-	long schemaDeleteDuration;
+
+	private long schemaDeleteDurationNonStatic;
+
+	// Init configurations
+	private static String searchURL;
+	private static String basicAuthUsername;
+	private static String basicAuthPassword;
+	private static String deleteSchemaAttributesFilePath;
+	private static long schemaDeleteDuration;
+
+	@Autowired
+	public ManageTableService(@Value("${base-search-url}") String solrURLNonStatic,
+			@Value("${basic-auth.username}") String basicAuthUsernameNonStatic,
+			@Value("${basic-auth.password}") String basicAuthPasswordNonStatic,
+			@Value("${table-schema-attributes.delete-file-path}") String deleteSchemaAttributesFilePathNonStatic,
+			@Value("${table-schema-attributes.days}") long schemaDeleteDurationNonStatic) {
+
+		searchURL = solrURLNonStatic;
+		basicAuthUsername = basicAuthUsernameNonStatic;
+		basicAuthPassword = basicAuthPasswordNonStatic;
+		deleteSchemaAttributesFilePath = deleteSchemaAttributesFilePathNonStatic;
+		schemaDeleteDuration = schemaDeleteDurationNonStatic;
+	}
 
 	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
 
@@ -129,9 +154,11 @@ public class ManageTableService implements ManageTableServicePort {
 	SearchJAdapter searchJAdapter;
 	
 	
-	public ManageTableService(String searchUrl, SearchAPIAdapter searchAPIAdapter, HttpSolrClient searchClient,
-			SearchJAdapter searchJAdapter) 
-	{
+	public ManageTableService(
+			String searchUrl, 
+			SearchAPIAdapter searchAPIAdapter, 
+			HttpSolrClient searchClient,
+			SearchJAdapter searchJAdapter) {
 		this.searchURL = searchUrl;
 		this.searchAPIAdapter = searchAPIAdapter;
 		this.searchClient = searchClient;
@@ -176,8 +203,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getCurrentTableSchema(int tenantId, String tableName) {
 
 		if (!isTableExists(tableName + "_" + tenantId))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),"Table "+tableName.split("_")[0]+ 
-        			" having TenantID: "+tableName.split("_")[1]+" Not Found");
+			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -211,9 +238,7 @@ public class ManageTableService implements ManageTableServicePort {
 		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(tableName, searchClientActive);
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
-
 		try {
-
 			finalResponseMap = ManageTableUtil
 					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
 		} catch (Exception e) {
@@ -265,11 +290,10 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response deleteTable(String tableName) {
 
 		if (!isTableExists(tableName))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),"Table "+tableName.split("_")[0]+ 
-        			" having TenantID: "+tableName.split("_")[1]+" Not Found");
+			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
 
 		// Delete table
-
 		Response apiResponseDTO = new Response();
 
 		boolean response = searchJAdapter.deleteTableFromSolrj(tableName);
@@ -301,12 +325,8 @@ public class ManageTableService implements ManageTableServicePort {
 		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
 		apiResponseDTO.setMessage(tableSchemaResponseDTO.getMessage());
 
-	
-
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
-
-	
 
 		return apiResponseDTO;
 	}
@@ -336,7 +356,7 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (Exception e) {
 			getListItemsResponseDTO.setStatusCode(400);
 			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
-			
+
 		}
 		return getListItemsResponseDTO;
 	}
@@ -393,15 +413,12 @@ public class ManageTableService implements ManageTableServicePort {
 		TableSchemav2Data data = new TableSchemav2Data();
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
 		try {
-
-		
-
 			SchemaResponse schemaResponse = searchJAdapter.getSchemaFields(searchClientActive);
+
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			tableSchemaResponseDTO.setStatusCode(200);
-	
+
 			List<SchemaField> solrSchemaFieldDTOs = new ArrayList<>();
-		
 
 			for (Map<String, Object> f : schemaFields) {
 
@@ -474,10 +491,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-
 			throw new InvalidSKUOccurredException(HttpStatusCode.INVALID_SKU_NAME.getCode(),
 					HttpStatusCode.INVALID_SKU_NAME.getMessage() + " : " + manageTableDTO.getSku());
-
 		}
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
@@ -504,8 +519,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
-
-
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
 
@@ -516,7 +529,6 @@ public class ManageTableService implements ManageTableServicePort {
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
-			
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			SchemaResponse schemaResponse = searchJAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
 
@@ -525,7 +537,6 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
 
 			// Add new fields present in the Target Schema to the given collection/table
-			
 			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
 			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
 
@@ -622,7 +633,7 @@ public class ManageTableService implements ManageTableServicePort {
 		try {
 			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			searchJAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
-			
+
 			// Get all fields from incoming(from req Body) schemaDTO
 			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
 			List<Map<String, Object>> targetSchemafields = searchJAdapter
@@ -728,7 +739,6 @@ public class ManageTableService implements ManageTableServicePort {
 		List<SchemaField> existingSchemaAttributes = getTableSchema(tableName + "_" + tenantId).getData().getColumns();
 
 		for (SchemaField existingSchemaAttribute : existingSchemaAttributes) {
-
 			String exsitingSchemaName = existingSchemaAttribute.getName();
 			boolean isContains = ManageTableUtil.checkIfListContainsSchemaColumn(schemaColumns,
 					existingSchemaAttribute);
@@ -776,7 +786,6 @@ public class ManageTableService implements ManageTableServicePort {
 				}
 				lineNumber++;
 			}
-
 		} catch (Exception e) {
 			logger.error("Soft Delete SchemaInfo could not be retrieved");
 			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
