@@ -7,8 +7,6 @@ import com.searchservice.app.domain.port.spi.SearchAPIPort;
 
 @Service
 public class SearchAPIAdapter implements SearchAPIPort {
-	
-	public SearchAPIAdapter() {}
 
 	@Override
 	public HttpSolrClient getSearchClient(String urlString) {

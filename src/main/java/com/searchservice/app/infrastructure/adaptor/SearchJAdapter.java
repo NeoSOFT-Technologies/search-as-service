@@ -37,6 +37,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SearchJAdapter {
 
+	private static final String EXCEPTION_OCCURRED = "Exception occurred: {}";
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
@@ -76,8 +77,7 @@ public class SearchJAdapter {
 	}
 	
 	
-	public CollectionAdminResponse getTableDetailsFromSolrjCluster(String tableName,
-			HttpSolrClient searchClientActive) {
+	public CollectionAdminResponse getTableDetailsFromSolrjCluster(HttpSolrClient searchClientActive) {
 
 		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
 		CollectionAdminResponse response = null;
@@ -127,20 +127,6 @@ public class SearchJAdapter {
 		return configSetResponse;
 	}
 
-	public CollectionAdminResponse getAllTablesList(HttpSolrClient searchClientActive) {
-		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
-		CollectionAdminResponse response = null;
-		try {
-			response = request.process(searchClientActive);
-
-		} catch (SolrServerException | IOException e) {
-			logger.error(e.getMessage());
-		} finally {
-			SearchUtil.closeSearchClientConnection(searchClientActive);
-		}
-		return response;
-
-	}
 
 	public SchemaResponse getSchemaFields(HttpSolrClient searchClientActive) {
 
@@ -282,7 +268,7 @@ public class SearchJAdapter {
 			schemaResponse = schemaRequest.process(searchClientActive);
 		} catch (SolrServerException | IOException e) {
 			logger.debug("Schema Field Types couldn't be retrieved");
-			logger.debug("Exception occurred: {}", e.getMessage());
+			logger.debug(EXCEPTION_OCCURRED, e.getMessage());
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
@@ -298,7 +284,7 @@ public class SearchJAdapter {
 			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
-			logger.error("Exception occurred: {}", e.getMessage());
+			logger.error(EXCEPTION_OCCURRED, e.getMessage());
 			throw new BadRequestOccurredException(400, "Could not confirm if partial_search field type is available");
 		}
 	}
@@ -317,7 +303,7 @@ public class SearchJAdapter {
 						tableSchemaDTO.getTableName());
 				addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
 			} catch(Exception e) {
-				logger.error("Exception occurred: {}", e.getMessage());
+				logger.error(EXCEPTION_OCCURRED, e.getMessage());
 				throw new BadRequestOccurredException(400, "Couldn't create partial search field type");
 			}
 		} else

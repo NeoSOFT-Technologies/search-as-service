@@ -140,7 +140,7 @@ public class TableSchemaParserUtil {
 
 		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
 		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
-		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, "partial_search");
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, PARTIAL_SEARCH);
 		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
 
 		Map<String, Object> analyzerObject = new HashMap<>();

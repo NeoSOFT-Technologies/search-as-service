@@ -105,7 +105,6 @@ class ManageTableServiceTest {
 		collectionAdminResponse.setRequestUrl(searchUrl);
 		collectionAdminResponse.setResponse(emptyData());
 		Mockito.when(searchJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
-		Mockito.when(searchJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
 		configSetResponse.setResponse(test1());
 		Mockito.when(searchJAdapter.getConfigSetFromSolrj(solrClient)).thenReturn(configSetResponse);
 		manageTable.setColumns(null);
@@ -125,7 +124,7 @@ class ManageTableServiceTest {
 		collectionAdminResponse.setElapsedTime(5);
 		collectionAdminResponse.setRequestUrl(searchUrl);
 		collectionAdminResponse.setResponse(test());
-		Mockito.when(searchJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
+		Mockito.when(searchJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
 		manageTable.setColumns(null);
 		manageTable.setSku("B");
 		manageTable.setTableName("Testing_101");
@@ -216,9 +215,6 @@ class ManageTableServiceTest {
 		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
 		Mockito.when(searchJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
-
-		Mockito.when(searchJAdapter.getAllTablesList(solrClient)).thenReturn(collectionAdminResponse);
-
 		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);

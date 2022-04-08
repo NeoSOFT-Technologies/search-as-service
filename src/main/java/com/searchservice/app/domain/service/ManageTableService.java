@@ -234,8 +234,8 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Map<Object, Object> getTableDetails(String tableName) {
 
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
-		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(tableName, searchClientActive);
+		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(searchClientActive);
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		try {
@@ -365,7 +365,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public boolean isTableExists(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		try {
-			CollectionAdminResponse response = searchJAdapter.getAllTablesList(searchClientActive);
+			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
 			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
@@ -836,7 +836,7 @@ public class ManageTableService implements ManageTableServicePort {
 			long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
 			return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
-			logger.error("Error!", e.getMessage());
+			logger.error("Error! {}", e.getMessage());
 			return 0;
 		}
 	}
