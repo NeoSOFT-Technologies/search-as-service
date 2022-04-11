@@ -1,1 +1,6 @@
 TenantID,TableName,RequestTime,ColumnName
+101,automatedTestCollection,11-4-2022 10:45:11,http://localhost:8983/solr
+101,automatedTestCollection,11-4-2022 12:32:16,http://localhost:8983/solr
+101,automatedTestCollection,11-4-2022 03:19:47,http://localhost:8983/solr
+101,automatedTestCollection,11-4-2022 03:27:05,http://localhost:8983/solr
+101,automatedTestCollection,11-4-2022 03:28:28,http://localhost:8983/solr

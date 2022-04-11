@@ -502,7 +502,7 @@ class ManageTableServiceTest {
 
 	}
 
-	@Disabled
+
 	@Test
 	void updateSchemaAttributes() {
 
@@ -569,7 +569,7 @@ class ManageTableServiceTest {
 		}
 	}
 
-	@Disabled
+
 	@Test
 	void updateTableSchema() {
 		setMockitoSuccessResponseForService();
