@@ -231,32 +231,33 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchema;
 	}
 
-	@Override
-	public Map<Object, Object> getTableDetails(String tableName) {
-
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(searchClientActive);
-
-		Map<Object, Object> finalResponseMap = new HashMap<>();
-		try {
-			finalResponseMap = ManageTableUtil
-					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
-		} catch (Exception e) {
-			logger.error(e.toString());
-			finalResponseMap.put("Error", "Error connecting to cluster.");
-			return finalResponseMap;
-		}
-
-		if (!finalResponseMap.containsKey("tableDetails") || finalResponseMap.get("tableDetails") == null) {
-			finalResponseMap = new HashMap<>();
-			finalResponseMap.put("Error", "Invalid table name provided.");
-
-			return finalResponseMap;
-		} else {
-
-			return finalResponseMap;
-		}
-	}
+	//Future
+//	@Override
+//	public Map<Object, Object> getTableDetails(String tableName) {
+//
+//		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
+//		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(searchClientActive);
+//
+//		Map<Object, Object> finalResponseMap = new HashMap<>();
+//		try {
+//			finalResponseMap = ManageTableUtil
+//					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
+//		} catch (Exception e) {
+//			logger.error(e.toString());
+//			finalResponseMap.put("Error", "Error connecting to cluster.");
+//			return finalResponseMap;
+//		}
+//
+//		if (!finalResponseMap.containsKey("tableDetails") || finalResponseMap.get("tableDetails") == null) {
+//			finalResponseMap = new HashMap<>();
+//			finalResponseMap.put("Error", "Invalid table name provided.");
+//
+//			return finalResponseMap;
+//		} else {
+//
+//			return finalResponseMap;
+//		}
+//	}
 
 	@Override
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
@@ -659,7 +660,7 @@ public class ManageTableService implements ManageTableServicePort {
 				// Pass the fieldAttribute to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
-
+                
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
 				updatedFields++;
 				logger.info("Field- {} is successfully updated", currField.get("name"));

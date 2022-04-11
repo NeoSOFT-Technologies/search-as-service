@@ -45,7 +45,8 @@ public interface ManageTableServicePort {
 
 	TableSchemav2 getTableSchemaIfPresent(String tableName);
 
-	Map<Object, Object> getTableDetails(String tableName);
+	// For Future
+	//Map<Object, Object> getTableDetails(String tableName);
 
 	TableSchemav2 getTableSchema(String tableName);
 
