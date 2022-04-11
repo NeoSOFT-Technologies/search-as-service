@@ -142,7 +142,7 @@ public class ManageTableResource {
 	}
 
 	@DeleteMapping("/{tenantId}/{tableName}")
-	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "DELETE A TABLE (SOFT DELETE) FOR THE GIVEN TENANT ID AND TABLE NAME.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteTable(@PathVariable int tenantId, @PathVariable String tableName) {
 
 		tableName = tableName + "_" + tenantId;
@@ -170,7 +170,7 @@ public class ManageTableResource {
 	}
 
 	@PutMapping("/restore/{tenantId}/{tableName}")
-	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "RESTORE A DELETED TABLE FOR THE GIVEN TENANT ID AND TABLE NAME.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> undoTable(@PathVariable int tenantId, @PathVariable String tableName) {
 
 		String tableNameForMessage = tableName;
