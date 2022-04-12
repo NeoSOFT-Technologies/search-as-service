@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages={"com.searchservice.app"})
+@SpringBootApplication(scanBasePackages={"com.searchservice.app", "com.searchservice.app.infrastructure.adaptor"})
 public class SearchServiceApplication {
 
 	public static void main(String[] args) {

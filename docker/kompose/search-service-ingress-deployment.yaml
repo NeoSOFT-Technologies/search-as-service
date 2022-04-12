@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yml convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: search-service-ingress
+  name: search-service-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: search-service-ingress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yml convert
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/saas-network: "true"
+        io.kompose.service: search-service-ingress
+    spec:
+      containers:
+        - env:
+            - name: KEYCLOAK_CLIENT_NAME
+              value: saas-ingress-microservice
+            - name: KEYCLOAK_CLIENT_SECRET
+              value: TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
+            - name: KEYCLOAK_CONTAINER_NAME
+              value: keycloak-container
+            - name: KEYCLOAK_REALM_NAME
+              value: docker_realm
+            - name: SOLR_CONTAINER_NAME
+              value: solr1-container
+          image: neosoftcoe/search-service-ingress:latest
+          name: ssi-container
+          ports:
+            - containerPort: 8081
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/app/DeletedRecordFiles
+              name: search-service-ingress-claim0
+      restartPolicy: Always
+      volumes:
+        - name: search-service-ingress-claim0
+          persistentVolumeClaim:
+            claimName: search-service-ingress-claim0
+status: {}

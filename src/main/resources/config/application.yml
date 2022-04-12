@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev #prod
+    active: dev #prod #default
   jackson:
     deserialization:
       fail-on-unknown-properties: true

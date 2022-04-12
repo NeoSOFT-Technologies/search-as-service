@@ -1,10 +1,10 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.Response;
@@ -31,7 +32,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -43,19 +44,17 @@ public class ManageTableResource {
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 	private static final String TABLE = "Table ";
-	@Autowired
-	ManageTableServicePort manageTableServicePort;
 
-	@Autowired
-	TableDeleteServicePort tableDeleteServicePort;
+         @Autowired
+	private ManageTableServicePort manageTableServicePort;
+    @Autowired
+    private TableDeleteServicePort tableDeleteServicePort;
 
-	public ManageTableResource(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort) {
-		this.manageTableServicePort = manageTableServicePort;
-		this.tableDeleteServicePort = tableDeleteServicePort;
-
-	}
-
+    public ManageTableResource(ManageTableServicePort manageTableServicePort, TableDeleteServicePort tableDeleteServicePort) {
+        this.manageTableServicePort = manageTableServicePort;
+        this.tableDeleteServicePort = tableDeleteServicePort;
+    }
+	
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<GetCapacityPlan> capacityPlans() {
@@ -64,9 +63,9 @@ public class ManageTableResource {
 		return ResponseEntity.status(HttpStatus.OK).body(manageTableServicePort.capacityPlans());
 	}
 
-	@GetMapping("/{tenantId}")
+	@GetMapping("/")
 	@Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> getTables(@PathVariable int tenantId) {
+	public ResponseEntity<Response> getTables(@RequestParam int tenantId) {
 
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
 
@@ -84,9 +83,9 @@ public class ManageTableResource {
 		}
 	}
 
-	@GetMapping("/{tenantId}/{tableName}")
+	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<TableSchemav2> getTable(@PathVariable int tenantId, @PathVariable String tableName) {
+	public ResponseEntity<TableSchemav2> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
@@ -111,9 +110,9 @@ public class ManageTableResource {
 		}
 	}
 
-	@PostMapping("/{tenantId}")
+	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> createTable(@PathVariable int tenantId, @RequestBody ManageTable manageTableDTO) {
+	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody ManageTable manageTableDTO) {
 
 		if (manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
 			log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
@@ -127,7 +126,7 @@ public class ManageTableResource {
 			} else {
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
-
+ 
 				if (apiResponseDTO.getStatusCode() == 200) {
 					apiResponseDTO.setMessage(
 							"Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
@@ -140,11 +139,9 @@ public class ManageTableResource {
 		}
 
 	}
-
-	@DeleteMapping("/{tenantId}/{tableName}")
-	@Operation(summary = "DELETE A TABLE (SOFT DELETE) FOR THE GIVEN TENANT ID AND TABLE NAME.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> deleteTable(@PathVariable int tenantId, @PathVariable String tableName) {
-
+	@DeleteMapping("/{tableName}")
+	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		tableName = tableName + "_" + tenantId;
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
 
@@ -169,10 +166,10 @@ public class ManageTableResource {
 		}
 	}
 
-	@PutMapping("/restore/{tenantId}/{tableName}")
-	@Operation(summary = "RESTORE A DELETED TABLE FOR THE GIVEN TENANT ID AND TABLE NAME.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> undoTable(@PathVariable int tenantId, @PathVariable String tableName) {
 
+	@PutMapping("/restore/{tableName}")
+	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<Response> undoTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
 
 		tableName = tableName + "_" + tenantId;
@@ -192,9 +189,9 @@ public class ManageTableResource {
         }
 	}
 
-	@PutMapping("/{tenantId}/{tableName}")
+	@PutMapping("/{tableName}")
 	@Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> updateTableSchema(@PathVariable int tenantId, @PathVariable String tableName,
+	public ResponseEntity<Response> updateTableSchema(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody TableSchema newTableSchemaDTO) {
 
 		tableName = tableName + "_" + tenantId;
@@ -222,4 +219,6 @@ public class ManageTableResource {
 		}
         }
 	}
+
+	
 }

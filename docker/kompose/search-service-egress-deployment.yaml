@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yml convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: search-service-egress
+  name: search-service-egress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: search-service-egress
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yml convert
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/saas-network: "true"
+        io.kompose.service: search-service-egress
+    spec:
+      containers:
+        - env:
+            - name: KEYCLOAK_CLIENT_NAME
+              value: saas-ingress-microservice
+            - name: KEYCLOAK_CLIENT_SECRET
+              value: TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
+            - name: KEYCLOAK_CONTAINER_NAME
+              value: keycloak-container
+            - name: KEYCLOAK_REALM_NAME
+              value: docker_realm
+            - name: SOLR_CONTAINER_NAME
+              value: solr1-container
+          image: neosoftcoe/search-service-egress:latest
+          name: sse-container
+          ports:
+            - containerPort: 8082
+          resources: {}
+      restartPolicy: Always
+status: {}
