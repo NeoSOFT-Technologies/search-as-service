@@ -139,11 +139,9 @@ public class ManageTableResource {
 		}
 
 	}
-
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
-
 		tableName = tableName + "_" + tenantId;
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
 
@@ -168,10 +166,10 @@ public class ManageTableResource {
 		}
 	}
 
+
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> undoTable(@RequestParam int tenantId, @PathVariable String tableName) {
-
 		String tableNameForMessage = tableName;
 
 		tableName = tableName + "_" + tenantId;
