@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
@@ -57,8 +58,7 @@ class ManageTableServiceTest {
 	@Value("${base-search-url}")
 	String searchUrl;
 
-	@Value("${table-schema-attributes.delete-file-path}")
-	private String deleteSchemaAttributesFilePathNonStatic;
+	private String deleteSchemaAttributesFileTest = "src/test/resources/SchemaDeleteRecordTest";
 
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -91,6 +91,8 @@ class ManageTableServiceTest {
 	@MockBean
 	SchemaRequest schemaRequest;
 
+	
+	
 	ManageTable manageTable = new ManageTable();
 
 	TableSchema newTableSchemaDTO = new TableSchema();
@@ -246,7 +248,7 @@ class ManageTableServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-
+		ReflectionTestUtils.setField(manageTableService,"deleteSchemaAttributesFilePath","src/test/resources/SchemaDeleteRecordTest");
 		setUpTestClass();
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
 		Mockito.when(solrApiAdapterMocked.getSearchClientWithTable(Mockito.any(), Mockito.any()))
@@ -618,15 +620,24 @@ class ManageTableServiceTest {
 	@Test
 	void performSchemaDeletion() {
 		assertFalse(manageTableService.performSchemaDeletion("101,automatedTestCollection,14-3-2022 05:05:26,name"));
-
+		
 	}
 
 	@Test
 	void checkIfSchemaFileExistInvalid() {
 		boolean b = manageTableService
-				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic + "/Testing"));
+				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFileTest + "/Testing"));
 		assertFalse(b);
 
+	}
+	
+	@Test
+	void checkIfSchemaFileExistValid() {
+		File testFile = new File(deleteSchemaAttributesFileTest  + "1"); 
+		boolean b = manageTableService
+				.checkIfSchemaFileExist(testFile);
+		assertTrue(b);
+		testFile.delete();
 	}
 
 	public NamedList<Object> test() {
