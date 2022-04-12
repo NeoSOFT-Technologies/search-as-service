@@ -33,9 +33,9 @@ spec:
               value: zoo1:2181, zoo2:2181, zoo3:2181
           resources:
             requests:
-              cpu: "400m"
-            limits:
               cpu: "600m"
+            limits:
+              cpu: "800m"
           ports:
             - containerPort: 8983
           volumeMounts:

@@ -1,50 +1,22 @@
 1. Install Minikube, Kubernetes on the host machine
 
 2. Create a cluster using ->
-minikube start --driver=hyperv --memory=4gb
+minikube start --driver=hyperv --memory=4gb --cpus 3 --extra-config=kubelet.housekeeping-interval=10s
 
 3. Run any cluster configuration using ->
+minikube addons enable metrics-server
+kubectl apply -f ./1-solr-node-scaled-to-n-nodes-3-zk/ZooKeeper
 kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
 
 4. Check out the created resources using ->
-kubectl get deployments
-kubectl get pods
-kubectl get services
+kubectl get all
 
 5. Expose the service to access the pod from the host machine using->
 minikube service --url solr-node-container
 
 6. Delete the applied cluster configuration using ->
+kubectl delete -f ./1-solr-node-scaled-to-n-nodes-3-zk/ZooKeeper
 kubectl delete -f 1-solr-node-scaled-to-n-nodes-3-zk
 
 7. Delete the cluster using ->
 minikube delete
-
-===================AUTOSCALING============================
-minikube start --driver=hyperv --memory=4gb --cpus 2 --kubernetes-version=v1.21.2 --extra-config=kubelet.housekeeping-interval=10s
-
-minikube start --driver=hyperv --memory=4gb --extra-config=kubelet.housekeeping-interval=10s
-
-minikube addons list
-minikube addons enable metrics-server
-
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
-kubectl get deployment metrics-server -n kube-system
-
-kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
-
-kubectl get all
-
-minikube service --url solr-node-container
-
-kubectl get hpa
-
-#INCREASE LOAD
-
-kubectl top node
-
-kubectl top pods --all-namespaces
-
-minikube delete
-===============================================
