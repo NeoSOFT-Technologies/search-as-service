@@ -70,7 +70,7 @@ class InputDocumentResourceTest {
 	void testinputdocs() throws Exception {
 		
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + tenantId + "/" + tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(inputString))
 				.andExpect(status().isOk());
@@ -80,7 +80,7 @@ class InputDocumentResourceTest {
 	void testinputdoc() throws Exception {
 	
 		setMockitoSucccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + tenantId + "/" + tableName)
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(inputString)).andExpect(status().isOk());
 	}

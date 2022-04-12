@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
@@ -49,9 +50,9 @@ public class InputDocumentResource {
 	}
 
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-	@PostMapping("/ingest-nrt/{tenantId}/{tableName}")
+	@PostMapping("/ingest-nrt/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ThrottlerResponse> documents(@PathVariable int tenantId, @PathVariable String tableName,
+	public ResponseEntity<ThrottlerResponse> documents(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
@@ -76,9 +77,9 @@ public class InputDocumentResource {
 	}
 
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
-	@PostMapping("/ingest/{tenantId}/{tableName}")
+	@PostMapping("/ingest/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ThrottlerResponse> document(@PathVariable int tenantId, @PathVariable String tableName,
+	public ResponseEntity<ThrottlerResponse> document(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
