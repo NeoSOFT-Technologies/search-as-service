@@ -23,7 +23,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	// Init configurations
 	private  static String searchURL;
 
-
+     @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
 	
 	@Autowired

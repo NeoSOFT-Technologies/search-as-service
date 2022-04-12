@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.squareup.okhttp.MediaType;
@@ -15,6 +16,7 @@ import com.squareup.okhttp.Response;
 import lombok.Data;
 
 @Data
+@Component
 public class UploadDocumentUtil {
 
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
