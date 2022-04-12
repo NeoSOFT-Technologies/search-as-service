@@ -29,20 +29,5 @@ public class TypeCastingUtil {
         return resultList;
     }
 
-    //For Future
-//    public static Map<Object, Object> castFromObjectToMap(Object obj) {
-//        Map<Object, Object> resultMap = new HashMap<>();
-//        if (obj instanceof Map) {
-//            resultMap.put("responseMap", obj);
-//        }
-//        return resultMap;
-//    }
-//
-//    public static Map<Object, Object> castFromNamedListOfObjectsToMap(NamedList<Object> obj) {
-//        Map<Object, Object> resultMap = new HashMap<>();
-//        if (obj instanceof Map) {
-//            resultMap.put("responseMap", obj);
-//        }
-//        return resultMap;
-//    }
+
 }

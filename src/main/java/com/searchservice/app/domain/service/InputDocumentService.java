@@ -69,7 +69,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
 		// STRUCTURALLY CORRECT
-		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
+		UploadDocumentUtil uploadDocumentUtils = extracted(tableName, payload);
 
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
 
@@ -90,7 +90,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
 		// STRUCTURALLY CORRECT
 
-		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
+		UploadDocumentUtil uploadDocumentUtils = extracted(tableName, payload);
 
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
 
