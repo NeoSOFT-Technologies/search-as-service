@@ -1,11 +1,7 @@
 package com.searchservice.app.domain.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.solr.common.util.NamedList;
 
 import lombok.Data;
 

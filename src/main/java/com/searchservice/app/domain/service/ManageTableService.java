@@ -231,33 +231,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchema;
 	}
 
-	//Future
-//	@Override
-//	public Map<Object, Object> getTableDetails(String tableName) {
-//
-//		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-//		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(searchClientActive);
-//
-//		Map<Object, Object> finalResponseMap = new HashMap<>();
-//		try {
-//			finalResponseMap = ManageTableUtil
-//					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
-//		} catch (Exception e) {
-//			logger.error(e.toString());
-//			finalResponseMap.put("Error", "Error connecting to cluster.");
-//			return finalResponseMap;
-//		}
-//
-//		if (!finalResponseMap.containsKey("tableDetails") || finalResponseMap.get("tableDetails") == null) {
-//			finalResponseMap = new HashMap<>();
-//			finalResponseMap.put("Error", "Invalid table name provided.");
-//
-//			return finalResponseMap;
-//		} else {
-//
-//			return finalResponseMap;
-//		}
-//	}
+
 
 	@Override
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {

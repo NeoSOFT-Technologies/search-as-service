@@ -1,7 +1,5 @@
 package com.searchservice.app.domain.port.api;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.Response;
@@ -44,9 +42,6 @@ public interface ManageTableServicePort {
 	boolean isTableExists(String tableName);
 
 	TableSchemav2 getTableSchemaIfPresent(String tableName);
-
-	// For Future
-	//Map<Object, Object> getTableDetails(String tableName);
 
 	TableSchemav2 getTableSchema(String tableName);
 
