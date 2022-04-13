@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.ConfigSet;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -167,10 +167,10 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public GetCapacityPlan capacityPlans() {
+	public CapacityPlanResponse capacityPlans() {
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 
-		return new GetCapacityPlan(200, "Successfully retrieved all Capacity Plans", capacityPlans);
+		return new CapacityPlanResponse(200, "Successfully retrieved all Capacity Plans", capacityPlans);
 	}
 
 	@Override

@@ -54,16 +54,16 @@ class InputDocumentResourceTest {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		//Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.anyInt(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
 	}
 
 	public void setMockitoBadResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
-		Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		//Mockito.when(inputDocumentService.addDocument(Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.addDocuments(Mockito.anyInt(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 	}
 
 	@Test

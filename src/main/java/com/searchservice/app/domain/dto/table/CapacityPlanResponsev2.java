@@ -15,10 +15,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetCapacityPlan {
+public class CapacityPlanResponsev2 {
 
 	private int statusCode;
 	private String message;
 	private List<CapacityPlanProperties.Plan> plans;
+
+	public CapacityPlanResponsev2(List<CapacityPlanProperties.Plan> plans) {
+		this.plans = plans;
+	}
 
 }

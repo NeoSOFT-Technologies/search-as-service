@@ -28,7 +28,7 @@ public class TableSchemaParserUtil {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String PARTIAL_SEARCH = "partial_search";
-	
+	public static Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
 	private static final Logger logger = LoggerFactory.getLogger(TableSchemaParserUtil.class);
 	
 	@Value("${base-search-url}")
@@ -41,6 +41,42 @@ public class TableSchemaParserUtil {
 		return searchAPIAdapter;
 	}
 	
+	static
+	{
+		final String FIELD_TYPE_CLASS = "class";
+		final String FIELD_TYPE_NAME = "name";
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
+		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, PARTIAL_SEARCH);
+		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
+
+		Map<String, Object> analyzerObject = new HashMap<>();
+		// Prepare charFilters
+		Map<String, Object> charFilter = new HashMap<>();
+		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
+		charFilter.put("replacement", "$1$1");
+		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
+		// Prepare tokenizer
+		Map<String, Object> tokenizerObject = new HashMap<>();
+		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
+		// Prepare filters
+		Map<String, Object> filterObject1 = new HashMap<>();
+		Map<String, Object> filterObject2 = new HashMap<>();
+		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
+		filterObject1.put("preserveOriginal", "0");
+		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
+		filterObject2.put("maxGramSize", "25");
+		filterObject2.put("minGramSize", "3");
+		Map<String, Object> filtersObject = new HashMap<>();
+		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+		// Add charFilters, tokenizer & filters to analyzer
+		analyzerObject.put("charFilters", Arrays.asList(charFilter));
+		analyzerObject.put("tokenizer", tokenizerObject);
+		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+
+		Object analyzerFinalObject = analyzerObject;
+		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
+		
+	}
 	
 	public static boolean validateSchemaField(SchemaField searchFieldDTO) {
 		logger.debug("Validate schema field: {}", searchFieldDTO);
@@ -134,42 +170,42 @@ public class TableSchemaParserUtil {
 	
 	
 	// Partial Search Field Type
-	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
-		final String FIELD_TYPE_CLASS = "class";
-		final String FIELD_TYPE_NAME = "name";
-
-		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
-		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
-		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, PARTIAL_SEARCH);
-		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
-
-		Map<String, Object> analyzerObject = new HashMap<>();
-		// Prepare charFilters
-		Map<String, Object> charFilter = new HashMap<>();
-		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
-		charFilter.put("replacement", "$1$1");
-		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
-		// Prepare tokenizer
-		Map<String, Object> tokenizerObject = new HashMap<>();
-		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
-		// Prepare filters
-		Map<String, Object> filterObject1 = new HashMap<>();
-		Map<String, Object> filterObject2 = new HashMap<>();
-		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
-		filterObject1.put("preserveOriginal", "0");
-		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
-		filterObject2.put("maxGramSize", "25");
-		filterObject2.put("minGramSize", "3");
-		Map<String, Object> filtersObject = new HashMap<>();
-		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
-		// Add charFilters, tokenizer & filters to analyzer
-		analyzerObject.put("charFilters", Arrays.asList(charFilter));
-		analyzerObject.put("tokenizer", tokenizerObject);
-		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
-
-		Object analyzerFinalObject = analyzerObject;
-		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
-
-		return partialSearchFieldTypeAttrs;
-	}
+//	public static Map<String, Object> getFieldTypeAttributesForPartialSearch() {
+//		final String FIELD_TYPE_CLASS = "class";
+//		final String FIELD_TYPE_NAME = "name";
+//
+//		Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
+//		partialSearchFieldTypeAttrs.put(FIELD_TYPE_CLASS, "solr.TextField");
+//		partialSearchFieldTypeAttrs.put(FIELD_TYPE_NAME, PARTIAL_SEARCH);
+//		partialSearchFieldTypeAttrs.put("positionIncrementGap", "100");
+//
+//		Map<String, Object> analyzerObject = new HashMap<>();
+//		// Prepare charFilters
+//		Map<String, Object> charFilter = new HashMap<>();
+//		charFilter.put(FIELD_TYPE_CLASS, "solr.PatternReplaceCharFilterFactory");
+//		charFilter.put("replacement", "$1$1");
+//		charFilter.put("pattern", "([a-zA-Z])\\\\1+");
+//		// Prepare tokenizer
+//		Map<String, Object> tokenizerObject = new HashMap<>();
+//		tokenizerObject.put(FIELD_TYPE_CLASS, "solr.WhitespaceTokenizerFactory");
+//		// Prepare filters
+//		Map<String, Object> filterObject1 = new HashMap<>();
+//		Map<String, Object> filterObject2 = new HashMap<>();
+//		filterObject1.put(FIELD_TYPE_CLASS, "solr.WordDelimiterFilterFactory");
+//		filterObject1.put("preserveOriginal", "0");
+//		filterObject2.put(FIELD_TYPE_CLASS, "solr.NGramTokenizerFactory");
+//		filterObject2.put("maxGramSize", "25");
+//		filterObject2.put("minGramSize", "3");
+//		Map<String, Object> filtersObject = new HashMap<>();
+//		filtersObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+//		// Add charFilters, tokenizer & filters to analyzer
+//		analyzerObject.put("charFilters", Arrays.asList(charFilter));
+//		analyzerObject.put("tokenizer", tokenizerObject);
+//		analyzerObject.put("filters", Arrays.asList(filterObject1, filterObject2));
+//
+//		Object analyzerFinalObject = analyzerObject;
+//		partialSearchFieldTypeAttrs.put("analyzer", analyzerFinalObject);
+//
+//		return partialSearchFieldTypeAttrs;
+//	}
 }

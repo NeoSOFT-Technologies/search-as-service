@@ -44,7 +44,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		Map<String, Object> errorDetails = new HashMap<>();
-		// Get authorization header and validate
+		// Get authorization header and checkConfiguration
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		if (null == header || header.isEmpty() || !header.startsWith("Bearer ")) {
@@ -55,10 +55,10 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 			return;
 		}
 
-		// Get jwt token and validate
+		// Get jwt token and checkConfiguration
 		final String token = header.split(" ")[1].trim();
 
-		if (!validate(token)) {
+		if (!checkConfiguration(token)) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -70,7 +70,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 	}
 
 	
-	private boolean validate(String token) {
+	private boolean checkConfiguration(String token) {
 
 		String url = keycloakConfigProperties.getAuth_server_url() + "/realms/" + keycloakConfigProperties.getRealm()
 				+ "/protocol/openid-connect/token/introspect";

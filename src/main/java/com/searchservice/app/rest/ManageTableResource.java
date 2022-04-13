@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
@@ -57,7 +57,7 @@ public class ManageTableResource {
 	
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<GetCapacityPlan> capacityPlans() {
+	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
 		log.debug("Get capacity plans");
 
 		return ResponseEntity.status(HttpStatus.OK).body(manageTableServicePort.capacityPlans());
@@ -169,7 +169,7 @@ public class ManageTableResource {
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> undoTable(@RequestParam int tenantId, @PathVariable String tableName) {
+	public ResponseEntity<Response> restoreTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
 
 		tableName = tableName + "_" + tenantId;

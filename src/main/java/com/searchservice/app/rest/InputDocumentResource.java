@@ -52,7 +52,7 @@ public class InputDocumentResource {
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest-nrt/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ThrottlerResponse> documents(@RequestParam int tenantId, @PathVariable String tableName,
+	public ResponseEntity<ThrottlerResponse> addDocumentsWithNRT(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
@@ -70,7 +70,7 @@ public class InputDocumentResource {
 		tableName = tableName + "_" + tenantId;
 		if (manageTableServicePort.isTableExists(tableName)) {
 
-			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
+			return performDocumentInjection(0,tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
@@ -79,7 +79,7 @@ public class InputDocumentResource {
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<ThrottlerResponse> document(@RequestParam int tenantId, @PathVariable String tableName,
+	public ResponseEntity<ThrottlerResponse> addDocumentWithoutNRT(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
@@ -100,7 +100,7 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		if (manageTableServicePort.isTableExists(tableName)) {
-			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
+			return performDocumentInjection(1, tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
@@ -121,9 +121,9 @@ public class InputDocumentResource {
 				.body(rateLimitResponseDTO);
 	}
 
-	public ResponseEntity<ThrottlerResponse> performDocumentInjection(String tableName, String payload,
+	public ResponseEntity<ThrottlerResponse> performDocumentInjection(int commitType, String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
-		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(tableName, payload);
+		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(commitType, tableName, payload);
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());

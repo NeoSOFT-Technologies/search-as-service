@@ -73,60 +73,48 @@ class InputDocumentServiceTest {
 	}
 
 	@Test
-	void testAddDocument() {
-		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
-		//setMockitoSucccessResponseForService();
-		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
-		ThrottlerResponse response1 = inputDocumentService.addDocument(tableName, payload);
-		assertEquals(400, response1.getStatusCode());
-
-	}
-
-	@Test
-	void testAddDocuments() {
+	void testAddDocumentsNrt() {
 		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
 		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
-		ThrottlerResponse response = inputDocumentService.addDocuments(tableName, payload);
+		ThrottlerResponse response = inputDocumentService.addDocuments(0,tableName, payload);
 		assertEquals(400, response.getStatusCode());
 
 	}
-
+	
 	@Test
-	void testBadDocument() {
-		setMockitoBadResponseForService();
-
-		try {
-			inputDocumentService.addDocument(tableName, payload);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-	}
-
-	@Test
-	void testBadDocuments() {
-		setMockitoBadResponseForService();
-
-		try {
-			inputDocumentService.addDocument(tableName, payload);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
+	void testAddDocumentsWithoutNrt() {
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+		response.setDocumentUploaded(true);
+		setMockitoSucccessResponseForService();
+		ThrottlerResponse response = inputDocumentService.addDocuments(1,tableName, payload);
+		assertEquals(400, response.getStatusCode());
 
 	}
 	
-
 	@Test
-	void testBadAddDocuments() {
+	void testBadAddDocumentsForNRT() {
 		setMockitoBadResponseForService();
 
 		try {
-			inputDocumentService.addDocuments(tableName, payload);
+			inputDocumentService.addDocuments(0,tableName, payload);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
 
+	@Test
+	void testBadAddDocumentsWithoutNRT() {
+		setMockitoBadResponseForService();
+
+		try {
+			inputDocumentService.addDocuments(1,tableName, payload);
+		} catch (BadRequestOccurredException e) {
+			assertEquals(400, e.getExceptionCode());
+		}
+	}
+
+	
 	@Test
 	void isValidJsonArrayFailure() {
 		boolean b = inputDocumentService.isValidJsonArray(message);

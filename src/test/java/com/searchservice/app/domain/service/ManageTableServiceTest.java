@@ -481,16 +481,16 @@ class ManageTableServiceTest {
 		}
 
 	}
-
-	@Test
-	void getFieldTypeAttributesForPartialSearch() {
-		try {
-			TableSchemaParserUtil.getFieldTypeAttributesForPartialSearch();
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
-	}
+ 
+//	@Test
+//	void getFieldTypeAttributesForPartialSearch() {
+//		try {
+//			TableSchemaParserUtil.getFieldTypeAttributesForPartialSearch();
+//		} catch (BadRequestOccurredException e) {
+//			assertEquals(400, e.getExceptionCode());
+//		}
+//
+//	}
 
 	@Test
 	void checkTableDeletionStatus() {

@@ -38,7 +38,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	}
 
-	private void extracted(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
+	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
 
 		if (response.isDocumentUploaded()) {
 			responseDTO.setMessage("Successfully Added!");
@@ -49,7 +49,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 	}
 
-	private UploadDocumentUtil extracted(String tableName, String payload) {
+	private UploadDocumentUtil documentUploadResponse(String tableName, String payload) {
 		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
 		uploadDocumentUtil.setBaseSearchUrl(searchURL);
@@ -59,7 +59,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponse addDocuments(String tableName, String payload) {
+	public ThrottlerResponse addDocuments(int commitType, String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
@@ -68,35 +68,37 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
 		// STRUCTURALLY CORRECT
-		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
-
-		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
-
-		extracted(responseDTO, response);
-
+		UploadDocumentUtil uploadDocumentUtil = documentUploadResponse(tableName, payload);
+        if(commitType == 0) {
+		   UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
+		   documentUploadResponse(responseDTO, response);
+        }else {
+        	UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
+        	documentUploadResponse(responseDTO, response);
+        }
 		return responseDTO;
 
 	}
 
-	@Override
-	public ThrottlerResponse addDocument(String tableName, String payload) {
-
-		if (!manageTableServicePort.isTableExists(tableName))
-			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
-
-		ThrottlerResponse responseDTO = new ThrottlerResponse();
-
-		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
-		// STRUCTURALLY CORRECT
-
-		UploadDocumentUtil uploadDocumentUtil = extracted(tableName, payload);
-
-		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
-
-		extracted(responseDTO, response);
-
-		return responseDTO;
-	}
+//	@Override
+//	public ThrottlerResponse addDocument(String tableName, String payload) {
+//
+//		if (!manageTableServicePort.isTableExists(tableName))
+//			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+//
+//		ThrottlerResponse responseDTO = new ThrottlerResponse();
+//
+//		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
+//		// STRUCTURALLY CORRECT
+//
+//		UploadDocumentUtil uploadDocumentUtil = documentUploadResponse(tableName, payload);
+//
+//		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
+//
+//		documentUploadResponse(responseDTO, response);
+//
+//		return responseDTO;
+//	}
 
 	public boolean isValidJsonArray(String jsonString) {
 
