@@ -59,7 +59,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponse addDocuments(int commitType, String tableName, String payload) {
+	public ThrottlerResponse addDocuments(boolean isNrt, String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
@@ -69,11 +69,11 @@ public class InputDocumentService implements InputDocumentServicePort {
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
 		// STRUCTURALLY CORRECT
 		UploadDocumentUtil uploadDocumentUtil = documentUploadResponse(tableName, payload);
-        if(commitType == 0) {
-		   UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
+        if(isNrt) {
+		   UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
 		   documentUploadResponse(responseDTO, response);
         }else {
-        	UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
+        	UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
         	documentUploadResponse(responseDTO, response);
         }
 		return responseDTO;
