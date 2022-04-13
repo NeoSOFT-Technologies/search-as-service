@@ -70,7 +70,7 @@ public class InputDocumentResource {
 		tableName = tableName + "_" + tenantId;
 		if (manageTableServicePort.isTableExists(tableName)) {
 
-			return performDocumentInjection(0,tableName, payload, documentInjectionThrottlerResponse);
+			return performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
@@ -100,7 +100,7 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		if (manageTableServicePort.isTableExists(tableName)) {
-			return performDocumentInjection(1, tableName, payload, documentInjectionThrottlerResponse);
+			return performDocumentInjection(false, tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
