@@ -80,26 +80,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	}
 
-//	@Override
-//	public ThrottlerResponse addDocument(String tableName, String payload) {
-//
-//		if (!manageTableServicePort.isTableExists(tableName))
-//			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
-//
-//		ThrottlerResponse responseDTO = new ThrottlerResponse();
-//
-//		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
-//		// STRUCTURALLY CORRECT
-//
-//		UploadDocumentUtil uploadDocumentUtil = documentUploadResponse(tableName, payload);
-//
-//		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
-//
-//		documentUploadResponse(responseDTO, response);
-//
-//		return responseDTO;
-//	}
-
 	public boolean isValidJsonArray(String jsonString) {
 
 		boolean valid = true;
