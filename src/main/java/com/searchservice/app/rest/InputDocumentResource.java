@@ -121,9 +121,9 @@ public class InputDocumentResource {
 				.body(rateLimitResponseDTO);
 	}
 
-	public ResponseEntity<ThrottlerResponse> performDocumentInjection(int commitType, String tableName, String payload,
+	public ResponseEntity<ThrottlerResponse> performDocumentInjection(boolean isNrt, String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
-		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(commitType, tableName, payload);
+		ThrottlerResponse documentInjectionResponse = inputDocumentServicePort.addDocuments(isNrt, tableName, payload);
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
 		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
