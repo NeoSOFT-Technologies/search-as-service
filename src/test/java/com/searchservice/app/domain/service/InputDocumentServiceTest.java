@@ -77,7 +77,7 @@ class InputDocumentServiceTest {
 		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
 		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
-		ThrottlerResponse response = inputDocumentService.addDocuments(0,tableName, payload);
+		ThrottlerResponse response = inputDocumentService.addDocuments(true,tableName, payload);
 		assertEquals(400, response.getStatusCode());
 
 	}
@@ -87,7 +87,7 @@ class InputDocumentServiceTest {
 		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
 		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
-		ThrottlerResponse response = inputDocumentService.addDocuments(1,tableName, payload);
+		ThrottlerResponse response = inputDocumentService.addDocuments(false,tableName, payload);
 		assertEquals(400, response.getStatusCode());
 
 	}
@@ -97,7 +97,7 @@ class InputDocumentServiceTest {
 		setMockitoBadResponseForService();
 
 		try {
-			inputDocumentService.addDocuments(0,tableName, payload);
+			inputDocumentService.addDocuments(true,tableName, payload);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
@@ -108,7 +108,7 @@ class InputDocumentServiceTest {
 		setMockitoBadResponseForService();
 
 		try {
-			inputDocumentService.addDocuments(1,tableName, payload);
+			inputDocumentService.addDocuments(false,tableName, payload);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
