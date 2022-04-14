@@ -91,7 +91,7 @@ class InputDocumentServiceTest {
 	void testAddDocumentsNrtTableNotExist() {
 		tableNotExist();
 		try {
-			inputDocumentService.addDocument(true, tableName, payload);
+			inputDocumentService.addDocuments(true, tableName, payload);
 		}catch(BadRequestOccurredException e) {
 			assertEquals(400,e.getExceptionCode());
 		}
