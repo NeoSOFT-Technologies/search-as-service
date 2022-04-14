@@ -40,7 +40,6 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
-	
 	public TableDeleteService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 
@@ -57,6 +56,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 		Response deleteRecordInsertionResponse = new Response();
 		String actualTableName = "";
+
 		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
 			File file = new File(deleteRecordFilePath + ".csv");
 			checkIfTableDeleteFileExist(file);
@@ -228,8 +228,9 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Override
 	public boolean checkTableDeletionStatus(int deleteRecordCount) {
-	return (deleteRecordCount > 0);
+		return (deleteRecordCount > 0);
 	}
+
 	@Override
 	public boolean checkTableExistensce(String tableName) {
 		return manageTableServicePort.isTableExists(tableName);

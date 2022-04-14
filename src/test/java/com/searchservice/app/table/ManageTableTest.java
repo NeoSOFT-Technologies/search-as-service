@@ -115,7 +115,7 @@ class ManageTableTest {
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		finalResponseMap.put("Random message", "Data is returned");
-		Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
+	//	Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
@@ -154,7 +154,7 @@ class ManageTableTest {
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		finalResponseMap.put("Error", "Error connecting to cluster.");
-		Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
+	//	Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
 		Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString())).thenReturn(unodDeleteResponseDTO);
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);

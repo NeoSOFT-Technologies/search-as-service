@@ -4,7 +4,6 @@ package com.searchservice.app.domain.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +11,7 @@ import java.io.File;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
@@ -31,8 +32,7 @@ import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 @ExtendWith(SpringExtension.class)
 class TableDeleteServiceTest {
 
-	@Value("${table-delete-file.path}")
-	String deleteRecordFilePath;
+	String deleteRecordFilePath = "src/test/resources/TableDeleteRecordTest";
 
 	@MockBean
 	private TableDeleteServicePort tableDeleteServicePort;
@@ -43,6 +43,7 @@ class TableDeleteServiceTest {
 	@InjectMocks
 	private TableDeleteService tableDeleteService;
 
+	
 	private Response tableDeleteIntializeResponseDTO;
 	private Response tableDeleteResponseDTO;
 
@@ -59,6 +60,10 @@ class TableDeleteServiceTest {
 		Mockito.when(manageTableServicePort.deleteTable(Mockito.anyString())).thenReturn(tableDeleteResponseDTO);
 	}
 
+	@BeforeEach
+	void setUp() {
+		ReflectionTestUtils.setField(tableDeleteService,"deleteRecordFilePath",deleteRecordFilePath);
+	}
    
 	@Test
 	void testTableDeletion() {
@@ -74,8 +79,10 @@ class TableDeleteServiceTest {
 	void intializeTableforUndoDeletion() {
 		tableDeleteService.initializeTableDelete(101, "TestTable_101");
 	}
+	
 	@Test
-	void testTableDeleteInitialize() {
+	void testTableDeleteInitializeInvalid() {
+		
 		logger.info("Table Delete Intialization test cases getting executed..");
 		// For Valid Client ID and Table Name
 
@@ -84,6 +91,13 @@ class TableDeleteServiceTest {
 
 		// Checking With Table Name as Null
 		assertEquals(400, tableDeleteService.initializeTableDelete(101, "").getStatusCode());
+
+	}
+	
+	@Test
+	void testTableDeleteInitializeValid() {
+		
+		assertEquals(200, tableDeleteService.initializeTableDelete(101, "Testing_101").getStatusCode());
 
 	}
 
@@ -115,6 +129,14 @@ class TableDeleteServiceTest {
 	void checkDeleteFileInvalidPath() {
 		boolean b = tableDeleteService.checkIfTableDeleteFileExist(new File(deleteRecordFilePath + "/Testing"));
 		assertFalse(b);
+	}
+	
+	@Test
+	void checkDeleteFileValidPath() {
+		File tesFile = new File(deleteRecordFilePath +"1");
+		boolean b = tableDeleteService.checkIfTableDeleteFileExist(tesFile);
+		assertTrue(b);
+		tesFile.delete();
 	}
 
 	@Test

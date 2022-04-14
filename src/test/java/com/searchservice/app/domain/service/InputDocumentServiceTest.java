@@ -8,7 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,20 +41,21 @@ class InputDocumentServiceTest {
 	@InjectMocks
 	private InputDocumentService inputDocumentService;
 
+	@MockBean
 	private ThrottlerResponse responseDTO;
 
 	@MockBean
 	UploadDocumentSearchUtilRespnse response;
 
 	@MockBean
-	private UploadDocumentUtil uploadDocumentUtil;
+	UploadDocumentUtil uploadDocumentUtil;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		responseDTO = new ThrottlerResponse();
 		responseDTO.setMessage("Document Uplode");
 		responseDTO.setStatusCode(200);
-		response.setDocumentUploaded(true);
+		response = new UploadDocumentSearchUtilRespnse(true, "Testing");
 
 	}
 
@@ -60,16 +63,48 @@ class InputDocumentServiceTest {
 		responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(200);
 		responseDTO.setMessage(message);
-		response.setDocumentUploaded(true);
-		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
+		response = new UploadDocumentSearchUtilRespnse(true, "Testing");
 		Mockito.when(uploadDocumentUtil.commit()).thenReturn(response);
+		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
+		
+		//Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
+	
 	}
 
 	public void setMockitoBadResponseForService() {
 		responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
+		response = new UploadDocumentSearchUtilRespnse(false, "Testing");
+		Mockito.when(uploadDocumentUtil.commit()).thenReturn(response);
+		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
+	}
+	
+	public void tableExist() {
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+	}
+	
+	public void tableNotExist() {
 		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(false);
-
+	}
+	
+	@Test
+	void testAddDocumentsNrtTableNotExist() {
+		tableNotExist();
+		try {
+			inputDocumentService.addDocument(true, tableName, payload);
+		}catch(BadRequestOccurredException e) {
+			assertEquals(400,e.getExceptionCode());
+		}
+	}
+	
+	@Test
+	void testAddDocumentsWithoutNrtTableNotExist() {
+		tableNotExist();
+		try {
+			inputDocumentService.addDocuments(false, tableName, payload);
+		}catch(BadRequestOccurredException e) {
+			assertEquals(400,e.getExceptionCode());
+		}
 	}
 
 	@Test
@@ -79,7 +114,6 @@ class InputDocumentServiceTest {
 		setMockitoSucccessResponseForService();
 		ThrottlerResponse response = inputDocumentService.addDocuments(true,tableName, payload);
 		assertEquals(400, response.getStatusCode());
-
 	}
 	
 	@Test
@@ -105,8 +139,6 @@ class InputDocumentServiceTest {
 
 	@Test
 	void testBadAddDocumentsWithoutNRT() {
-		setMockitoBadResponseForService();
-
 		try {
 			inputDocumentService.addDocuments(false,tableName, payload);
 		} catch (BadRequestOccurredException e) {

@@ -23,6 +23,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	// Init configurations
 	private  static String searchURL;
 
+     @Autowired
+	UploadDocumentUtil uploadDocumentUtil;
+	
 	@Autowired
 	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
 
@@ -49,9 +52,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 	}
 
-	private UploadDocumentUtil documentUploadResponse(String tableName, String payload) {
-		UploadDocumentUtil uploadDocumentUtil = new UploadDocumentUtil();
 
+	private UploadDocumentUtil documentUploadResponse(String tableName, String payload) {
 		uploadDocumentUtil.setBaseSearchUrl(searchURL);
 		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);

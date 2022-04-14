@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
@@ -57,9 +58,15 @@ class ManageTableServiceTest {
 	@Value("${base-search-url}")
 	String searchUrl;
 
-	@Value("${table-schema-attributes.delete-file-path}")
-	private String deleteSchemaAttributesFilePathNonStatic;
+	private String deleteSchemaAttributesFileTest = "src/test/resources/SchemaDeleteRecordTest";
 
+	private static final String MULTIVALUED = "multiValued";
+	private static final String STORED = "stored";
+	private static final String REQUIRED = "required";
+
+	private static final String DOCVALUES = "docValues";
+	private static final String INDEXED = "indexed";
+	private static final String PARTIAL_SEARCH = "partial_search";
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
 	HttpSolrClient solrClientWithTable = null;
@@ -84,6 +91,8 @@ class ManageTableServiceTest {
 	@MockBean
 	SchemaRequest schemaRequest;
 
+	
+	
 	ManageTable manageTable = new ManageTable();
 
 	TableSchema newTableSchemaDTO = new TableSchema();
@@ -118,6 +127,15 @@ class ManageTableServiceTest {
 		newPlan.setReplicas(1);
 		plan.add(newPlan);
 		Mockito.when(capacityPlanProperties.getPlans()).thenReturn(plan);
+		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(null);
+		schemaResponse.setElapsedTime(3);
+		schemaResponse.setRequestUrl(searchUrl);
+		schemaResponse.setResponse(test2());
+		setTableSchemaDTO();
+		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
+
 	}
 
 	public void setMockitoTableNotExist() {
@@ -172,20 +190,19 @@ class ManageTableServiceTest {
 
 		finalResponseMap.put(" message", "Data is returned");
 
-		newTableSchemaDTO.setSchemaName("table");
-		newTableSchemaDTO.setColumns(list);
-		newTableSchemaDTO.setTableDetails(finalResponseMap);
 		newTableSchemaDTO.setTableName(tableName);
-
+		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
-		schemaField.setName("ok");
+		schemaField.setName("test");
 		schemaField.setPartialSearch(true);
 		schemaField.setRequired(true);
 		schemaField.setSortable(true);
 		schemaField.setStorable(true);
 		schemaField.setType("string");
 		list.add(schemaField);
+		newTableSchemaDTO.setColumns(list);
+
 		manageTable.setColumns(list);
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
@@ -219,6 +236,8 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
+		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
+		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
 
 	}
 
@@ -229,7 +248,7 @@ class ManageTableServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-
+		ReflectionTestUtils.setField(manageTableService,"deleteSchemaAttributesFilePath","src/test/resources/SchemaDeleteRecordTest");
 		setUpTestClass();
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
 		Mockito.when(solrApiAdapterMocked.getSearchClientWithTable(Mockito.any(), Mockito.any()))
@@ -328,13 +347,6 @@ class ManageTableServiceTest {
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
-	}
-
-	@Test
-	void testGetTableDetails() {
-		setMockitoSuccessResponseForService();
-		assertNotNull(manageTableService.getTableDetails(tableName));
-
 	}
 
 	@Test
@@ -502,10 +514,10 @@ class ManageTableServiceTest {
 
 	}
 
-	@Disabled
+
 	@Test
 	void updateSchemaAttributes() {
-
+		setMockitoSuccessResponseForService();
 		try {
 			manageTableService.updateSchemaAttributes(newTableSchemaDTO);
 		} catch (BadRequestOccurredException e) {
@@ -569,11 +581,15 @@ class ManageTableServiceTest {
 		}
 	}
 
-	@Disabled
+
 	@Test
 	void updateTableSchema() {
 		setMockitoSuccessResponseForService();
-		newTableSchemaDTO.setColumns(list);
+		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
+		assertEquals(200, rs.getStatusCode());
+	}
+	
+	public void setTableSchemaDTO() {
 		newTableSchemaDTO.setTableName(tableName);
 		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
@@ -586,8 +602,13 @@ class ManageTableServiceTest {
 		schemaField.setType("string");
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
+	}
+	@Test
+	void updateTableSchemaException() {
+		setTableSchemaDTO();
+		setMockitoBadResponseForService();
 		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(200, rs.getStatusCode());
+		assertEquals(400, rs.getStatusCode());
 	}
 
 	@Test
@@ -599,15 +620,24 @@ class ManageTableServiceTest {
 	@Test
 	void performSchemaDeletion() {
 		assertFalse(manageTableService.performSchemaDeletion("101,automatedTestCollection,14-3-2022 05:05:26,name"));
-
+		
 	}
 
 	@Test
 	void checkIfSchemaFileExistInvalid() {
 		boolean b = manageTableService
-				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic + "/Testing"));
+				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFileTest + "/Testing"));
 		assertFalse(b);
 
+	}
+	
+	@Test
+	void checkIfSchemaFileExistValid() {
+		File testFile = new File(deleteSchemaAttributesFileTest  + "1"); 
+		boolean b = manageTableService
+				.checkIfSchemaFileExist(testFile);
+		assertTrue(b);
+		testFile.delete();
 	}
 
 	public NamedList<Object> test() {
@@ -688,6 +718,20 @@ class ManageTableServiceTest {
 		NamedList<Object> lst = new NamedList<Object>();
 		lst.add("schema", map1);
 		return lst;
+	}
+	
+	public List<Map<String, Object>> testing(SchemaField fieldDto){
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
+		Map<String, Object> fieldDtoMap = new HashMap<>();
+		fieldDtoMap.put("name", fieldDto.getName());
+		fieldDtoMap.put(STORED, fieldDto.isStorable());
+		fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
+		fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+		fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
+		fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
+		schemaFieldsListOfMap.add(fieldDtoMap);
+		return schemaFieldsListOfMap;
+		
 	}
 
 }
