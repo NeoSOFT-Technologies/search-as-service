@@ -123,7 +123,7 @@ saas-ms:
 #================================================================
 #TableSoftDelete File Path
 table-delete-file:
-    path: DeletedRecordFiles/TableDeleteRecord
+    path: DeletedRecordFiles/TableDeleteRecord.csv
  
 table-delete-duration:
       days: 15
@@ -133,6 +133,6 @@ table-delete-duration:
 #=================================================================
 #UpdateTable configurations
 table-schema-attributes:
-  delete-file-path: DeletedRecordFiles/SchemaDeleteRecord
+  delete-file-path: DeletedRecordFiles/SchemaDeleteRecord.csv
   days: 15
 #=================================================================

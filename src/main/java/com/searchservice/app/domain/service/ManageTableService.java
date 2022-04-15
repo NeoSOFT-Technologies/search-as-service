@@ -728,7 +728,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	public void initializeSchemaDeletion(int tenantId, String tableName, String columnName) {
-		File file = new File(deleteSchemaAttributesFilePath + ".csv");
+		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
 			String newRecord = tenantId + "," + tableName + "," + formatter.format(Calendar.getInstance().getTime())
@@ -745,7 +745,7 @@ public class ManageTableService implements ManageTableServicePort {
 	// Soft Delete Table Schema Info Retrieval
 	public List<String> readSchemaInfoFromSchemaDeleteManager(int tenantId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
-		File file = new File(deleteSchemaAttributesFilePath + ".csv");
+		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileReader fr = new FileReader(file)) {
 			BufferedReader br = new BufferedReader(fr);
@@ -770,9 +770,9 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File(deleteSchemaAttributesFilePath + ".csv");
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(existingSchemaFile);
-		File newSchemaFile = new File(deleteSchemaAttributesFilePath + "Temp" + ".csv");
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath.substring(0, deleteSchemaAttributesFilePath.length()-4)+"Temp.csv");
 		int lineNumber = 0;
 		int schemaDeleteRecordCount = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
