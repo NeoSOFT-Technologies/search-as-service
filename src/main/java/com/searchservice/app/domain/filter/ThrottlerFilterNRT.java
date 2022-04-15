@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,11 +24,14 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.service.ThrottlerService;
 
 @Component
-@Order(3)
 public class ThrottlerFilterNRT implements Filter {
 
 	@Autowired
 	public ThrottlerService throttlerServicePort;
+	
+	// Max request size configuration values
+	@Value("${throttler.maxRequestSizeLimiter.maxAllowedRequestSizeNRT}")
+	String maxAllowedRequestSizeNRT;
 	
 	private ObjectMapper mapper = new ObjectMapper();
 
@@ -40,9 +43,8 @@ public class ThrottlerFilterNRT implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 		
         // Make request to be ready to be read multiple times
-        request = new RequestWrapper(req);
+        request = new HttpRequestWrapper(req);
 
-        // testing
         String payload = "";
         if ("POST".equalsIgnoreCase(req.getMethod())) 
         {
@@ -53,16 +55,15 @@ public class ThrottlerFilterNRT implements Filter {
 				.documentInjectionRequestSizeLimiter(payload, true);
         Map<String, Object> errorDetails = new HashMap<>();
 		if (documentInjectionThrottlerResponse.getStatusCode() == 406) {
-			errorDetails.put("Request not allowed", "Request size exceeded the limit");
+			errorDetails.put("httpStatus", HttpStatus.NOT_ACCEPTABLE);
+			errorDetails.put("message", "Request size exceeded the limit");
+			errorDetails.put("maxAllowedRequestSize", maxAllowedRequestSizeNRT);
 			res.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			mapper.writeValue(response.getWriter(), errorDetails);
-			  
-			//throw new BadRequestOccurredException(406, "Request not allowed. Request size exceeded the limit");
-			//return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
+			
+			mapper.writeValue(response.getWriter(), documentInjectionThrottlerResponse);
+			return;
 		}
 		chain.doFilter(request, response);
 	}
-	
-	
 }

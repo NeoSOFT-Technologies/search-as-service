@@ -164,10 +164,7 @@ public class RestControllerAdvice {
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getMessage()),HttpStatus.BAD_REQUEST);
 			}
 			else {
-				// testing
-				System.out.println("Json Mapping isueeeeee #######");
-				
-				return new ResponseEntity<Object>(new RestApiErrorHandling(
+				return new ResponseEntity<>(new RestApiErrorHandling(
 
 						HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
 						HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);

@@ -7,12 +7,9 @@ import org.springframework.context.annotation.Configuration;
 
 import com.searchservice.app.domain.filter.ThrottlerFilterBatch;
 import com.searchservice.app.domain.filter.ThrottlerFilterNRT;
-import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 
 @Configuration
 public class FilterConfig {
-
-	public ThrottlerServicePort throttlerServicePort;
 	
 	@Autowired
 	ThrottlerFilterNRT throttlerFilterNRT;
@@ -21,7 +18,7 @@ public class FilterConfig {
 	ThrottlerFilterBatch throttlerFilterBatch;
 	
 	@Bean
-	public FilterRegistrationBean<ThrottlerFilterNRT> registrationBean() {
+	public FilterRegistrationBean<ThrottlerFilterNRT> registrationBeanNRT() {
 		
 		FilterRegistrationBean<ThrottlerFilterNRT> registrationBean = new FilterRegistrationBean<>();
 		
@@ -33,7 +30,7 @@ public class FilterConfig {
 	
 	
 	@Bean
-	public FilterRegistrationBean<ThrottlerFilterBatch> registrationBean2() {
+	public FilterRegistrationBean<ThrottlerFilterBatch> registrationBeanBatch() {
 		
 		FilterRegistrationBean<ThrottlerFilterBatch> registrationBean = new FilterRegistrationBean<>();
 		

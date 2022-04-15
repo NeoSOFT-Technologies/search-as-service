@@ -11,11 +11,13 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-public class RequestWrapper extends HttpServletRequestWrapper {
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
+
+public class HttpRequestWrapper extends HttpServletRequestWrapper {
 
 	private final String body;
 
-	public RequestWrapper(HttpServletRequest request) throws IOException {
+	public HttpRequestWrapper(HttpServletRequest request) throws IOException {
 		// So that other request method behave just like before
 	    super(request);
 
@@ -34,13 +36,13 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 				stringBuilder.append("");
 			}
 		} catch (IOException ex) {
-			throw ex;
+			throw new BadRequestOccurredException(400, ex.getMessage());
 		} finally {
 			if (bufferedReader != null) {
 				try {
 					bufferedReader.close();
 				} catch (IOException ex) {
-					throw ex;
+					throw new BadRequestOccurredException(400, ex.getMessage());
 				}
 			}
 		}
@@ -51,30 +53,26 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
-		ServletInputStream servletInputStream = new ServletInputStream() {
+		return new ServletInputStream() {
 			public int read() throws IOException {
 				return byteArrayInputStream.read();
 			}
 
 			@Override
 			public boolean isFinished() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
 			@Override
 			public boolean isReady() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
 			@Override
 			public void setReadListener(ReadListener listener) {
-				// TODO Auto-generated method stub
 				
 			}
 		};
-		return servletInputStream;
 	}
 
 	@Override

@@ -54,31 +54,19 @@ public class InputDocumentResource {
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<ThrottlerResponse> documents(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
-
-		System.out.println("inside InpDocRes ####");
-		log.debug("nrt request in process......; payload >>>>> {}", payload);
 		
 		if (!inputDocumentService.isValidJsonArray(payload)) {
-			
-			// testing
-			System.out.println("Json not valid #####");
-			
 			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 		}
 
-
-		// Apply RequestSizeLimiting Throttler on payload before service the request
+		// Apply RequestSizeLimiting Throttler on payload before serving the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, true);
-
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		tableName = tableName + "_" + tenantId;
 		if (manageTableServicePort.isTableExists(tableName)) {
-
 			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
 		} else {
 			return documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
@@ -95,19 +83,12 @@ public class InputDocumentResource {
 			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 
-		// Apply RequestSizeLimiting Throttler on payload before service the request
+		// Apply RequestSizeLimiting Throttler on payload before serving the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, false);
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
-
+		
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-
 		tableName = tableName + "_" + tenantId;
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
-
-		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		if (manageTableServicePort.isTableExists(tableName)) {
 			return performDocumentInjection(tableName, payload, documentInjectionThrottlerResponse);
 		} else {
