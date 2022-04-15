@@ -79,6 +79,7 @@ public class ThrottlerService implements ThrottlerServicePort {
 			throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSizeNRT);
 		else
 			throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSizeBatch);
+
 		if (isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
 			throttlerMaxRequestSizeResponseDTO.setStatusCode(406);
 			throttlerMaxRequestSizeResponseDTO

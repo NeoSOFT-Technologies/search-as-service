@@ -151,6 +151,7 @@ public class RestControllerAdvice {
 			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field : "+fieldName+" is not expected as : "+value));
 			//targetType = ex.getTargetType().getName();
 		}else if(exception.getCause() instanceof JsonMappingException) {
+			
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
 			if(ex.getCause() instanceof BadRequestOccurredException) {
 				BadRequestOccurredException exc = (BadRequestOccurredException)ex.getCause();
@@ -162,11 +163,12 @@ public class RestControllerAdvice {
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getMessage()),HttpStatus.BAD_REQUEST);
 			}
-			else
-				return new ResponseEntity<Object>(new RestApiErrorHandling(
+			else {
+				return new ResponseEntity<>(new RestApiErrorHandling(
 
 						HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
 						HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);
+			}
 		}else {
 			return new ResponseEntity<Object>(new RestApiErrorHandling(
 

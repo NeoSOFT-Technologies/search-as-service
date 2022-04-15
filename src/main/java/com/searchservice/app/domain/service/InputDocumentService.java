@@ -100,7 +100,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	public boolean isValidJsonArray(String jsonString) {
-
 		boolean valid = true;
 		try {
 			if (null == jsonString || jsonString.trim().isEmpty() || !jsonString.trim().startsWith("[{")
