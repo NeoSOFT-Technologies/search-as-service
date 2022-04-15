@@ -58,7 +58,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		String actualTableName = "";
 
 		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
-			File file = new File(deleteRecordFilePath + ".csv");
+			File file = new File(deleteRecordFilePath);
 			checkIfTableDeleteFileExist(file);
 			try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
 				actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
@@ -89,9 +89,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Override
 	public int checkDeletionofTable() {
-
-		File existingFile = new File(deleteRecordFilePath + ".csv");
-		File newFile = new File(deleteRecordFilePath + "Temp.csv");
+		File existingFile = new File(deleteRecordFilePath);
+		File newFile = new File(deleteRecordFilePath.substring(0, deleteRecordFilePath.length()-4)+"Temp.csv");
 		int lineNumber = 0;
 		int delRecordCount = 0;
 
@@ -128,7 +127,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile, int delRecordCount) {
-		File deleteRecordFile = new File(deleteRecordFilePath + ".csv");
+		File deleteRecordFile = new File(deleteRecordFilePath);
 		if (existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
 			checkTableDeletionStatus(delRecordCount);
 		}
@@ -168,9 +167,9 @@ public class TableDeleteService implements TableDeleteServicePort {
 	public Response performUndoTableDeletion(String tableName) {
 		String actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
 		Response undoTableDeletionResponse = new Response();
-		File existingFile = new File(deleteRecordFilePath + ".csv");
+		File existingFile = new File(deleteRecordFilePath);
 		checkIfTableDeleteFileExist(existingFile);
-		File newFile = new File(deleteRecordFilePath + "Temp.csv");
+		File newFile = new File(deleteRecordFilePath.substring(0, deleteRecordFilePath.length()-4)+"Temp.csv");
 		int lineNumber = 0;
 		int undoRecord = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
@@ -193,7 +192,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			pw.flush();
 			pw.close();
 			br.close();
-			File deleteRecordFile = new File(deleteRecordFilePath + ".csv");
+			File deleteRecordFile = new File(deleteRecordFilePath);
 			if (existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
 				undoTableDeletionResponse = getUndoDeleteResponse(undoRecord, actualTableName);
 			}
@@ -251,7 +250,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Override
 	public List<String> getTableUnderDeletion() {
 		List<String> tableUnderDeletionList = new ArrayList<>();
-		File existingFile = new File(deleteRecordFilePath + ".csv");
+		File existingFile = new File(deleteRecordFilePath);
 		checkIfTableDeleteFileExist(existingFile);
 		int lineNumber = 0;
 		try (FileReader fr = new FileReader(existingFile); BufferedReader br = new BufferedReader(fr);) {

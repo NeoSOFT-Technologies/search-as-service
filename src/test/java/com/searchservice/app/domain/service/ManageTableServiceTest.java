@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +20,13 @@ import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
@@ -53,12 +59,13 @@ import com.searchservice.app.rest.errors.TableNotFoundException;
 @ExtendWith(SpringExtension.class)
 
 @SpringBootTest
+@TestInstance(Lifecycle.PER_CLASS)
 class ManageTableServiceTest {
 
 	@Value("${base-search-url}")
 	String searchUrl;
 
-	private String deleteSchemaAttributesFileTest = "src/test/resources/SchemaDeleteRecordTest";
+	private String deleteSchemaAttributesFileTest = "src/test/resources/SchemaDeleteRecordTest.csv";
 
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
@@ -245,17 +252,24 @@ class ManageTableServiceTest {
 		solrClient = solrApiAdapter.getSearchClient(searchUrl);
 		solrClientWithTable = solrApiAdapter.getSearchClientWithTable(searchUrl, tableName);
 	}
+	
 
 	@BeforeEach
-	void setUp() throws Exception {
-		ReflectionTestUtils.setField(manageTableService,"deleteSchemaAttributesFilePath","src/test/resources/SchemaDeleteRecordTest");
+	void setUpTestFiles() throws Exception {
+		File testSchemaFile = new File(deleteSchemaAttributesFileTest);
+		testSchemaFile.createNewFile();
+		addSampleData(testSchemaFile);
+		ReflectionTestUtils.setField(manageTableService,"deleteSchemaAttributesFilePath",deleteSchemaAttributesFileTest);
+	}
+	
+	@BeforeEach
+	void setUp() {
 		setUpTestClass();
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
 		Mockito.when(solrApiAdapterMocked.getSearchClientWithTable(Mockito.any(), Mockito.any()))
 				.thenReturn(solrClientWithTable);
 		configSetResponse.setResponse(test1());
 		Mockito.when(searchJAdapter.getConfigSetFromSolrj(solrClient)).thenReturn(configSetResponse);
-
 	}
 
 	void configErrorResponse() {
@@ -732,6 +746,36 @@ class ManageTableServiceTest {
 		schemaFieldsListOfMap.add(fieldDtoMap);
 		return schemaFieldsListOfMap;
 		
+	}
+	
+	public void addSampleData(File file) {
+		 int lineNumber = 0;
+		 while(lineNumber!=2) {	
+		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
+			if(lineNumber == 0) {
+				bw.write("TenantID,TableName,RequestTime,ColumnName\n");
+			}
+			else {
+				bw.write("1,Demo,11-4-2022 07:17:04,category\n");
+				bw.write("1,Demo,11-4-2022 07:17:04,is_available\n");
+				bw.write("1,Demo,11-4-2022 07:17:04,price\n");
+				bw.write(STORED);
+			}
+			lineNumber++;
+			}catch (Exception e) {
+				e.printStackTrace();		
+			} 
+		 }
+	}
+	
+	@AfterAll
+	void deleteAllTestFiles() {
+		File file = new File("src/test/resources");
+		for(File f: file.listFiles()) {
+			if(f.toString().endsWith(".csv")) {
+				f.delete();
+			}
+		}
 	}
 
 }

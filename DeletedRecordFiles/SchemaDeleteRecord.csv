@@ -30,3 +30,7 @@ TenantID,TableName,RequestTime,ColumnName
 101,automatedTestCollection,12-4-2022 09:56:45,_nest_path
 101,automatedTestCollection,12-4-2022 11:08:42,http://localhost:8983/solr
 101,automatedTestCollection,12-4-2022 11:08:42,_nest_path
+2,egresstest1,15-4-2022 11:31:27,category
+2,egresstest1,15-4-2022 11:31:27,is_available
+2,egresstest1,15-4-2022 11:31:27,price
+2,egresstest1,15-4-2022 11:31:27,product_name
