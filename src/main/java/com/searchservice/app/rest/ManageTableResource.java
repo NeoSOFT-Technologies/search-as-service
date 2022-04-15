@@ -132,7 +132,7 @@ public class ManageTableResource {
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
 					log.info(TABLE +"could not be created: {}", apiResponseDTO);
-					throw new BadRequestOccurredException(101, "REST operation could not be performed");
+					throw new BadRequestOccurredException(400, "REST operation could not be performed");
 				}
 			}
 		}
