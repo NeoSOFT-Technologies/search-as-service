@@ -18,3 +18,11 @@ TenantID,TableName,RequestTime,ColumnName
 101,automatedTestCollection,12-4-2022 12:29:02,_nest_path
 101,automatedTestCollection,12-4-2022 12:32:54,http://localhost:8983/solr
 101,automatedTestCollection,12-4-2022 12:32:54,_nest_path
+101,automatedTestCollection,12-4-2022 12:37:47,http://localhost:8983/solr
+101,automatedTestCollection,12-4-2022 12:37:47,_nest_path
+101,automatedTestCollection,15-4-2022 02:12:46,http://localhost:8983/solr
+101,automatedTestCollection,15-4-2022 02:12:46,_nest_path
+101,automatedTestCollection,15-4-2022 02:14:11,http://localhost:8983/solr
+101,automatedTestCollection,15-4-2022 02:14:11,_nest_path
+101,automatedTestCollection,15-4-2022 02:15:38,http://localhost:8983/solr
+101,automatedTestCollection,15-4-2022 02:15:38,_nest_path
