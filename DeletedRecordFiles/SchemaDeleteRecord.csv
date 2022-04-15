@@ -34,3 +34,8 @@ TenantID,TableName,RequestTime,ColumnName
 2,egresstest1,15-4-2022 11:31:27,is_available
 2,egresstest1,15-4-2022 11:31:27,price
 2,egresstest1,15-4-2022 11:31:27,product_name
+101,inputTest,15-4-2022 02:38:46,category
+101,inputTest,15-4-2022 02:38:46,is_available
+101,inputTest,15-4-2022 02:38:47,string
+101,inputTest,15-4-2022 02:38:47,title
+101,inputTest,15-4-2022 02:38:47,vendor_id

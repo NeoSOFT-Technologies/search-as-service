@@ -204,7 +204,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -222,7 +222,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
 
 		if (!isTableExists(tableName))
-			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
+			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 		TableSchemav2 tableSchema = getTableSchema(tableName);
 
 		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
@@ -266,7 +266,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// Delete table
 		Response apiResponseDTO = new Response();

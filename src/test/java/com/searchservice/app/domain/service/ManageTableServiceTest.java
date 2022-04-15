@@ -51,6 +51,7 @@ import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
@@ -338,8 +339,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.getTableSchemaIfPresent("InvalidTable");
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
+		} catch (TableNotFoundException e) {
+			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptioncode());
 		}
 	}
 
