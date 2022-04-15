@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +20,13 @@ import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
@@ -29,6 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
@@ -44,6 +51,7 @@ import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
@@ -52,14 +60,21 @@ import com.searchservice.app.rest.errors.TableNotFoundException;
 @ExtendWith(SpringExtension.class)
 
 @SpringBootTest
+@TestInstance(Lifecycle.PER_CLASS)
 class ManageTableServiceTest {
 
 	@Value("${base-search-url}")
 	String searchUrl;
 
-	@Value("${table-schema-attributes.delete-file-path}")
-	private String deleteSchemaAttributesFilePathNonStatic;
+	private String deleteSchemaAttributesFileTest = "src/test/resources/SchemaDeleteRecordTest.csv";
 
+	private static final String MULTIVALUED = "multiValued";
+	private static final String STORED = "stored";
+	private static final String REQUIRED = "required";
+
+	private static final String DOCVALUES = "docValues";
+	private static final String INDEXED = "indexed";
+	private static final String PARTIAL_SEARCH = "partial_search";
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
 	HttpSolrClient solrClientWithTable = null;
@@ -84,6 +99,8 @@ class ManageTableServiceTest {
 	@MockBean
 	SchemaRequest schemaRequest;
 
+	
+	
 	ManageTable manageTable = new ManageTable();
 
 	TableSchema newTableSchemaDTO = new TableSchema();
@@ -118,6 +135,15 @@ class ManageTableServiceTest {
 		newPlan.setReplicas(1);
 		plan.add(newPlan);
 		Mockito.when(capacityPlanProperties.getPlans()).thenReturn(plan);
+		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(null);
+		schemaResponse.setElapsedTime(3);
+		schemaResponse.setRequestUrl(searchUrl);
+		schemaResponse.setResponse(test2());
+		setTableSchemaDTO();
+		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
+
 	}
 
 	public void setMockitoTableNotExist() {
@@ -172,20 +198,19 @@ class ManageTableServiceTest {
 
 		finalResponseMap.put(" message", "Data is returned");
 
-		newTableSchemaDTO.setSchemaName("table");
-		newTableSchemaDTO.setColumns(list);
-		newTableSchemaDTO.setTableDetails(finalResponseMap);
 		newTableSchemaDTO.setTableName(tableName);
-
+		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
-		schemaField.setName("ok");
+		schemaField.setName("test");
 		schemaField.setPartialSearch(true);
 		schemaField.setRequired(true);
 		schemaField.setSortable(true);
 		schemaField.setStorable(true);
 		schemaField.setType("string");
 		list.add(schemaField);
+		newTableSchemaDTO.setColumns(list);
+
 		manageTable.setColumns(list);
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
@@ -219,6 +244,8 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
+		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
+		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
 
 	}
 
@@ -226,17 +253,24 @@ class ManageTableServiceTest {
 		solrClient = solrApiAdapter.getSearchClient(searchUrl);
 		solrClientWithTable = solrApiAdapter.getSearchClientWithTable(searchUrl, tableName);
 	}
+	
 
 	@BeforeEach
-	void setUp() throws Exception {
-
+	void setUpTestFiles() throws Exception {
+		File testSchemaFile = new File(deleteSchemaAttributesFileTest);
+		testSchemaFile.createNewFile();
+		addSampleData(testSchemaFile);
+		ReflectionTestUtils.setField(manageTableService,"deleteSchemaAttributesFilePath",deleteSchemaAttributesFileTest);
+	}
+	
+	@BeforeEach
+	void setUp() {
 		setUpTestClass();
 		Mockito.when(solrApiAdapterMocked.getSearchClient(searchUrl)).thenReturn(solrClient);
 		Mockito.when(solrApiAdapterMocked.getSearchClientWithTable(Mockito.any(), Mockito.any()))
 				.thenReturn(solrClientWithTable);
 		configSetResponse.setResponse(test1());
 		Mockito.when(searchJAdapter.getConfigSetFromSolrj(solrClient)).thenReturn(configSetResponse);
-
 	}
 
 	void configErrorResponse() {
@@ -305,8 +339,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.getTableSchemaIfPresent("InvalidTable");
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
+		} catch (TableNotFoundException e) {
+			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptioncode());
 		}
 	}
 
@@ -328,13 +362,6 @@ class ManageTableServiceTest {
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
-	}
-
-	@Test
-	void testGetTableDetails() {
-		setMockitoSuccessResponseForService();
-		assertNotNull(manageTableService.getTableDetails(tableName));
-
 	}
 
 	@Test
@@ -502,10 +529,10 @@ class ManageTableServiceTest {
 
 	}
 
-	@Disabled
+
 	@Test
 	void updateSchemaAttributes() {
-
+		setMockitoSuccessResponseForService();
 		try {
 			manageTableService.updateSchemaAttributes(newTableSchemaDTO);
 		} catch (BadRequestOccurredException e) {
@@ -569,11 +596,15 @@ class ManageTableServiceTest {
 		}
 	}
 
-	@Disabled
+
 	@Test
 	void updateTableSchema() {
 		setMockitoSuccessResponseForService();
-		newTableSchemaDTO.setColumns(list);
+		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
+		assertEquals(200, rs.getStatusCode());
+	}
+	
+	public void setTableSchemaDTO() {
 		newTableSchemaDTO.setTableName(tableName);
 		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
@@ -586,8 +617,13 @@ class ManageTableServiceTest {
 		schemaField.setType("string");
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
+	}
+	@Test
+	void updateTableSchemaException() {
+		setTableSchemaDTO();
+		setMockitoBadResponseForService();
 		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(200, rs.getStatusCode());
+		assertEquals(400, rs.getStatusCode());
 	}
 
 	@Test
@@ -599,15 +635,24 @@ class ManageTableServiceTest {
 	@Test
 	void performSchemaDeletion() {
 		assertFalse(manageTableService.performSchemaDeletion("101,automatedTestCollection,14-3-2022 05:05:26,name"));
-
+		
 	}
 
 	@Test
 	void checkIfSchemaFileExistInvalid() {
 		boolean b = manageTableService
-				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFilePathNonStatic + "/Testing"));
+				.checkIfSchemaFileExist(new File(deleteSchemaAttributesFileTest + "/Testing"));
 		assertFalse(b);
 
+	}
+	
+	@Test
+	void checkIfSchemaFileExistValid() {
+		File testFile = new File(deleteSchemaAttributesFileTest  + "1"); 
+		boolean b = manageTableService
+				.checkIfSchemaFileExist(testFile);
+		assertTrue(b);
+		testFile.delete();
 	}
 
 	public NamedList<Object> test() {
@@ -688,6 +733,50 @@ class ManageTableServiceTest {
 		NamedList<Object> lst = new NamedList<Object>();
 		lst.add("schema", map1);
 		return lst;
+	}
+	
+	public List<Map<String, Object>> testing(SchemaField fieldDto){
+		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
+		Map<String, Object> fieldDtoMap = new HashMap<>();
+		fieldDtoMap.put("name", fieldDto.getName());
+		fieldDtoMap.put(STORED, fieldDto.isStorable());
+		fieldDtoMap.put(MULTIVALUED, fieldDto.isMultiValue());
+		fieldDtoMap.put(REQUIRED, fieldDto.isRequired());
+		fieldDtoMap.put(DOCVALUES, fieldDto.isSortable());
+		fieldDtoMap.put(INDEXED, fieldDto.isFilterable());
+		schemaFieldsListOfMap.add(fieldDtoMap);
+		return schemaFieldsListOfMap;
+		
+	}
+	
+	public void addSampleData(File file) {
+		 int lineNumber = 0;
+		 while(lineNumber!=2) {	
+		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
+			if(lineNumber == 0) {
+				bw.write("TenantID,TableName,RequestTime,ColumnName\n");
+			}
+			else {
+				bw.write("1,Demo,11-4-2022 07:17:04,category\n");
+				bw.write("1,Demo,11-4-2022 07:17:04,is_available\n");
+				bw.write("1,Demo,11-4-2022 07:17:04,price\n");
+				bw.write(STORED);
+			}
+			lineNumber++;
+			}catch (Exception e) {
+				e.printStackTrace();		
+			} 
+		 }
+	}
+	
+	@AfterAll
+	void deleteAllTestFiles() {
+		File file = new File("src/test/resources");
+		for(File f: file.listFiles()) {
+			if(f.toString().endsWith(".csv")) {
+				f.delete();
+			}
+		}
 	}
 
 }

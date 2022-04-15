@@ -204,7 +204,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -222,7 +222,7 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
 
 		if (!isTableExists(tableName))
-			throw new BadRequestOccurredException(400, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
+			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 		TableSchemav2 tableSchema = getTableSchema(tableName);
 
 		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
@@ -231,32 +231,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchema;
 	}
 
-	@Override
-	public Map<Object, Object> getTableDetails(String tableName) {
 
-		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL, tableName);
-		CollectionAdminResponse response = searchJAdapter.getTableDetailsFromSolrjCluster(searchClientActive);
-
-		Map<Object, Object> finalResponseMap = new HashMap<>();
-		try {
-			finalResponseMap = ManageTableUtil
-					.getTableInfoFromClusterStatusResponseObject(response.getResponse().asMap(20), tableName);
-		} catch (Exception e) {
-			logger.error(e.toString());
-			finalResponseMap.put("Error", "Error connecting to cluster.");
-			return finalResponseMap;
-		}
-
-		if (!finalResponseMap.containsKey("tableDetails") || finalResponseMap.get("tableDetails") == null) {
-			finalResponseMap = new HashMap<>();
-			finalResponseMap.put("Error", "Invalid table name provided.");
-
-			return finalResponseMap;
-		} else {
-
-			return finalResponseMap;
-		}
-	}
 
 	@Override
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
@@ -291,7 +266,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " Not Found");
+					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// Delete table
 		Response apiResponseDTO = new Response();
@@ -659,7 +634,7 @@ public class ManageTableService implements ManageTableServicePort {
 				// Pass the fieldAttribute to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				updateFieldsResponse = searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
-
+                
 				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
 				updatedFields++;
 				logger.info("Field- {} is successfully updated", currField.get("name"));
@@ -753,7 +728,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	public void initializeSchemaDeletion(int tenantId, String tableName, String columnName) {
-		File file = new File(deleteSchemaAttributesFilePath + ".csv");
+		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
 			String newRecord = tenantId + "," + tableName + "," + formatter.format(Calendar.getInstance().getTime())
@@ -770,7 +745,7 @@ public class ManageTableService implements ManageTableServicePort {
 	// Soft Delete Table Schema Info Retrieval
 	public List<String> readSchemaInfoFromSchemaDeleteManager(int tenantId, String tableName) {
 		List<String> deletedSchemaAttributes = new ArrayList<>();
-		File file = new File(deleteSchemaAttributesFilePath + ".csv");
+		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileReader fr = new FileReader(file)) {
 			BufferedReader br = new BufferedReader(fr);
@@ -795,9 +770,9 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File(deleteSchemaAttributesFilePath + ".csv");
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(existingSchemaFile);
-		File newSchemaFile = new File(deleteSchemaAttributesFilePath + "Temp" + ".csv");
+		File newSchemaFile = new File(deleteSchemaAttributesFilePath.substring(0, deleteSchemaAttributesFilePath.length()-4)+"Temp.csv");
 		int lineNumber = 0;
 		int schemaDeleteRecordCount = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
