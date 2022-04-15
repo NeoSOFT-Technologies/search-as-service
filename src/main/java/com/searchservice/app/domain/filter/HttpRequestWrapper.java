@@ -23,8 +23,7 @@ public class HttpRequestWrapper extends HttpServletRequestWrapper {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		BufferedReader bufferedReader = null;
-		try {
-			InputStream inputStream = request.getInputStream();
+		try(InputStream inputStream = request.getInputStream()) {
 			if (inputStream != null) {
 				bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				char[] charBuffer = new char[128];
@@ -39,11 +38,7 @@ public class HttpRequestWrapper extends HttpServletRequestWrapper {
 			throw new BadRequestOccurredException(400, ex.getMessage());
 		} finally {
 			if (bufferedReader != null) {
-				try {
-					bufferedReader.close();
-				} catch (IOException ex) {
-					throw new BadRequestOccurredException(400, ex.getMessage());
-				}
+				bufferedReader.close();
 			}
 		}
 		// Store request pody content in 'body' variable
@@ -70,7 +65,9 @@ public class HttpRequestWrapper extends HttpServletRequestWrapper {
 
 			@Override
 			public void setReadListener(ReadListener listener) {
-				
+				/*
+				 * No need to override this method as per our current filters definitions
+				 */
 			}
 		};
 	}
