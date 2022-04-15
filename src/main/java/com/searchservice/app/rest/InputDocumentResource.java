@@ -55,9 +55,18 @@ public class InputDocumentResource {
 	public ResponseEntity<ThrottlerResponse> documents(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
-		if (!inputDocumentService.isValidJsonArray(payload))
+		System.out.println("inside InpDocRes ####");
+		log.debug("nrt request in process......; payload >>>>> {}", payload);
+		
+		if (!inputDocumentService.isValidJsonArray(payload)) {
+			
+			// testing
+			System.out.println("Json not valid #####");
+			
 			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		}
+
 
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort

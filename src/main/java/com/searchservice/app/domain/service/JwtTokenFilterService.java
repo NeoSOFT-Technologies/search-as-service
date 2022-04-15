@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.config.KeycloakConfigProperties;
 
 //@Component
+@Order(1)
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
 	private RestTemplate restTemplate;
@@ -65,6 +67,11 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 			mapper.writeValue(response.getWriter(), errorDetails);
 
 		} else {
+			
+			// testing
+			System.out.println("JwtFilter: request >>> "+request);
+			System.out.println("JwtFilter: response >>> "+response);
+			
 			chain.doFilter(request, response);
 		}
 	}
