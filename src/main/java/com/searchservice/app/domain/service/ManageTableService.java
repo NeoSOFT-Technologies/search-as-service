@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.ConfigSet;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -167,10 +167,10 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public GetCapacityPlan capacityPlans() {
+	public CapacityPlanResponse capacityPlans() {
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
 
-		return new GetCapacityPlan(200, "Successfully retrieved all Capacity Plans", capacityPlans);
+		return new CapacityPlanResponse(200, "Successfully retrieved all Capacity Plans", capacityPlans);
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		} catch (Exception e) {
 			logger.error(e.toString());
-			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
 
 		}
@@ -237,7 +237,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
 
 		if (isTableExists(manageTableDTO.getTableName()))
-			throw new BadRequestOccurredException(400, manageTableDTO.getTableName() + " table already exists");
+			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
+					manageTableDTO.getTableName() + " table already exists");
 
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
@@ -280,7 +281,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		} else {
 
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 
 			apiResponseDTO.setMessage("Unable to delete table: " + tableName);
 		}
@@ -313,7 +314,7 @@ public class ManageTableService implements ManageTableServicePort {
 		if (configSetName != null)
 			return configSets.getData().contains(configSetName);
 		else
-			throw new NullPointerOccurredException(404, "Could not fetch any configset, null returned");
+			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), "Could not fetch any configset, null returned");
 	}
 
 	@Override
@@ -329,7 +330,7 @@ public class ManageTableService implements ManageTableServicePort {
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all config sets");
 		} catch (Exception e) {
-			getListItemsResponseDTO.setStatusCode(400);
+			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			getListItemsResponseDTO.setMessage("Configsets could not be retrieved. Error occured");
 
 		}
@@ -347,9 +348,10 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.error(e.toString());
 			if ((e instanceof SolrServerException)
 					&& (HttpHostConnectException) e.getCause() instanceof HttpHostConnectException)
-				throw new BadRequestOccurredException(503, "Could not connect to Solr server");
+				throw new BadRequestOccurredException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),
+						"Could not connect to Solr server");
 			else
-				throw new BadRequestOccurredException(400, "Table Search operation could not be completed");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Table Search operation could not be completed");
 		}
 	}
 
@@ -419,7 +421,7 @@ public class ManageTableService implements ManageTableServicePort {
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
 		} catch (SolrException e) {
-			tableSchemaResponseDTO.setStatusCode(400);
+			tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			logger.error(SEARCH_EXCEPTION_MSG, tableName);
 			logger.info(e.toString());
 		}
@@ -444,7 +446,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO = new Response(200, "ConfigSet is created successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be created");
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			logger.error("Error caused while creating ConfigSet");
 		}
 		return apiResponseDTO;
@@ -482,7 +484,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
 			logger.error(e.toString());
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 
 			apiResponseDTO.setMessage("Unable to create table: " + manageTableDTO.getTableName() + ". Exception.");
 		} finally {
@@ -540,7 +542,7 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 			// If No new schema attribute is found, RETURN
 			if (!newFieldFound) {
-				tableSchemaResponseDTO.setStatusCode(400);
+				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 				tableSchemaResponseDTO.setMessage("No new attributes found");
 				return tableSchemaResponseDTO;
 			} else {
@@ -553,7 +555,7 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 
 			if (newAttributesHashMap.isEmpty()) {
-				tableSchemaResponseDTO.setStatusCode(405);
+				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.OPERATION_NOT_ALLOWED.getCode());
 				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
 			} else {
 				for (Map.Entry<String, SchemaField> fieldDtoEntry : newAttributesHashMap.entrySet()) {
@@ -561,7 +563,7 @@ public class ManageTableService implements ManageTableServicePort {
 					if (!TableSchemaParserUtil.validateSchemaField(fieldDto)) {
 						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}",
 								schemaName);
-						tableSchemaResponseDTO.setStatusCode(400);
+						tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 						break;
 					}
 					if (fieldDto.isSortable()) {
@@ -588,7 +590,7 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 
 		} catch (SolrException e) {
-			tableSchemaResponseDTO.setStatusCode(400);
+			tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			tableSchemaResponseDTO.setMessage("Schema attributes could not be added to the table " + e.getMessage());
 			logger.error(SEARCH_SCHEMA_EXCEPTION_MSG, payloadOperation, errorCausingField);
 		} finally {
@@ -648,18 +650,18 @@ public class ManageTableService implements ManageTableServicePort {
 
 			
 		} catch (NullPointerException e) {
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode());
 			apiResponseDTO.setMessage("Schema could not be updated successfully");
 			logger.error("Null value detected!", e);
 		} catch (SolrException e) {
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error(
 					SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName(), 
 					e.getMessage());
 		} catch (SolrSchemaValidationException e) {
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			apiResponseDTO.setMessage("Schema could not be updated");
 			logger.error("Error Message: {}", e.getMessage());
 		}
@@ -677,7 +679,7 @@ public class ManageTableService implements ManageTableServicePort {
 			searchJAdapter.addAliasTableInSolrj(searchClientActive, request);
 			apiResponseDTO.setStatusCode(200);
 		} catch (Exception e) {
-			apiResponseDTO.setStatusCode(400);
+			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			logger.error(e.toString());
 		}
 		if (apiResponseDTO.getStatusCode() == 200) {
@@ -703,7 +705,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");
 		} catch (Exception e) {
 			apiResponseDTO.setMessage("ConfigSet could not be deleted");
-			apiResponseDTO.setStatusCode(401);
+			apiResponseDTO.setStatusCode(HttpStatusCode.UNAUTHORIZED_EXCEPTION.getCode());
 		}
 		return apiResponseDTO;
 	}
@@ -763,7 +765,8 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 		} catch (Exception e) {
 			logger.error("Soft Delete SchemaInfo could not be retrieved");
-			throw new OperationIncompleteException(500, "Soft Delete SchemaInfo could not be retrieved");
+			throw new OperationIncompleteException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), 
+					"Soft Delete SchemaInfo could not be retrieved");
 		}
 
 		return deletedSchemaAttributes;
@@ -841,7 +844,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile, int schemaDeleteRecordCount) {
-		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath + ".csv");
+		File schemaDeleteRecordFile = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(schemaDeleteRecordFile);
 		if (existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile)) {
 			checkTableDeletionStatus(schemaDeleteRecordCount);

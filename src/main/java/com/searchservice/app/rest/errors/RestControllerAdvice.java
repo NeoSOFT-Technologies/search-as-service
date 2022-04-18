@@ -23,13 +23,16 @@ public class RestControllerAdvice {
 
 	@ExceptionHandler(BadRequestOccurredException.class)
 	public ResponseEntity<Object> handleBadRequestOccurred(BadRequestOccurredException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getExceptionMessage()));
+		return new ResponseEntity<>(new RestApiErrorHandling(
+
+				HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), HttpStatusCode.INVALID_TABLE_NAME,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(InvalidInputOccurredException.class)
 	public ResponseEntity<Object> handleInvalidInput(InvalidInputOccurredException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.INVALID_TABLE_NAME.getCode(), HttpStatusCode.INVALID_TABLE_NAME,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
@@ -38,7 +41,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(TableNotFoundException.class)
 	public ResponseEntity<Object> handleTableNotFound(TableNotFoundException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
@@ -47,7 +50,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(TableNotUnderDeletionException.class)
 	public ResponseEntity<Object> handleTableNotUnderDeletion(TableNotUnderDeletionException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(), HttpStatusCode.TABLE_NOT_UNDER_DELETION,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
@@ -55,7 +58,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(InvalidSKUOccurredException.class)
 	public ResponseEntity<Object> handleInvalidSKU(InvalidSKUOccurredException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.INVALID_SKU_NAME.getCode(), HttpStatusCode.INVALID_SKU_NAME,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
@@ -64,7 +67,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(NullColumnOccurredException.class)
 	public ResponseEntity<Object> handlenullColumn(NullColumnOccurredException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.NULL_COLUMN.getCode(), HttpStatusCode.NULL_COLUMN, exception.getExceptionMessage()),
 				HttpStatus.BAD_REQUEST);
@@ -73,13 +76,13 @@ public class RestControllerAdvice {
 	public ResponseEntity<Object> handleInvalidJsonInput(InvalidJsonInputOccurredException exception) {
 
 		if(exception.getCause() instanceof InvalidJsonInputOccurredException) {
-			return new ResponseEntity<Object>(new RestApiErrorHandling(
+			return new ResponseEntity<>(new RestApiErrorHandling(
 
 					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
 					HttpStatus.BAD_REQUEST);
 		}
 		else {
-			return new ResponseEntity<Object>(new RestApiErrorHandling(
+			return new ResponseEntity<>(new RestApiErrorHandling(
 
 					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
 					HttpStatus.BAD_REQUEST);
@@ -88,7 +91,7 @@ public class RestControllerAdvice {
 	@ExceptionHandler(DeletionOccurredException.class)
 	public ResponseEntity<Object> handledeletionprocess(DeletionOccurredException exception) {
 
-		return new ResponseEntity<Object>(new RestApiErrorHandling(
+		return new ResponseEntity<>(new RestApiErrorHandling(
 
 				HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), HttpStatusCode.UNDER_DELETION_PROCESS,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
@@ -101,7 +104,9 @@ public class RestControllerAdvice {
 
 	@ExceptionHandler(NullPointerOccurredException.class)
 	public ResponseEntity<Object> handleNullPointerOccurredException(NullPointerOccurredException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.NOT_FOUND, exception.getExceptionMessage()));
+		return new ResponseEntity<>(new RestApiErrorHandling(
+				HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), HttpStatusCode.NULL_POINTER_EXCEPTION,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(Exception.class)
@@ -170,7 +175,7 @@ public class RestControllerAdvice {
 						HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);
 			}
 		}else {
-			return new ResponseEntity<Object>(new RestApiErrorHandling(
+			return new ResponseEntity<>(new RestApiErrorHandling(
 
 					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);
@@ -184,7 +189,6 @@ public class RestControllerAdvice {
 		String fieldName = "";
 		String requiredType = "";
 		if (exception.getCause() instanceof NumberFormatException) {
-			// NumberFormatException ex = (NumberFormatException)exception.getCause();
 			fieldName = exception.getName();
 			requiredType = exception.getRequiredType().getName();
 		}

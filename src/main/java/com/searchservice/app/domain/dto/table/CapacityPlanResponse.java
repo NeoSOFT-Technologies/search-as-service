@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetCapacityPlan {
+public class CapacityPlanResponse {
 
 	private int statusCode;
 	private String message;

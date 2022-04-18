@@ -293,7 +293,7 @@ public class SearchJAdapter {
 	public void createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO, Map<String, Object> fieldTypeAttributes) {
 		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
 			FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
-			fieldTypeAttributes = TableSchemaParserUtil.getFieldTypeAttributesForPartialSearch();
+			fieldTypeAttributes = TableSchemaParserUtil.partialSearchFieldTypeAttrs;
 			fieldTypeDef.setAttributes(fieldTypeAttributes);
 			
 			try {

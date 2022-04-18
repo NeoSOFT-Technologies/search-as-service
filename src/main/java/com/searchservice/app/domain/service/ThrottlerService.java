@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.utils.ThrottlerUtils;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 public class ThrottlerService implements ThrottlerServicePort {
@@ -50,11 +51,11 @@ public class ThrottlerService implements ThrottlerServicePort {
 		 */
 
 		if (isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
-			throttlerMaxRequestSizeResponseDTO.setStatusCode(405);
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(HttpStatusCode.OPERATION_NOT_ALLOWED.getCode());
 			throttlerMaxRequestSizeResponseDTO
 					.setMessage("Incoming request size exceeded the limit! " + "This request can't be processed");
 		} else {
-			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(HttpStatusCode.PROCESSING_NOT_COMPLETED.getCode());
 			throttlerMaxRequestSizeResponseDTO.setMessage("Incoming request size is under the limit, can be processed");
 		}
 		logger.info("Max request size limiting has been applied");
@@ -81,11 +82,11 @@ public class ThrottlerService implements ThrottlerServicePort {
 			throttlerMaxRequestSizeResponseDTO.setMaxAllowedRequestSize(maxAllowedRequestSizeBatch);
 
 		if (isRequestSizeExceedingLimit(throttlerMaxRequestSizeResponseDTO)) {
-			throttlerMaxRequestSizeResponseDTO.setStatusCode(406);
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode());
 			throttlerMaxRequestSizeResponseDTO
 					.setMessage("Incoming request size exceeded the limit! " + "This request can't be processed");
 		} else {
-			throttlerMaxRequestSizeResponseDTO.setStatusCode(202);
+			throttlerMaxRequestSizeResponseDTO.setStatusCode(HttpStatusCode.PROCESSING_NOT_COMPLETED.getCode());
 			throttlerMaxRequestSizeResponseDTO.setMessage("Incoming request size is under the limit, can be processed");
 		}
 		logger.info("Max request size limiting has been applied");
