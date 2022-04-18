@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.session.RegisterSessionAu
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.client.RestTemplate;
 
-import com.searchservice.app.domain.service.JwtTokenFilterService;
+import com.searchservice.app.domain.filter.JwtTokenFilterService;
 
 @KeycloakConfiguration
 public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
