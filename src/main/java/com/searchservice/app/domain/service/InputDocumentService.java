@@ -41,7 +41,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	}
 
-	private void extracted(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
+	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
 
 		if (response.isDocumentUploaded()) {
 			responseDTO.setMessage("Successfully Added!");
@@ -52,7 +52,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 	}
 
-	private UploadDocumentUtil extracted(String tableName, String payload) {
+	private UploadDocumentUtil documentUploadResponse(String tableName, String payload) {
 		uploadDocumentUtil.setBaseSearchUrl(searchURL);
 		uploadDocumentUtil.setTableName(tableName);
 		uploadDocumentUtil.setContent(payload);
@@ -60,7 +60,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	}
 
 	@Override
-	public ThrottlerResponse addDocuments(String tableName, String payload) {
+	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
@@ -69,35 +69,23 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
 		// STRUCTURALLY CORRECT
-		  extracted(tableName, payload);
-
+		  documentUploadResponse(tableName, payload);
+        if(isNRT)
+        {
 		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.commit();
-
-		extracted(responseDTO, response);
+		documentUploadResponse(responseDTO, response);
+		}
+		else
+		{
+		  UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
+		  documentUploadResponse(responseDTO, response);
+		}
+		
 
 		return responseDTO;
 
 	}
 
-	@Override
-	public ThrottlerResponse addDocument(String tableName, String payload) {
-
-		if (!manageTableServicePort.isTableExists(tableName))
-			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
-
-		ThrottlerResponse responseDTO = new ThrottlerResponse();
-
-		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
-		// STRUCTURALLY CORRECT
-
-		extracted(tableName, payload);
-
-		UploadDocumentUtil.UploadDocumentSearchUtilRespnse response = uploadDocumentUtil.softcommit();
-
-		extracted(responseDTO, response);
-
-		return responseDTO;
-	}
 
 	public boolean isValidJsonArray(String jsonString) {
 		boolean valid = true;

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.ConfigSet;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
@@ -17,7 +17,7 @@ public interface ManageTableServicePort {
 	 */
 	// GET request
 
-	GetCapacityPlan capacityPlans();
+	CapacityPlanResponse capacityPlans();
 
 	Response getTables(int tenantId);
 

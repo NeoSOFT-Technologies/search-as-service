@@ -1,6 +1,8 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.ResponseMessages;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
@@ -41,8 +44,6 @@ public class ManageTableResource {
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
 	private static final String TABLE = "Table ";
-	private static final String TENANT_ID =" For Tenant ID: ";
-	private static final String MSG_SEPERATOR =" is ";
 
          @Autowired
 	private ManageTableServicePort manageTableServicePort;
@@ -56,7 +57,7 @@ public class ManageTableResource {
 	
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<GetCapacityPlan> capacityPlans() {
+	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
 		log.debug("Get capacity plans");
 
 		return ResponseEntity.status(HttpStatus.OK).body(manageTableServicePort.capacityPlans());
@@ -86,9 +87,9 @@ public class ManageTableResource {
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchemav2> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
-		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_" + tenantId)) {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName + TENANT_ID +tenantId + MSG_SEPERATOR+ HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+					TABLE + tableName + " is Under Deletion Process");
 
 		} else {
 
@@ -117,22 +118,22 @@ public class ManageTableResource {
 			log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
 
 			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					"Creating Table Failed ,"+HttpStatusCode.INVALID_TABLE_NAME.getMessage()+" " + manageTableDTO.getTableName() + " is Provided");
+					"Creating Table Failed , as Invalid Table Name " + manageTableDTO.getTableName() + " is Provided");
 		} else {
 			if (tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
-				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-						"Table With Same Name " + manageTableDTO.getTableName() + MSG_SEPERATOR+HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+				throw new BadRequestOccurredException(400,
+						"Table With Same Name " + manageTableDTO.getTableName() + " is Marked For Deletion");
 			} else {
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
  
 				if (apiResponseDTO.getStatusCode() == 200) {
 					apiResponseDTO.setMessage(
-							TABLE + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
+							"Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
-					log.info(TABLE +"could not be created: {}", apiResponseDTO);
-					throw new BadRequestOccurredException(400, "REST operation could not be performed");
+					log.info("Table could not be created: {}", apiResponseDTO);
+					throw new BadRequestOccurredException(101, "REST operation could not be performed");
 				}
 			}
 		}
@@ -156,19 +157,19 @@ public class ManageTableResource {
 					throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
 				}
 			} else {
-				throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-						TABLE + tableName.split("_")[0] + TENANT_ID + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+				throw new BadRequestOccurredException(400,
+						TABLE + tableName.split("_")[0] + " For Client ID " + tenantId + " Does Not Exist");
 			}
 		} else {
-			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName.split("_")[0] + TENANT_ID + tenantId + MSG_SEPERATOR+HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+			throw new BadRequestOccurredException(400,
+					TABLE + tableName.split("_")[0] + " For Client ID " + tenantId + " is Already Under Deletion");
 		}
 	}
 
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> undoTable(@RequestParam int tenantId, @PathVariable String tableName) {
+	public ResponseEntity<Response> restoreTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
 
 		tableName = tableName + "_" + tenantId;
@@ -181,10 +182,10 @@ public class ManageTableResource {
 		} else {
 
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
-			throw new BadRequestOccurredException(400,"Something Went Wrong While Performing Restore for "+TABLE+ tableNameForMessage);
+			throw new BadRequestOccurredException(400, tableNameForMessage + " is not available for restoring");
 		}}else {
         	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
-        			TABLE + tableNameForMessage+ TENANT_ID +tenantId +MSG_SEPERATOR + HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage());
+        			TABLE+tableNameForMessage+" is Not Under Deletion");
         }
 	}
 
@@ -195,8 +196,8 @@ public class ManageTableResource {
 
 		tableName = tableName + "_" + tenantId;
 		if(!manageTableServicePort.isTableExists(tableName)) {
-        	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),TABLE + tableName.split("_")[0]+ 
-        			TENANT_ID +tableName.split("_")[1]+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+        	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),TABLE+tableName.split("_")[0]+ 
+        			" having TenantID: "+tableName.split("_")[1]+" Not Found");
         }else {
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
 			newTableSchemaDTO.setTableName(tableName);
@@ -214,7 +215,7 @@ public class ManageTableResource {
 			}
 		} else {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName.split("_")[0] + TENANT_ID +tenantId +MSG_SEPERATOR+ HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+					TABLE + tableName + " is Under Deletion Process");
 		}
         }
 	}

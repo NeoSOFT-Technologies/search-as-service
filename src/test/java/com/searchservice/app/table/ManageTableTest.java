@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.GetCapacityPlan;
+import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -101,7 +101,7 @@ class ManageTableTest {
 		getTablesResponseDTO.setMessage("Testing");
 		getTablesResponseDTO.setData(mockGetTableList);
 
-		GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
+		CapacityPlanResponse capacityPlanResponseDTO = new CapacityPlanResponse();
 
 		Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
@@ -141,7 +141,7 @@ class ManageTableTest {
 		getTablesResponseDTO.setStatusCode(400);
 		getTablesResponseDTO.setMessage("Testing");
 
-		GetCapacityPlan capacityPlanResponseDTO = new GetCapacityPlan();
+		CapacityPlanResponse capacityPlanResponseDTO = new CapacityPlanResponse();
 
 		Mockito.when(manageTableService.createTableIfNotPresent(Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
