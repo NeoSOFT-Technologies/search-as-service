@@ -21,9 +21,7 @@ import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
 import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -47,7 +45,6 @@ import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
 import com.searchservice.app.domain.utils.SearchUtil;
-import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -510,16 +507,6 @@ class ManageTableServiceTest {
 	}
 
 	@Test
-	void getFieldTypeAttributesForPartialSearch() {
-		try {
-			TableSchemaParserUtil.getFieldTypeAttributesForPartialSearch();
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
-	}
-
-	@Test
 	void checkTableDeletionStatus() {
 		try {
 			manageTableService.checkTableDeletionStatus(tenantId);
@@ -623,7 +610,7 @@ class ManageTableServiceTest {
 		setTableSchemaDTO();
 		setMockitoBadResponseForService();
 		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(400, rs.getStatusCode());
+		assertEquals(404, rs.getStatusCode());
 	}
 
 	@Test

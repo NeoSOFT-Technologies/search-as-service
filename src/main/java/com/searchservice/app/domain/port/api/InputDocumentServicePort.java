@@ -4,7 +4,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 
 public interface InputDocumentServicePort {
 
-	ThrottlerResponse addDocuments(String collectionName, String payload);
-	ThrottlerResponse addDocument(String collectionName, String payload);
+	ThrottlerResponse addDocuments(boolean isNRT,String collectionName, String payload);
+
 
 }
