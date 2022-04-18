@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 
@@ -74,7 +75,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 			} catch (Exception e) {
 				logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName, e);
-				deleteRecordInsertionResponse.setStatusCode(400);
+				deleteRecordInsertionResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 
 				deleteRecordInsertionResponse
 						.setMessage("Error While Initializing Deletion For Table: " + actualTableName);
@@ -144,7 +145,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		} else {
 			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
 
-			performUndoDeleteResponse.setStatusCode(400);
+			performUndoDeleteResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			performUndoDeleteResponse.setMessage(TABLE_DELETE_UNDO_ERROR_MSG);
 		}
 
@@ -197,7 +198,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 				undoTableDeletionResponse = getUndoDeleteResponse(undoRecord, actualTableName);
 			}
 		} catch (Exception e) {
-			undoTableDeletionResponse.setStatusCode(400);
+			undoTableDeletionResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			undoTableDeletionResponse.setMessage(e.getLocalizedMessage());
 		}
 		return undoTableDeletionResponse;

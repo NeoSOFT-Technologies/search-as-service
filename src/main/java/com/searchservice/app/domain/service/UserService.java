@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.UserServicePort;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 public class UserService implements UserServicePort {
@@ -44,7 +45,8 @@ public class UserService implements UserServicePort {
 	public Response getToken(String userName, String password) {
 		
 		if (userName.isBlank() || userName.isEmpty() || password.isBlank() || password.isEmpty()) {
-			return createResponse(ERROR, "username and password must bot be blank.", 400);
+			return createResponse(ERROR, "username and password must bot be blank.", 
+					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		String url = keycloakServerUrl + "/realms/" + realmName + "/protocol/openid-connect/token";
 		log.info(" client_Id : {}", clientId);
@@ -71,7 +73,7 @@ public class UserService implements UserServicePort {
 		try {
 			response = restTemplate.postForEntity(url, request, String.class);
 		} catch (Exception e) {
-			return createResponse(null, "Invalid credentials", 400);
+			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		JSONObject obj = new JSONObject(response.getBody());
 		if (obj.has("access_token")) {
@@ -83,7 +85,7 @@ public class UserService implements UserServicePort {
 			String error = obj.getString(ERROR);
 			return createResponse(error, errorDesc, 400);
 		}
-		return createResponse(null, "Something went wrong! Please try again...", 400);
+		return createResponse(null, "Something went wrong! Please try again...", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 	}
 
 	public Response createResponse(String token, String message, int statusCode) {

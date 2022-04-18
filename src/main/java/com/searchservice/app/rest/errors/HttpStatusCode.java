@@ -18,9 +18,23 @@ public enum HttpStatusCode {
 	
 	TABLE_NOT_FOUND(108, "does not exist"),
 	
-	TABLE_NOT_UNDER_DELETION(109, "not under deletion");
-		
+	TABLE_NOT_UNDER_DELETION(109, "not under deletion"),
 	
+	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
+	
+	NULL_POINTER_EXCEPTION(404,"Received Null response"),
+	
+	SERVER_UNAVAILABLE(503,"Unable to Connect To the Server"),
+	
+	OPERATION_NOT_ALLOWED(405,"Operation is Not Allowed"),
+	
+	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
+	
+	INTERNAL_SERVER_ERROR (500, "Internal Server Error Occured"),
+	
+	PROCESSING_NOT_COMPLETED (202, "Request cannot be Processed"),
+	
+	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable");
 	private int code;
 	private String message;
 	
