@@ -290,10 +290,10 @@ public class SearchJAdapter {
 	}
 	
 	
-	public void createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO, Map<String, Object> fieldTypeAttributes) {
+	public Map<String, Object> createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO) {
+		Map<String, Object> fieldTypeAttributes = TableSchemaParserUtil.partialSearchFieldTypeAttrs;
 		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
 			FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
-			fieldTypeAttributes = TableSchemaParserUtil.partialSearchFieldTypeAttrs;
 			fieldTypeDef.setAttributes(fieldTypeAttributes);
 			
 			try {
@@ -308,6 +308,8 @@ public class SearchJAdapter {
 			}
 		} else
 			fieldTypeAttributes.put("name", PARTIAL_SEARCH);
+		
+		return fieldTypeAttributes;
 	}
 	
 	
@@ -342,10 +344,8 @@ public class SearchJAdapter {
 	public void partialSearchUpdate(TableSchema tableSchemaDTO, SchemaField fieldDto, Map<String, Object> fieldDtoMap) {
 		// if partial search enabled
 		if (fieldDto.isPartialSearch()) {
-			Map<String, Object> fieldTypeAttributes = new HashMap<>();
-
 			// Add <partial-search> field-type if not present already
-			createPartialSearchFieldTypeIfNotPresent(tableSchemaDTO, fieldTypeAttributes);
+			Map<String, Object> fieldTypeAttributes = createPartialSearchFieldTypeIfNotPresent(tableSchemaDTO);
 
 			// Add <partial-search> fieldType to the field
 			fieldDtoMap.put("type", fieldTypeAttributes.get("name"));
