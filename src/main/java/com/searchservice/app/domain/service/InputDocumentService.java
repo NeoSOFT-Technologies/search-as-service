@@ -13,6 +13,7 @@ import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -48,7 +49,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 			responseDTO.setStatusCode(200);
 		} else {
 			responseDTO.setMessage(response.getMessage());
-			responseDTO.setStatusCode(400);
+			responseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 	}
 
@@ -83,7 +84,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocument(String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
-			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), tableName.split("_")[0] + " table doesn't exist");
 
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 

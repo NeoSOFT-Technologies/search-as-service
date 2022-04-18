@@ -2,6 +2,7 @@
 package com.search.app.inputdocument;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -74,16 +75,52 @@ class InputDocumentResourceTest {
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(inputString))
 				.andExpect(status().isOk());
+		
+		TimeUnit.SECONDS.sleep(10);
+		
+		setMockitoBadResponseForService();
+		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(inputString))
+				.andExpect(status().isBadRequest());
+		
+		setMockitoBadResponseForService();
+		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(false);
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(inputString))
+				.andExpect(status().isBadRequest());
+	
 	}
 
 	@Test
 	void testinputdoc() throws Exception {
-	
+		TimeUnit.SECONDS.sleep(10);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(inputString)).andExpect(status().isOk());
+		
+		setMockitoBadResponseForService();
+		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(inputString))
+				.andExpect(status().isBadRequest());
+		
+		TimeUnit.SECONDS.sleep(10);
+		setMockitoBadResponseForService();
+		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(false);
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.content(inputString))
+				.andExpect(status().isBadRequest());
+	
+		
 	}
+	
+
 	
 	
 

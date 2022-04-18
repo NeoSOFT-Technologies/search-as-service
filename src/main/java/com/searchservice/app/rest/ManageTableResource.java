@@ -78,7 +78,8 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 
-			throw new BadRequestOccurredException(400, ResponseMessages.DEFAULT_EXCEPTION_MSG);
+			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
+					ResponseMessages.DEFAULT_EXCEPTION_MSG);
 		}
 	}
 
@@ -96,7 +97,8 @@ public class ManageTableResource {
 			TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 
 			if (tableInfoResponseDTO == null)
-				throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
+				throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
+						HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 
 			if (tableInfoResponseDTO.getStatusCode() == 200) {
 
@@ -104,7 +106,8 @@ public class ManageTableResource {
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
 
-				throw new BadRequestOccurredException(400, "REST operation couldn't be performed");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode()
+						, "REST operation couldn't be performed");
 			}
 		}
 	}
@@ -132,7 +135,8 @@ public class ManageTableResource {
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
 					log.info(TABLE +"could not be created: {}", apiResponseDTO);
-					throw new BadRequestOccurredException(400, "REST operation could not be performed");
+					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+							"REST operation could not be performed");
 				}
 			}
 		}
@@ -153,7 +157,7 @@ public class ManageTableResource {
 				} else {
 					log.debug("Exception occurred: {}", apiResponseDTO);
 
-					throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), BAD_REQUEST_MSG);
 				}
 			} else {
 				throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
@@ -181,7 +185,8 @@ public class ManageTableResource {
 		} else {
 
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
-			throw new BadRequestOccurredException(400,"Something Went Wrong While Performing Restore for "+TABLE+ tableNameForMessage);
+			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					"Something Went Wrong While Performing Restore for "+TABLE+ tableNameForMessage);
 		}}else {
         	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
         			TABLE + tableNameForMessage+ TENANT_ID +tenantId +MSG_SEPERATOR + HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage());
@@ -210,7 +215,7 @@ public class ManageTableResource {
 				return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 			} else {
 
-				throw new BadRequestOccurredException(400, BAD_REQUEST_MSG);
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), BAD_REQUEST_MSG);
 			}
 		} else {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),

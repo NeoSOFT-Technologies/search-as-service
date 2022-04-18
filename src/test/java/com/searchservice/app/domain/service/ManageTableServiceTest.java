@@ -623,7 +623,7 @@ class ManageTableServiceTest {
 		setTableSchemaDTO();
 		setMockitoBadResponseForService();
 		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(400, rs.getStatusCode());
+		assertEquals(404, rs.getStatusCode());
 	}
 
 	@Test
