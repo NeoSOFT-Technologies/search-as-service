@@ -1,4 +1,4 @@
-package com.searchservice.app.config.aspect;
+package com.searchservice.app.config;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

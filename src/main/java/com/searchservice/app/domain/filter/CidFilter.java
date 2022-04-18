@@ -1,4 +1,4 @@
-package com.searchservice.app.config.aspect;
+package com.searchservice.app.domain.filter;
 
 import java.io.IOException;
 import java.util.UUID;
