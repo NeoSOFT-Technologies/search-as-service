@@ -4,6 +4,7 @@
 minikube start --driver=hyperv --memory=4gb --cpus 3 --extra-config=kubelet.housekeeping-interval=10s
 
 3. Run any cluster configuration using ->
+
 minikube addons enable metrics-server
 kubectl apply -f ./1-solr-node-scaled-to-n-nodes-3-zk/ZooKeeper
 kubectl apply -f 1-solr-node-scaled-to-n-nodes-3-zk
