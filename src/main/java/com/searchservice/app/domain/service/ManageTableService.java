@@ -93,6 +93,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String DEFAULT_CONFIGSET = "_default";
 	private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
+	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
 	@Value("${base-search-url}")
@@ -205,7 +206,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -239,7 +240,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (isTableExists(manageTableDTO.getTableName()))
 			throw new TableAlreadyExistsException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), 
-					"Table "+manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
+					TABLE + manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
 							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
 
 		// Configset is present, proceed
@@ -269,7 +270,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// Delete table
 		Response apiResponseDTO = new Response();
