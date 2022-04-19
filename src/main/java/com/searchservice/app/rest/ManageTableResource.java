@@ -107,7 +107,7 @@ public class ManageTableResource {
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
 				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode()
-						, "REST operation couldn't be performed");
+						, "Something Went Wrong While Fetching Schema Details for Table: "+tableName);
 			}
 		}
 	}
