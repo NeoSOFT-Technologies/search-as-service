@@ -106,7 +106,6 @@ public class ManageTableResource {
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
-                 tableInfoResponseDTO.setMessage("Table not found");
 				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode()
 						, "REST operation couldn't be performed");
 			}
