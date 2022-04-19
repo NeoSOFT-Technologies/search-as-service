@@ -564,17 +564,6 @@ class ManageTableServiceTest {
 	}
 
 	@Test
-	void checkDatesDifference() {
-
-		try {
-			manageTableService.checkDatesDifference(searchUrl);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-		//
-	}
-
-	@Test
 	void schemaDelete() {
 		try {
 			manageTableService.checkForSchemaDeletion();

@@ -8,13 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
+import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
@@ -37,7 +33,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Value("${table-delete-duration.days}")
 	long tableDeleteDuration;
-	SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
 	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
@@ -63,7 +59,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			checkIfTableDeleteFileExist(file);
 			try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
 				actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
-				String newRecord = tenantId + "," + tableName + "," + formatter.format(Calendar.getInstance().getTime())
+				String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate()
 						+ "\n";
 				fw.write(newRecord);
 				fw.flush();
@@ -100,7 +96,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			String currentDeleteRecord;
 			while ((currentDeleteRecord = br.readLine()) != null) {
 				if (lineNumber != 0) {
-					long diff = checkDatesDifference(currentDeleteRecord);
+					long diff = DateUtil.checkDatesDifference(currentDeleteRecord);
 					if (diff < tableDeleteDuration) {
 						pw.println(currentDeleteRecord);
 					} else {
@@ -152,18 +148,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		return performUndoDeleteResponse;
 	}
 
-	public long checkDatesDifference(String currentDeleteRecord) {
-		try {
-			String date = currentDeleteRecord.split(",")[2];
-			Date requestDate = formatter.parse(date);
-			Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
-			long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
-			return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			logger.error("Error!", e);
-			return 0;
-		}
-	}
+	
 
 	public Response performUndoTableDeletion(String tableName) {
 		String actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));

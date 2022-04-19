@@ -39,3 +39,9 @@ TenantID,TableName,RequestTime,ColumnName
 101,inputTest,15-4-2022 02:38:47,string
 101,inputTest,15-4-2022 02:38:47,title
 101,inputTest,15-4-2022 02:38:47,vendor_id
+6,DemoTest,19-4-2022 10:18:21,category
+6,DemoTest,19-4-2022 10:18:21,is_available
+6,DemoTest,19-4-2022 10:18:21,price
+6,DemoTest,19-4-2022 10:18:21,product_name
+6,DemoTest,19-4-2022 10:18:21,title
+6,DemoTest,19-4-2022 10:18:21,vendor_id

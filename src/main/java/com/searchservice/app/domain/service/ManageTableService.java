@@ -7,14 +7,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -42,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
+import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -51,6 +47,7 @@ import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.BasicUtil;
+import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
@@ -90,7 +87,6 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String DEFAULT_CONFIGSET = "_default";
-	private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 
@@ -138,7 +134,7 @@ public class ManageTableService implements ManageTableServicePort {
 		schemaDeleteDuration = schemaDeleteDurationNonStatic;
 	}
 
-	SimpleDateFormat formatter = new SimpleDateFormat(SIMPLE_DATE_FORMATTER);
+
 
 	private String servicename = "Manage_Table_Service";
 	private String username = "Username";
@@ -733,7 +729,7 @@ public class ManageTableService implements ManageTableServicePort {
 		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
-			String newRecord = tenantId + "," + tableName + "," + formatter.format(Calendar.getInstance().getTime())
+			String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate()
 					+ "," + columnName;
 			bw.write(newRecord);
 			bw.newLine();
@@ -783,7 +779,7 @@ public class ManageTableService implements ManageTableServicePort {
 			String currentSchemaDeleteRecord;
 			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
 				if (lineNumber != 0) {
-					long diff = checkDatesDifference(currentSchemaDeleteRecord);
+					long diff = DateUtil.checkDatesDifference(currentSchemaDeleteRecord);
 					if (diff < schemaDeleteDuration) {
 						pw.println(currentSchemaDeleteRecord);
 					} else {
@@ -806,18 +802,7 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 	}
 
-	public long checkDatesDifference(String currentSchemaDeleteRecord) {
-		try {
-			String date = currentSchemaDeleteRecord.split(",")[2];
-			Date requestDate = formatter.parse(date);
-			Date currentDate = formatter.parse(formatter.format(Calendar.getInstance().getTime()));
-			long diffInMillies = Math.abs(requestDate.getTime() - currentDate.getTime());
-			return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			logger.error("Error! {}", e.getMessage());
-			return 0;
-		}
-	}
+
 
 	public boolean performSchemaDeletion(String schemaDeleteData) {
 		String columnName = schemaDeleteData.split(",")[3];
