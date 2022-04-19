@@ -51,6 +51,7 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -346,8 +347,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.createTableIfNotPresent(manageTable);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
+		} catch (TableAlreadyExistsException e) {
+			assertEquals(110, e.getExceptioncode());
 		}
 	}
 

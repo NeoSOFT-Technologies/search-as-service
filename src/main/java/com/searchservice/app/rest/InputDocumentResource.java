@@ -89,13 +89,13 @@ public class InputDocumentResource {
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, false);
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+		if (documentInjectionThrottlerResponse.getStatusCode() == HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode())
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 
 		tableName = tableName + "_" + tenantId;
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+		if (documentInjectionThrottlerResponse.getStatusCode() == HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode())
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
@@ -139,7 +139,7 @@ public class InputDocumentResource {
 	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
 		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
 		documentInjectionThrottlerResponse.setStatusCode(HttpStatusCode.TABLE_NOT_FOUND.getCode());
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+" Not Found");
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 }

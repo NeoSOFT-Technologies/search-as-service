@@ -65,6 +65,7 @@ import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
 import com.searchservice.app.rest.errors.SolrSchemaValidationException;
+import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
 import lombok.AllArgsConstructor;
@@ -204,7 +205,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+					"Table " + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -237,8 +238,9 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
 
 		if (isTableExists(manageTableDTO.getTableName()))
-			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
-					manageTableDTO.getTableName() + " table already exists");
+			throw new TableAlreadyExistsException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), 
+					"Table "+manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
+							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
 
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
