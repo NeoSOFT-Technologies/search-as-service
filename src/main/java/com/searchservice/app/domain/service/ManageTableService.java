@@ -204,7 +204,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					"Table " + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+					"Table " + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
