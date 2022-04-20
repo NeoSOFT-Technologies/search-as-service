@@ -73,9 +73,11 @@ class ManageTableServiceTest {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String PARTIAL_SEARCH = "partial_search";
+	
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
 	HttpSolrClient solrClientWithTable = null;
+	
 	private String tableName = "automatedTestCollection";
 	private int tenantId = 101;
 
@@ -97,7 +99,6 @@ class ManageTableServiceTest {
 	@MockBean
 	SchemaRequest schemaRequest;
 
-	
 	
 	ManageTable manageTable = new ManageTable();
 
@@ -197,7 +198,6 @@ class ManageTableServiceTest {
 		finalResponseMap.put(" message", "Data is returned");
 
 		newTableSchemaDTO.setTableName(tableName);
-		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
 		schemaField.setName("test");
@@ -594,7 +594,6 @@ class ManageTableServiceTest {
 	
 	public void setTableSchemaDTO() {
 		newTableSchemaDTO.setTableName(tableName);
-		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
 		schemaField.setName("_nest_path");
@@ -606,6 +605,7 @@ class ManageTableServiceTest {
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
 	}
+	
 	@Test
 	void updateTableSchemaException() {
 		setTableSchemaDTO();

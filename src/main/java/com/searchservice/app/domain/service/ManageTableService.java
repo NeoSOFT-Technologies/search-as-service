@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.KeyStore.Entry;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +64,6 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
-import com.searchservice.app.rest.errors.SolrSchemaValidationException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
@@ -87,12 +85,6 @@ public class ManageTableService implements ManageTableServicePort {
 			+ "Perhaps the target field- {} isn't present.";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
-	private static final String STORED = "stored";
-	private static final String REQUIRED = "required";
-	private static final String VALIDATED = "validated";
-	private static final String DOCVALUES = "docValues";
-	private static final String INDEXED = "indexed";
-	private static final String DEFAULT_CONFIGSET = "_default";
 	private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
@@ -237,12 +229,10 @@ public class ManageTableService implements ManageTableServicePort {
 			} else if (manageTableDTO.getColumns().isEmpty())
 				return apiResponseDTO;
 
-			// Add schemaAttributes
-			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(), DEFAULT_CONFIGSET,
-					manageTableDTO.getColumns());
+			// Add schema fields
+			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(), manageTableDTO.getColumns());
 			Response tableSchemaResponseDTO = addSchemaFields(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
-
 		}
 		return apiResponseDTO;
 	}
