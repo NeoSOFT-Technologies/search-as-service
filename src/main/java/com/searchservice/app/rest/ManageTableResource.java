@@ -43,9 +43,9 @@ public class ManageTableResource {
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
 	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
+	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private static final String TABLE = "Table ";
-	private static final String TENANTID = " For TenantID: ";
-	private static final String MSG_SEPERATOR = " is ";
+	private static final String ERROR_MSG ="Something Went Wrong While";
 
          @Autowired
 	private ManageTableServicePort manageTableServicePort;
@@ -72,7 +72,7 @@ public class ManageTableResource {
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
 
 		if (getListItemsResponseDTO == null)
-			throw new NullPointerOccurredException(404, ResponseMessages.NULL_RESPONSE_MESSAGE);
+			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), ResponseMessages.NULL_RESPONSE_MESSAGE);
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
@@ -92,7 +92,7 @@ public class ManageTableResource {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName + TENANTID+ tenantId+ MSG_SEPERATOR + HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+					String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 
 		} else {
 
@@ -108,8 +108,8 @@ public class ManageTableResource {
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode()
-						, "Something Went Wrong While Fetching Schema Details For Table: "+tableName +TENANTID + tenantId);
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+						String.format(ERROR_MSG+ "Fetching Schema Details For Table: %s Having TenantID; %d",tableName, tenantId));
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public class ManageTableResource {
 		} else {
 			if (tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
 				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-						"Table With Same Name " + manageTableDTO.getTableName() + MSG_SEPERATOR + HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+						String.format("Table With Same Name %s %s%s", manageTableDTO.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.
 			} else {
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
@@ -138,7 +138,7 @@ public class ManageTableResource {
 				} else {
 					log.info(TABLE +"could not be created: {}", apiResponseDTO);
 					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-							"Something Went Wrong While Creating Table "+manageTableDTO.getTableName().split("_")[0]+ TENANTID + tenantId);
+							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",manageTableDTO.getTableName().split("_")[0], tenantId));
 				}
 			}
 		}
@@ -163,11 +163,11 @@ public class ManageTableResource {
 				}
 			} else {
 				throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-						TABLE + tableName.split("_")[0] + TENANTID + tenantId + " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+						String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "", HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
 			}
 		} else {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName.split("_")[0] + TENANTID + tenantId + MSG_SEPERATOR + HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
 
@@ -188,10 +188,10 @@ public class ManageTableResource {
 
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
 			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					"Something Went Wrong While Performing Restore for "+TABLE+ tableNameForMessage);
+					String.format(ERROR_MSG+ "Restoring for %s %s ", TABLE, tableNameForMessage));
 		}}else {
         	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
-        			TABLE+tableNameForMessage+TENANTID + tenantId + MSG_SEPERATOR + HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage() );
+        			String.format(TABLE_RESPONSE_MSG, tableNameForMessage, tenantId, "is ", HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage()));
         }
 	}
 
@@ -203,7 +203,7 @@ public class ManageTableResource {
 		tableName = tableName + "_" + tenantId;
 		if(!manageTableServicePort.isTableExists(tableName)) {
         	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-        			TABLE + tableName.split("_")[0] + TENANTID + tenantId + " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+        			String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "", HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
         }else {
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
 			newTableSchemaDTO.setTableName(tableName);
@@ -221,7 +221,7 @@ public class ManageTableResource {
 			}
 		} else {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					TABLE + tableName.split("_")[0] + TENANTID + tenantId + MSG_SEPERATOR + HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
         }
 	}
