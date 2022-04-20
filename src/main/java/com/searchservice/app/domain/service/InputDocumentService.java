@@ -87,8 +87,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 	}
 
-
-
 	public boolean isValidJsonArray(String jsonString) {
 		boolean valid = true;
 		try {

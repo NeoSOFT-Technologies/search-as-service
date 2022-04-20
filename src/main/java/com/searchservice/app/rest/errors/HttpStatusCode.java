@@ -34,7 +34,10 @@ public enum HttpStatusCode {
 	
 	PROCESSING_NOT_COMPLETED (202, "Request cannot be Processed"),
 	
-	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable");
+	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable"),
+	
+	TABLE_ALREADY_EXISTS(110, "already exists");
+	
 	private int code;
 	private String message;
 	

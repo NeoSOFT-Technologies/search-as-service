@@ -38,6 +38,15 @@ public class RestControllerAdvice {
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(TableAlreadyExistsException.class)
+	public ResponseEntity<Object> handleExistTable(TableAlreadyExistsException exception) {
+
+		return new ResponseEntity<>(new RestApiErrorHandling(
+
+				HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), HttpStatusCode.TABLE_ALREADY_EXISTS,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(TableNotFoundException.class)
 	public ResponseEntity<Object> handleTableNotFound(TableNotFoundException exception) {
 
