@@ -47,7 +47,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
       - name: Build & Push Docker Image to DockerHub
-        #if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "neosoftcoe" --password-stdin
           docker build -t neosoftcoe/search-service-ingress .
