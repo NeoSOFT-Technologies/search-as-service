@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.ResponseMessages;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -42,7 +40,7 @@ public class ManageTableResource {
 
 	private final Logger log = LoggerFactory.getLogger(ManageTableResource.class);
 
-	private static final String BAD_REQUEST_MSG = ResponseMessages.BAD_REQUEST_MSG;
+	private static final String BAD_REQUEST_MSG = HttpStatusCode.BAD_REQUEST_EXCEPTION.getMessage();
 	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private static final String TABLE = "Table ";
 	private static final String ERROR_MSG ="Something Went Wrong While";
@@ -72,7 +70,7 @@ public class ManageTableResource {
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
 
 		if (getListItemsResponseDTO == null)
-			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), ResponseMessages.NULL_RESPONSE_MESSAGE);
+			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
@@ -82,7 +80,7 @@ public class ManageTableResource {
 		} else {
 
 			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
-					ResponseMessages.DEFAULT_EXCEPTION_MSG);
+					"REST call could not be performed");
 		}
 	}
 

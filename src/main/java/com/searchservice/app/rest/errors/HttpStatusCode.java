@@ -20,7 +20,7 @@ public enum HttpStatusCode {
 	
 	TABLE_NOT_UNDER_DELETION(109, "not under deletion"),
 	
-	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
+	BAD_REQUEST_EXCEPTION(400,"Bad Request call made. Unable to perform the request\""),
 	
 	NULL_POINTER_EXCEPTION(404,"Received Null response"),
 	
