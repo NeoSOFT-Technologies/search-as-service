@@ -24,7 +24,6 @@ public class TableSchemaParserUtil {
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
-	private static final String VALIDATED = "validated";
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String PARTIAL_SEARCH = "partial_search";
@@ -85,9 +84,9 @@ public class TableSchemaParserUtil {
 		String fieldName = searchFieldDTO.getName();
 		String fieldType = searchFieldDTO.getType();
 		
-		// If DOCVALUES == TRUE(=> SORTABLE == TRUE), then MULTIVALUED = FALSE
-		if(searchFieldDTO.isSortable())
-			searchFieldDTO.setMultiValue(false);
+		// If MULTIVALUED = TRUE, then DOCVALUES(SORTABLE) has to be FALSE
+		if(searchFieldDTO.isMultiValue())
+			searchFieldDTO.setSortable(false);
 		
 		if(fieldName.length() < 1) {
 			fieldValidated = false;
