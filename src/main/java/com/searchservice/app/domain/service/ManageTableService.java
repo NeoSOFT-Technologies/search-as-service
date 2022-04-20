@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.KeyStore.Entry;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,6 +79,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
+	private static final String NAME = "name";
 	private static final String TABLE_NOT_FOUND_MSG = "Table: %s, does not exist";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
@@ -121,21 +123,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 	// Init configurations
 	private static String searchURL;
-	private static String basicAuthUsername;
-	private static String basicAuthPassword;
 	private static String deleteSchemaAttributesFilePath;
 	private static long schemaDeleteDuration;
 
 	@Autowired
 	public ManageTableService(@Value("${base-search-url}") String solrURLNonStatic,
-			@Value("${basic-auth.username}") String basicAuthUsernameNonStatic,
-			@Value("${basic-auth.password}") String basicAuthPasswordNonStatic,
 			@Value("${table-schema-attributes.delete-file-path}") String deleteSchemaAttributesFilePathNonStatic,
 			@Value("${table-schema-attributes.days}") long schemaDeleteDurationNonStatic) {
 
 		searchURL = solrURLNonStatic;
-		basicAuthUsername = basicAuthUsernameNonStatic;
-		basicAuthPassword = basicAuthPasswordNonStatic;
 		deleteSchemaAttributesFilePath = deleteSchemaAttributesFilePathNonStatic;
 		schemaDeleteDuration = schemaDeleteDurationNonStatic;
 	}
@@ -155,18 +151,6 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SearchJAdapter searchJAdapter;
 	
-	
-	public ManageTableService(
-			String searchUrl, 
-			SearchAPIAdapter searchAPIAdapter, 
-			HttpSolrClient searchClient,
-			SearchJAdapter searchJAdapter) {
-		this.searchURL = searchUrl;
-		this.searchAPIAdapter = searchAPIAdapter;
-		this.searchClient = searchClient;
-		this.searchJAdapter = searchJAdapter;
-
-	}
 
 	@Override
 	public CapacityPlanResponse capacityPlans() {
@@ -233,8 +217,6 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchema;
 	}
 
-
-
 	@Override
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
 
@@ -258,7 +240,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// Add schemaAttributes
 			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(), DEFAULT_CONFIGSET,
 					manageTableDTO.getColumns());
-			Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+			Response tableSchemaResponseDTO = addSchemaFields(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 
 		}
@@ -299,13 +281,13 @@ public class ManageTableService implements ManageTableServicePort {
 		checkForSchemaSoftDeletion(tenantId, tableName, tableSchemaDTO.getColumns());
 
 		// ADD new schema fields to the table
-		Response tableSchemaResponseDTO = addSchemaAttributes(tableSchemaDTO);
+		Response tableSchemaResponseDTO = addSchemaFields(tableSchemaDTO);
 
 		apiResponseDTO.setStatusCode(tableSchemaResponseDTO.getStatusCode());
 		apiResponseDTO.setMessage(tableSchemaResponseDTO.getMessage());
 
 		// UPDATE existing schema attributes
-		apiResponseDTO = updateSchemaAttributes(tableSchemaDTO);
+		apiResponseDTO = updateSchemaFields(tableSchemaDTO);
 
 		return apiResponseDTO;
 	}
@@ -404,7 +386,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 				// Prepare the SolrFieldDTO
 				SchemaField solrFieldDTO = new SchemaField();
-				solrFieldDTO.setName((String) f.get("name"));
+				solrFieldDTO.setName((String) f.get(NAME));
 
 				// Parse Field Type Object(String) to Enum
 
@@ -442,7 +424,6 @@ public class ManageTableService implements ManageTableServicePort {
 			configSetRequest.setBaseConfigSetName(configSetDTO.getBaseConfigSetName());
 			configSetRequest.setConfigSetName(configSetDTO.getConfigSetName());
 			configSetRequest.setMethod(METHOD.POST);
-			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 
 			searchJAdapter.createConfigSetInSolrj(configSetRequest, searchClientActive);
 
@@ -481,7 +462,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
-			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			searchJAdapter.createTableInSolrj(request, searchClientActive);
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
@@ -498,95 +478,48 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response addSchemaAttributes(TableSchema newTableSchemaDTO) {
+	public Response addSchemaFields(TableSchema newTableSchemaDTO) {
+		// Prepare SearchClient instance
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
-
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
 
-		String schemaName = "";
 		String errorCausingField = null;
 		String payloadOperation = "";
 		try {
-			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			SchemaResponse schemaResponse = searchJAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
-
+			SchemaResponse schemaResponse = searchJAdapter.processSchemaRequest(searchClientActive, schemaRequest);
 			SchemaRepresentation retrievedSchema = schemaResponse.getSchemaRepresentation();
-			schemaName = retrievedSchema.getName();
 			List<Map<String, Object>> schemaFields = retrievedSchema.getFields();
+			
+			// Prepare final HashMap, and remove already existing schema fields
+			List<SchemaField> newFields = newTableSchemaDTO.getColumns();
+			Map<String, SchemaField> newFieldsHashMap = BasicUtil.convertSchemaFieldListToHashMap(newFields);
+			newFieldsHashMap = ManageTableUtil.removeExistingFields(newFieldsHashMap, newFields, schemaFields);
 
-			// Add new fields present in the Target Schema to the given collection/table
-			List<SchemaField> newAttributes = newTableSchemaDTO.getColumns();
-			Map<String, SchemaField> newAttributesHashMap = BasicUtil.convertSchemaFieldListToHashMap(newAttributes);
-
-			// ####### Add Schema Fields logic #######
-			UpdateResponse addFieldResponse;
-			NamedList<Object> schemaResponseAddFields = new NamedList<>();
-			payloadOperation = "SchemaRequest.AddField";
-			boolean newFieldFound = false;
-
-			List<String> existingAttributesNames = new ArrayList<>();
-			for (int i = 0; i < newAttributes.size(); i++) {
-
-				SchemaField fieldDto = newAttributes.get(i);
-
-				boolean isPresent = false;
-				for (Map<String, Object> field : schemaFields) {
-
-					if (field.get("name").equals(fieldDto.getName())) {
-						isPresent = true;
-						existingAttributesNames.add(fieldDto.getName());
-						break;
-					}
-				}
-				if (!isPresent)
-					newFieldFound = true;
-			}
-			// If No new schema attribute is found, RETURN
-			if (!newFieldFound) {
-				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-				tableSchemaResponseDTO.setMessage("No new attributes found");
-				return tableSchemaResponseDTO;
-			} else {
-				if (!existingAttributesNames.isEmpty()) {
-					// REMOVE existing attributess from newAttributes list
-					for (String attributeName : existingAttributesNames) {
-						newAttributesHashMap.remove(attributeName);
-					}
-				}
-			}
-
-			if (newAttributesHashMap.isEmpty()) {
+			if (newFieldsHashMap.isEmpty()) {
 				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.OPERATION_NOT_ALLOWED.getCode());
 				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
 			} else {
-				for (Map.Entry<String, SchemaField> fieldDtoEntry : newAttributesHashMap.entrySet()) {
+				for (Map.Entry<String, SchemaField> fieldDtoEntry : newFieldsHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
+					payloadOperation = "SchemaRequest.AddField";
+					errorCausingField = fieldDto.getName();
+					
 					if (!TableSchemaParserUtil.validateSchemaField(fieldDto)) {
-						logger.info("Validation failed for SolrFieldDTO before updating the current schema- {}",
-								schemaName);
+						logger.info("Validation failed for SolrFieldDTO before updating the current schema");
 						tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 						break;
 					}
-					if (fieldDto.isSortable()) {
-						fieldDto.setMultiValue(false); // For SortOnField UseCase MultiValue must be False
-					}
-					errorCausingField = fieldDto.getName();
+					
 					Map<String, Object> newField = new HashMap<>();
-
 					// PARTIAL_SEARCH UPDATE
 					searchJAdapter.partialSearchUpdate(newTableSchemaDTO, fieldDto, newField);
+					newField = TableSchemaParserUtil.prepareNewField(newField, fieldDto);
 
-					newField.put("name", fieldDto.getName());
-					newField.put(REQUIRED, fieldDto.isRequired());
-					newField.put(STORED, fieldDto.isStorable());
-					newField.put(MULTIVALUED, fieldDto.isMultiValue());
-					newField.put(INDEXED, fieldDto.isFilterable());
-
+					// Add new fields present in the Target Schema to the given collection/table
 					SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(newField);
-					addFieldResponse = searchJAdapter.addFieldRequestInSolrj(addFieldRequest, searchClientActive);
-					schemaResponseAddFields.add(fieldDto.getName(), addFieldResponse.getResponse());
+					searchJAdapter.addFieldRequestInSolrj(addFieldRequest, searchClientActive);
 				}
 				tableSchemaResponseDTO.setStatusCode(200);
 				tableSchemaResponseDTO.setMessage("New attributes are added successfully");
@@ -603,55 +536,31 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response updateSchemaAttributes(TableSchema newTableSchemaDTO) {
-		SchemaRequest schemaRequest = new SchemaRequest();
+	public Response updateSchemaFields(TableSchema newTableSchemaDTO) {
+		// Prepare SearchClient instance
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());
-
 		Response apiResponseDTO = new Response();
 
 		try {
-			schemaRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
-			searchJAdapter.addSchemaAttributesInSolrj(searchClientActive, schemaRequest);
-
-			// Get all fields from incoming(from req Body) schemaDTO
-			List<SchemaField> newSchemaFields = newTableSchemaDTO.getColumns();
+			// Get all fields from incoming(from req Body) schemaDTO and validate
 			List<Map<String, Object>> targetSchemafields = searchJAdapter
 					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
 
-			// Validate Table Schema Fields
-			Map<String, Object> validationEntry = targetSchemafields.get(0);
-			if (validationEntry.containsKey(VALIDATED)) {
-				Object validatedFields = validationEntry.get(VALIDATED);
-				if (validatedFields.equals(false))
-					throw new SolrSchemaValidationException("Target Schema Fields validation failed!");
-			}
-
-			int totalUpdatesRequired = newSchemaFields.size();
-
-			// Update Schema Logic
-			UpdateResponse updateFieldsResponse;
-			NamedList<Object> schemaResponseUpdateFields = new NamedList<>();
-
 			int updatedFields = 0;
 			for (Map<String, Object> currField : targetSchemafields) {
-				
-				// Pass the fieldAttribute to be updated
+				// Pass the field to be updated
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
-				updateFieldsResponse = searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
-                
-				schemaResponseUpdateFields.add((String) currField.get("name"), updateFieldsResponse.getResponse());
+				searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
 				updatedFields++;
-				logger.info("Field- {} is successfully updated", currField.get("name"));
+				logger.info("Field- {} is successfully updated", currField.get(NAME));
 			}
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
 			// Compare required Vs Updated Fields
-
-			logger.debug("Total field updates required in the current schema: {}", totalUpdatesRequired);
+			logger.debug("Total field updates required in the current schema: {}", newTableSchemaDTO.getColumns().size());
 			logger.debug("Total fields updated in the current schema: {}", updatedFields);
 
-			
 		} catch (NullPointerException e) {
 			apiResponseDTO.setStatusCode(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode());
 			apiResponseDTO.setMessage("Schema could not be updated successfully");
@@ -663,10 +572,6 @@ public class ManageTableService implements ManageTableServicePort {
 					SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName(), 
 					e.getMessage());
-		} catch (SolrSchemaValidationException e) {
-			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			apiResponseDTO.setMessage("Schema could not be updated");
-			logger.error("Error Message: {}", e.getMessage());
 		}
 		return apiResponseDTO;
 	}
@@ -678,7 +583,6 @@ public class ManageTableService implements ManageTableServicePort {
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
 		HttpSolrClient searchClientActive = searchAPIAdapter.getSearchClient(searchURL);
 		try {
-			request.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			searchJAdapter.addAliasTableInSolrj(searchClientActive, request);
 			apiResponseDTO.setStatusCode(200);
 		} catch (Exception e) {
@@ -702,7 +606,6 @@ public class ManageTableService implements ManageTableServicePort {
 		ConfigSetAdminRequest.Delete configSetRequest = new ConfigSetAdminRequest.Delete();
 		try {
 			configSetRequest.setMethod(METHOD.DELETE);
-			configSetRequest.setBasicAuthCredentials(basicAuthUsername, basicAuthPassword);
 			configSetRequest.setConfigSetName(configSetName);
 			searchJAdapter.deleteConfigSetFromSolrj(searchClientActive, configSetRequest);
 			apiResponseDTO = new Response(200, "ConfigSet got deleted successfully");

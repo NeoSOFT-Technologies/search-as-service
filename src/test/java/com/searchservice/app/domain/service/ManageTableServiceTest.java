@@ -139,7 +139,7 @@ class ManageTableServiceTest {
 		schemaResponse.setResponse(test2());
 		setTableSchemaDTO();
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
-		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.processSchemaRequest(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
 
 	}
@@ -238,7 +238,7 @@ class ManageTableServiceTest {
 		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
 		Mockito.when(searchJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
-		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.processSchemaRequest(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
@@ -522,7 +522,7 @@ class ManageTableServiceTest {
 	void updateSchemaAttributes() {
 		setMockitoSuccessResponseForService();
 		try {
-			manageTableService.updateSchemaAttributes(newTableSchemaDTO);
+			manageTableService.updateSchemaFields(newTableSchemaDTO);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
@@ -559,7 +559,7 @@ class ManageTableServiceTest {
 
 		setMockitoSuccessResponseForService();
 
-		Response rs = manageTableService.addSchemaAttributes(newTableSchemaDTO);
+		Response rs = manageTableService.addSchemaFields(newTableSchemaDTO);
 		assertEquals(200, rs.getStatusCode());
 
 	}

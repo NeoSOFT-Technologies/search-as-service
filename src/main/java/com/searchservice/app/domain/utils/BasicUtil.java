@@ -10,15 +10,11 @@ public class BasicUtil {
 	private BasicUtil() {}
 	
     public static Map<String, SchemaField> convertSchemaFieldListToHashMap(
-    		List<SchemaField> list)
-    {
+    		List<SchemaField> list) {
         Map<String, SchemaField> hashMap = new HashMap<>();
-  
         for (SchemaField dto : list) {
-  
             hashMap.put(dto.getName(), dto);
         }
-  
         return hashMap;
     }
 }

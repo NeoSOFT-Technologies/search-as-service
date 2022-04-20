@@ -21,6 +21,7 @@ import lombok.Data;
 @Data
 public class TableSchemaParserUtil {
 
+	private static final String NAME = "name";
 	private static final String MULTIVALUED = "multiValued";
 	private static final String STORED = "stored";
 	private static final String REQUIRED = "required";
@@ -165,6 +166,16 @@ public class TableSchemaParserUtil {
 			searchFieldDTO.setPartialSearch(true);
 		}
 
+	}
+
+
+	public static Map<String, Object> prepareNewField(Map<String, Object> newField, SchemaField fieldDto) {
+		newField.put(NAME, fieldDto.getName());
+		newField.put(REQUIRED, fieldDto.isRequired());
+		newField.put(STORED, fieldDto.isStorable());
+		newField.put(MULTIVALUED, fieldDto.isMultiValue());
+		newField.put(INDEXED, fieldDto.isFilterable());
+		return newField;
 	}
 	
 	
