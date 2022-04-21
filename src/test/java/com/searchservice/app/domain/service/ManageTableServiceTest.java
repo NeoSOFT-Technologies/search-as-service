@@ -605,14 +605,7 @@ class ManageTableServiceTest {
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
 	}
-	
-	@Test
-	void updateTableSchemaException() {
-		setTableSchemaDTO();
-		setMockitoBadResponseForService();
-		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(404, rs.getStatusCode());
-	}
+
 
 	@Test
 	void checkTableDeletionStatusTest() {

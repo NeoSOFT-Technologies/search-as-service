@@ -278,7 +278,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		// UPDATE existing schema attributes
 		apiResponseDTO = updateSchemaFields(tableSchemaDTO);
-
+		
 		return apiResponseDTO;
 	}
 
@@ -488,8 +488,9 @@ public class ManageTableService implements ManageTableServicePort {
 			newFieldsHashMap = ManageTableUtil.removeExistingFields(newFieldsHashMap, newFields, schemaFields);
 
 			if (newFieldsHashMap.isEmpty()) {
-				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.OPERATION_NOT_ALLOWED.getCode());
+				tableSchemaResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 				tableSchemaResponseDTO.setMessage("No new fields found; add attributes operation NOT ALLOWED");
+				return tableSchemaResponseDTO;
 			} else {
 				for (Map.Entry<String, SchemaField> fieldDtoEntry : newFieldsHashMap.entrySet()) {
 					SchemaField fieldDto = fieldDtoEntry.getValue();
@@ -702,7 +703,7 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 	}
 
-	public long checkDatesDifference(String currentSchemaDeleteRecord) {
+	public long checkDatesDifference(String currentSchemaDeleteRecord) {	
 		try {
 			String date = currentSchemaDeleteRecord.split(",")[2];
 			Date requestDate = formatter.parse(date);
