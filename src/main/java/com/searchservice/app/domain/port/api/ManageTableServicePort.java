@@ -2,8 +2,9 @@ package com.searchservice.app.domain.port.api;
 
 import org.springframework.stereotype.Component;
 
+import org.springframework.stereotype.Component;
+
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -35,17 +36,12 @@ public interface ManageTableServicePort {
 	/*
 	 * Auxiliary TableServices
 	 */
-	boolean isConfigSetExists(String configSetName);
-
-	Response getConfigSets();
 
 	boolean isTableExists(String tableName);
 
 	TableSchemav2 getTableSchemaIfPresent(String tableName);
 
 	TableSchemav2 getTableSchema(String tableName);
-
-	Response createConfigSet(ConfigSet configSetDTO);
 
 	Response createTable(ManageTable manageTableDTO);
 
@@ -54,8 +50,6 @@ public interface ManageTableServicePort {
 	Response updateSchemaAttributes(TableSchema tableSchemaDTO);
 
 	Response addAliasTable(String tableOriginalName, String tableAlias);
-
-	Response deleteConfigSet(String configSetName);
 
 	// UPDATE Table additional methods
 	TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,

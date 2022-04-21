@@ -50,7 +50,6 @@ import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
-import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -212,7 +211,7 @@ class ManageTableServiceTest {
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
 		manageTable.setTableName("Demo");
-		manageTable.setTableNewName("Demo1");
+	
 		configSetDTO.setBaseConfigSetName("solrUrl");
 		configSetDTO.setConfigSetName("solrUrl");
 		tableSchemav2Data.setColumns(list);
@@ -275,11 +274,6 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.getConfigSetFromSolrj(Mockito.any())).thenReturn(configSetResponse);
 	}
 
-	@Test
-	void configSetError() {
-		configErrorResponse();
-		assertEquals(400, manageTableService.getConfigSets().getStatusCode());
-	}
 
 	@Test
 	void getTablesInvalidData() {
@@ -398,20 +392,6 @@ class ManageTableServiceTest {
 		}
 	}
 
-	@Test
-	void isConfigSetExists() {
-		boolean configSetExist = manageTableService.isConfigSetExists("_default");
-		assertTrue(configSetExist);
-	}
-
-	@Test
-	void isConfigSetDontExists() {
-		try {
-			manageTableService.isConfigSetExists(null);
-		} catch (NullPointerOccurredException e) {
-			assertEquals(404, e.getExceptionCode());
-		}
-	}
 
 	@Test
 	void addAliasTable() {
@@ -421,15 +401,7 @@ class ManageTableServiceTest {
 		assertEquals(200, rs.getStatusCode());
 	}
 
-	@Test
-	void deleteConfigSet() {
 
-		try {
-			manageTableService.deleteConfigSet(searchUrl);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-	}
 
 	@Test
 	void initializeSchemaDeletion() {
@@ -483,17 +455,7 @@ class ManageTableServiceTest {
 
 	}
 
-	@Test
-	void createConfigSet() {
-		setMockitoSuccessResponseForService();
 
-		try {
-			manageTableService.createConfigSet(configSetDTO);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
-	}
 
 	@Test
 	void isPartialSearchFieldTypePresent() {
