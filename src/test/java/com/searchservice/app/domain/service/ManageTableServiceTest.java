@@ -38,7 +38,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -108,7 +107,7 @@ class ManageTableServiceTest {
 	CollectionAdminResponse collectionAdminResponse = new CollectionAdminResponse();
 	List<SchemaField> list = new ArrayList<SchemaField>();
 	SchemaField schemaField = new SchemaField();
-	ConfigSet configSetDTO = new ConfigSet();
+
 	UpdateResponse updatedResponse = new UpdateResponse();
 	Response responseDTO = new Response();
 
@@ -211,9 +210,6 @@ class ManageTableServiceTest {
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
 		manageTable.setTableName("Demo");
-	
-		configSetDTO.setBaseConfigSetName("solrUrl");
-		configSetDTO.setConfigSetName("solrUrl");
 		tableSchemav2Data.setColumns(list);
 		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();

@@ -2,8 +2,6 @@ package com.searchservice.app.domain.port.api;
 
 import org.springframework.stereotype.Component;
 
-import org.springframework.stereotype.Component;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
