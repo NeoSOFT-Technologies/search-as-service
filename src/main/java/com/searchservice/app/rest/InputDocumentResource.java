@@ -69,23 +69,10 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		tableName = tableName + "_" + tenantId;
-		
-		// testing
-		System.out.println("manageTableServicePort.isTableExists(tableName) >>> "+manageTableServicePort.isTableExists(tableName));
-		
 		if (manageTableServicePort.isTableExists(tableName)) {
 			return inputDocumentServicePort.performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
 		} else {
-			
-			// testing
-			System.out.println("inputDocumentServicePort >>> "+inputDocumentServicePort);
-			System.out.println("tenantId >>> "+tenantId);
-			System.out.println("tableName >>> "+tableName);
-			
 			ResponseEntity<ThrottlerResponse> responseEntity = inputDocumentServicePort.documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
-			
-			System.out.println("responseEntity >>> "+responseEntity);
-			
 			return responseEntity;
 		}
 	}
