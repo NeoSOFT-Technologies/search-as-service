@@ -78,7 +78,7 @@ public class ManageTableResource {
 		} else {
 
 			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					"REST call could not be performed");
+					String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
 		}
 	}
 
