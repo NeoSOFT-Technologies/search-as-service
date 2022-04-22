@@ -72,8 +72,7 @@ public class InputDocumentResource {
 		if (manageTableServicePort.isTableExists(tableName)) {
 			return inputDocumentServicePort.performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
 		} else {
-			ResponseEntity<ThrottlerResponse> responseEntity = inputDocumentServicePort.documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
-			return responseEntity;
+			return inputDocumentServicePort.documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
 		}
 	}
 
