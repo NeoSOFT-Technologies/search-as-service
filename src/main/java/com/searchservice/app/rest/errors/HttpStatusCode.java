@@ -36,7 +36,9 @@ public enum HttpStatusCode {
 	
 	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable"),
 	
-	TABLE_ALREADY_EXISTS(110, "already exists");
+	TABLE_ALREADY_EXISTS(110, "already exists"),
+	
+	INVALID_COLUMN_NAME(111, "invalid column name provided");
 	
 	private int code;
 	private String message;

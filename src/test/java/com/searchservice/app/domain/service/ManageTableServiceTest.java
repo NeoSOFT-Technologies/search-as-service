@@ -49,6 +49,7 @@ import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidColumnNameException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
@@ -92,7 +93,7 @@ class ManageTableServiceTest {
 
 	@MockBean
 	SearchJAdapter searchJAdapter;
-
+	
 	@InjectMocks
 	ManageTableService manageTableService;
 
@@ -198,22 +199,6 @@ class ManageTableServiceTest {
 		finalResponseMap.put(" message", "Data is returned");
 
 		newTableSchemaDTO.setTableName(tableName);
-		schemaField.setFilterable(true);
-		schemaField.setMultiValue(true);
-		schemaField.setName("test");
-		schemaField.setPartialSearch(true);
-		schemaField.setRequired(true);
-		schemaField.setSortable(true);
-		schemaField.setStorable(true);
-		schemaField.setType("string");
-		list.add(schemaField);
-		newTableSchemaDTO.setColumns(list);
-
-		manageTable.setColumns(list);
-		manageTable.setSchemaName("timestamp");
-		manageTable.setSku("B");
-		manageTable.setTableName("Demo");
-		manageTable.setTableNewName("Demo1");
 		configSetDTO.setBaseConfigSetName("solrUrl");
 		configSetDTO.setConfigSetName("solrUrl");
 		tableSchemav2Data.setColumns(list);
@@ -245,6 +230,28 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
 		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
 
+	}
+	
+	public void setUpManageTable(int validColumn) {
+		schemaField.setFilterable(true);
+		schemaField.setMultiValue(true);
+		if(validColumn == 1) {
+		  schemaField.setName("test");
+		}else {
+			  schemaField.setName("test_123");
+		}
+		schemaField.setPartialSearch(true);
+		schemaField.setRequired(true);
+		schemaField.setSortable(true);
+		schemaField.setStorable(true);
+		schemaField.setType("string");
+		list.add(schemaField);
+		newTableSchemaDTO.setColumns(list);
+		manageTable.setColumns(list);
+		manageTable.setSchemaName("timestamp");
+		manageTable.setSku("B");
+		manageTable.setTableName("Demo");
+		manageTable.setTableNewName("Demo1");
 	}
 
 	public void setUpTestClass() {
@@ -541,6 +548,7 @@ class ManageTableServiceTest {
 	void createTable() {
 
 		setMockitoSuccessResponseForService();
+		setUpManageTable(1);
 		Response rs = manageTableService.createTable(manageTable);
 		assertEquals(200, rs.getStatusCode());
 	}
@@ -549,9 +557,22 @@ class ManageTableServiceTest {
 	void createTableIfNotPresent() {
 
 		setMockitoSuccessResponseForService();
-
+		setUpManageTable(1);
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
+	}
+	
+	@Test
+	void createTableIfNotPresentInvalidColumnName() {
+
+		setMockitoSuccessResponseForService();
+		setUpManageTable(0);
+		try {
+		Response se = manageTableService.createTableIfNotPresent(manageTable);
+		assertEquals(200, se.getStatusCode());
+		}catch(InvalidColumnNameException e) {
+			assertEquals(111, e.getExceptionCode());
+		}
 	}
 
 	@Test

@@ -38,6 +38,15 @@ public class RestControllerAdvice {
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(InvalidColumnNameException.class)
+	public ResponseEntity<Object> handleInvalidColumnName(InvalidColumnNameException exception) {
+
+		return new ResponseEntity<>(new RestApiErrorHandling(
+
+				HttpStatusCode.INVALID_COLUMN_NAME.getCode(), HttpStatusCode.INVALID_COLUMN_NAME,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(TableAlreadyExistsException.class)
 	public ResponseEntity<Object> handleExistTable(TableAlreadyExistsException exception) {
 

@@ -124,6 +124,7 @@ class ManageTableTest {
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
+        //Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(true);
 	}
 
 	public void setMockitoBadResponseForService() {
@@ -162,6 +163,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		
 
 	}

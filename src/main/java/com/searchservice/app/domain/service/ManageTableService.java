@@ -60,6 +60,7 @@ import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidColumnNameException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
@@ -216,7 +217,11 @@ public class ManageTableService implements ManageTableServicePort {
 			throw new TableAlreadyExistsException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), 
 					TABLE + manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
 							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
-
+        
+		if(!isColumnNameValid(manageTableDTO.getColumns())) {
+			   throw new InvalidColumnNameException(HttpStatusCode.INVALID_COLUMN_NAME.getCode(),
+					HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
+		}
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
 
@@ -428,7 +433,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response createTable(ManageTable manageTableDTO) {
-
 		Response apiResponseDTO = new Response();
 
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
@@ -786,6 +790,25 @@ public class ManageTableService implements ManageTableServicePort {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isColumnNameValid(List<SchemaField> columns) {
+		if(columns == null) {
+			return true;
+		}else {
+		Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+		boolean columnNameIsValid = true;
+		for(SchemaField column: columns) {	
+			Matcher matcher = pattern.matcher(column.getName());
+			if(matcher.find()) {
+				columnNameIsValid = false;
+				break;
+			}
+			
+		}
+		return columnNameIsValid;
+	}
 	}
 
 }
