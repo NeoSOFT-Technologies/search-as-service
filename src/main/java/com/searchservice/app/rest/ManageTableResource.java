@@ -43,7 +43,7 @@ public class ManageTableResource {
 	private static final String TABLE = "Table ";
 	private static final String ERROR_MSG ="Something Went Wrong While";
 
-         @Autowired
+    @Autowired
 	private ManageTableServicePort manageTableServicePort;
     @Autowired
     private TableDeleteServicePort tableDeleteServicePort;
@@ -52,7 +52,8 @@ public class ManageTableResource {
         this.manageTableServicePort = manageTableServicePort;
         this.tableDeleteServicePort = tableDeleteServicePort;
     }
-	
+
+    
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
@@ -143,6 +144,7 @@ public class ManageTableResource {
 		}
 
 	}
+		
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
@@ -169,7 +171,6 @@ public class ManageTableResource {
 					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
-
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
@@ -225,5 +226,4 @@ public class ManageTableResource {
         }
 	}
 
-	
 }

@@ -20,22 +20,18 @@ public class TableSchema {
 
 	@JsonIgnore
 	private String tableName;
-	@JsonIgnore
-	private String schemaName;
 	private List<SchemaField> columns;
 	@JsonIgnore
 	private Map<Object, Object> tableDetails;
 
 	public TableSchema(TableSchema schemaDTO) {
 		this.tableName = schemaDTO.getTableName();
-		this.schemaName = schemaDTO.getSchemaName();
 		this.columns = schemaDTO.getColumns();
 
 	}
 
-	public TableSchema(String tableName, String schemaName, List<SchemaField> attributes) {
+	public TableSchema(String tableName, List<SchemaField> attributes) {
 		this.tableName = tableName;
-		this.schemaName = schemaName;
 		this.columns = attributes;
 	}
 

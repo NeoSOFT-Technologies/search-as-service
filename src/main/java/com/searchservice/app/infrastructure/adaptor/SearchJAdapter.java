@@ -169,7 +169,7 @@ public class SearchJAdapter {
 
 	}
 
-	public SchemaResponse addSchemaAttributesInSolrj(HttpSolrClient searchClientActive, SchemaRequest schemaRequest) {
+	public SchemaResponse processSchemaRequest(HttpSolrClient searchClientActive, SchemaRequest schemaRequest) {
 
 		SchemaResponse schemaResponse = null;
 		try {

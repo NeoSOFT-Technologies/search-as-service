@@ -3,6 +3,8 @@ package com.searchservice.app.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,23 +29,21 @@ public class InputDocumentService implements InputDocumentServicePort {
      @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
 	
+ 	@Autowired
+ 	public  ManageTableServicePort manageTableServicePort;
+     
 	@Autowired
 	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
-
 		searchURL = solrURLNonStatic;
 	}
-
-	@Autowired
-   public  ManageTableServicePort manageTableServicePort;
-
 
 	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 
 	}
 
-	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {
-
+	
+	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {		
 		if (response.isDocumentUploaded()) {
 			responseDTO.setMessage("Successfully Added!");
 			responseDTO.setStatusCode(200);
@@ -102,6 +102,31 @@ public class InputDocumentService implements InputDocumentServicePort {
 		}
 		return valid;
 
+	}
+
+	@Override
+	public ResponseEntity<ThrottlerResponse> performDocumentInjection(boolean isNrt, String tableName, String payload,
+			ThrottlerResponse documentInjectionThrottlerResponse) {
+		ThrottlerResponse documentInjectionResponse = addDocuments(isNrt, tableName, payload);
+
+		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
+		documentInjectionThrottlerResponse.setStatusCode(documentInjectionResponse.getStatusCode());
+		if (documentInjectionThrottlerResponse.getStatusCode() == 200) {
+
+			return ResponseEntity.status(HttpStatus.OK).body(documentInjectionThrottlerResponse);
+		} else {
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
+		}
+	}
+
+	
+	@Override
+	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
+		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
+		documentInjectionThrottlerResponse.setStatusCode(HttpStatusCode.TABLE_NOT_FOUND.getCode());
+    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
 }

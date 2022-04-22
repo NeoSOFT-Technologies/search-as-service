@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -62,10 +64,16 @@ class InputDocumentResourceTest {
 		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.anyBoolean(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
+		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
+		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
+		
+		ResponseEntity<ThrottlerResponse> responseEntity = new ResponseEntity<ThrottlerResponse>(
+				HttpStatus.BAD_REQUEST);
+		Mockito.when(inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName)).thenReturn(responseEntity);
 	}
 
 	@Test
-	void testinputdocs() throws Exception {
+	void testInputDocumentNRTAPI() throws Exception {
 		
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
@@ -77,7 +85,7 @@ class InputDocumentResourceTest {
 		
 		setMockitoBadResponseForService();
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
-		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
+		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt" + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(inputString))
 				.andExpect(status().isBadRequest());
@@ -88,11 +96,10 @@ class InputDocumentResourceTest {
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(inputString))
 				.andExpect(status().isBadRequest());
-	
 	}
 
 	@Test
-	void testinputdoc() throws Exception {
+	void testInputDocumentBatchAPI() throws Exception {
 		TimeUnit.SECONDS.sleep(10);
 		setMockitoSucccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )

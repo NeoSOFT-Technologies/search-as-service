@@ -52,9 +52,9 @@ public interface ManageTableServicePort {
 
 	Response createTable(ManageTable manageTableDTO);
 
-	Response addSchemaAttributes(TableSchema tableSchemaDTO);
+	Response addSchemaFields(TableSchema tableSchemaDTO);
 
-	Response updateSchemaAttributes(TableSchema tableSchemaDTO);
+	Response updateSchemaFields(TableSchema tableSchemaDTO);
 
 	Response addAliasTable(String tableOriginalName, String tableAlias);
 
