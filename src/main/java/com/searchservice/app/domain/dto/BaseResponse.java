@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BaseResponse {
 	
-	public int statusCode;
-	public String message;
+	protected int statusCode;
+	protected String message;
 
 }
