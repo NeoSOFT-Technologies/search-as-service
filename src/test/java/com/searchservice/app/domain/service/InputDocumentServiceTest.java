@@ -18,6 +18,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
+import com.searchservice.app.rest.errors.BadRequestOccurredException;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 

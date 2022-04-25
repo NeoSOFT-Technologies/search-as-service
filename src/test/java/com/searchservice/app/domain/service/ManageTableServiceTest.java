@@ -201,8 +201,7 @@ class ManageTableServiceTest {
 
 		newTableSchemaDTO.setTableName(tableName);
 
-		configSetDTO.setBaseConfigSetName("solrUrl");
-		configSetDTO.setConfigSetName("solrUrl");
+		
 
 		tableSchemav2Data.setColumns(list);
 		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
@@ -254,7 +253,7 @@ class ManageTableServiceTest {
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
 		manageTable.setTableName("Demo");
-		manageTable.setTableNewName("Demo1");
+	
 	}
 
 	public void setUpTestClass() {
