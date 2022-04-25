@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	private static final String TABLE_DELETE_INITIALIZE_ERROR_MSG = "Error While Initializing Deletion For Table: {}";
 	private static final String TABLE_DELETE_UNDO_ERROR_MSG = "Undo Table Delete Failed , Invalid CLient ID Provided";
 	private static final String TABLE_FILE_CREATE_ERROR = "Error File Creating File {}";
-
+	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	@Override
 	public Response initializeTableDelete(int tenantId, String tableName) {
 
@@ -59,7 +60,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			checkIfTableDeleteFileExist(file);
 			try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
 				actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
-				String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate()
+				String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate(formatter)
 						+ "\n";
 				fw.write(newRecord);
 				fw.flush();
@@ -96,7 +97,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			String currentDeleteRecord;
 			while ((currentDeleteRecord = br.readLine()) != null) {
 				if (lineNumber != 0) {
-					long diff = DateUtil.checkDatesDifference(currentDeleteRecord);
+					long diff = DateUtil.checkDatesDifference(currentDeleteRecord,formatter);
 					if (diff < tableDeleteDuration) {
 						pw.println(currentDeleteRecord);
 					} else {

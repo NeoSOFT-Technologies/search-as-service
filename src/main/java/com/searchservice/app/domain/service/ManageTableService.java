@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +81,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
-
+	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	@Value("${base-search-url}")
 
 	private String searchNonStatic;
@@ -566,7 +567,7 @@ public class ManageTableService implements ManageTableServicePort {
 		File file = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(file);
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
-			String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate() + "," + columnName;
+			String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate(formatter) + "," + columnName;
 			bw.write(newRecord);
 			bw.newLine();
 
@@ -616,7 +617,7 @@ public class ManageTableService implements ManageTableServicePort {
 			String currentSchemaDeleteRecord;
 			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
 				if (lineNumber != 0) {
-					long diff = DateUtil.checkDatesDifference(currentSchemaDeleteRecord);
+					long diff = DateUtil.checkDatesDifference(currentSchemaDeleteRecord,formatter);
 					if (diff < schemaDeleteDuration) {
 						pw.println(currentSchemaDeleteRecord);
 					} else {

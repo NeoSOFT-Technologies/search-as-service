@@ -14,7 +14,7 @@ public class DateUtil {
 	
 	private DateUtil() {}
 
-	private static  SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	
 	private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 	
 	public static DateTime utcTime() {
@@ -22,7 +22,7 @@ public class DateUtil {
 		return now.toDateTime(DateTimeZone.UTC);
 	}
 	
-	public static long checkDatesDifference(String currentDeleteRecord) {
+	public static long checkDatesDifference(String currentDeleteRecord, SimpleDateFormat formatter) {
 		try {
 			String date = currentDeleteRecord.split(",")[2];
 			Date requestDate = formatter.parse(date);
@@ -35,7 +35,7 @@ public class DateUtil {
 		}
 	}
 	
-	public static String getFormattedDate() {
+	public static String getFormattedDate( SimpleDateFormat formatter) {
 		return formatter.format(Calendar.getInstance().getTime());
 	}
 }
