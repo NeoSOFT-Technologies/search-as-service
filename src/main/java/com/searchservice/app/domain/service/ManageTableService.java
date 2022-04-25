@@ -77,9 +77,6 @@ public class ManageTableService implements ManageTableServicePort {
 			+ "Perhaps the target field- {} isn't present.";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String MULTIVALUED = "multiValued";
-
-	private static final String SIMPLE_DATE_FORMATTER = "dd-M-yyyy hh:mm:ss";
-
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
@@ -130,8 +127,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Autowired
 	SearchAPIPort searchAPIPort;
-
-//	HttpSolrClient searchClient;
 
 	@Autowired
 	SearchJAdapter searchJAdapter;
