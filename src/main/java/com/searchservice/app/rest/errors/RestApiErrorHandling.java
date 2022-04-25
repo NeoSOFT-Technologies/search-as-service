@@ -15,7 +15,7 @@ public class RestApiErrorHandling extends BaseResponse{
 	   private RestApiErrorHandling() {
 	       timestamp = LocalDateTime.now();
 	   }
-	   RestApiErrorHandling(HttpStatusCode status,int statusCode) {
+	   RestApiErrorHandling(HttpStatusCode status) {
 	       this();
 	       super.statusCode=status.getCode();
 	       this.status=status;
@@ -49,10 +49,12 @@ public class RestApiErrorHandling extends BaseResponse{
            super.message = message;
 	   }
 
+	@Override
 	public int getStatusCode() {
 		return statusCode;
 	}
 
+	@Override
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
 	}
@@ -65,10 +67,12 @@ public class RestApiErrorHandling extends BaseResponse{
 		this.status = status;
 	}
 
+	@Override
 	public String getMessage() {
 		return message;
 	}
 
+	@Override
 	public void setMessage(String message) {
 		this.message = message;
 	}

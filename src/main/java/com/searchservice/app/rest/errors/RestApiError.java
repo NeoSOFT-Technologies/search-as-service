@@ -34,10 +34,12 @@ public class RestApiError extends BaseResponse{
            super.message = ex.getLocalizedMessage();
 	   }
 
+	@Override
 	public int getStatusCode() {
 		return statusCode;
 	}
 
+	@Override
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
 	}
@@ -50,10 +52,12 @@ public class RestApiError extends BaseResponse{
 		this.status = status;
 	}
 
+	@Override
 	public String getMessage() {
 		return message;
 	}
 
+	@Override
 	public void setMessage(String message) {
 		this.message = message;
 	}

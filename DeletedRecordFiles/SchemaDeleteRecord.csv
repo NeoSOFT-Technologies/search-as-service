@@ -52,3 +52,5 @@ TenantID,TableName,RequestTime,ColumnName
 2,shubham,25-4-2022 12:52:22,name
 1,demoTest1,25-4-2022 01:17:43,abc
 2,DemoTest,25-4-2022 04:58:04,abc
+2,DemoTest2,25-4-2022 05:29:20,mno
+2,DemoTest2,25-4-2022 05:29:20,xyz
