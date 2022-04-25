@@ -1,10 +1,13 @@
 package com.searchservice.app.domain.port.api;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
 
@@ -43,9 +46,9 @@ public interface ManageTableServicePort {
 
 	Response createTable(ManageTable manageTableDTO);
 
-	Response addSchemaAttributes(TableSchema tableSchemaDTO);
+	Response addSchemaFields(TableSchema tableSchemaDTO);
 
-	Response updateSchemaAttributes(TableSchema tableSchemaDTO);
+	Response updateSchemaFields(TableSchema tableSchemaDTO);
 
 	Response addAliasTable(String tableOriginalName, String tableAlias);
 
@@ -54,5 +57,7 @@ public interface ManageTableServicePort {
 			TableSchemav2 tableSchema);
 
 	boolean checkIfTableNameisValid(String tableName);
+	
+	boolean isColumnNameValid(List<SchemaField> columns);
 
 }

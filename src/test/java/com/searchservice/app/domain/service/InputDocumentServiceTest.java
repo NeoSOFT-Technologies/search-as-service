@@ -9,8 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
@@ -72,6 +74,36 @@ class InputDocumentServiceTest {
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
 	}
 
+	
+	public void tableExist() {
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+	}
+	
+	public void tableNotExist() {
+		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(false);
+	}
+	
+	@Test
+	void testAddDocumentsNrtTableNotExist() {
+		tableNotExist();
+		try {
+			inputDocumentService.addDocuments(true, tableName, payload);
+		}catch(BadRequestOccurredException e) {
+			assertEquals(400,e.getExceptionCode());
+		}
+	}
+	
+	@Test
+	void testAddDocumentsBatchTableNotExist() {
+		tableNotExist();
+		try {
+			inputDocumentService.addDocuments(false, tableName, payload);
+		}catch(BadRequestOccurredException e) {
+			assertEquals(400,e.getExceptionCode());
+		}
+	}
+
+
 	@Test
 	void testAddDocumentsNrt() {
 		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
@@ -82,7 +114,11 @@ class InputDocumentServiceTest {
 	}
 	
 	@Test
-	void testAddDocumentsWithoutNrt() {
+
+	void testAddDocumentsBatch() {
+		Mockito.when(manageTableServiceport.isTableExists(tableName)).thenReturn(true);
+		response.setDocumentUploaded(true);
+
 		setMockitoSucccessResponseForService();
 		ThrottlerResponse response = inputDocumentService.addDocuments(false,tableName, payload);
 		assertEquals(200, response.getStatusCode());
@@ -117,4 +153,23 @@ class InputDocumentServiceTest {
 		assertTrue(b);
 
 	}
+
+	@Test
+	void testDocumentInjectWithInvalidTableName() {
+		ResponseEntity<ThrottlerResponse> responseEntity = inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName);
+		assertEquals(400, responseEntity.getStatusCodeValue());
+	}
+	
+	@Test
+	void testPerformDocumentInjection() {
+		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(true);
+		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
+		ResponseEntity<ThrottlerResponse> responseEntityBatch = inputDocumentService.performDocumentInjection(false, tableName, payload, responseDTO);
+		assertEquals(200, responseEntityBatch.getStatusCodeValue());
+		
+		Mockito.when(uploadDocumentUtil.commit()).thenReturn(response);
+		ResponseEntity<ThrottlerResponse> responseEntityNRT = inputDocumentService.performDocumentInjection(true, tableName, payload, responseDTO);
+		assertEquals(200, responseEntityNRT.getStatusCodeValue());
+	}
+	
 }

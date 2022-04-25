@@ -2,7 +2,6 @@ package com.searchservice.app.table;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ class ManageTableTest {
 	private String tableName = "automatedTestCollection";
 	private int tenantId = 101;
 
-	String schemaName = "default-config";
 	SchemaField search = new SchemaField("testField6", "string", true, true, false, true, true, false);
 	// SchemaFieldDTO[] attributes = { search };
 	List<SchemaField> attributes = new ArrayList<>(Arrays.asList(search));
@@ -126,6 +124,7 @@ class ManageTableTest {
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
+        //Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(true);
 	}
 
 	public void setMockitoBadResponseForService() {
@@ -164,6 +163,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
+		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		
 
 	}
@@ -255,7 +255,7 @@ class ManageTableTest {
 
 		// Update Schema
 		setMockitoSuccessResponseForService();
-		TableSchema schemaDTO = new TableSchema(tableName, schemaName, attributes);
+		TableSchema schemaDTO = new TableSchema(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"+ "/" + tableName+ "/?tenantId="+tenantId)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -263,7 +263,7 @@ class ManageTableTest {
 
 		// Update Schema for non-existing table
 		setMockitoForTableNotExist();
-		schemaDTO = new TableSchema(tableName, schemaName, attributes);
+		schemaDTO = new TableSchema(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"  + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -272,7 +272,7 @@ class ManageTableTest {
 		// Update Schema for Table Under Deletion
 		Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
-		schemaDTO = new TableSchema(tableName, schemaName, attributes);
+		schemaDTO = new TableSchema(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"  + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))

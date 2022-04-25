@@ -2,6 +2,7 @@ package com.searchservice.app.rest;
 
 import java.util.List;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.searchservice.app.domain.dto.Response;
-
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -47,7 +46,7 @@ public class ManageTableResource {
 	private static final String TABLE = "Table ";
 	private static final String ERROR_MSG ="Something Went Wrong While";
 
-         @Autowired
+    @Autowired
 	private ManageTableServicePort manageTableServicePort;
     @Autowired
     private TableDeleteServicePort tableDeleteServicePort;
@@ -56,7 +55,8 @@ public class ManageTableResource {
         this.manageTableServicePort = manageTableServicePort;
         this.tableDeleteServicePort = tableDeleteServicePort;
     }
-	
+
+    
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
@@ -81,8 +81,10 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 
-			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
-					"REST call could not be performed");
+
+			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
+
 		}
 	}
 
@@ -120,15 +122,20 @@ public class ManageTableResource {
 
 		if (manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
 			log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
-
 			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
 					"Creating Table Failed , as Invalid Table Name " + manageTableDTO.getTableName() + " is Provided");
-		} else {
+		}
+		else {
 			if (tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
 				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
 						String.format("Table With Same Name %s %s%s", manageTableDTO.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
-			} else {
+
+			} 
+			
+			else {
+
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
+				
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
  
 				if (apiResponseDTO.getStatusCode() == 200) {
@@ -144,6 +151,7 @@ public class ManageTableResource {
 		}
 
 	}
+		
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
@@ -170,7 +178,6 @@ public class ManageTableResource {
 					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
-
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
@@ -226,5 +233,4 @@ public class ManageTableResource {
         }
 	}
 
-	
 }

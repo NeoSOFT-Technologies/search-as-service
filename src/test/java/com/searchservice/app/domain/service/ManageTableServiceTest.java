@@ -48,7 +48,12 @@ import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.InvalidColumnNameException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
+
+import com.searchservice.app.rest.errors.NullPointerOccurredException;
+import com.searchservice.app.rest.errors.TableAlreadyExistsException;
+
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,9 +75,11 @@ class ManageTableServiceTest {
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
 	private static final String PARTIAL_SEARCH = "partial_search";
+	
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
 	HttpSolrClient solrClientWithTable = null;
+	
 	private String tableName = "automatedTestCollection";
 	private int tenantId = 101;
 
@@ -87,14 +94,13 @@ class ManageTableServiceTest {
 
 	@MockBean
 	SearchJAdapter searchJAdapter;
-
+	
 	@InjectMocks
 	ManageTableService manageTableService;
 
 	@MockBean
 	SchemaRequest schemaRequest;
 
-	
 	
 	ManageTable manageTable = new ManageTable();
 
@@ -136,7 +142,7 @@ class ManageTableServiceTest {
 		schemaResponse.setResponse(test2());
 		setTableSchemaDTO();
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
-		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.processSchemaRequest(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
 
 	}
@@ -194,22 +200,10 @@ class ManageTableServiceTest {
 		finalResponseMap.put(" message", "Data is returned");
 
 		newTableSchemaDTO.setTableName(tableName);
-		newTableSchemaDTO.setSchemaName("solrUrl");
-		schemaField.setFilterable(true);
-		schemaField.setMultiValue(true);
-		schemaField.setName("test");
-		schemaField.setPartialSearch(true);
-		schemaField.setRequired(true);
-		schemaField.setSortable(true);
-		schemaField.setStorable(true);
-		schemaField.setType("string");
-		list.add(schemaField);
-		newTableSchemaDTO.setColumns(list);
 
-		manageTable.setColumns(list);
-		manageTable.setSchemaName("timestamp");
-		manageTable.setSku("B");
-		manageTable.setTableName("Demo");
+		configSetDTO.setBaseConfigSetName("solrUrl");
+		configSetDTO.setConfigSetName("solrUrl");
+
 		tableSchemav2Data.setColumns(list);
 		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
@@ -232,13 +226,35 @@ class ManageTableServiceTest {
 		tableSchema.setMessage("Testing");
 		tableSchema.setData(tableSchemav2Data);
 		Mockito.when(searchJAdapter.getCollectionAdminRequestList(solrClient)).thenReturn(collectionAdminResponse);
-		Mockito.when(searchJAdapter.addSchemaAttributesInSolrj(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
+		Mockito.when(searchJAdapter.processSchemaRequest(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.addFieldRequestInSolrj(Mockito.any(), Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
 		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
 
+	}
+	
+	public void setUpManageTable(int validColumn) {
+		schemaField.setFilterable(true);
+		schemaField.setMultiValue(true);
+		if(validColumn == 1) {
+		  schemaField.setName("test");
+		}else {
+			  schemaField.setName("test_123");
+		}
+		schemaField.setPartialSearch(true);
+		schemaField.setRequired(true);
+		schemaField.setSortable(true);
+		schemaField.setStorable(true);
+		schemaField.setType("string");
+		list.add(schemaField);
+		newTableSchemaDTO.setColumns(list);
+		manageTable.setColumns(list);
+		manageTable.setSchemaName("timestamp");
+		manageTable.setSku("B");
+		manageTable.setTableName("Demo");
+		manageTable.setTableNewName("Demo1");
 	}
 
 	public void setUpTestClass() {
@@ -336,8 +352,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.createTableIfNotPresent(manageTable);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
+		} catch (TableAlreadyExistsException e) {
+			assertEquals(110, e.getExceptioncode());
 		}
 	}
 
@@ -479,7 +495,7 @@ class ManageTableServiceTest {
 	void updateSchemaAttributes() {
 		setMockitoSuccessResponseForService();
 		try {
-			manageTableService.updateSchemaAttributes(newTableSchemaDTO);
+			manageTableService.updateSchemaFields(newTableSchemaDTO);
 		} catch (BadRequestOccurredException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
@@ -498,6 +514,7 @@ class ManageTableServiceTest {
 	void createTable() {
 
 		setMockitoSuccessResponseForService();
+		setUpManageTable(1);
 		Response rs = manageTableService.createTable(manageTable);
 		assertEquals(200, rs.getStatusCode());
 	}
@@ -506,9 +523,22 @@ class ManageTableServiceTest {
 	void createTableIfNotPresent() {
 
 		setMockitoSuccessResponseForService();
-
+		setUpManageTable(1);
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
+	}
+	
+	@Test
+	void createTableIfNotPresentInvalidColumnName() {
+
+		setMockitoSuccessResponseForService();
+		setUpManageTable(0);
+		try {
+		Response se = manageTableService.createTableIfNotPresent(manageTable);
+		assertEquals(200, se.getStatusCode());
+		}catch(InvalidColumnNameException e) {
+			assertEquals(111, e.getExceptionCode());
+		}
 	}
 
 	@Test
@@ -516,7 +546,7 @@ class ManageTableServiceTest {
 
 		setMockitoSuccessResponseForService();
 
-		Response rs = manageTableService.addSchemaAttributes(newTableSchemaDTO);
+		Response rs = manageTableService.addSchemaFields(newTableSchemaDTO);
 		assertEquals(200, rs.getStatusCode());
 
 	}
@@ -540,7 +570,6 @@ class ManageTableServiceTest {
 	
 	public void setTableSchemaDTO() {
 		newTableSchemaDTO.setTableName(tableName);
-		newTableSchemaDTO.setSchemaName("solrUrl");
 		schemaField.setFilterable(true);
 		schemaField.setMultiValue(true);
 		schemaField.setName("_nest_path");
@@ -552,13 +581,7 @@ class ManageTableServiceTest {
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
 	}
-	@Test
-	void updateTableSchemaException() {
-		setTableSchemaDTO();
-		setMockitoBadResponseForService();
-		Response rs = manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
-		assertEquals(404, rs.getStatusCode());
-	}
+
 
 	@Test
 	void checkTableDeletionStatusTest() {
