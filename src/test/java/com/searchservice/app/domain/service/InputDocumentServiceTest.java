@@ -87,6 +87,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testAddDocumentsNrtTableNotExist() {
 		tableNotExist();
+		setMockitoBadResponseForService();
 		try {
 			inputDocumentService.addDocuments(true, tableName, payload);
 		}catch(BadRequestOccurredException e) {
@@ -97,6 +98,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testAddDocumentsBatchTableNotExist() {
 		tableNotExist();
+		setMockitoBadResponseForService();
 		try {
 			inputDocumentService.addDocuments(false, tableName, payload);
 		}catch(BadRequestOccurredException e) {
