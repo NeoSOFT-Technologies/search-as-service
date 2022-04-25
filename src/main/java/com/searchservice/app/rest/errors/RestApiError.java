@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.searchservice.app.domain.dto.BaseResponse;
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RestApiError {
-       private int statusCode;
+public class RestApiError extends BaseResponse{
+     
 	   private HttpStatus status;
-	   private String message;
 	 
 	   
 	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
@@ -22,16 +22,16 @@ public class RestApiError {
 	   
 	   RestApiError(HttpStatus status, String message) {
 	       this();
-           this.statusCode=status.value();
+           super.statusCode=status.value();
            this.status=status;
-	       this.message = message;
+           super.message = message;
 	   }
 	   
 	   RestApiError(HttpStatus status, Throwable ex) {
 	       this();
-           this.statusCode=status.value();
+	       super.statusCode=status.value();
            this.status=status;
-	       this.message = ex.getLocalizedMessage();
+           super.message = ex.getLocalizedMessage();
 	   }
 
 	public int getStatusCode() {

@@ -3,12 +3,12 @@ package com.searchservice.app.rest.errors;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.searchservice.app.domain.dto.BaseResponse;
 
-public class RestApiErrorHandling {
-       private int statusCode;
+public class RestApiErrorHandling extends BaseResponse{
+      
        private HttpStatusCode status;
-	   private String message;
-	   
+	 
 	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	   private LocalDateTime timestamp;
 
@@ -17,36 +17,36 @@ public class RestApiErrorHandling {
 	   }
 	   RestApiErrorHandling(HttpStatusCode status,int statusCode) {
 	       this();
-	       this.statusCode=status.getCode();
+	       super.statusCode=status.getCode();
 	       this.status=status;
-	       this.message = "Unexpected Exception";
+	       super.message = "Unexpected Exception";
 	   }
 	   
 	   RestApiErrorHandling(HttpStatusCode status, String message) {
 	       this();
-           this.statusCode=status.getCode();
+	       super.statusCode=status.getCode();
            this.status=status;
-	       this.message = message;
+           super.message = message;
 	   }
 
 	   RestApiErrorHandling(HttpStatusCode status, Throwable ex) {
 	       this();
-           this.statusCode=status.getCode();
+	       super.statusCode=status.getCode();
            this.status=status;
-	       this.message = ex.getLocalizedMessage();
+           super.message = ex.getLocalizedMessage();
 	   }
 	   
 	   RestApiErrorHandling(int statuscode, Throwable ex) {
 	       this();
-           this.statusCode=statuscode;
-	       this.message = ex.getLocalizedMessage();
+	       super.statusCode=statuscode;
+	       super.message = ex.getLocalizedMessage();
 	   }
 	   
 	   RestApiErrorHandling(int statuscode, HttpStatusCode status,String message) {
 	       this();
-           this.statusCode=statuscode;
+	       super.statusCode=statuscode;
            this.status=status;
-	       this.message = message;
+           super.message = message;
 	   }
 
 	public int getStatusCode() {
