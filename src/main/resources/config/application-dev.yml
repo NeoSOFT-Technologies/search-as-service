@@ -70,7 +70,7 @@ capacity-plan:
 # Throttler configurations
 throttler:
   maxRequestSizeLimiter:
-    maxAllowedRequestSizeNRT: 10kB
+    maxAllowedRequestSizeNRT: 50kB
     maxAllowedRequestSizeBatch: 3200kB
 resilience4j.ratelimiter:
   instances:
