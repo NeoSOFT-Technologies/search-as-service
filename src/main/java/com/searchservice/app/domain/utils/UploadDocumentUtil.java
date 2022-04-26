@@ -36,19 +36,7 @@ public class UploadDocumentUtil {
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 
-		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", APPLICATION_JSON).build();
-		try {
-			Response response = client.newCall(request).execute();
-			if (response.code() != 400) {
-				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
-			} else {
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possible, something is wrong with the data");
-			}
-		} catch (IOException e) {
-			log.error(e.toString());
-			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
-		}
+		return processUploadDocumentRequest(client, body, url);
 	}
 
 	public UploadDocumentSearchUtilRespnse softcommit() {
@@ -61,6 +49,10 @@ public class UploadDocumentUtil {
 
 		log.debug("SOFT COMMIT");
 
+		return processUploadDocumentRequest(client, body, url);
+	}
+	
+	private UploadDocumentSearchUtilRespnse processUploadDocumentRequest(OkHttpClient client, RequestBody body, String url) {
 		Request request = new Request.Builder().url(url).method("POST", body)
 				.addHeader("Content-Type", APPLICATION_JSON).build();
 		try {
@@ -68,7 +60,7 @@ public class UploadDocumentUtil {
 			if (response.code() != 400) {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possible, something is wrong with the data");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possibly, something is wrong with the data");
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
