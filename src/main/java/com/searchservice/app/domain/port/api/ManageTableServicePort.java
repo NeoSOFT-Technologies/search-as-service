@@ -67,5 +67,7 @@ public interface ManageTableServicePort {
 	boolean checkIfTableNameisValid(String tableName);
 	
 	boolean isColumnNameValid(List<SchemaField> columns);
+	
+	Boolean checkMultivaluedDataType(List<SchemaField> columns);
 
 }

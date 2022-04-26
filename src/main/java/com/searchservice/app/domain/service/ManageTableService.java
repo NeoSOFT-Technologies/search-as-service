@@ -67,6 +67,7 @@ import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
+import com.searchservice.app.rest.errors.WrongMultiValueTypeException;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -222,6 +223,13 @@ public class ManageTableService implements ManageTableServicePort {
 			   throw new InvalidColumnNameException(HttpStatusCode.INVALID_COLUMN_NAME.getCode(),
 					HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
 		}
+		
+		if (Boolean.FALSE.equals(checkMultivaluedDataType(manageTableDTO.getColumns()))) {
+
+			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
+					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
+
+		}
 		// Configset is present, proceed
 		Response apiResponseDTO = createTable(manageTableDTO);
 
@@ -275,6 +283,14 @@ public class ManageTableService implements ManageTableServicePort {
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
 		checkForSchemaSoftDeletion(tenantId, tableName, tableSchemaDTO.getColumns());
 
+
+		if (Boolean.FALSE.equals(checkMultivaluedDataType(tableSchemaDTO.getColumns()))) {
+
+			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
+					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
+
+		}
+		
 		// ADD new schema fields to the table
 		Response tableSchemaResponseDTO = addSchemaFields(tableSchemaDTO);
 
@@ -809,6 +825,19 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		return columnNameIsValid;
 	}
+	}
+
+	@Override
+	public Boolean checkMultivaluedDataType(List<SchemaField> columns) {
+		boolean multiValueCheck = true;
+		for (SchemaField column : columns) {
+			if (Boolean.FALSE.equals(TableSchemaParserUtil.isMultivaluedDataTypeWrong(column))) {
+
+				multiValueCheck = false;
+				break;
+			}
+		}
+		return multiValueCheck;
 	}
 
 }
