@@ -27,13 +27,6 @@ public class RestApiError extends BaseResponse {
 		super.message = message;
 	}
 
-	RestApiError(HttpStatus status, Throwable ex) {
-		this();
-		super.statusCode = status.value();
-		this.status = status;
-		super.message = ex.getLocalizedMessage();
-	}
-
 	@Override
 	public int getStatusCode() {
 		return statusCode;

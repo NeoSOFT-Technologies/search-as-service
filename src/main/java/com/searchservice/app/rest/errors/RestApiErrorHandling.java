@@ -16,33 +16,6 @@ public class RestApiErrorHandling extends BaseResponse {
 		timestamp = LocalDateTime.now();
 	}
 
-	RestApiErrorHandling(HttpStatusCode status) {
-		this();
-		super.statusCode = status.getCode();
-		this.status = status;
-		super.message = "Unexpected Exception";
-	}
-
-	RestApiErrorHandling(HttpStatusCode status, String message) {
-		this();
-		super.statusCode = status.getCode();
-		this.status = status;
-		super.message = message;
-	}
-
-	RestApiErrorHandling(HttpStatusCode status, Throwable ex) {
-		this();
-		super.statusCode = status.getCode();
-		this.status = status;
-		super.message = ex.getLocalizedMessage();
-	}
-
-	RestApiErrorHandling(int statuscode, Throwable ex) {
-		this();
-		super.statusCode = statuscode;
-		super.message = ex.getLocalizedMessage();
-	}
-
 	RestApiErrorHandling(int statuscode, HttpStatusCode status, String message) {
 		this();
 		super.statusCode = statuscode;
