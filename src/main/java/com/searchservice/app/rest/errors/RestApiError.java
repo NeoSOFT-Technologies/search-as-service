@@ -8,6 +8,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.domain.dto.BaseResponse;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestApiError extends BaseResponse {
 
@@ -25,51 +30,5 @@ public class RestApiError extends BaseResponse {
 		super.statusCode = status.value();
 		this.status = status;
 		super.message = message;
-	}
-
-	@Override
-	public int getStatusCode() {
-		return statusCode;
-	}
-
-	@Override
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
-	}
-
-	public HttpStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatus status) {
-		this.status = status;
-	}
-
-	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return super.equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
 	}
 }

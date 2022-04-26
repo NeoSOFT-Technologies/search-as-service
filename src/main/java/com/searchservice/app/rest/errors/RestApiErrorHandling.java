@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.searchservice.app.domain.dto.BaseResponse;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class RestApiErrorHandling extends BaseResponse {
 
 	private HttpStatusCode status;
@@ -22,51 +27,4 @@ public class RestApiErrorHandling extends BaseResponse {
 		this.status = status;
 		super.message = message;
 	}
-
-	@Override
-	public int getStatusCode() {
-		return statusCode;
-	}
-
-	@Override
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
-	}
-
-	public HttpStatusCode getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatusCode status) {
-		this.status = status;
-	}
-
-	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return super.equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
 }
