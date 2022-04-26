@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -28,7 +29,6 @@ public class UploadDocumentUtil {
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
 	public UploadDocumentSearchUtilRespnse commit() {
-
 		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse(APPLICATION_JSON);
 		RequestBody body = RequestBody.create(mediaType, content);
@@ -43,7 +43,7 @@ public class UploadDocumentUtil {
 			if (response.code() != 400) {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
-				throw new BadRequestOccurredException(400, "Document not uploaded!");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possible, something is wrong with the data");
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
@@ -52,7 +52,6 @@ public class UploadDocumentUtil {
 	}
 
 	public UploadDocumentSearchUtilRespnse softcommit() {
-
 		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse(APPLICATION_JSON);
 		RequestBody body = RequestBody.create(mediaType, content);
@@ -69,7 +68,7 @@ public class UploadDocumentUtil {
 			if (response.code() != 400) {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
-				throw new BadRequestOccurredException(400, "Document not uploaded!");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possible, something is wrong with the data");
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
