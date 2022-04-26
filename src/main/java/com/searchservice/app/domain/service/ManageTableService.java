@@ -829,6 +829,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Boolean checkMultivaluedDataType(List<SchemaField> columns) {
+		if(columns == null) {
+			return true;
+		}else {
 		boolean multiValueCheck = true;
 		for (SchemaField column : columns) {
 			if (Boolean.FALSE.equals(TableSchemaParserUtil.isMultivaluedDataTypeWrong(column))) {
@@ -838,6 +841,7 @@ public class ManageTableService implements ManageTableServicePort {
 			}
 		}
 		return multiValueCheck;
+		}
 	}
 
 }
