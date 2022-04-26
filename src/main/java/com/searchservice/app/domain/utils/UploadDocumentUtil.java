@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -44,7 +45,7 @@ public class UploadDocumentUtil {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
 				// return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
-				throw new BadRequestOccurredException(400, "Document not uploaded!");
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded!");
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
