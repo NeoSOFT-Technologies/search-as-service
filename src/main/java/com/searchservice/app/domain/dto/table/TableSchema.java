@@ -18,12 +18,11 @@ import lombok.NoArgsConstructor;
 public class TableSchema extends BaseResponse {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Data
+	@NoArgsConstructor
 	public static class TableSchemaData {
 		private String tableName;
 		private List<SchemaField> columns;
-
-		public TableSchemaData() {
-		}
 
 		public String getTableName() {
 			return tableName;
