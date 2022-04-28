@@ -237,13 +237,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
-
-		if (!isTableExists(tableName))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-
-					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "
-							+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
-
 		// Delete table
 		Response apiResponseDTO = new Response();
 
