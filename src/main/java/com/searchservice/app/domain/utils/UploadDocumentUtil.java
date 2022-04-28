@@ -19,24 +19,24 @@ import lombok.Data;
 @Data
 @Component
 public class UploadDocumentUtil {
-
+	  private static String contentType="application/json";
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
 	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
-
+  
 	public UploadDocumentSearchUtilRespnse commit() {
 
 		OkHttpClient client = new OkHttpClient();
-		MediaType mediaType = MediaType.parse("application/json");
+		MediaType mediaType = MediaType.parse(contentType);
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 
 		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", "application/json").build();
+				.addHeader("Content-Type", contentType).build();
 
 		try {
 
@@ -44,7 +44,6 @@ public class UploadDocumentUtil {
 			if (response.code() != 400) {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
-				// return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
 				throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded!");
 			}
 		} catch (IOException e) {
@@ -60,7 +59,7 @@ public class UploadDocumentUtil {
 
 		OkHttpClient client = new OkHttpClient();
 
-		MediaType mediaType = MediaType.parse("application/json");
+		MediaType mediaType = MediaType.parse(contentType);
 
 		RequestBody body = RequestBody.create(mediaType, content);
 
@@ -71,7 +70,7 @@ public class UploadDocumentUtil {
 		log.debug("SOFT COMMIT");
 
 		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", "application/json").build();
+				.addHeader("Content-Type", contentType).build();
 
 		try {
 			// Response response =

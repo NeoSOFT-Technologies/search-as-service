@@ -68,11 +68,12 @@ public class RestControllerAdvice {
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
+			CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
 			if(ex.getCause() instanceof CustomExceptionHandler) {
-				CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
+//				CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
 			}
-			else if(ex.getCause() instanceof CustomExceptionHandler) {
+			else if(ex.getCause() instanceof CustomExceptionHandler &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {
 				return new ResponseEntity<Object>(new RestApiErrorHandling(
 						
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,

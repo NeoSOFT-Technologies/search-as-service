@@ -21,5 +21,7 @@ public class CustomExceptionHandler extends RuntimeException{
 		private HttpStatusCode status;
 		private String exceptionMessage;
 		
+		
+		
 	}
 
