@@ -21,7 +21,6 @@ public class TableSchemav2 {
 	public static class TableSchemav2Data {
 		private String tableName;
 		private List<SchemaField> columns;
-		private Map<Object, Object> tableDetails;
 
 		public TableSchemav2Data() {
 		}
@@ -41,14 +40,6 @@ public class TableSchemav2 {
 		public void setColumns(List<SchemaField> columns) {
 			this.columns = columns;
 		}
-
-		public Map<Object, Object> getTableDetails() {
-			return tableDetails;
-		}
-
-		public void setTableDetails(Map<Object, Object> tableDetails) {
-			this.tableDetails = tableDetails;
-		}
 	}
 
 	private int statusCode;
@@ -60,7 +51,6 @@ public class TableSchemav2 {
 //		this.message=schemaResponseDTO.getMessage();
 		this.data.setTableName(schemaResponseDTO.getTableName());
 		this.data.setColumns(schemaResponseDTO.getColumns());
-		this.data.setTableDetails(schemaResponseDTO.getTableDetails());
 	}
 
 }

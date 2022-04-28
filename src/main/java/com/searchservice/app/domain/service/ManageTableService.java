@@ -187,20 +187,6 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
-
-		if (!isTableExists(tableName))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
-		TableSchemav2 tableSchema = getTableSchema(tableName);
-
-		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
-				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
-
-		return tableSchema;
-	}
-
-	@Override
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
 
 		if (isTableExists(manageTableDTO.getTableName()))

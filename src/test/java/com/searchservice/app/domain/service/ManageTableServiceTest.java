@@ -47,11 +47,9 @@ import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidColumnNameException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 
-import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 
 import com.searchservice.app.rest.errors.TableNotFoundException;
@@ -250,7 +248,6 @@ class ManageTableServiceTest {
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
 		manageTable.setColumns(list);
-		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
 		manageTable.setTableName("Demo");
 	
@@ -337,16 +334,6 @@ class ManageTableServiceTest {
 	}
 
 	@Test
-	void getTableSchemaIfPresentNonExistingTable() {
-		setMockitoTableNotExist();
-		try {
-			manageTableService.getTableSchemaIfPresent("InvalidTable");
-		} catch (TableNotFoundException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptioncode());
-		}
-	}
-
-	@Test
 	void createTableIfNotPresentNonExistingTable() {
 		setMockitoTableNotExist();
 		try {
@@ -373,13 +360,6 @@ class ManageTableServiceTest {
 		} catch (InvalidInputOccurredException e) {
 			assertEquals(101, e.getExceptioncode());
 		}
-	}
-
-	@Test
-	void testGetTableSchemaIfPresent() {
-		setMockitoSuccessResponseForService();
-		TableSchemav2 tableSchemaResponse = manageTableService.getTableSchemaIfPresent(tableName);
-		assertEquals(200, tableSchemaResponse.getStatusCode());
 	}
 
 	@Test

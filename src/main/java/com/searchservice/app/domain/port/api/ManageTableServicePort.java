@@ -40,8 +40,6 @@ public interface ManageTableServicePort {
 
 	boolean isTableExists(String tableName);
 
-	TableSchemav2 getTableSchemaIfPresent(String tableName);
-
 	TableSchemav2 getTableSchema(String tableName);
 
 	Response createTable(ManageTable manageTableDTO);

@@ -2,7 +2,6 @@ package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Data;
@@ -18,15 +17,12 @@ public class ManageTable {
 
 	private String tableName;
 	private String sku;
-	@JsonIgnore
-	private String schemaName;
 	private List<SchemaField> columns;
 
 
 	public ManageTable(ManageTable manageTableDTO) {
 		this.tableName = manageTableDTO.getTableName();
 		this.sku = manageTableDTO.getSku();
-		this.schemaName = manageTableDTO.getSchemaName();
 		this.columns = manageTableDTO.getColumns();
 		
 	}
@@ -34,7 +30,6 @@ public class ManageTable {
 	public ManageTable(String tableName, String sku, String schemaName, List<SchemaField> columns) {
 		this.tableName = tableName;
 		this.sku = sku;
-		this.schemaName = schemaName;
 		this.columns = columns;
 	}
 

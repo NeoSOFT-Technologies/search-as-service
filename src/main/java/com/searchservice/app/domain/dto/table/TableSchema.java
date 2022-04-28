@@ -1,7 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,18 +20,11 @@ public class TableSchema {
 	@JsonIgnore
 	private String tableName;
 	private List<SchemaField> columns;
-	@JsonIgnore
-	private Map<Object, Object> tableDetails;
 
 	public TableSchema(TableSchema schemaDTO) {
 		this.tableName = schemaDTO.getTableName();
 		this.columns = schemaDTO.getColumns();
 
-	}
-
-	public TableSchema(String tableName, List<SchemaField> attributes) {
-		this.tableName = tableName;
-		this.columns = attributes;
 	}
 
 }
