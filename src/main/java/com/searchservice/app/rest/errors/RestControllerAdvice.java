@@ -25,7 +25,7 @@ public class RestControllerAdvice {
 	public ResponseEntity<Object> handleBadRequestOccurred(BadRequestOccurredException exception) {
 		return new ResponseEntity<>(new RestApiErrorHandling(
 
-				HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), HttpStatusCode.INVALID_TABLE_NAME,
+				HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), HttpStatusCode.BAD_REQUEST_EXCEPTION,
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 

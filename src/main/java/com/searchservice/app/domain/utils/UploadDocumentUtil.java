@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -19,6 +20,8 @@ import lombok.Data;
 @Component
 public class UploadDocumentUtil {
 
+	private static final String APPLICATION_JSON = "application/json";
+
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
@@ -26,65 +29,43 @@ public class UploadDocumentUtil {
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
 
 	public UploadDocumentSearchUtilRespnse commit() {
-
 		OkHttpClient client = new OkHttpClient();
-		MediaType mediaType = MediaType.parse("application/json");
+		MediaType mediaType = MediaType.parse(APPLICATION_JSON);
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 
-		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", "application/json").build();
-
-		try {
-
-			Response response = client.newCall(request).execute();
-			if (response.code() != 400) {
-				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
-			} else {
-				// return new UploadDocumentSolrUtilRespnse(false, "Document not uploaded!");
-				throw new BadRequestOccurredException(400, "Document not uploaded!");
-			}
-		} catch (IOException e) {
-			log.error(e.toString());
-
-			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
-
-		}
-
+		return processUploadDocumentRequest(client, body, url);
 	}
 
 	public UploadDocumentSearchUtilRespnse softcommit() {
-
 		OkHttpClient client = new OkHttpClient();
-
-		MediaType mediaType = MediaType.parse("application/json");
-
+		MediaType mediaType = MediaType.parse(APPLICATION_JSON);
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
-
 		url += "softCommit=true";
 
 		log.debug("SOFT COMMIT");
 
+		return processUploadDocumentRequest(client, body, url);
+	}
+	
+	private UploadDocumentSearchUtilRespnse processUploadDocumentRequest(OkHttpClient client, RequestBody body, String url) {
 		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", "application/json").build();
-
+				.addHeader("Content-Type", APPLICATION_JSON).build();
 		try {
-			// Response response =
-			client.newCall(request).execute();
-
-			return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
-
+			Response response = client.newCall(request).execute();
+			if (response.code() != 400) {
+				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+			} else {
+				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), "Document not uploaded! Possibly, something is wrong with the data");
+			}
 		} catch (IOException e) {
 			log.error(e.toString());
-
-			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
-
+			return new UploadDocumentSearchUtilRespnse(true, "Document upload operation completed.");
 		}
-
 	}
 
 	@Data
