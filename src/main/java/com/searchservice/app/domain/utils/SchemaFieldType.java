@@ -83,8 +83,6 @@ public class SchemaFieldType {
             	return "Date";
             case "pdates":
             	return "Dates";
-            case "text_general":
-            	return "text";
             default:
                 if (isMultivalue != null && (boolean)isMultivalue)
                     return "strings";
