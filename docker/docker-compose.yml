@@ -22,7 +22,7 @@ services:
       - KEYCLOAK_CONTAINER_NAME=keycloak-container
       - KEYCLOAK_REALM_NAME=saas-realm
       - KEYCLOAK_CLIENT_NAME=saas-client
-      - KEYCLOAK_CLIENT_SECRET=TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
+      - KEYCLOAK_CLIENT_SECRET=Fn7lKppwFB7J9kCWD6g9cuF6pSvfEAdk
     networks:
       - saas-network
     depends_on:
@@ -38,7 +38,7 @@ services:
       - KEYCLOAK_CONTAINER_NAME=keycloak-container
       - KEYCLOAK_REALM_NAME=saas-realm
       - KEYCLOAK_CLIENT_NAME=saas-client
-      - KEYCLOAK_CLIENT_SECRET=TYnc5vsee7iqyRUs0JSN89Q2HCntkkDq
+      - KEYCLOAK_CLIENT_SECRET=Fn7lKppwFB7J9kCWD6g9cuF6pSvfEAdk
     networks:
       - saas-network
     depends_on:
