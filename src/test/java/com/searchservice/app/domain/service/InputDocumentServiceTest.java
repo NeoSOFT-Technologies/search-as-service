@@ -20,7 +20,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.CustomExceptionHandler;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 
@@ -90,7 +90,7 @@ class InputDocumentServiceTest {
 		tableNotExist();
 		try {
 			inputDocumentService.addDocuments(true, tableName, payload);
-		}catch(BadRequestOccurredException e) {
+		}catch(CustomExceptionHandler e) {
 			assertEquals(400,e.getExceptionCode());
 		}
 	}
@@ -100,7 +100,7 @@ class InputDocumentServiceTest {
 		tableNotExist();
 		try {
 			inputDocumentService.addDocuments(false, tableName, payload);
-		}catch(BadRequestOccurredException e) {
+		}catch(CustomExceptionHandler e) {
 			assertEquals(400,e.getExceptionCode());
 		}
 	}
@@ -130,7 +130,7 @@ class InputDocumentServiceTest {
 
 		try {
 			inputDocumentService.addDocuments(true,tableName, payload);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomExceptionHandler e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
@@ -139,7 +139,7 @@ class InputDocumentServiceTest {
 	void testBadAddDocumentsWithoutNRT() {
 		try {
 			inputDocumentService.addDocuments(false,tableName, payload);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomExceptionHandler e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}

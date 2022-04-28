@@ -13,9 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomExceptionHandler;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -64,7 +64,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
-			throw new BadRequestOccurredException(400, tableName.split("_")[0] + " table doesn't exist");
+			throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,tableName.split("_")[0] + " table doesn't exist");
 
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 

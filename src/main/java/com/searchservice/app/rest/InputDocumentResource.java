@@ -18,8 +18,8 @@ import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
-import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidJsonInputOccurredException;
+import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomExceptionHandler;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -57,8 +57,8 @@ public class InputDocumentResource {
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
-			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
-					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+			throw new CustomExceptionHandler(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
@@ -83,8 +83,8 @@ public class InputDocumentResource {
 			@RequestBody String payload) {
 
 		if (!inputDocumentService.isValidJsonArray(payload))
-			throw new InvalidJsonInputOccurredException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
-					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+			throw new CustomExceptionHandler(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
 
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort

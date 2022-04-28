@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @Service
 

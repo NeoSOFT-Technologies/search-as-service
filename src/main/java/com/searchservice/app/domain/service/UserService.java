@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.UserServicePort;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @Service
 public class UserService implements UserServicePort {
