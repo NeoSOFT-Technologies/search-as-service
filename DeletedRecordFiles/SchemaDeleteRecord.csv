@@ -56,3 +56,9 @@ TenantID,TableName,RequestTime,ColumnName
 2,DemoTest2,25-4-2022 05:29:20,xyz
 2,DemoTest4,26-4-2022 11:01:41,OPQ
 2,DemoTest4,26-4-2022 11:01:41,xyz
+8,DemoTest,27-4-2022 10:25:41,name
+8,DemoTest,27-4-2022 10:25:41,price
+8,DemoTest,27-4-2022 10:25:41,productName
+8,DemoTest,27-4-2022 10:25:41,title
+8,DemoTest,27-4-2022 10:25:41,vendorId
+8,DemoTest,27-4-2022 10:25:41,xyz

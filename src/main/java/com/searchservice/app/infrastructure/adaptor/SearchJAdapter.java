@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.searchservice.app.domain.dto.table.SchemaDto;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.utils.SchemaFieldType;
@@ -276,7 +276,7 @@ public class SearchJAdapter {
 
 			SchemaResponse schemaResponse = isPartialSearchFieldInSolrj(searchClientActive, schemaRequest);
 			List<FieldTypeDefinition> fieldTypes = schemaResponse.getSchemaRepresentation().getFieldTypes();
-			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(SchemaDto.PARTIAL_SEARCH.getLabel()));
+			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(SchemaLabel.PARTIAL_SEARCH.getLabel()));
 		} catch (Exception e) {
 			logger.error(EXCEPTION_OCCURRED, e.getMessage());
 			throw new BadRequestOccurredException(400, "Could not confirm if partial_search field type is available");
@@ -301,7 +301,7 @@ public class SearchJAdapter {
 				throw new BadRequestOccurredException(400, "Couldn't create partial search field type");
 			}
 		} else
-			fieldTypeAttributes.put("name", SchemaDto.PARTIAL_SEARCH.getLabel());
+			fieldTypeAttributes.put("name", SchemaLabel.PARTIAL_SEARCH.getLabel());
 		
 		return fieldTypeAttributes;
 	}
@@ -314,7 +314,7 @@ public class SearchJAdapter {
 			Map<String, Object> fieldDtoMap = new HashMap<>();
 			if (!TableSchemaParserUtil.validateSchemaField(fieldDto)) {
 				fieldDtoMap = new HashMap<>();
-				fieldDtoMap.put(SchemaDto.VALIDATED.getLabel(), false);
+				fieldDtoMap.put(SchemaLabel.VALIDATED.getLabel(), false);
 				return schemaFieldsListOfMap;
 			}
 			if (TableSchemaParserUtil.isFieldUnchangeable(fieldDto.getName()))
@@ -323,12 +323,12 @@ public class SearchJAdapter {
 			// PARTIAL_SEARCH UPDATE
 			partialSearchUpdate(tableSchemaDTO, fieldDto, fieldDtoMap);
 
-			fieldDtoMap.put(SchemaDto.NAME.getLabel(), fieldDto.getName());
-			fieldDtoMap.put(SchemaDto.STORED.getLabel(), fieldDto.isStorable());
-			fieldDtoMap.put(SchemaDto.MULTIVALUED.getLabel(), fieldDto.isMultiValue());
-			fieldDtoMap.put(SchemaDto.REQUIRED.getLabel(), fieldDto.isRequired());
-			fieldDtoMap.put(SchemaDto.DOCVALUES.getLabel(), fieldDto.isSortable());
-			fieldDtoMap.put(SchemaDto.INDEXED.getLabel(), fieldDto.isFilterable());
+			fieldDtoMap.put(SchemaLabel.NAME.getLabel(), fieldDto.getName());
+			fieldDtoMap.put(SchemaLabel.STORED.getLabel(), fieldDto.isStorable());
+			fieldDtoMap.put(SchemaLabel.MULTIVALUED.getLabel(), fieldDto.isMultiValue());
+			fieldDtoMap.put(SchemaLabel.REQUIRED.getLabel(), fieldDto.isRequired());
+			fieldDtoMap.put(SchemaLabel.DOCVALUES.getLabel(), fieldDto.isSortable());
+			fieldDtoMap.put(SchemaLabel.INDEXED.getLabel(), fieldDto.isFilterable());
 			schemaFieldsListOfMap.add(fieldDtoMap);
 		}
 		return schemaFieldsListOfMap;
@@ -342,13 +342,13 @@ public class SearchJAdapter {
 			Map<String, Object> fieldTypeAttributes = createPartialSearchFieldTypeIfNotPresent(tableSchemaDTO);
 
 			// Add <partial-search> fieldType to the field
-			fieldDtoMap.put("type", fieldTypeAttributes.get(SchemaDto.NAME.getLabel()));
+			fieldDtoMap.put("type", fieldTypeAttributes.get(SchemaLabel.NAME.getLabel()));
 			// Since "partial search" is enabled on this field, docValues has to be disabled
 			fieldDto.setSortable(false);
 		} else {
 			fieldDtoMap.put("type", SchemaFieldType.fromStandardDataTypeToSearchFieldType(fieldDto.getType(),
 					fieldDto.isMultiValue()));
-			fieldDtoMap.put(SchemaDto.DOCVALUES.getLabel(), fieldDto.isSortable());
+			fieldDtoMap.put(SchemaLabel.DOCVALUES.getLabel(), fieldDto.isSortable());
 		}
 	}
 	

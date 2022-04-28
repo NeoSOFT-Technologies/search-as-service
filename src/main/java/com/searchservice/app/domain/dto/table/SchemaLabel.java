@@ -1,6 +1,6 @@
 package com.searchservice.app.domain.dto.table;
 
-public enum SchemaDto {
+public enum SchemaLabel {
 	NAME("name"),
 	MULTIVALUED("multiValued"),
 	STORED("stored"),
@@ -12,7 +12,7 @@ public enum SchemaDto {
 
 	private String label;
 	
-	SchemaDto(String label) {
+	SchemaLabel(String label) {
         this.label = label;
 	}
 

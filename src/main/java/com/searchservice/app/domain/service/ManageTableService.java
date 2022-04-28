@@ -45,7 +45,7 @@ import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
-import com.searchservice.app.domain.dto.table.SchemaDto;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
@@ -381,12 +381,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 				// Prepare the SolrFieldDTO
 				SchemaField solrFieldDTO = new SchemaField();
-				solrFieldDTO.setName((String) f.get(SchemaDto.NAME.getLabel()));
+				solrFieldDTO.setName((String) f.get(SchemaLabel.NAME.getLabel()));
 
 				// Parse Field Type Object(String) to Enum
 
 				String solrFieldType = SchemaFieldType.fromSearchFieldTypeToStandardDataType((String) f.get("type"),
-						f.get(SchemaDto.MULTIVALUED.getLabel()));
+						f.get(SchemaLabel.MULTIVALUED.getLabel()));
 
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParserUtil.setFieldsAsPerTheSchema(solrFieldDTO, f);
@@ -548,7 +548,7 @@ public class ManageTableService implements ManageTableServicePort {
 				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
 				searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
 				updatedFields++;
-				logger.info("Field- {} is successfully updated", currField.get(SchemaDto.NAME.getLabel()));
+				logger.info("Field- {} is successfully updated", currField.get(SchemaLabel.NAME.getLabel()));
 			}
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
