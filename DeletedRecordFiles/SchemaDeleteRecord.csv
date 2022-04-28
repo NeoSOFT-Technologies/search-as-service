@@ -49,16 +49,3 @@ TenantID,TableName,RequestTime,ColumnName
 303,bugtest4,20-4-2022 06:12:16,is_available
 303,bugtest4,20-4-2022 06:54:23,is_available
 303,bugtest4,22-4-2022 12:45:16,is_available
-2,shubham,25-4-2022 12:52:22,name
-1,demoTest1,25-4-2022 01:17:43,abc
-2,DemoTest,25-4-2022 04:58:04,abc
-2,DemoTest2,25-4-2022 05:29:20,mno
-2,DemoTest2,25-4-2022 05:29:20,xyz
-2,DemoTest4,26-4-2022 11:01:41,OPQ
-2,DemoTest4,26-4-2022 11:01:41,xyz
-8,DemoTest,27-4-2022 10:25:41,name
-8,DemoTest,27-4-2022 10:25:41,price
-8,DemoTest,27-4-2022 10:25:41,productName
-8,DemoTest,27-4-2022 10:25:41,title
-8,DemoTest,27-4-2022 10:25:41,vendorId
-8,DemoTest,27-4-2022 10:25:41,xyz
