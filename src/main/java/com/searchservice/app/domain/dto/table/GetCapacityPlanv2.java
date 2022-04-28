@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.searchservice.app.config.CapacityPlanProperties;
+import com.searchservice.app.config.CapacityPlanProperties.Plan;
+import com.searchservice.app.domain.dto.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,14 +17,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetCapacityPlanv2 {
+public class GetCapacityPlanv2 extends BaseResponse{
 
-	private int statusCode;
-	private String message;
 	private List<CapacityPlanProperties.Plan> plans;
+	
 
-	public GetCapacityPlanv2(List<CapacityPlanProperties.Plan> plans) {
+	public GetCapacityPlanv2(int statusCode, String message, List<Plan> plans) {
+		super(statusCode, message);
 		this.plans = plans;
 	}
+	
 
 }

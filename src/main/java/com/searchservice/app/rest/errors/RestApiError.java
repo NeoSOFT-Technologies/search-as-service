@@ -6,65 +6,29 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.searchservice.app.domain.dto.BaseResponse;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RestApiError {
-       private int statusCode;
-	   private HttpStatus status;
-	   private String message;
-	 
-	   
-	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-	   private LocalDateTime timestamp;
+public class RestApiError extends BaseResponse {
 
-	   private RestApiError() {
-	       timestamp = LocalDateTime.now();
-	   }
-	   
-	   RestApiError(HttpStatus status, String message) {
-	       this();
-           this.statusCode=status.value();
-           this.status=status;
-	       this.message = message;
-	   }
-	   
-	   RestApiError(HttpStatus status, Throwable ex) {
-	       this();
-           this.statusCode=status.value();
-           this.status=status;
-	       this.message = ex.getLocalizedMessage();
-	   }
+	private HttpStatus status;
 
-	public int getStatusCode() {
-		return statusCode;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	private LocalDateTime timestamp;
+
+	private RestApiError() {
+		timestamp = LocalDateTime.now();
 	}
 
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
-	}
-
-	public HttpStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatus status) {
+	RestApiError(HttpStatus status, String message) {
+		this();
+		super.statusCode = status.value();
 		this.status = status;
+		super.message = message;
 	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-	   
-	   
-	}
+}

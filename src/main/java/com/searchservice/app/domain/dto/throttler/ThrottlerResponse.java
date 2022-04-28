@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.dto.throttler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.searchservice.app.domain.dto.BaseResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,9 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ThrottlerResponse {
-	private int statusCode;
-	private String message;
+public class ThrottlerResponse extends BaseResponse{
 
 	// Rate Limiter member variables
 	private String maxRequestsAllowed; // maximum number of requests allowed for current limitRefreshPeriod
@@ -26,9 +25,8 @@ public class ThrottlerResponse {
 	private String incomingRequestSize;
 	private String apiResponseData;
 
-	public ThrottlerResponse(int statusCode, String responseMessage) {
-		this.statusCode = statusCode;
-		this.message = responseMessage;
-	}
 
+	public ThrottlerResponse(int statusCode, String message) {
+		super(statusCode, message);
+	}
 }
