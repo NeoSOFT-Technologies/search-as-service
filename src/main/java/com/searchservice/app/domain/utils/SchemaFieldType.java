@@ -3,15 +3,15 @@ package com.searchservice.app.domain.utils;
 public class SchemaFieldType {
 
     public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
-    	String newDataType = "";
-    
+    	dataType.toLowerCase();
+    	StringBuilder newDataType = new StringBuilder();
+
     	if(dataType.endsWith("s")) {
-    
-    		for(int i=0;i<dataType.length()-1;i++) newDataType += dataType.charAt(i);
+    		for(int i=0;i<dataType.length()-1;i++) newDataType.append(dataType.charAt(i));
     	}
-    	else newDataType = dataType;
+    	else newDataType.append(dataType);
     	
-        switch (newDataType.toLowerCase()) {
+        switch (newDataType.toString()) {
 
             case "boolean":
                 if (isMultivalue)

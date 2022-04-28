@@ -129,8 +129,7 @@ public class TableSchemaParserUtil {
 		logger.info("All Schema field boolean attributes are valid");
 		return fieldAttributesValidated;
 	}
-	//isMultivaluedDataTypePlural;
-	//isValidFormatDataTypeForMultivalued;
+	
 	public static boolean isMultivaluedDataTypePlural(SchemaField searchFieldDTO) {
 		boolean checkForMultiValue = true;
 		if (!searchFieldDTO.isMultiValue()) {
