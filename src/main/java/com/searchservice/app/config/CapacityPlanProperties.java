@@ -24,7 +24,6 @@ public class CapacityPlanProperties {
         private String name;
         private int replicas;
         private int shards;
-//        private int storage;
     }
 
 }

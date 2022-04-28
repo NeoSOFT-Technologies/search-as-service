@@ -1,8 +1,11 @@
 package com.searchservice.app.rest;
 
 import java.util.List;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +31,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableNotFoundException;
 import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -78,8 +81,10 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 
+
 			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
+
 		}
 	}
 
@@ -124,9 +129,11 @@ public class ManageTableResource {
 			if (tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
 				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
 						String.format("Table With Same Name %s %s%s", manageTableDTO.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+
 			} 
 			
 			else {
+
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
 				
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);

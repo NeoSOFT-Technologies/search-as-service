@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8083
 
 spring:
   profiles:
@@ -9,11 +9,11 @@ spring:
       fail-on-unknown-properties: true
  # Keycloak Server Configurations
 keycloak:
-  realm: ravi_realm
+  realm: ${KEYCLOAK_REALM_NAME:Ingress_Micro_realm}
   credentials: 
-    secret: oFN5MkLnp7hLRgojjZ3nJWJDGR31muLg
-  resource: search-as-service
-  auth-server-url: http://localhost:8080/auth
+    secret: ${KEYCLOAK_CLIENT_SECRET:sWnYAspIZJf03EuGlE07us9xpxuU1ldK}
+  resource: ${KEYCLOAK_CLIENT_NAME:ingress_micro_realm}
+  auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
