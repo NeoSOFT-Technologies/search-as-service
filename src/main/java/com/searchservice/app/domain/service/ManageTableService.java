@@ -37,6 +37,7 @@ import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchemav2;
@@ -70,14 +71,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
-	private static final String NAME = "name";
+	
 	private static final String TABLE_NOT_FOUND_MSG = "Table: %s, does not exist";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
 			+ "Perhaps the target field- {} isn't present.";
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
-	private static final String MULTIVALUED = "multiValued";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
@@ -342,12 +342,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 				// Prepare the SolrFieldDTO
 				SchemaField solrFieldDTO = new SchemaField();
-				solrFieldDTO.setName((String) f.get(NAME));
+				solrFieldDTO.setName((String) f.get(SchemaLabel.NAME.getLabel()));
 
 				// Parse Field Type Object(String) to Enum
 
 				String solrFieldType = SchemaFieldType.fromSearchFieldTypeToStandardDataType((String) f.get("type"),
-						f.get(MULTIVALUED));
+						f.get(SchemaLabel.MULTIVALUED.getLabel()));
 
 				solrFieldDTO.setType(solrFieldType);
 				TableSchemaParserUtil.setFieldsAsPerTheSchema(solrFieldDTO, f);
@@ -491,7 +491,7 @@ public class ManageTableService implements ManageTableServicePort {
 				searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
 
 				updatedFields++;
-				logger.info("Field- {} is successfully updated", currField.get(NAME));
+				logger.info("Field- {} is successfully updated", currField.get(SchemaLabel.NAME.getLabel()));
 			}
 			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage(SCHEMA_UPDATE_SUCCESS);
