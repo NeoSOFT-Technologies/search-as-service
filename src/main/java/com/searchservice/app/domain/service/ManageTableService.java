@@ -224,7 +224,7 @@ public class ManageTableService implements ManageTableServicePort {
 					HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
 		}
 		
-		if (Boolean.FALSE.equals(checkMultivaluedDataType(manageTableDTO.getColumns()))) {
+		if (Boolean.FALSE.equals(isMultivaluedDataTypePlural(manageTableDTO.getColumns()))) {
 
 			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
 					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
@@ -284,7 +284,7 @@ public class ManageTableService implements ManageTableServicePort {
 		checkForSchemaSoftDeletion(tenantId, tableName, tableSchemaDTO.getColumns());
 
 
-		if (Boolean.FALSE.equals(checkMultivaluedDataType(tableSchemaDTO.getColumns()))) {
+		if (Boolean.FALSE.equals(isMultivaluedDataTypePlural(tableSchemaDTO.getColumns()))) {
 
 			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
 					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
@@ -828,17 +828,20 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Boolean checkMultivaluedDataType(List<SchemaField> columns) {
+	public Boolean isMultivaluedDataTypePlural(List<SchemaField> columns) {
 		if(columns == null) {
 			return true;
 		}else {
 		boolean multiValueCheck = true;
 		for (SchemaField column : columns) {
-			if (Boolean.FALSE.equals(TableSchemaParserUtil.isMultivaluedDataTypeWrong(column))) {
-
-				multiValueCheck = false;
-				break;
+			boolean checkForMultiValue = true;
+			if (!column.isMultiValue()) {
+				String stringData = column.getType();
+				if (stringData.endsWith("s") || stringData.endsWith("S")) {
+					checkForMultiValue = false;
+				}
 			}
+			return checkForMultiValue;
 		}
 		return multiValueCheck;
 		}
