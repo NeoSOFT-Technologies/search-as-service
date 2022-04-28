@@ -3,8 +3,15 @@ package com.searchservice.app.domain.utils;
 public class SchemaFieldType {
 
     public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
-
-        switch (dataType.toLowerCase()) {
+    	String newDataType = "";
+    
+    	if(dataType.endsWith("s")) {
+    
+    		for(int i=0;i<dataType.length()-1;i++) newDataType += dataType.charAt(i);
+    	}
+    	else newDataType = dataType;
+    	
+        switch (newDataType.toLowerCase()) {
 
             case "boolean":
                 if (isMultivalue)
@@ -18,7 +25,10 @@ public class SchemaFieldType {
                     return "plong";
 
             case "date":
-                return "pdate";
+            	 if (isMultivalue)
+                return "pdates";	
+            	 else
+                	return "pdate";
 
             case "int":
                 if (isMultivalue)
@@ -73,6 +83,8 @@ public class SchemaFieldType {
             	return "Date";
             case "pdates":
             	return "Dates";
+            case "text_general":
+            	return "text";
             default:
                 if (isMultivalue != null && (boolean)isMultivalue)
                     return "strings";

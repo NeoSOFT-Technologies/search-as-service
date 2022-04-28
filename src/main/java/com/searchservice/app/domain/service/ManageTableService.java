@@ -216,8 +216,7 @@ public class ManageTableService implements ManageTableServicePort {
 					HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
 		}
 		
-		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(manageTableDTO.getColumns()))) {
-
+		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(manageTableDTO.getColumns()))) {		
 			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
 					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
 
