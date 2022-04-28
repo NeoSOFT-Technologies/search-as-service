@@ -38,7 +38,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.ConfigSet;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
@@ -51,8 +50,10 @@ import com.searchservice.app.rest.errors.BadRequestOccurredException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.InvalidColumnNameException;
 import com.searchservice.app.rest.errors.InvalidInputOccurredException;
+
 import com.searchservice.app.rest.errors.NullPointerOccurredException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
+
 import com.searchservice.app.rest.errors.TableNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -112,7 +113,7 @@ class ManageTableServiceTest {
 	CollectionAdminResponse collectionAdminResponse = new CollectionAdminResponse();
 	List<SchemaField> list = new ArrayList<SchemaField>();
 	SchemaField schemaField = new SchemaField();
-	ConfigSet configSetDTO = new ConfigSet();
+
 	UpdateResponse updatedResponse = new UpdateResponse();
 	Response responseDTO = new Response();
 
@@ -199,8 +200,9 @@ class ManageTableServiceTest {
 		finalResponseMap.put(" message", "Data is returned");
 
 		newTableSchemaDTO.setTableName(tableName);
-		configSetDTO.setBaseConfigSetName("solrUrl");
-		configSetDTO.setConfigSetName("solrUrl");
+
+		
+
 		tableSchemav2Data.setColumns(list);
 		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
@@ -251,7 +253,7 @@ class ManageTableServiceTest {
 		manageTable.setSchemaName("timestamp");
 		manageTable.setSku("B");
 		manageTable.setTableName("Demo");
-		manageTable.setTableNewName("Demo1");
+	
 	}
 
 	public void setUpTestClass() {
@@ -283,11 +285,6 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.getConfigSetFromSolrj(Mockito.any())).thenReturn(configSetResponse);
 	}
 
-	@Test
-	void configSetError() {
-		configErrorResponse();
-		assertEquals(400, manageTableService.getConfigSets().getStatusCode());
-	}
 
 	@Test
 	void getTablesInvalidData() {
@@ -406,20 +403,6 @@ class ManageTableServiceTest {
 		}
 	}
 
-	@Test
-	void isConfigSetExists() {
-		boolean configSetExist = manageTableService.isConfigSetExists("_default");
-		assertTrue(configSetExist);
-	}
-
-	@Test
-	void isConfigSetDontExists() {
-		try {
-			manageTableService.isConfigSetExists(null);
-		} catch (NullPointerOccurredException e) {
-			assertEquals(404, e.getExceptionCode());
-		}
-	}
 
 	@Test
 	void addAliasTable() {
@@ -429,15 +412,7 @@ class ManageTableServiceTest {
 		assertEquals(200, rs.getStatusCode());
 	}
 
-	@Test
-	void deleteConfigSet() {
 
-		try {
-			manageTableService.deleteConfigSet(searchUrl);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-	}
 
 	@Test
 	void initializeSchemaDeletion() {
@@ -491,17 +466,7 @@ class ManageTableServiceTest {
 
 	}
 
-	@Test
-	void createConfigSet() {
-		setMockitoSuccessResponseForService();
 
-		try {
-			manageTableService.createConfigSet(configSetDTO);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-
-	}
 
 	@Test
 	void isPartialSearchFieldTypePresent() {
@@ -583,17 +548,6 @@ class ManageTableServiceTest {
 		Response rs = manageTableService.addSchemaFields(newTableSchemaDTO);
 		assertEquals(200, rs.getStatusCode());
 
-	}
-
-	@Test
-	void checkDatesDifference() {
-
-		try {
-			manageTableService.checkDatesDifference(searchUrl);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
-		//
 	}
 
 	@Test

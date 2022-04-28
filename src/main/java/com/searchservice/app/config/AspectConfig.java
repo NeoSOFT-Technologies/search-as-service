@@ -10,8 +10,6 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.jboss.logging.MDC;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.UserDTO;
+import com.searchservice.app.domain.utils.DateUtil;
 
 @Aspect
 @Configuration
@@ -42,7 +41,7 @@ public class AspectConfig {
 			log.error(e.toString());
 		}
 		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 		return joinPoint;
@@ -52,7 +51,7 @@ public class AspectConfig {
 	@Before(value = "execution(* com.searchservice.app.rest.ManageTableResource.*(..))")
 	public void logStatementForManagetableResource(JoinPoint joinPoint) {
 		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 	}
@@ -60,7 +59,7 @@ public class AspectConfig {
 	@Before(value = "execution(* com.searchservice.app.rest.InputDocumentResource.*(..))")
 	public void logStatementForRest1(JoinPoint joinPoint) {
 		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(),DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 	}
@@ -69,7 +68,7 @@ public class AspectConfig {
 	public void logStatementForService(JoinPoint joinPoint) {
 
 		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 	}
@@ -78,7 +77,7 @@ public class AspectConfig {
 	public void logStatementAfterRest(JoinPoint joinPoint) {
 
 		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 	}
@@ -86,7 +85,7 @@ public class AspectConfig {
 	@After(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
 	public void logStatementAfterService(JoinPoint joinPoint) {
 		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
-				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), utcTime(),
+				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
 	}
@@ -147,9 +146,6 @@ public class AspectConfig {
 
 	}
 
-	public static DateTime utcTime() {
-		DateTime now = new DateTime(); // Gives the default time zone.
-		return now.toDateTime(DateTimeZone.UTC);
-	}
+	
 
 }
