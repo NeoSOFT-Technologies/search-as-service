@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response extends BaseResponse{
 
@@ -23,7 +23,6 @@ public class Response extends BaseResponse{
 
 	public Response(int statusCode, String message) {
 		super(statusCode, message);
-		
 	}
 
 	public Response(int statusCode, String message, String token) {

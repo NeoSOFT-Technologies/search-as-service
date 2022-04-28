@@ -38,11 +38,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
-import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
+import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
@@ -100,12 +100,12 @@ class ManageTableServiceTest {
 	SchemaRequest schemaRequest;
 
 	
-	ManageTable manageTable = new ManageTable();
+	CreateTable manageTable = new CreateTable();
 
-	TableSchema newTableSchemaDTO = new TableSchema();
+	ManageTable newTableSchemaDTO = new ManageTable();
 
-	TableSchemav2 tableSchema = new TableSchemav2();
-	TableSchemav2Data tableSchemav2Data = new TableSchemav2Data();
+	TableSchema tableSchema = new TableSchema();
+	TableSchemaData tableSchemav2Data = new TableSchemaData();
 	SchemaResponse schemaResponse = new SchemaResponse();
 	ConfigSetAdminResponse configSetResponse = new ConfigSetAdminResponse();
 	CollectionAdminResponse collectionAdminResponse = new CollectionAdminResponse();
@@ -182,7 +182,7 @@ class ManageTableServiceTest {
 		getTablesResponseDTO.setMessage("Testing");
 		getTablesResponseDTO.setData(mockGetTableList);
 
-		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
+		TableSchema tableSchemaResponseDTO = new TableSchema();
 		tableSchemaResponseDTO.setMessage("Testting");
 		tableSchemaResponseDTO.setStatusCode(200);
 
@@ -408,7 +408,7 @@ class ManageTableServiceTest {
 	void getTableSchema() {
 		setMockitoSuccessResponseForService();
 
-		TableSchemav2 tableSchemaResponseDTO = manageTableService.getTableSchema(tableName);
+		TableSchema tableSchemaResponseDTO = manageTableService.getTableSchema(tableName);
 		assertEquals(200, tableSchemaResponseDTO.getStatusCode());
 	}
 
@@ -485,7 +485,7 @@ class ManageTableServiceTest {
 	void getCurrentTableSchema() {
 
 		setMockitoSuccessResponseForService();
-		TableSchemav2 getCurrentTableSchema = manageTableService.getCurrentTableSchema(tenantId, tableName);
+		TableSchema getCurrentTableSchema = manageTableService.getCurrentTableSchema(tenantId, tableName);
 		assertEquals(200, getCurrentTableSchema.getStatusCode());
 	}
 

@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
+import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.rest.errors.BadRequestOccurredException;
@@ -73,40 +73,34 @@ public class ManageTableResource {
 
 		if (getListItemsResponseDTO == null)
 			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
-
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
 			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
-
-
 			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
-
 		}
 	}
 
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<TableSchemav2> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
+	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
 					String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
-
 		} else {
 
 			// GET tableSchema
-			TableSchemav2 tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
+			TableSchema tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 
 			if (tableInfoResponseDTO == null)
 				throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
 						HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
-
 			if (tableInfoResponseDTO.getStatusCode() == 200) {
-
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
@@ -118,7 +112,7 @@ public class ManageTableResource {
 
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody ManageTable manageTableDTO) {
+	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable manageTableDTO) {
 
 		if (manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
 			log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
@@ -205,7 +199,7 @@ public class ManageTableResource {
 	@PutMapping("/{tableName}")
 	@Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> updateTableSchema(@RequestParam int tenantId, @PathVariable String tableName,
-			@RequestBody TableSchema newTableSchemaDTO) {
+			@RequestBody ManageTable newTableSchemaDTO) {
 
 		tableName = tableName + "_" + tenantId;
 		if(!manageTableServicePort.isTableExists(tableName)) {
