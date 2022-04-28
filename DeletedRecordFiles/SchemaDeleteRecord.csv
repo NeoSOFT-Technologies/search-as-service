@@ -49,4 +49,3 @@ TenantID,TableName,RequestTime,ColumnName
 303,bugtest4,20-4-2022 06:12:16,is_available
 303,bugtest4,20-4-2022 06:54:23,is_available
 303,bugtest4,22-4-2022 12:45:16,is_available
-606,makeup1,27-4-2022 09:01:00,hyperLinks

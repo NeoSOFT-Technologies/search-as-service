@@ -3,83 +3,28 @@ package com.searchservice.app.rest.errors;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.searchservice.app.domain.dto.BaseResponse;
 
-public class RestApiErrorHandling {
-       private int statusCode;
-       private HttpStatusCode status;
-	   private String message;
-	   
-	   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-	   private LocalDateTime timestamp;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-	   private RestApiErrorHandling() {
-	       timestamp = LocalDateTime.now();
-	   }
-	   RestApiErrorHandling(HttpStatusCode status,int statusCode) {
-	       this();
-	       this.statusCode=status.getCode();
-	       this.status=status;
-	       this.message = "Unexpected Exception";
-	   }
-	   
-	   RestApiErrorHandling(HttpStatusCode status, String message) {
-	       this();
-           this.statusCode=status.getCode();
-           this.status=status;
-	       this.message = message;
-	   }
+@Data
+@AllArgsConstructor
+public class RestApiErrorHandling extends BaseResponse {
 
-	   RestApiErrorHandling(HttpStatusCode status, Throwable ex) {
-	       this();
-           this.statusCode=status.getCode();
-           this.status=status;
-	       this.message = ex.getLocalizedMessage();
-	   }
-	   
-	   RestApiErrorHandling(int statuscode, Throwable ex) {
-	       this();
-           this.statusCode=statuscode;
-	       this.message = ex.getLocalizedMessage();
-	   }
-	   
-	   RestApiErrorHandling(int statuscode, HttpStatusCode status,String message) {
-	       this();
-           this.statusCode=statuscode;
-           this.status=status;
-	       this.message = message;
-	   }
+	private HttpStatusCode status;
 
-	public int getStatusCode() {
-		return statusCode;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	private LocalDateTime timestamp;
+
+	private RestApiErrorHandling() {
+		timestamp = LocalDateTime.now();
 	}
 
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
-	}
-
-	public HttpStatusCode getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatusCode status) {
+	RestApiErrorHandling(int statuscode, HttpStatusCode status, String message) {
+		this();
+		super.statusCode = statuscode;
 		this.status = status;
+		super.message = message;
 	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-	   
-	   
-	}
+}
