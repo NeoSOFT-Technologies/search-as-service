@@ -3,8 +3,8 @@ package com.searchservice.app.rest.errors;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.dto.BaseResponse;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

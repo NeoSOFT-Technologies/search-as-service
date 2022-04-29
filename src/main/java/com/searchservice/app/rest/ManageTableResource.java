@@ -2,7 +2,6 @@ package com.searchservice.app.rest;
 
 import java.util.List;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +23,8 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.DeletionOccurredException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
-import com.searchservice.app.rest.errors.NullPointerOccurredException;
-import com.searchservice.app.rest.errors.TableNotFoundException;
-import com.searchservice.app.rest.errors.TableNotUnderDeletionException;
-
+import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -72,16 +65,16 @@ public class ManageTableResource {
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
 
 		if (getListItemsResponseDTO == null)
-			throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
-		
+			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
 			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
-			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
 		}
 	}
 
@@ -90,56 +83,55 @@ public class ManageTableResource {
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
-			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		} else {
 
 			// GET tableSchema
 			TableSchema tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 
 			if (tableInfoResponseDTO == null)
-				throw new NullPointerOccurredException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
-						HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+				throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
+						HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 			if (tableInfoResponseDTO.getStatusCode() == 200) {
 				tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 				return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 			} else {
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-						String.format(ERROR_MSG+ "Fetching Schema Details For Table: %s Having TenantID; %d",tableName, tenantId));
+				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+						HttpStatusCode.BAD_REQUEST_EXCEPTION,String.format(ERROR_MSG+ "Fetching Schema Details For Table: %s Having TenantID; %d",tableName, tenantId));
 			}
 		}
 	}
 
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTable) {
+	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTableDTO) {
 
-		if (manageTableServicePort.checkIfTableNameisValid(createTable.getTableName())) {
-			log.error("Table Name  {} is Invalid", createTable.getTableName());
-			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					"Creating Table Failed , as Invalid Table Name " + createTable.getTableName() + " is Provided");
+		if (manageTableServicePort.checkIfTableNameisValid(createTableDTO.getTableName())) {
+			log.error("Table Name  {} is Invalid", createTableDTO.getTableName());
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + createTableDTO.getTableName() + " is Provided");
 		}
 		else {
-			if (tableDeleteServicePort.isTableUnderDeletion(createTable.getTableName())) {
-				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-						String.format("Table With Same Name %s %s%s", createTable.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			if (tableDeleteServicePort.isTableUnderDeletion(createTableDTO.getTableName())) {
+				throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+						HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table With Same Name %s %s%s", createTableDTO.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			} else {
 
-			} 
-			
-			else {
-
-				createTable.setTableName(createTable.getTableName() + "_" + tenantId);
+				createTableDTO.setTableName(createTableDTO.getTableName() + "_" + tenantId);
 				
-				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(createTable);
+				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(createTableDTO);
  
 				if (apiResponseDTO.getStatusCode() == 200) {
 					apiResponseDTO.setMessage(
-							"Table-" + createTable.getTableName().split("_")[0] + ", is created successfully");
+							"Table-" + createTableDTO.getTableName().split("_")[0] + ", is created successfully");
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
 					log.info(TABLE +"could not be created: {}", apiResponseDTO);
-					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",createTable.getTableName().split("_")[0], tenantId));
+					throw new CustomException(
+							HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+							HttpStatusCode.BAD_REQUEST_EXCEPTION,
+							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",createTableDTO.getTableName().split("_")[0], tenantId));
 				}
 			}
 		}
@@ -161,15 +153,15 @@ public class ManageTableResource {
 				} else {
 					log.debug("Exception occurred: {}", apiResponseDTO);
 
-					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), BAD_REQUEST_MSG);
+					throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
 				}
 			} else {
-				throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
+				throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 						String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "", HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
 			}
 		} else {
-			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
 
@@ -188,10 +180,10 @@ public class ManageTableResource {
 		} else {
 
 			log.debug("Exception Occured While Performing Restore Delete For Table: {} ", tableNameForMessage);
-			throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					String.format(ERROR_MSG+ "Restoring for %s %s ", TABLE, tableNameForMessage));
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION,String.format(ERROR_MSG+ "Restoring for %s %s ", TABLE, tableNameForMessage));
 		}}else {
-        	throw new TableNotUnderDeletionException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),
+        	throw new CustomException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),HttpStatusCode.TABLE_NOT_UNDER_DELETION,
         			String.format(TABLE_RESPONSE_MSG, tableNameForMessage, tenantId, "is ", HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage()));
         }
 	}
@@ -202,29 +194,33 @@ public class ManageTableResource {
 			@RequestBody ManageTable newTableSchemaDTO) {
 
 		tableName = tableName + "_" + tenantId;
-		if(!manageTableServicePort.isTableExists(tableName)) {
-        	throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-        			String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "", HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
-        }else {
-		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
-			newTableSchemaDTO.setTableName(tableName);
-
-			Response apiResponseDTO = manageTableServicePort.updateTableSchema(tenantId, tableName.split("_")[0],
-					newTableSchemaDTO);
-
-			if (apiResponseDTO.getStatusCode() == 200) {
-
-				apiResponseDTO.setMessage("Table is updated successfully");
-				return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-			} else {
-
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), BAD_REQUEST_MSG);
-			}
+		if (!manageTableServicePort.isTableExists(tableName)) {
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "",
+							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
 		} else {
-			throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
+				newTableSchemaDTO.setTableName(tableName);
+
+				Response apiResponseDTO = manageTableServicePort.updateTableSchema(tenantId, tableName.split("_")[0],
+						newTableSchemaDTO);
+
+				if (apiResponseDTO.getStatusCode() == 200) {
+
+					apiResponseDTO.setMessage("Table is updated successfully");
+					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+				} else {
+
+					throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+							HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
+				}
+			} else {
+				throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+						HttpStatusCode.UNDER_DELETION_PROCESS,
+						String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ",
+								HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+			}
 		}
-        }
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,11 @@ import org.springframework.stereotype.Component;
 import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParserUtil;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.CustomException;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -279,7 +281,7 @@ public class SearchJAdapter {
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(SchemaLabel.PARTIAL_SEARCH.getLabel()));
 		} catch (Exception e) {
 			logger.error(EXCEPTION_OCCURRED, e.getMessage());
-			throw new BadRequestOccurredException(400, "Could not confirm if partial_search field type is available");
+			throw new CustomException(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Could not confirm if partial_search field type is available");
 		}
 	}
 	
@@ -298,7 +300,7 @@ public class SearchJAdapter {
 				addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
 			} catch(Exception e) {
 				logger.error(EXCEPTION_OCCURRED, e.getMessage());
-				throw new BadRequestOccurredException(400, "Couldn't create partial search field type");
+				throw new CustomException(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Couldn't create partial search field type");
 			}
 		} else
 			fieldTypeAttributes.put("name", SchemaLabel.PARTIAL_SEARCH.getLabel());

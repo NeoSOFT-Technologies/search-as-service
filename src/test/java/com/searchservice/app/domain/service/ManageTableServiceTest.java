@@ -46,14 +46,7 @@ import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.InvalidColumnNameException;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
-
-import com.searchservice.app.rest.errors.TableAlreadyExistsException;
-
-import com.searchservice.app.rest.errors.TableNotFoundException;
-import com.searchservice.app.rest.errors.WrongMultiValueTypeException;
+import com.searchservice.app.rest.errors.CustomException;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -73,7 +66,6 @@ class ManageTableServiceTest {
 
 	private static final String DOCVALUES = "docValues";
 	private static final String INDEXED = "indexed";
-	private static final String PARTIAL_SEARCH = "partial_search";
 	
 	SearchAPIAdapter solrApiAdapter = new SearchAPIAdapter();
 	HttpSolrClient solrClient = null;
@@ -315,8 +307,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.getCurrentTableSchema(tenantId, "InvalidTable_101");
-		} catch (TableNotFoundException e) {
-			assertEquals(108, e.getExceptioncode());
+		} catch (CustomException e) {
+			assertEquals(108, e.getExceptionCode());
 		}
 	}
 
@@ -332,8 +324,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.deleteTable(tableName + "_123");
-		} catch (TableNotFoundException e) {
-			assertEquals(108, e.getExceptioncode());
+		} catch (CustomException e) {
+			assertEquals(108, e.getExceptionCode());
 		}
 	}
 
@@ -349,8 +341,8 @@ class ManageTableServiceTest {
 		setMockitoTableNotExist();
 		try {
 			manageTableService.createTableIfNotPresent(manageTable);
-		} catch (TableAlreadyExistsException e) {
-			assertEquals(110, e.getExceptioncode());
+		} catch (CustomException e) {
+			assertEquals(110, e.getExceptionCode());
 		}
 	}
 
@@ -367,8 +359,8 @@ class ManageTableServiceTest {
 	void checkInvalidTableName() {
 		try {
 			manageTableService.checkIfTableNameisValid("");
-		} catch (InvalidInputOccurredException e) {
-			assertEquals(101, e.getExceptioncode());
+		} catch (CustomException e) {
+			assertEquals(101, e.getExceptionCode());
 		}
 	}
 
@@ -378,7 +370,7 @@ class ManageTableServiceTest {
 		try {
 
 			manageTableService.getCurrentTableSchema(tenantId, tableName);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
@@ -388,11 +380,10 @@ class ManageTableServiceTest {
 
 		try {
 			manageTableService.isTableExists(tableName);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
-
 
 	@Test
 	void addAliasTable() {
@@ -402,14 +393,12 @@ class ManageTableServiceTest {
 		assertEquals(200, rs.getStatusCode());
 	}
 
-
-
 	@Test
 	void initializeSchemaDeletion() {
 
 		try {
 			manageTableService.initializeSchemaDeletion(tenantId, tableName, searchUrl);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
@@ -427,7 +416,7 @@ class ManageTableServiceTest {
 
 		try {
 			manageTableService.checkIfTableNameisValid(tableName);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}
@@ -456,14 +445,12 @@ class ManageTableServiceTest {
 
 	}
 
-
-
 	@Test
 	void isPartialSearchFieldTypePresent() {
 
 		try {
 			searchJAdapter.isPartialSearchFieldTypePresent(tableName);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 
@@ -473,7 +460,7 @@ class ManageTableServiceTest {
 	void checkTableDeletionStatus() {
 		try {
 			manageTableService.checkTableDeletionStatus(tenantId);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 
@@ -485,7 +472,7 @@ class ManageTableServiceTest {
 		setMockitoSuccessResponseForService();
 		try {
 			manageTableService.updateSchemaFields(newTableSchemaDTO);
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 
@@ -524,8 +511,8 @@ class ManageTableServiceTest {
 		setMockitoSuccessResponseForService();
 		setUpManageTable(1,1);
 		try {
-		Response se = manageTableService.createTableIfNotPresent(manageTable);
-		}catch(WrongMultiValueTypeException e)
+		manageTableService.createTableIfNotPresent(manageTable);
+		}catch(CustomException e)
 		{
 			assertEquals(112, e.getExceptionCode());
 		}
@@ -540,7 +527,7 @@ class ManageTableServiceTest {
 		try {
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
-		}catch(InvalidColumnNameException e) {
+		}catch(CustomException e) {
 			assertEquals(111, e.getExceptionCode());
 		}
 	}
@@ -555,11 +542,12 @@ class ManageTableServiceTest {
 
 	}
 
+
 	@Test
 	void schemaDelete() {
 		try {
 			manageTableService.checkForSchemaDeletion();
-		} catch (BadRequestOccurredException e) {
+		} catch (CustomException e) {
 			assertEquals(400, e.getExceptionCode());
 		}
 	}

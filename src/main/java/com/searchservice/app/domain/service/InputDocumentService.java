@@ -13,8 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomException;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -62,6 +63,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
+		if (!manageTableServicePort.isTableExists(tableName))
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " table doesn't exist");
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE

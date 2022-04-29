@@ -18,7 +18,7 @@ import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.rest.errors.CustomException;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 
@@ -90,8 +90,8 @@ class InputDocumentServiceTest {
 		setMockitoBadResponseForService();
 		try {
 			inputDocumentService.addDocuments(true, tableName, payload);
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+		}catch(CustomException e) {
+			assertEquals(108,e.getExceptionCode());
 		}
 	}
 	
@@ -101,8 +101,8 @@ class InputDocumentServiceTest {
 		setMockitoBadResponseForService();
 		try {
 			inputDocumentService.addDocuments(false, tableName, payload);
-		}catch(BadRequestOccurredException e) {
-			assertEquals(400,e.getExceptionCode());
+		}catch(CustomException e) {
+			assertEquals(108,e.getExceptionCode());
 		}
 	}
 
@@ -131,6 +131,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testBadAddDocumentsForNRT() {
 		setMockitoBadResponseForService();
+		tableExist();
 		ThrottlerResponse response =inputDocumentService.addDocuments(true,tableName, payload);
 		assertEquals(400, response.getStatusCode());
 	}
@@ -138,6 +139,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testBadAddDocumentsWithoutNRT() {
 		setMockitoBadResponseForService();
+		tableExist();
 		ThrottlerResponse response =inputDocumentService.addDocuments(false,tableName, payload);
 		assertEquals(400, response.getStatusCode());
 	}
