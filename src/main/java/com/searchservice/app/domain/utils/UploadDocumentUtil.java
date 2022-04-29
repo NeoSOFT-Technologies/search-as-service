@@ -19,16 +19,16 @@ import lombok.Data;
 @Data
 @Component
 public class UploadDocumentUtil {
-	  private static String CONTENT_TYPE="application/json";
-	  private static String DOCUMENT_UPLOAD_SUCCESS="Document Added Successfully!";
+	private static String CONTENT_TYPE="application/json";
+	private static String DOCUMENT_UPLOAD_SUCCESS="Document Added Successfully!";
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
 	private String tableName;
 	private String content;// "[{'name': 'karthik1'},{'name': 'karthik2'}]"
   
-	public UploadDocumentSearchUtilRespnse commit() {
 
+	public UploadDocumentSearchUtilRespnse commit() {
 		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse(CONTENT_TYPE);
 		RequestBody body = RequestBody.create(mediaType, content);
@@ -36,56 +36,21 @@ public class UploadDocumentUtil {
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 
-		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", CONTENT_TYPE).build();
-
-		try {
-
-			Response response = client.newCall(request).execute();
-			if (response.code() != 400) {
-				return new UploadDocumentSearchUtilRespnse(true, DOCUMENT_UPLOAD_SUCCESS);
-			} else {
-				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded!");
-			}
-		} catch (IOException e) {
-			log.error(e.toString());
-
-			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
-
-		}
-
+		return processUploadDocumentRequest(client, body, url);
 	}
 
+	
 	public UploadDocumentSearchUtilRespnse softcommit() {
-
 		OkHttpClient client = new OkHttpClient();
-
 		MediaType mediaType = MediaType.parse(CONTENT_TYPE);
-
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
-
 		url += "softCommit=true";
 
 		log.debug("SOFT COMMIT");
 
-		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", CONTENT_TYPE).build();
-
-		try {
-			// Response response =
-			client.newCall(request).execute();
-
-			return new UploadDocumentSearchUtilRespnse(true, DOCUMENT_UPLOAD_SUCCESS);
-
-		} catch (IOException e) {
-			log.error(e.toString());
-
-			return new UploadDocumentSearchUtilRespnse(false, "Document not uploaded! IOException.");
-
-		}
-
+		return processUploadDocumentRequest(client, body, url);
 	}
 	
 	private UploadDocumentSearchUtilRespnse processUploadDocumentRequest(OkHttpClient client, RequestBody body, String url) {
