@@ -15,7 +15,7 @@ import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import com.searchservice.app.rest.errors.CustomExceptionHandler;
+import com.searchservice.app.rest.errors.CustomException;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
@@ -64,7 +64,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
 		if (!manageTableServicePort.isTableExists(tableName))
-			throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,tableName.split("_")[0] + " table doesn't exist");
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " table doesn't exist");
 
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 

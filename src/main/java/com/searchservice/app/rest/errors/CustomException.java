@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class CustomExceptionHandler extends RuntimeException{
+public class CustomException extends RuntimeException{
 
 		private static final long serialVersionUID = 1L;
 		private int exceptionCode;

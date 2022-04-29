@@ -29,7 +29,7 @@ import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParserUtil;
-import com.searchservice.app.rest.errors.CustomExceptionHandler;
+import com.searchservice.app.rest.errors.CustomException;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -287,7 +287,7 @@ public class SearchJAdapter {
 			return fieldTypes.stream().anyMatch(ft -> ft.getAttributes().containsValue(PARTIAL_SEARCH));
 		} catch (Exception e) {
 			logger.error(EXCEPTION_OCCURRED, e.getMessage());
-			throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Could not confirm if partial_search field type is available");
+			throw new CustomException(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Could not confirm if partial_search field type is available");
 		}
 	}
 	
@@ -306,7 +306,7 @@ public class SearchJAdapter {
 				addFieldTypeRequest(addFieldTypeRequest, searchClientActive);
 			} catch(Exception e) {
 				logger.error(EXCEPTION_OCCURRED, e.getMessage());
-				throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Couldn't create partial search field type");
+				throw new CustomException(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,"Couldn't create partial search field type");
 			}
 		} else
 			fieldTypeAttributes.put("name", PARTIAL_SEARCH);

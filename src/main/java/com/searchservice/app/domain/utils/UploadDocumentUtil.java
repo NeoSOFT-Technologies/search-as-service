@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.searchservice.app.rest.errors.CustomExceptionHandler;
+import com.searchservice.app.rest.errors.CustomException;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -19,7 +19,7 @@ import lombok.Data;
 @Data
 @Component
 public class UploadDocumentUtil {
-	  private static String contentType="application/json";
+	  private static String CONTENT_TYPE="application/json";
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
@@ -29,14 +29,14 @@ public class UploadDocumentUtil {
 	public UploadDocumentSearchUtilRespnse commit() {
 
 		OkHttpClient client = new OkHttpClient();
-		MediaType mediaType = MediaType.parse(contentType);
+		MediaType mediaType = MediaType.parse(CONTENT_TYPE);
 		RequestBody body = RequestBody.create(mediaType, content);
 
 		String url = baseSearchUrl + "/" + tableName + "/update?";
 		url += "commit=true";
 
 		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", contentType).build();
+				.addHeader("Content-Type", CONTENT_TYPE).build();
 
 		try {
 
@@ -44,7 +44,7 @@ public class UploadDocumentUtil {
 			if (response.code() != 400) {
 				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
 			} else {
-				throw new CustomExceptionHandler(400,HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded!");
+				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded!");
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
@@ -59,7 +59,7 @@ public class UploadDocumentUtil {
 
 		OkHttpClient client = new OkHttpClient();
 
-		MediaType mediaType = MediaType.parse(contentType);
+		MediaType mediaType = MediaType.parse(CONTENT_TYPE);
 
 		RequestBody body = RequestBody.create(mediaType, content);
 
@@ -70,7 +70,7 @@ public class UploadDocumentUtil {
 		log.debug("SOFT COMMIT");
 
 		Request request = new Request.Builder().url(url).method("POST", body)
-				.addHeader("Content-Type", contentType).build();
+				.addHeader("Content-Type", CONTENT_TYPE).build();
 
 		try {
 			// Response response =

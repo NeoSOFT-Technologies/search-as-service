@@ -23,8 +23,8 @@ public class RestControllerAdvice {
 	private final Logger log = LoggerFactory.getLogger(RestControllerAdvice.class);
 
 	
-	@ExceptionHandler(CustomExceptionHandler.class)
-	public ResponseEntity<Object> handleGenricException(CustomExceptionHandler exception) {
+	@ExceptionHandler(CustomException.class)
+	public ResponseEntity<Object> handleGenericException(CustomException exception) {
 
 		return new ResponseEntity<>(new RestApiErrorHandling(
 
@@ -68,12 +68,12 @@ public class RestControllerAdvice {
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
-			CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
-			if(ex.getCause() instanceof CustomExceptionHandler) {
+			CustomException exc = (CustomException)ex.getCause();
+			if(ex.getCause() instanceof CustomException) {
 //				CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
 			}
-			else if(ex.getCause() instanceof CustomExceptionHandler &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {
+			else if(ex.getCause() instanceof CustomException &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {
 				return new ResponseEntity<Object>(new RestApiErrorHandling(
 						
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,
