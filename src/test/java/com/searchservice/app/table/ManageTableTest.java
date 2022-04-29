@@ -22,10 +22,10 @@ import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
-import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
 import com.searchservice.app.domain.service.ManageTableService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
@@ -84,7 +84,7 @@ class ManageTableTest {
 
 	public void setMockitoSuccessResponseForService() {
 		Response responseDTO = new Response();
-		TableSchemav2 tableInfoResponseDTO= new TableSchemav2();
+		TableSchema tableInfoResponseDTO= new TableSchema();
 		tableInfoResponseDTO.setStatusCode(200);
 		
 		responseDTO.setStatusCode(200);
@@ -131,7 +131,7 @@ class ManageTableTest {
 		Response responseDTO = new Response();
 		responseDTO.setStatusCode(400);
 		responseDTO.setMessage("Testing");
-		TableSchemav2 tableInfoResponseDTO= new TableSchemav2();
+		TableSchema tableInfoResponseDTO= new TableSchema();
 		tableInfoResponseDTO.setStatusCode(400);
 		Response unodDeleteResponseDTO = new Response();
 		unodDeleteResponseDTO.setStatusCode(400);
@@ -171,7 +171,7 @@ class ManageTableTest {
 	@Test
 	void testCreateTable() throws Exception {
 
-		ManageTable createTableDTO = new ManageTable(tableName, "B", "default-schema", attributes);
+		CreateTable createTableDTO = new CreateTable(tableName, "B", attributes);
 
 		// CREATE COLLECTION
 		setMockitoSuccessResponseForService();
@@ -215,7 +215,7 @@ class ManageTableTest {
 	@Test
 	void testDeleteTable() throws Exception {
 
-		ManageTable createTableForDeletion = new ManageTable(tableName, "B", "default-schema", attributes);
+		CreateTable createTableForDeletion = new CreateTable(tableName, "B", attributes);
 
 		// DELETE A NON EXISTING COLLECTION
 		Response deleteTableResponseDTO = new Response();
@@ -255,7 +255,7 @@ class ManageTableTest {
 
 		// Update Schema
 		setMockitoSuccessResponseForService();
-		TableSchema schemaDTO = new TableSchema(tableName, attributes);
+		ManageTable schemaDTO = new ManageTable(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"+ "/" + tableName+ "/?tenantId="+tenantId)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -263,7 +263,7 @@ class ManageTableTest {
 
 		// Update Schema for non-existing table
 		setMockitoForTableNotExist();
-		schemaDTO = new TableSchema(tableName, attributes);
+		schemaDTO = new ManageTable(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"  + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -272,7 +272,7 @@ class ManageTableTest {
 		// Update Schema for Table Under Deletion
 		Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
-		schemaDTO = new TableSchema(tableName, attributes);
+		schemaDTO = new ManageTable(tableName, attributes);
 		restAMockMvc.perform(MockMvcRequestBuilders
 				.put(apiEndpoint + "/manage/table"  + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
@@ -300,6 +300,7 @@ class ManageTableTest {
 	                .accept(MediaType.APPLICATION_JSON))
 	        .andExpect(status().isOk());
 	}
+	
 	public void setMockitoForTableUnderDeletion() {
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
 		Response unodDeleteResponseDTO = new Response();

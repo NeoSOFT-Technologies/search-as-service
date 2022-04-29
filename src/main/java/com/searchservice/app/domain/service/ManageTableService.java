@@ -38,12 +38,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
-import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchemav2;
-import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
+import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
 import com.searchservice.app.domain.utils.BasicUtil;
@@ -68,7 +68,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
 	
-	private static final String TABLE_NOT_FOUND_MSG = "Table: %s, does not exist";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
@@ -87,9 +86,6 @@ public class ManageTableService implements ManageTableServicePort {
 	@Value("${basic-auth.password}")
 
 	private String basicAuthPasswordNonStatic;
-
-	// ConfigSet
-	@Value("${base-configset}")
 
 	private String baseConfigSetNonStatic;
 
@@ -141,7 +137,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
 
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		java.util.List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
 				tenantId);
 
 		try {
@@ -162,17 +158,17 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public TableSchemav2 getCurrentTableSchema(int tenantId, String tableName) {
+	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
-		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
+		TableSchema tableSchema = getTableSchema(tableName + "_" + tenantId);
 
 		// Compare tableSchema locally Vs. tableSchema at Search cloud
-		TableSchemav2 schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(tableName, tenantId,
+		TableSchema schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(tableName, tenantId,
 				tableSchema);
 		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream()
 				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
@@ -181,52 +177,36 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
+	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
-		if (!isTableExists(tableName))
-			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND
-					, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
-		TableSchemav2 tableSchema = getTableSchema(tableName);
-
-		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
-				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
-
-		return tableSchema;
-	}
-
-	@Override
-	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
-
-		if (isTableExists(manageTableDTO.getTableName()))
+		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
-					TABLE + manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
+					TABLE + createTableDTO.getTableName().split("_")[0] + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
 							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
         
-		if(!isColumnNameValid(manageTableDTO.getColumns())) {
+		if(!isColumnNameValid(createTableDTO.getColumns())) {
 			   throw new CustomException(HttpStatusCode.INVALID_COLUMN_NAME.getCode()
 					   ,HttpStatusCode.INVALID_COLUMN_NAME,HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
 		}
 		
-		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(manageTableDTO.getColumns()))) {		
-			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(), HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
-					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
-
+		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(createTableDTO.getColumns()))) {		
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(), HttpStatusCode.WRONG_DATA_TYPE,
+					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
 		}
 
-		// Configset is present, proceed
-		Response apiResponseDTO = createTable(manageTableDTO);
+		Response apiResponseDTO = createTable(createTableDTO);
 
 		if (apiResponseDTO.getStatusCode() == 200) {
 			// Check if new table columns are to be added(Non-null list of columns)
-			if (manageTableDTO.getColumns() == null) {
+			if (createTableDTO.getColumns() == null) {
 				String updatedMsg = String.format("%s. No new columns found", apiResponseDTO.getMessage());
 				apiResponseDTO.setMessage(updatedMsg);
 				return apiResponseDTO;
-			} else if (manageTableDTO.getColumns().isEmpty())
+			} else if (createTableDTO.getColumns().isEmpty())
 				return apiResponseDTO;
 
 			// Add schema fields
-			TableSchema tableSchemaDTO = new TableSchema(manageTableDTO.getTableName(), manageTableDTO.getColumns());
+			ManageTable tableSchemaDTO = new ManageTable(createTableDTO.getTableName(), createTableDTO.getColumns());
 			Response tableSchemaResponseDTO = addSchemaFields(tableSchemaDTO);
 			logger.info("Adding schema attributes response: {}", tableSchemaResponseDTO.getMessage());
 		}
@@ -258,7 +238,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response updateTableSchema(int tenantId, String tableName, TableSchema tableSchemaDTO) {
+	public Response updateTableSchema(int tenantId, String tableName, ManageTable tableSchemaDTO) {
 		Response apiResponseDTO = new Response();
 
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
@@ -267,8 +247,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(tableSchemaDTO.getColumns()))) {
 
-			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
-					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(),HttpStatusCode.WRONG_DATA_TYPE,
+					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
 
 		}
 		
@@ -305,10 +285,10 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public TableSchemav2 compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
-			TableSchemav2 tableSchema) {
+	public TableSchema compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
+			TableSchema tableSchema) {
 
-		TableSchemav2Data data = new TableSchemav2Data();
+		TableSchemaData data = new TableSchemaData();
 		data.setTableName(tableName);
 
 		List<SchemaField> schemaAttributesCloud = tableSchema.getData().getColumns();
@@ -333,10 +313,10 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public TableSchemav2 getTableSchema(String tableName) {
+	public TableSchema getTableSchema(String tableName) {
 
-		TableSchemav2 tableSchemaResponseDTO = new TableSchemav2();
-		TableSchemav2Data data = new TableSchemav2Data();
+		TableSchema tableSchemaResponseDTO = new TableSchema();
+		TableSchemaData data = new TableSchemaData();
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
 		try {
 			SchemaResponse schemaResponse = searchJAdapter.getSchemaFields(searchClientActive);
@@ -380,7 +360,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 
-	public Response createTable(ManageTable manageTableDTO) {
+	public Response createTable(CreateTable manageTableDTO) {
 		Response apiResponseDTO = new Response();
 
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
@@ -420,7 +400,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response addSchemaFields(TableSchema newTableSchemaDTO) {
+	public Response addSchemaFields(ManageTable newTableSchemaDTO) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
 
 				newTableSchemaDTO.getTableName());
@@ -480,7 +460,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 
-	public Response updateSchemaFields(TableSchema newTableSchemaDTO) {
+	public Response updateSchemaFields(ManageTable newTableSchemaDTO) {
 		// Prepare SearchClient instance
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
 				newTableSchemaDTO.getTableName());

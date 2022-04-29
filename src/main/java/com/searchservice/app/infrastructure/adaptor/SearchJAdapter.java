@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.SchemaField;
-import com.searchservice.app.domain.dto.table.TableSchema;
+import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
@@ -286,7 +286,7 @@ public class SearchJAdapter {
 	}
 	
 	
-	public Map<String, Object> createPartialSearchFieldTypeIfNotPresent(TableSchema tableSchemaDTO) {
+	public Map<String, Object> createPartialSearchFieldTypeIfNotPresent(ManageTable tableSchemaDTO) {
 		Map<String, Object> fieldTypeAttributes = TableSchemaParserUtil.partialSearchFieldTypeAttrs;
 		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
 			FieldTypeDefinition fieldTypeDef = new FieldTypeDefinition();
@@ -309,7 +309,7 @@ public class SearchJAdapter {
 	}
 	
 	
-	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(TableSchema tableSchemaDTO) {
+	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(ManageTable tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 
 		for (SchemaField fieldDto : tableSchemaDTO.getColumns()) {
@@ -337,7 +337,7 @@ public class SearchJAdapter {
 	}
 	
 	
-	public void partialSearchUpdate(TableSchema tableSchemaDTO, SchemaField fieldDto, Map<String, Object> fieldDtoMap) {
+	public void partialSearchUpdate(ManageTable tableSchemaDTO, SchemaField fieldDto, Map<String, Object> fieldDtoMap) {
 		// if partial search enabled
 		if (fieldDto.isPartialSearch()) {
 			// Add <partial-search> field-type if not present already

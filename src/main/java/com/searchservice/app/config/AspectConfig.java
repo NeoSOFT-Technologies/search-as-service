@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 
 import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.user.UserDTO;
+import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.utils.DateUtil;
 
 @Aspect
@@ -28,12 +28,12 @@ public class AspectConfig {
 	private static final String STARTED_EXECUTION = "--------Started Request of Service Name : {}, Username : {}, CorrelationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
 	private static final String SUCCESSFUL_EXECUTION = "--------Successfully Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, TimeStamp : {}, Parameters : {}";
 	private static final String CORRELATION_ID_LOG_VAR_NAME = "CID";
-	private static UserDTO user;
+	private static User user;
 	private static String ip;
 
 	@Before(value = "execution(* com.searchservice.app.rest.UserResource.*(..))")
 	public static Object logStatementForRest(JoinPoint joinPoint) {
-		user = (UserDTO) joinPoint.getArgs()[0];
+		user = (User) joinPoint.getArgs()[0];
 
 		try {
 			ip = InetAddress.getLocalHost().getHostAddress();

@@ -19,8 +19,8 @@ import lombok.Data;
 @Data
 @Component
 public class UploadDocumentUtil {
-	private static String CONTENT_TYPE="application/json";
-	private static String DOCUMENT_UPLOAD_SUCCESS="Document Added Successfully!";
+	private static final String CONTENT_TYPE="application/json";
+	private static final String DOCUMENT_UPLOAD_SUCCESS="Document Added Successfully!";
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
