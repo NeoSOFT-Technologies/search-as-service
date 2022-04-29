@@ -2,6 +2,7 @@
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +23,7 @@ import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.DateUtil;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @Service
 
