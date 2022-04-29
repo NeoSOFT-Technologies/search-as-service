@@ -1,4 +1,4 @@
-package com.searchservice.app.rest.errors;
+package com.searchservice.app.domain.utils;
 
 public enum HttpStatusCode {
 	
@@ -38,10 +38,9 @@ public enum HttpStatusCode {
 	
 	TABLE_ALREADY_EXISTS(110, "already exists"),
 	
-	INVALID_COLUMN_NAME(111, "invalid column name provided"),	
+	INVALID_COLUMN_NAME(111, "invalid column name provided"),
 	
 	WRONG_DATA_TYPE_MULTIVALUED(112, "wrong datatype selected for non multivalued field");
-	
 	
 	private int code;
 	private String message;
@@ -55,17 +54,11 @@ public enum HttpStatusCode {
 		return code;
 	}
 
-	public void setCode(int code) {
-		this.code = code;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+	
 	
 
 }

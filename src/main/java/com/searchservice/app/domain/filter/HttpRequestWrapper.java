@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.filter;
 
 import java.io.BufferedReader;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +12,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
+import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomException;
 
 public class HttpRequestWrapper extends HttpServletRequestWrapper {
 
@@ -35,7 +37,7 @@ public class HttpRequestWrapper extends HttpServletRequestWrapper {
 				stringBuilder.append("");
 			}
 		} catch (IOException ex) {
-			throw new BadRequestOccurredException(400, ex.getMessage());
+			throw new CustomException(400,HttpStatusCode.BAD_REQUEST_EXCEPTION,ex.getMessage());
 		} finally {
 			if (bufferedReader != null) {
 				bufferedReader.close();

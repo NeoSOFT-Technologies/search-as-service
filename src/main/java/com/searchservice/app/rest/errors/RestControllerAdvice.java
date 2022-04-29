@@ -14,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -21,132 +22,23 @@ public class RestControllerAdvice {
 
 	private final Logger log = LoggerFactory.getLogger(RestControllerAdvice.class);
 
-	@ExceptionHandler(BadRequestOccurredException.class)
-	public ResponseEntity<Object> handleBadRequestOccurred(BadRequestOccurredException exception) {
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), HttpStatusCode.BAD_REQUEST_EXCEPTION,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(InvalidInputOccurredException.class)
-	public ResponseEntity<Object> handleInvalidInput(InvalidInputOccurredException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.INVALID_TABLE_NAME.getCode(), HttpStatusCode.INVALID_TABLE_NAME,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
 	
-	@ExceptionHandler(InvalidColumnNameException.class)
-	public ResponseEntity<Object> handleInvalidColumnName(InvalidColumnNameException exception) {
+	@ExceptionHandler(CustomException.class)
+	public ResponseEntity<Object> handleGenericException(CustomException exception) {
 
 		return new ResponseEntity<>(new RestApiErrorHandling(
 
-				HttpStatusCode.INVALID_COLUMN_NAME.getCode(), HttpStatusCode.INVALID_COLUMN_NAME,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-	
-	@ExceptionHandler(TableAlreadyExistsException.class)
-	public ResponseEntity<Object> handleExistTable(TableAlreadyExistsException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), HttpStatusCode.TABLE_ALREADY_EXISTS,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-	
-	@ExceptionHandler(TableNotFoundException.class)
-	public ResponseEntity<Object> handleTableNotFound(TableNotFoundException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
+				exception.getExceptionCode(), exception.getStatus(),
 				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(TableNotUnderDeletionException.class)
-	public ResponseEntity<Object> handleTableNotUnderDeletion(TableNotUnderDeletionException exception) {
 
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(), HttpStatusCode.TABLE_NOT_UNDER_DELETION,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-	@ExceptionHandler(InvalidSKUOccurredException.class)
-	public ResponseEntity<Object> handleInvalidSKU(InvalidSKUOccurredException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.INVALID_SKU_NAME.getCode(), HttpStatusCode.INVALID_SKU_NAME,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(NullColumnOccurredException.class)
-	public ResponseEntity<Object> handlenullColumn(NullColumnOccurredException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.NULL_COLUMN.getCode(), HttpStatusCode.NULL_COLUMN, exception.getExceptionMessage()),
-				HttpStatus.BAD_REQUEST);
-	}
-	@ExceptionHandler(InvalidJsonInputOccurredException.class)
-	public ResponseEntity<Object> handleInvalidJsonInput(InvalidJsonInputOccurredException exception) {
-
-		if(exception.getCause() instanceof InvalidJsonInputOccurredException) {
-			return new ResponseEntity<>(new RestApiErrorHandling(
-
-					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
-					HttpStatus.BAD_REQUEST);
-		}
-		else {
-			return new ResponseEntity<>(new RestApiErrorHandling(
-
-					HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT, HttpStatusCode.INVALID_JSON_INPUT.getMessage()),
-					HttpStatus.BAD_REQUEST);
-		}
-	}
-	@ExceptionHandler(DeletionOccurredException.class)
-	public ResponseEntity<Object> handledeletionprocess(DeletionOccurredException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), HttpStatusCode.UNDER_DELETION_PROCESS,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(ContentNotFoundException.class)
-	public ResponseEntity<Object> handleRestApiDefaultException(ContentNotFoundException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.NOT_FOUND, exception.getExceptionMessage()));
-	}
-
-	@ExceptionHandler(NullPointerOccurredException.class)
-	public ResponseEntity<Object> handleNullPointerOccurredException(NullPointerOccurredException exception) {
-		return new ResponseEntity<>(new RestApiErrorHandling(
-				HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), HttpStatusCode.NULL_POINTER_EXCEPTION,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaughtException(Exception exception) {
 		
 		log.error("Uncaught Error Occured: {}", exception.getMessage());
 		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getMessage()));
-	}
-
-	@ExceptionHandler(InputDocumentException.class)
-	public ResponseEntity<Object> handleInputDocumentExcpetion(InputDocumentException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getExceptionMessage()));
-	}
-
-	@ExceptionHandler(SchemaResourceException.class)
-	public ResponseEntity<Object> handleSchemaResourceExcpetion(SchemaResourceException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getExceptionMessage()));
-	}
-
-	@ExceptionHandler(TableResourceException.class)
-	public ResponseEntity<Object> handleTableResourceExcpetion(TableResourceException exception) {
-		return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exception.getExceptionMessage()));
 	}
 
 	private ResponseEntity<Object> frameRestApiException(RestApiError err) {
@@ -172,17 +64,16 @@ public class RestControllerAdvice {
 		    }
 			String value = (null != ex.getValue())?ex.getValue().toString():"";
 			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field : "+fieldName+" is not expected as : "+value));
-			//targetType = ex.getTargetType().getName();
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
-			if(ex.getCause() instanceof BadRequestOccurredException) {
-				BadRequestOccurredException exc = (BadRequestOccurredException)ex.getCause();
+			CustomException exc = (CustomException)ex.getCause();
+			if(ex.getCause() instanceof CustomException) {
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
 			}
-			else if(ex.getCause() instanceof InvalidColumnOccurredException) {
+			else if(ex.getCause() instanceof CustomException &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {
 				return new ResponseEntity<Object>(new RestApiErrorHandling(
-
+						
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getMessage()),HttpStatus.BAD_REQUEST);
 			}
@@ -213,16 +104,6 @@ public class RestControllerAdvice {
 		return frameRestApiException(
 				new RestApiError(HttpStatus.BAD_REQUEST, fieldName + " must be of type " + requiredType));
 	}
-	
-	@ExceptionHandler(WrongMultiValueTypeException.class)
-	public ResponseEntity<Object> handleTWrongMultiValueType(WrongMultiValueTypeException exception) {
-
-		return new ResponseEntity<>(new RestApiErrorHandling(
-
-				HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(), HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
-				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
-	}
-	
 	
 	
 }

@@ -1,6 +1,8 @@
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
+
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -45,6 +47,7 @@ import com.searchservice.app.domain.dto.table.TableSchemav2.TableSchemav2Data;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
 import com.searchservice.app.domain.utils.BasicUtil;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
@@ -52,16 +55,8 @@ import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
-import com.searchservice.app.rest.errors.BadRequestOccurredException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
-import com.searchservice.app.rest.errors.InvalidColumnNameException;
-import com.searchservice.app.rest.errors.InvalidInputOccurredException;
-import com.searchservice.app.rest.errors.InvalidSKUOccurredException;
+import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
-import com.searchservice.app.rest.errors.TableAlreadyExistsException;
-import com.searchservice.app.rest.errors.TableNotFoundException;
-import com.searchservice.app.rest.errors.WrongMultiValueTypeException;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -170,10 +165,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getCurrentTableSchema(int tenantId, String tableName) {
 
 		if (!isTableExists(tableName + "_" + tenantId))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-
-					TABLE + tableName + " having TenantID: " + tenantId + " "
-							+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
+					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
 		// GET tableSchema at Search cloud
 		TableSchemav2 tableSchema = getTableSchema(tableName + "_" + tenantId);
@@ -191,8 +184,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public TableSchemav2 getTableSchemaIfPresent(String tableName) {
 
 		if (!isTableExists(tableName))
-			throw new TableNotFoundException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
-					String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND
+					, String.format(TABLE_NOT_FOUND_MSG, tableName.split("_")[0]));
 		TableSchemav2 tableSchema = getTableSchema(tableName);
 
 		tableSchema.getData().setColumns(tableSchema.getData().getColumns().stream()
@@ -205,19 +198,17 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response createTableIfNotPresent(ManageTable manageTableDTO) {
 
 		if (isTableExists(manageTableDTO.getTableName()))
-
-			throw new TableAlreadyExistsException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),
-					TABLE + manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "
-							+ manageTableDTO.getTableName().split("_")[1] + " "
-							+ HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
-
-		if (!isColumnNameValid(manageTableDTO.getColumns())) {
-			throw new InvalidColumnNameException(HttpStatusCode.INVALID_COLUMN_NAME.getCode(),
-					HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
+			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
+					TABLE + manageTableDTO.getTableName().split("_")[0] + " Having TenantID: "+manageTableDTO.getTableName().split("_")[1]
+							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
+        
+		if(!isColumnNameValid(manageTableDTO.getColumns())) {
+			   throw new CustomException(HttpStatusCode.INVALID_COLUMN_NAME.getCode()
+					   ,HttpStatusCode.INVALID_COLUMN_NAME,HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
 		}
 		
 		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(manageTableDTO.getColumns()))) {		
-			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(), HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
 					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
 
 		}
@@ -244,6 +235,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
+		if (!isTableExists(tableName))
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
+					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 		// Delete table
 		Response apiResponseDTO = new Response();
 
@@ -273,7 +267,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(tableSchemaDTO.getColumns()))) {
 
-			throw new WrongMultiValueTypeException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
 					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
 
 		}
@@ -291,7 +285,6 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
-
 	@Override
 	public boolean isTableExists(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
@@ -303,11 +296,11 @@ public class ManageTableService implements ManageTableServicePort {
 			logger.error(e.toString());
 			if ((e instanceof SolrServerException)
 					&& (HttpHostConnectException) e.getCause() instanceof HttpHostConnectException)
-				throw new BadRequestOccurredException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),
+				throw new CustomException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION,
 						"Could not connect to Solr server");
 			else
-				throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-						"Table Search operation could not be completed");
+				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+						HttpStatusCode.BAD_REQUEST_EXCEPTION, "Table Search operation could not be completed");
 		}
 	}
 
@@ -401,7 +394,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (selectedCapacityPlan == null) {
 			// INVALD SKU
-			throw new InvalidSKUOccurredException(HttpStatusCode.INVALID_SKU_NAME.getCode(),
+			throw new CustomException(HttpStatusCode.INVALID_SKU_NAME.getCode(),HttpStatusCode.INVALID_SKU_NAME,
 					HttpStatusCode.INVALID_SKU_NAME.getMessage() + " : " + manageTableDTO.getSku());
 		}
 
@@ -696,8 +689,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public boolean checkIfTableNameisValid(String tableName) {
 		if (null == tableName || tableName.isBlank() || tableName.isEmpty())
 
-			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					"Provide valid Table Name");
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Provide valid Table Name");
 		Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 		Matcher matcher = pattern.matcher(tableName);
 		return matcher.find();
