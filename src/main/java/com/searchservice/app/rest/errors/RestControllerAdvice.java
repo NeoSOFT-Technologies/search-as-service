@@ -64,13 +64,11 @@ public class RestControllerAdvice {
 		    }
 			String value = (null != ex.getValue())?ex.getValue().toString():"";
 			return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, "Value for field : "+fieldName+" is not expected as : "+value));
-			//targetType = ex.getTargetType().getName();
 		}else if(exception.getCause() instanceof JsonMappingException) {
 			
 			JsonMappingException ex = (JsonMappingException)exception.getCause();
 			CustomException exc = (CustomException)ex.getCause();
 			if(ex.getCause() instanceof CustomException) {
-//				CustomExceptionHandler exc = (CustomExceptionHandler)ex.getCause();
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
 			}
 			else if(ex.getCause() instanceof CustomException &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {

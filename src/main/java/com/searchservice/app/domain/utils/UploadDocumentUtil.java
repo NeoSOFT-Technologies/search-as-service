@@ -20,6 +20,7 @@ import lombok.Data;
 @Component
 public class UploadDocumentUtil {
 	  private static String CONTENT_TYPE="application/json";
+	  private static String DOCUMENT_UPLOAD_SUCCESS="Document Added Successfully!";
 	private final Logger log = LoggerFactory.getLogger(UploadDocumentUtil.class);
 
 	private String baseSearchUrl;
@@ -42,7 +43,7 @@ public class UploadDocumentUtil {
 
 			Response response = client.newCall(request).execute();
 			if (response.code() != 400) {
-				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+				return new UploadDocumentSearchUtilRespnse(true, DOCUMENT_UPLOAD_SUCCESS);
 			} else {
 				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded!");
 			}
@@ -76,7 +77,7 @@ public class UploadDocumentUtil {
 			// Response response =
 			client.newCall(request).execute();
 
-			return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+			return new UploadDocumentSearchUtilRespnse(true, DOCUMENT_UPLOAD_SUCCESS);
 
 		} catch (IOException e) {
 			log.error(e.toString());
@@ -93,7 +94,7 @@ public class UploadDocumentUtil {
 		try {
 			Response response = client.newCall(request).execute();
 			if (response.code() != 400) {
-				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+				return new UploadDocumentSearchUtilRespnse(true, DOCUMENT_UPLOAD_SUCCESS);
 			} else {
 				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded! Possibly, something is wrong with the data");
 			}
