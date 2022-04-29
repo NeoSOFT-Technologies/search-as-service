@@ -91,7 +91,7 @@ class InputDocumentServiceTest {
 		try {
 			inputDocumentService.addDocuments(true, tableName, payload);
 		}catch(CustomException e) {
-			assertEquals(400,e.getExceptionCode());
+			assertEquals(108,e.getExceptionCode());
 		}
 	}
 	
@@ -101,7 +101,7 @@ class InputDocumentServiceTest {
 		try {
 			inputDocumentService.addDocuments(false, tableName, payload);
 		}catch(CustomException e) {
-			assertEquals(400,e.getExceptionCode());
+			assertEquals(108,e.getExceptionCode());
 		}
 	}
 
@@ -127,21 +127,17 @@ class InputDocumentServiceTest {
 	@Test
 	void testBadAddDocumentsForNRT() {
 		setMockitoBadResponseForService();
-
-		try {
-			inputDocumentService.addDocuments(true,tableName, payload);
-		} catch (CustomException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
+		tableExist();
+		ThrottlerResponse response =inputDocumentService.addDocuments(true,tableName, payload);
+		assertEquals(400, response.getStatusCode());
 	}
 
 	@Test
 	void testBadAddDocumentsWithoutNRT() {
-		try {
-			inputDocumentService.addDocuments(false,tableName, payload);
-		} catch (CustomException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
+		setMockitoBadResponseForService();
+		tableExist();
+		ThrottlerResponse response =inputDocumentService.addDocuments(false,tableName, payload);
+		assertEquals(400, response.getStatusCode());
 	}
 
 	
