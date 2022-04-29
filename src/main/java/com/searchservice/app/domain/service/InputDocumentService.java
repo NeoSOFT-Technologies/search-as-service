@@ -65,7 +65,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 		if (!manageTableServicePort.isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " table doesn't exist");
-
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE

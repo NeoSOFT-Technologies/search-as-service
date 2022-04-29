@@ -2,9 +2,9 @@ package com.searchservice.app.rest;
 
 import java.util.List;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,8 +25,6 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.rest.errors.CustomException;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -76,9 +74,9 @@ public class ManageTableResource {
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
-
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
+
 		}
 	}
 
@@ -126,6 +124,7 @@ public class ManageTableResource {
 			} 
 			
 			else {
+
 				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
 				
 				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
