@@ -40,7 +40,7 @@ public enum HttpStatusCode {
 	
 	INVALID_COLUMN_NAME(111, "invalid column name provided"),
 	
-	WRONG_DATA_TYPE_MULTIVALUED(112, "wrong datatype selected for non multivalued field");
+	WRONG_DATA_TYPE(112, "wrong datatype selected for non multivalued field");
 	
 	private int code;
 	private String message;

@@ -87,9 +87,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	private String basicAuthPasswordNonStatic;
 
-	// ConfigSet
-	@Value("${base-configset}")
-
 	private String baseConfigSetNonStatic;
 
 	// UPDATE Table
@@ -193,8 +190,8 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		
 		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(createTableDTO.getColumns()))) {		
-			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(), HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
-					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(), HttpStatusCode.WRONG_DATA_TYPE,
+					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
 		}
 
 		Response apiResponseDTO = createTable(createTableDTO);
@@ -250,8 +247,8 @@ public class ManageTableService implements ManageTableServicePort {
 
 		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(tableSchemaDTO.getColumns()))) {
 
-			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(),HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
-					HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getMessage());
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(),HttpStatusCode.WRONG_DATA_TYPE,
+					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
 
 		}
 		
