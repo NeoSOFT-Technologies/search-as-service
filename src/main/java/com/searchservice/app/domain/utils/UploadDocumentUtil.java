@@ -86,6 +86,22 @@ public class UploadDocumentUtil {
 		}
 
 	}
+	
+	private UploadDocumentSearchUtilRespnse processUploadDocumentRequest(OkHttpClient client, RequestBody body, String url) {
+		Request request = new Request.Builder().url(url).method("POST", body)
+				.addHeader("Content-Type", CONTENT_TYPE).build();
+		try {
+			Response response = client.newCall(request).execute();
+			if (response.code() != 400) {
+				return new UploadDocumentSearchUtilRespnse(true, "Document Added Successfully!");
+			} else {
+				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION, "Document not uploaded! Possibly, something is wrong with the data");
+			}
+		} catch (IOException e) {
+			log.error(e.toString());
+			return new UploadDocumentSearchUtilRespnse(true, "Document upload operation completed.");
+		}
+	}
 
 	@Data
 	public static class UploadDocumentSearchUtilRespnse {
