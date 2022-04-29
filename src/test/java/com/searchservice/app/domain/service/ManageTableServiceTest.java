@@ -53,6 +53,7 @@ import com.searchservice.app.rest.errors.InvalidInputOccurredException;
 import com.searchservice.app.rest.errors.TableAlreadyExistsException;
 
 import com.searchservice.app.rest.errors.TableNotFoundException;
+import com.searchservice.app.rest.errors.WrongMultiValueTypeException;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -232,19 +233,29 @@ class ManageTableServiceTest {
 
 	}
 	
-	public void setUpManageTable(int validColumn) {
+	public void setUpManageTable(int validColumn, int multiValueCheck) {
 		schemaField.setFilterable(true);
-		schemaField.setMultiValue(true);
-		if(validColumn == 1) {
+		if(validColumn == 1 && multiValueCheck == 0)
+		 {
+		  schemaField.setMultiValue(true);
 		  schemaField.setName("test");
-		}else {
-			  schemaField.setName("test_123");
+		  schemaField.setType("string");
+		}
+		if(validColumn == 0 && multiValueCheck == 0) {
+			schemaField.setMultiValue(true);
+			 schemaField.setName("test_123");
+			 schemaField.setType("string");
+		}
+		if(multiValueCheck == 1) {
+			schemaField.setMultiValue(false);
+			 schemaField.setName("test123");
+			 schemaField.setType("strings");
 		}
 		schemaField.setPartialSearch(true);
 		schemaField.setRequired(true);
 		schemaField.setSortable(true);
 		schemaField.setStorable(true);
-		schemaField.setType("string");
+		
 		list.add(schemaField);
 		newTableSchemaDTO.setColumns(list);
 		manageTable.setColumns(list);
@@ -345,14 +356,13 @@ class ManageTableServiceTest {
 
 	@Test
 	void createTableIfNotPresentNullColumns() {
-		setMockitoBadResponseForService();
-		try {
-			manageTableService.createTableIfNotPresent(manageTable);
-		} catch (BadRequestOccurredException e) {
-			assertEquals(400, e.getExceptionCode());
-		}
+	setMockitoBadResponseForService();
+	//setMockitoTableNotExist();
+		Response response = manageTableService.createTableIfNotPresent(manageTable);
+		assertEquals(200, response.getStatusCode());
 	}
 
+	
 	@Test
 	void checkInvalidTableName() {
 		try {
@@ -493,7 +503,7 @@ class ManageTableServiceTest {
 	void createTable() {
 
 		setMockitoSuccessResponseForService();
-		setUpManageTable(1);
+		setUpManageTable(1,0);
 		Response rs = manageTableService.createTable(manageTable);
 		assertEquals(200, rs.getStatusCode());
 	}
@@ -502,16 +512,31 @@ class ManageTableServiceTest {
 	void createTableIfNotPresent() {
 
 		setMockitoSuccessResponseForService();
-		setUpManageTable(1);
+		setUpManageTable(1,0);
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
+	}
+	
+	
+	@Test
+	void createTableIfNotPresentMultiValueError() {
+
+		setMockitoSuccessResponseForService();
+		setUpManageTable(1,1);
+		try {
+		Response se = manageTableService.createTableIfNotPresent(manageTable);
+		}catch(WrongMultiValueTypeException e)
+		{
+			assertEquals(112, e.getExceptionCode());
+		}
+		
 	}
 	
 	@Test
 	void createTableIfNotPresentInvalidColumnName() {
 
 		setMockitoSuccessResponseForService();
-		setUpManageTable(0);
+		setUpManageTable(0,0);
 		try {
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
