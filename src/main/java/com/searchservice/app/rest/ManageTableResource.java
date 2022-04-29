@@ -112,34 +112,34 @@ public class ManageTableResource {
 
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable manageTableDTO) {
+	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTable) {
 
-		if (manageTableServicePort.checkIfTableNameisValid(manageTableDTO.getTableName())) {
-			log.error("Table Name  {} is Invalid", manageTableDTO.getTableName());
+		if (manageTableServicePort.checkIfTableNameisValid(createTable.getTableName())) {
+			log.error("Table Name  {} is Invalid", createTable.getTableName());
 			throw new InvalidInputOccurredException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					"Creating Table Failed , as Invalid Table Name " + manageTableDTO.getTableName() + " is Provided");
+					"Creating Table Failed , as Invalid Table Name " + createTable.getTableName() + " is Provided");
 		}
 		else {
-			if (tableDeleteServicePort.isTableUnderDeletion(manageTableDTO.getTableName())) {
+			if (tableDeleteServicePort.isTableUnderDeletion(createTable.getTableName())) {
 				throw new DeletionOccurredException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-						String.format("Table With Same Name %s %s%s", manageTableDTO.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+						String.format("Table With Same Name %s %s%s", createTable.getTableName(),"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 
 			} 
 			
 			else {
 
-				manageTableDTO.setTableName(manageTableDTO.getTableName() + "_" + tenantId);
+				createTable.setTableName(createTable.getTableName() + "_" + tenantId);
 				
-				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(manageTableDTO);
+				Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(createTable);
  
 				if (apiResponseDTO.getStatusCode() == 200) {
 					apiResponseDTO.setMessage(
-							"Table-" + manageTableDTO.getTableName().split("_")[0] + ", is created successfully");
+							"Table-" + createTable.getTableName().split("_")[0] + ", is created successfully");
 					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 				} else {
 					log.info(TABLE +"could not be created: {}", apiResponseDTO);
 					throw new BadRequestOccurredException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",manageTableDTO.getTableName().split("_")[0], tenantId));
+							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",createTable.getTableName().split("_")[0], tenantId));
 				}
 			}
 		}
