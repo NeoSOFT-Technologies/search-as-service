@@ -130,6 +130,17 @@ public class TableSchemaParserUtil {
 		return fieldAttributesValidated;
 	}
 	
+	public static boolean isMultivaluedDataTypePlural(SchemaField searchFieldDTO) {
+		boolean checkForMultiValue = true;
+		if (!searchFieldDTO.isMultiValue()) {
+			String stringData = searchFieldDTO.getType();
+			if (stringData.endsWith("s") || stringData.endsWith("S")) {
+				checkForMultiValue = false;
+			}
+		}
+		return checkForMultiValue;
+	}
+	
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
 		Pattern pattern = Pattern.compile("^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$");

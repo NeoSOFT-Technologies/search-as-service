@@ -213,4 +213,16 @@ public class RestControllerAdvice {
 		return frameRestApiException(
 				new RestApiError(HttpStatus.BAD_REQUEST, fieldName + " must be of type " + requiredType));
 	}
+	
+	@ExceptionHandler(WrongMultiValueTypeException.class)
+	public ResponseEntity<Object> handleTWrongMultiValueType(WrongMultiValueTypeException exception) {
+
+		return new ResponseEntity<>(new RestApiErrorHandling(
+
+				HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED.getCode(), HttpStatusCode.WRONG_DATA_TYPE_MULTIVALUED,
+				exception.getExceptionMessage()), HttpStatus.BAD_REQUEST);
+	}
+	
+	
+	
 }
