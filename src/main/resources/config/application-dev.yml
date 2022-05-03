@@ -95,9 +95,6 @@ throttle-service:
 
 
 #================================================================
-# ConfigSet Configurations
-base-configset: _default
-
 # Search authentication(basicAuth) credentials
 basic-auth:
   username: solr

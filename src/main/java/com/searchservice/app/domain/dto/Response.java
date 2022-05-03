@@ -10,12 +10,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Response {
+public class Response extends BaseResponse{
 
-	private int statusCode;
-	private String message;
 	private List<String> data;
 	private String token;
 
@@ -23,15 +21,14 @@ public class Response {
 		this.token = token;
 	}
 
-	public Response(int responseStatusCode, String responseMessage) {
-		this.statusCode = responseStatusCode;
-		this.message = responseMessage;
+	public Response(int statusCode, String message) {
+		super(statusCode, message);
 	}
 
-	public Response(int statusCode, String name, String message) {
-		this.statusCode = statusCode;
-		this.token = name;
-		this.message = message;
+	public Response(int statusCode, String message, String token) {
+		super(statusCode, message);
+		this.token = token;
 	}
+	
 
 }

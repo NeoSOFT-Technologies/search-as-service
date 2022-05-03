@@ -144,7 +144,7 @@ class SchemaFieldTypeTest extends SchemaFieldType {
 	@Test
 	void testFromStandardDataTypeToSearchFieldTypedate1() {
 	String a=	SchemaFieldType.fromStandardDataTypeToSearchFieldType("date", true);
-	assertEquals("pdate", a);
+	assertEquals("pdates", a);
 		
 	}
 	@Test
