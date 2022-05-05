@@ -80,6 +80,6 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
                 .and();
         
         // Add JWT token filter
-       http = http.addFilterBefore(new JwtTokenFilterService(keycloakConfigProperties,restTemplate), UsernamePasswordAuthenticationFilter.class);
+       http = http.addFilterBefore(new JwtTokenFilterService(restTemplate), UsernamePasswordAuthenticationFilter.class);
     }
 }

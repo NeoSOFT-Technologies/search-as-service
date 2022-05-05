@@ -1,5 +1,7 @@
 package com.searchservice.app.domain.service;
 
+import java.util.Arrays;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.Response;
+import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.port.api.UserServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 
@@ -27,51 +30,23 @@ public class UserService implements UserServicePort {
 	@Autowired
 	RestTemplate restTemplate;
 
-	@Value("${keycloak.realm}")
-	private String realmName;
-
-	@Value("${keycloak.auth-server-url}")
-	private String keycloakServerUrl;
-
-	@Value("${keycloak.resource}")
-	private String clientId;
-
-	@Value("${keycloak.credentials.secret}")
-	private String clientSecret;
+	@Value("${base-token-url}")
+	private String baseTokenUrl;
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Override
-	public Response getToken(String userName, String password) {
-		
-		if (userName.isBlank() || userName.isEmpty() || password.isBlank() || password.isEmpty()) {
+	public Response getToken(User user) {
+		if (user.getUsername().isBlank() || user.getUsername().isEmpty() || user.getPassword().isBlank() || user.getPassword().isEmpty()) {
 			return createResponse(ERROR, "username and password must bot be blank.", 
 					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
-		String url = keycloakServerUrl + "/realms/" + realmName + "/protocol/openid-connect/token";
-		log.info(" client_Id : {}", clientId);
-		log.info(" client_Secret : {}", clientSecret);
-		log.info(" url : {}", url);
-
-		// Creating and setting the Header
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-		// Creating Body parameters
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-		map.add("grant_type", "password");
-		map.add("client_id", clientId);
-		map.add("client_secret", clientSecret);
-		map.add("username", userName);
-		map.add("password", password);
-
-		// Creating HttpEntity and set header and body
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-
-		// Consuming rest API
-		ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);
-		try {
-			response = restTemplate.postForEntity(url, request, String.class);
+	    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+	    HttpEntity<User> request = new HttpEntity<>(user,headers);
+	    ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);
+	    try {
+			response = restTemplate.postForEntity(baseTokenUrl, request, String.class);
 		} catch (Exception e) {
 			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}

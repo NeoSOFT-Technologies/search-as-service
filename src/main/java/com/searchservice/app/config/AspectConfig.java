@@ -40,7 +40,7 @@ public class AspectConfig {
 		} catch (UnknownHostException e) {
 			log.error(e.toString());
 		}
-		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -50,7 +50,7 @@ public class AspectConfig {
 
 	@Before(value = "execution(* com.searchservice.app.rest.ManageTableResource.*(..))")
 	public void logStatementForManagetableResource(JoinPoint joinPoint) {
-		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -58,7 +58,7 @@ public class AspectConfig {
 
 	@Before(value = "execution(* com.searchservice.app.rest.InputDocumentResource.*(..))")
 	public void logStatementForRest1(JoinPoint joinPoint) {
-		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUserName():"",
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(),DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -67,7 +67,7 @@ public class AspectConfig {
 	@Before(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
 	public void logStatementForService(JoinPoint joinPoint) {
 
-		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUserName():"",
+		log.info(STARTED_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -76,7 +76,7 @@ public class AspectConfig {
 	@After(value = "execution(* com.searchservice.app.rest.*.*(..))")
 	public void logStatementAfterRest(JoinPoint joinPoint) {
 
-		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
+		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -84,7 +84,7 @@ public class AspectConfig {
 
 	@After(value = "execution(* com.searchservice.app.domain.service.*.*(..))")
 	public void logStatementAfterService(JoinPoint joinPoint) {
-		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
+		log.info(SUCCESSFUL_EXECUTION, joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), DateUtil.utcTime(),
 				joinPoint.getArgs());
 
@@ -94,7 +94,7 @@ public class AspectConfig {
 	public void logStatementAfterThrowing(JoinPoint joinPoint) {
 		log.error(
 				"--------Failed Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, Parameters : {}",
-				joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUserName():"",
+				joinPoint.getTarget().getClass().getSimpleName(),  user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), joinPoint.getArgs());
 	}
 
@@ -102,7 +102,7 @@ public class AspectConfig {
 	public void logStatementForServiceAfterThrowing(JoinPoint joinPoint, Exception e) {
 		log.error(
 				"--------Failed Response of Service Name : {}, Username : {}, CorrlationId : {}, IpAddress : {}, MethodName : {}, Parameters : {}",
-				joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUserName():"",
+				joinPoint.getTarget().getClass().getSimpleName(), user!=null?user.getUsername():"",
 				MDC.get(CORRELATION_ID_LOG_VAR_NAME), ip, joinPoint.getSignature().getName(), joinPoint.getArgs());
 	}
 

@@ -1,42 +1,43 @@
 package com.searchservice.app.domain.filter;
 
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.searchservice.app.config.KeycloakConfigProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 
 //@Component
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
 	private RestTemplate restTemplate;
-	private KeycloakConfigProperties keycloakConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
+	private final Logger log = LoggerFactory.getLogger(JwtTokenFilterService.class);
 
 	public JwtTokenFilterService() {
 		super();
 	}
 
-	public JwtTokenFilterService(KeycloakConfigProperties keycloakConfigProperties, RestTemplate restTemplate) {
+	public JwtTokenFilterService(RestTemplate restTemplate) {
 		super();
-		this.keycloakConfigProperties = keycloakConfigProperties;
 		this.restTemplate = restTemplate;
 	}
 
@@ -46,7 +47,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		Map<String, Object> errorDetails = new HashMap<>();
 		// Get authorization header and validate
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+		 log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : {}",header);
 		if (null == header || header.isEmpty() || !header.startsWith("Bearer ")) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -57,42 +58,52 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 
 		// Get jwt token and validate
 		final String token = header.split(" ")[1].trim();
-
-		if (!validate(token)) {
+		 log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}",token);
+		if (!validate(token, getPublicKeyTest())) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			mapper.writeValue(response.getWriter(), errorDetails);
 
 		} else {
+			log.debug("Token Validation Successfull");
 			chain.doFilter(request, response);
 		}
 	}
 
 	
-	private boolean validate(String token) {
+	private boolean validate(String token, String rsaPublicKey) {
+        boolean isTokenValid = false;
+    	try {
+    		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
+    		KeyFactory kf = KeyFactory.getInstance("RSA");
+    		PublicKey publicKey= kf.generatePublic(keySpec);
+    		Jws<Claims> jwt = Jwts.parserBuilder()
+    		                        .setSigningKey(publicKey)
+    		                        .build()
+    		                        .parseClaimsJws(token);
+    		 isTokenValid = true;
+    		 log.debug("Token is Valid");
+    		 } catch (Exception e) {
+    			 log.debug("Token is Invalid");
+    		     e.printStackTrace();
+    	}
+    	return isTokenValid;
+        
+	}
 
-		String url = keycloakConfigProperties.getAuth_server_url() + "/realms/" + keycloakConfigProperties.getRealm()
-				+ "/protocol/openid-connect/token/introspect";
-
-		// creating and setting the Header
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-		// creating Body parameters
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-		map.add("token", token);
-		map.add("client_id", keycloakConfigProperties.getResource());
-		map.add("client_secret", keycloakConfigProperties.getCredentials().getSecret());
-
-		// Creating HttpEntity and set header and body
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-		// Consuming rest API
-		ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-		JSONObject obj = new JSONObject(response.getBody());
-
-		return obj.getBoolean("active");
+	private String getPublicKeyTest() {
+		final String baseUrl = "https://iam-keycloak.neosofttech.com/auth/realms/master";
+		String publicKey = "";
+		try {
+			ResponseEntity<String> result = restTemplate.getForEntity(baseUrl, String.class);
+			JSONObject obj = new JSONObject(result.getBody());
+			if (obj.has("public_key")) {
+				publicKey = obj.getString("public_key");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return publicKey;
 	}
 }
