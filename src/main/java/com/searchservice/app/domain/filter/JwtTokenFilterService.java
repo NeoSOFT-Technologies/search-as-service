@@ -71,7 +71,6 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		}
 	}
 
-	
 	private boolean validate(String token, String rsaPublicKey) {
         boolean isTokenValid = false;
     	try {

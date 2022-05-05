@@ -1,6 +1,6 @@
 package com.searchservice.app;
 
-import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +18,10 @@ public class SearchServiceApplication {
 		return new RestTemplate();
 	}
 	// For Keycloak @START
-		@Bean
-	    public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
-	        return new KeycloakSpringBootConfigResolver();
-	    }
+//		@Bean
+//	    public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
+//	        return new KeycloakSpringBootConfigResolver();
+//	    }
 		
 
 

@@ -112,9 +112,6 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
 	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
 	
-	//Keycloak
-	implementation group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '11.0.2'
-	
 	// Spring Security
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.6.3'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
