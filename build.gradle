@@ -102,7 +102,7 @@ dependencies {
 	//JSON
 	implementation group: 'org.json', name: 'json', version: '20200518'
 
-
+    implementation group: 'org.jboss.logging', name: 'jboss-logging', version: '3.5.0.Final'
 
 	// Rate Limiter
 	// https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot2

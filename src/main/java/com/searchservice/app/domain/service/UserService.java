@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.port.api.UserServicePort;
@@ -29,6 +26,7 @@ public class UserService implements UserServicePort {
 
 	@Autowired
 	RestTemplate restTemplate;
+	
 	@Value("${base-token-url}")
 	private String baseTokenUrl;
 	
@@ -47,6 +45,7 @@ public class UserService implements UserServicePort {
 	    try {
 			response = restTemplate.postForEntity(baseTokenUrl, request, String.class);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		JSONObject obj = new JSONObject(response.getBody());
@@ -57,7 +56,7 @@ public class UserService implements UserServicePort {
 		if (obj.has(ERROR)) {
 			String errorDesc = obj.getString("error_description");
 			String error = obj.getString(ERROR);
-			return createResponse(error, errorDesc, 400);
+			return createResponse(error, errorDesc, HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		return createResponse(null, "Something went wrong! Please try again...", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 	}

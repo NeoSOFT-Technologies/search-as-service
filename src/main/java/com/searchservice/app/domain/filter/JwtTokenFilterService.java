@@ -30,7 +30,7 @@ import io.jsonwebtoken.Jwts;
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
 	private RestTemplate restTemplate;
-	private AuthConfigProperties loginConfigProperties;
+	private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private final Logger log = LoggerFactory.getLogger(JwtTokenFilterService.class);
 	
@@ -38,9 +38,9 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		super();
 	}
 
-	public JwtTokenFilterService(AuthConfigProperties loginConfigProperties, RestTemplate restTemplate) {
+	public JwtTokenFilterService(AuthConfigProperties authConfigProperties, RestTemplate restTemplate) {
 		super();
-		this.loginConfigProperties = loginConfigProperties;
+		this.authConfigProperties = authConfigProperties;
 		this.restTemplate = restTemplate;
 	}
 
@@ -62,7 +62,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		// Get jwt token and validate
 		final String token = header.split(" ")[1].trim();
 		 log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}",token);
-		if (!validate(token, getPublicKeyForRealm(loginConfigProperties.getRealmName()))) {
+		if (!validate(token, getPublicKeyForRealm(authConfigProperties.getRealmName()))) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -97,7 +97,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 	private String getPublicKeyForRealm(String realmName) {
 		String publicKey = "";
 		try {
-			ResponseEntity<String> result = restTemplate.getForEntity(loginConfigProperties.getKeyUrl()
+			ResponseEntity<String> result = restTemplate.getForEntity(authConfigProperties.getKeyUrl()
 					+ realmName, String.class);
 			JSONObject obj = new JSONObject(result.getBody());
 			if (obj.has("public_key")) {

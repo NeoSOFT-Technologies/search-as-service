@@ -28,22 +28,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	private RestTemplate restTemplate;
 	
 	@Autowired 
-	AuthConfigProperties loginConfigProperties;
-	
-//	@Value("${keycloak.realm}")
-//	private String realm_name;
-//	
-//	@Value("${keycloak.resource}")
-//	private String tenant_id;
-//	
-//	@Value("${keycloak.credentials.secret}")
-//	private String client_Secret;
-	
-// Register Keycloak as the Authentication Provider
-   
+	AuthConfigProperties authConfigProperties;
 
-// Defines the session authentication strategy.
-   
     @Override
 	public void configure(WebSecurity web) throws Exception {
     	//web.ignoring().mvcMatchers("/swagger-ui/**").mvcMatchers("/test/**");
@@ -62,6 +48,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .and();
         
         // Add JWT token filter
-       http = http.addFilterBefore(new JwtTokenFilterService(loginConfigProperties, restTemplate), UsernamePasswordAuthenticationFilter.class);
+       http = http.addFilterBefore(new JwtTokenFilterService(authConfigProperties, restTemplate), UsernamePasswordAuthenticationFilter.class);
     }
 }
