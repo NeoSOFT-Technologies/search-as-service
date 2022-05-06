@@ -10,9 +10,9 @@ metadata:
   name: search-service-ingress
 spec:
   ports:
-    - name: "8081"
-      port: 8081
-      targetPort: 8081
+    - name: "8083"
+      port: 8083
+      targetPort: 8083
   selector:
     io.kompose.service: search-service-ingress
 status:
