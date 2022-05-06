@@ -42,9 +42,9 @@ public class UserService implements UserServicePort {
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Override
-	public Response getToken(String userName, String password) {
+	public Response getToken(String username, String password) {
 		
-		if (userName.isBlank() || userName.isEmpty() || password.isBlank() || password.isEmpty()) {
+		if (username.isBlank() || username.isEmpty() || password.isBlank() || password.isEmpty()) {
 			return createResponse(ERROR, "username and password must bot be blank.", 
 					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
@@ -62,11 +62,11 @@ public class UserService implements UserServicePort {
 		map.add("grant_type", "password");
 		map.add("client_id", clientId);
 		map.add("client_secret", clientSecret);
-		map.add("username", userName);
+		map.add("username", username);
 		map.add("password", password);
 
 		// Creating HttpEntity and set header and body
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
 		// Consuming rest API
 		ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);

@@ -26,7 +26,7 @@ public class UserResource {
 	@PostMapping
     @Operation(summary = "/ GET AUTHORIZED TOKEN BY PROVIDING USERNAME AND PASSWORD ")
     public ResponseEntity<Response> getToken(@RequestBody User userDTO) {
-        Response responseDTO = userServicePort.getToken(userDTO.getUserName(), userDTO.getPassword());
+        Response responseDTO = userServicePort.getToken(userDTO.getUsername(), userDTO.getPassword());
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{

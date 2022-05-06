@@ -17,3 +17,15 @@ keycloak:
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
+  
+#================================================================
+#Keycloack UserName and Password For Ingress Token
+base-ingress-ms-url: http://localhost:8081
+token-username: demo
+token-password : demo
+token-url: /user/token
+keycloak-url:
+  realm: /admin/realms
+keycloak-config:
+  client-id: saas-client
+  tenant-id-1: 1d68fd1b-7f05-4856-b268-7b19cd572dab

@@ -7,9 +7,14 @@ import org.keycloak.adapters.springsecurity.management.HttpSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -20,6 +25,9 @@ import org.springframework.web.client.RestTemplate;
 import com.searchservice.app.domain.filter.JwtTokenFilterService;
 
 @KeycloakConfiguration
+@Configuration
+@EnableWebSecurity
+//@EnableGlobalMethodSecurity(jsr250Enabled = true)
 public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -68,18 +76,72 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
     	web.ignoring().antMatchers("/user/token").antMatchers("/v3/api-docs/**").antMatchers("/swagger-ui/**").antMatchers("/test/**");
 	}
 
+	/*
+	 * @Override protected void configure(HttpSecurity http) throws Exception { //
+	 * Disable CSRF http = http.csrf().disable();
+	 * 
+	 * // Set session management to stateless http = http .sessionManagement()
+	 * .sessionCreationPolicy(SessionCreationPolicy.STATELESS) .and();
+	 * http.authorizeRequests() .antMatchers("/api/v1/manage/table/**").permitAll();
+	 * http.authorizeRequests() // .antMatchers(HttpMethod.GET).hasAnyRole("user")
+	 * // .antMatchers(HttpMethod.GET, "/api/v1/manage/table/**").hasAnyRole("user")
+	 * // .antMatchers(HttpMethod.POST,
+	 * "/api/v1/manage/table/**").hasAnyRole("admin") //
+	 * .antMatchers("/api/v1/manage/table/**").hasAnyRole("user")
+	 * .antMatchers("/api/v1/ingest/**").hasAuthority("ROLE_USER") .and()
+	 * .authorizeRequests() .anyRequest().permitAll();
+	 * 
+	 * // Add JWT token filter http = http.addFilterBefore(new
+	 * JwtTokenFilterService(keycloakConfigProperties,restTemplate),
+	 * UsernamePasswordAuthenticationFilter.class); }
+	 */
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Disable CSRF
-        http = http.csrf().disable();
-
+        super.configure(http);
+        http.headers().frameOptions().sameOrigin();
+        
+        
         // Set session management to stateless
-        http = http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry = http.cors()
+        .and()
+        .csrf().disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .authorizeRequests();
+        
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/manage/table/**").hasRole("admin");
+        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers(HttpMethod.GET, "/api/v1/manage/table/**").hasRole("user");
+        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/manage/table/**").hasRole("admin");
+        
+        expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("bossbatch")
+        .and()
+        .authorizeRequests()
+        .antMatchers("/api/v1/ingest-nrt/**").hasAnyRole("bossnrt", "user");
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("bossadmin");
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("admin");
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("admin");
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("admin");
+//        expressionInterceptUrlRegistry = expressionInterceptUrlRegistry.antMatchers("/api/v1/ingest/**").hasRole("admin");
+        
+
+        expressionInterceptUrlRegistry.anyRequest().permitAll();
+        
+//		http.authorizeRequests()
+//		.antMatchers("/api/v1/manage/table/**").permitAll();
+//		http.authorizeRequests()
+//		.antMatchers(HttpMethod.GET).hasAnyRole("user")
+//		.antMatchers(HttpMethod.GET, "/api/v1/manage/table/**").hasAnyRole("user")
+//		.antMatchers(HttpMethod.POST, "/api/v1/manage/table/**").hasAnyRole("admin")
+//		.antMatchers("/api/v1/manage/table/**").hasAnyRole("user")
+//		.antMatchers("/api/v1/ingest/**").hasAuthority("ROLE_USER")
+//		.and()
+//		.authorizeRequests()
+//		.anyRequest().permitAll();
         
         // Add JWT token filter
        http = http.addFilterBefore(new JwtTokenFilterService(keycloakConfigProperties,restTemplate), UsernamePasswordAuthenticationFilter.class);
     }
+    
 }

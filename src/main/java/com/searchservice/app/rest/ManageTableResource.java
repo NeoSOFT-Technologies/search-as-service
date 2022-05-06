@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -78,6 +79,7 @@ public class ManageTableResource {
 		}
 	}
 
+	
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
