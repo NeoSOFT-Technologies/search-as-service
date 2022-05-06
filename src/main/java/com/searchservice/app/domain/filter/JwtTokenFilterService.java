@@ -11,17 +11,15 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.config.AuthConfigProperties;
+import com.searchservice.app.domain.service.PublicKeyService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -29,19 +27,22 @@ import io.jsonwebtoken.Jwts;
 
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
-	private RestTemplate restTemplate;
+	
 	private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
+	private PublicKeyService publicKeyService;
+	
 	private final Logger log = LoggerFactory.getLogger(JwtTokenFilterService.class);
 	
 	public JwtTokenFilterService() {
 		super();
 	}
 
-	public JwtTokenFilterService(AuthConfigProperties authConfigProperties, RestTemplate restTemplate) {
+	public JwtTokenFilterService(AuthConfigProperties authConfigProperties,PublicKeyService publicKeyService) {
 		super();
 		this.authConfigProperties = authConfigProperties;
-		this.restTemplate = restTemplate;
+		this.publicKeyService = publicKeyService;
+		this.publicKeyService.setAuthConfigProperties(authConfigProperties);
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		// Get jwt token and validate
 		final String token = header.split(" ")[1].trim();
 		 log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}",token);
-		if (!validate(token, getPublicKeyForRealm(authConfigProperties.getRealmName()))) {
+		if (!validate(token, publicKeyService.retirevePublicKey())) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -92,20 +93,5 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
     	}
     	return isTokenValid;
         
-	}
-
-	private String getPublicKeyForRealm(String realmName) {
-		String publicKey = "";
-		try {
-			ResponseEntity<String> result = restTemplate.getForEntity(authConfigProperties.getKeyUrl()
-					+ realmName, String.class);
-			JSONObject obj = new JSONObject(result.getBody());
-			if (obj.has("public_key")) {
-				publicKey = obj.getString("public_key");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return publicKey;
 	}
 }
