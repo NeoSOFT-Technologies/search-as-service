@@ -21,23 +21,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.searchservice.app.config.AuthConfigProperties;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 
-//@Component
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
 	private RestTemplate restTemplate;
+	private AuthConfigProperties loginConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private final Logger log = LoggerFactory.getLogger(JwtTokenFilterService.class);
-
+	
 	public JwtTokenFilterService() {
 		super();
 	}
 
-	public JwtTokenFilterService(RestTemplate restTemplate) {
+	public JwtTokenFilterService(AuthConfigProperties loginConfigProperties, RestTemplate restTemplate) {
 		super();
+		this.loginConfigProperties = loginConfigProperties;
 		this.restTemplate = restTemplate;
 	}
 
@@ -59,7 +62,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		// Get jwt token and validate
 		final String token = header.split(" ")[1].trim();
 		 log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}",token);
-		if (!validate(token, getPublicKeyTest())) {
+		if (!validate(token, getPublicKeyForRealm(loginConfigProperties.getRealmName()))) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -91,11 +94,11 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
         
 	}
 
-	private String getPublicKeyTest() {
-		final String baseUrl = "https://iam-keycloak.neosofttech.com/auth/realms/master";
+	private String getPublicKeyForRealm(String realmName) {
 		String publicKey = "";
 		try {
-			ResponseEntity<String> result = restTemplate.getForEntity(baseUrl, String.class);
+			ResponseEntity<String> result = restTemplate.getForEntity(loginConfigProperties.getKeyUrl()
+					+ realmName, String.class);
 			JSONObject obj = new JSONObject(result.getBody());
 			if (obj.has("public_key")) {
 				publicKey = obj.getString("public_key");

@@ -29,10 +29,9 @@ public class UserService implements UserServicePort {
 
 	@Autowired
 	RestTemplate restTemplate;
-
 	@Value("${base-token-url}")
 	private String baseTokenUrl;
-
+	
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Override

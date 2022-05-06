@@ -7,3 +7,9 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+
+# Authentication Server Configurations
+authentication:
+  realmName: master
+  keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
+  
