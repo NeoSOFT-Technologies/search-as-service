@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.searchservice.app.config.security.KeycloakTokenManagement;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.UserServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
@@ -41,6 +42,9 @@ public class UserService implements UserServicePort {
 
 	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
+	@Autowired
+	KeycloakTokenManagement keycloakTokenManagement;
+	
 	@Override
 	public Response getToken(String username, String password) {
 		
@@ -78,6 +82,11 @@ public class UserService implements UserServicePort {
 		JSONObject obj = new JSONObject(response.getBody());
 		if (obj.has("access_token")) {
 			String accessToken = obj.getString("access_token");
+			
+			// DECODE TOKEN AND VALIDATE PERMISSIONS
+			String decodedTokenPayload = keycloakTokenManagement.getDecodedTokenPayload(accessToken);
+			log.debug("decodedTokenPayload !!!!!!! {}", decodedTokenPayload);
+			
 			return createResponse(accessToken, "Token is generated successfully", 200);
 		}
 		if (obj.has(ERROR)) {
