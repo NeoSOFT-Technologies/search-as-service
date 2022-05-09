@@ -30,8 +30,6 @@ public class UserService implements UserServicePort {
 	@Value("${base-token-url}")
 	private String baseTokenUrl;
 	
-	private final Logger log = LoggerFactory.getLogger(UserService.class);
-
 	@Override
 	public Response getToken(User user) {
 		if (user.getUsername().isBlank() || user.getUsername().isEmpty() || user.getPassword().isBlank() || user.getPassword().isEmpty()) {

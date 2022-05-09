@@ -20,14 +20,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.domain.service.PublicKeyService;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+
 
 public class JwtTokenFilterService extends OncePerRequestFilter {
 
-	
 	private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private PublicKeyService publicKeyService;
@@ -42,7 +39,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		super();
 		this.authConfigProperties = authConfigProperties;
 		this.publicKeyService = publicKeyService;
-		this.publicKeyService.setAuthConfigProperties(authConfigProperties);
+		this.publicKeyService.setAuthConfigProperties(this.authConfigProperties);
 	}
 
 	@Override
@@ -70,7 +67,6 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 			mapper.writeValue(response.getWriter(), errorDetails);
 
 		} else {
-			log.debug("Token Validation Successfull");
 			chain.doFilter(request, response);
 		}
 	}
@@ -81,15 +77,11 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
     		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
     		KeyFactory kf = KeyFactory.getInstance("RSA");
     		PublicKey publicKey= kf.generatePublic(keySpec);
-    		Jws<Claims> jwt = Jwts.parserBuilder()
-    		                        .setSigningKey(publicKey)
-    		                        .build()
-    		                        .parseClaimsJws(token);
+    		Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
     		 isTokenValid = true;
-    		 log.debug("Token is Valid");
+    		 log.debug("Token Validation Successfull");
     		 } catch (Exception e) {
-    			 log.debug("Token is Invalid");
-    		     e.printStackTrace();
+    			 log.debug("Token Validation Failed",e);
     	}
     	return isTokenValid;
         
