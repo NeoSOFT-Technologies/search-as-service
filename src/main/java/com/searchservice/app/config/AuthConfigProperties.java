@@ -12,7 +12,6 @@ import lombok.Setter;
 public class AuthConfigProperties {
 	
 	private String realmName;
-	private String tokenUrl;
 	private String keyUrl;
 
 }

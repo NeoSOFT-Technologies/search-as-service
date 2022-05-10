@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.searchservice.app.domain.service.ManageTableService;
+import com.searchservice.app.domain.service.PublicKeyService;
 import com.searchservice.app.domain.service.TableDeleteService;
 
-@EnableScheduling
+@Component
 public class SearchServiceSchedular {
 
 	@Autowired
@@ -18,6 +20,9 @@ public class SearchServiceSchedular {
 	@Autowired
 	ManageTableService manageTableService;
 
+	@Autowired
+	PublicKeyService publicKeyService;
+	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Scheduled(cron = "0 15 8 * * ?")
@@ -32,4 +37,10 @@ public class SearchServiceSchedular {
 		logger.debug("Check For Table Schema Deletion Operation Started");
 		manageTableService.checkForSchemaDeletion();
 	}
+	
+	@Scheduled(fixedRate = 60000)
+	public void updatePublicKeyValueInCache() {
+		publicKeyService.checkIfPublicKeyExistsInCache();
+	}
+
 }

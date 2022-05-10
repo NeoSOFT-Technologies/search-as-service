@@ -118,8 +118,8 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 	
-	//Memcache 
-	implementation group: 'net.spy', name: 'spymemcached', version: '2.12.3'
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
+	
 }
 
 tasks.named('test') {

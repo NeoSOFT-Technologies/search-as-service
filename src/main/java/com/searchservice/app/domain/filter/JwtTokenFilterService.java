@@ -39,7 +39,6 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		super();
 		this.authConfigProperties = authConfigProperties;
 		this.publicKeyService = publicKeyService;
-		this.publicKeyService.setAuthConfigProperties(this.authConfigProperties);
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
 		// Get jwt token and validate
 		final String token = header.split(" ")[1].trim();
 		 log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}",token);
-		if (!validate(token, publicKeyService.retirevePublicKey())) {
+		if (!validate(token, publicKeyService.retirevePublicKey(authConfigProperties.getRealmName()))) {
 			errorDetails.put("Unauthorized", "Invalid token");
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
