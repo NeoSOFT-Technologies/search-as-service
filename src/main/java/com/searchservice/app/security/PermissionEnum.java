@@ -1,4 +1,4 @@
-package com.searchservice.app.config.security;
+package com.searchservice.app.security;
 
 public enum PermissionEnum {
 	

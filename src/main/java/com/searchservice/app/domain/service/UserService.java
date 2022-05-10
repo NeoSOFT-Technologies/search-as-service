@@ -41,9 +41,6 @@ public class UserService implements UserServicePort {
 	@Value("${keycloak.credentials.secret}")
 	private String clientSecret;
 
-	@Autowired
-	KeycloakAuthService keycloakTokenManagement;
-
 	@Override
 	public Response getToken(String userName, String password) {
 		

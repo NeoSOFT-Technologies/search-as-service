@@ -1,11 +1,9 @@
-package com.searchservice.app.domain.service;
+package com.searchservice.app.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -13,8 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import com.searchservice.app.config.security.PermissionEnum;
-import com.searchservice.app.domain.constant.KeycloakPermissionsConstants;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.rest.errors.CustomException;
 

@@ -1,4 +1,4 @@
-package com.searchservice.app.domain.constant;
+package com.searchservice.app.security;
 
 public class KeycloakPermissionsConstants {
 
