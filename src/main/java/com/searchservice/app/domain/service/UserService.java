@@ -24,6 +24,8 @@ public class UserService implements UserServicePort {
 
 	private static final String ERROR = "error";
 
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
+	
 	@Autowired
 	RestTemplate restTemplate;
 
@@ -39,7 +41,8 @@ public class UserService implements UserServicePort {
 	@Value("${keycloak.credentials.secret}")
 	private String clientSecret;
 
-	private final Logger log = LoggerFactory.getLogger(UserService.class);
+	@Autowired
+	KeycloakAuthService keycloakTokenManagement;
 
 	@Override
 	public Response getToken(String userName, String password) {
@@ -66,7 +69,7 @@ public class UserService implements UserServicePort {
 		map.add("password", password);
 
 		// Creating HttpEntity and set header and body
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
 		// Consuming rest API
 		ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);
@@ -78,6 +81,7 @@ public class UserService implements UserServicePort {
 		JSONObject obj = new JSONObject(response.getBody());
 		if (obj.has("access_token")) {
 			String accessToken = obj.getString("access_token");
+			
 			return createResponse(accessToken, "Token is generated successfully", 200);
 		}
 		if (obj.has(ERROR)) {

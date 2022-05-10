@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,18 +49,19 @@ public class ManageTableResource {
         this.manageTableServicePort = manageTableServicePort;
         this.tableDeleteServicePort = tableDeleteServicePort;
     }
-
     
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isReadPermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
 		log.debug("Get capacity plans");
-
+		
 		return ResponseEntity.status(HttpStatus.OK).body(manageTableServicePort.capacityPlans());
 	}
 
 	@GetMapping("/")
 	@Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isReadPermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<Response> getTables(@RequestParam int tenantId) {
 
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
@@ -80,6 +82,7 @@ public class ManageTableResource {
 
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isReadPermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
@@ -105,6 +108,7 @@ public class ManageTableResource {
 
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isWritePermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTableDTO) {
 
 		if (manageTableServicePort.checkIfTableNameisValid(createTableDTO.getTableName())) {
@@ -140,6 +144,7 @@ public class ManageTableResource {
 		
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isDeletePermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		tableName = tableName + "_" + tenantId;
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
@@ -167,6 +172,7 @@ public class ManageTableResource {
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isUpdatePermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<Response> restoreTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
 
@@ -190,6 +196,7 @@ public class ManageTableResource {
 
 	@PutMapping("/{tableName}")
 	@Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakAuthService.isUpdatePermissionGranted(principal.getKeycloakSecurityContext().getTokenString())")
 	public ResponseEntity<Response> updateTableSchema(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody ManageTable newTableSchemaDTO) {
 

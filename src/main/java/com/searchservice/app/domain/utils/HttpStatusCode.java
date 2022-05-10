@@ -58,7 +58,4 @@ public enum HttpStatusCode {
 		return message;
 	}
 
-	
-	
-
 }

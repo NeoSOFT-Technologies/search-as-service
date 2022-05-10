@@ -114,10 +114,15 @@ dependencies {
 	
 	//Keycloak
 	implementation group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '11.0.2'
+	implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '18.0.0'
+	
 	
 	// Spring Security
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.6.3'
 	
+	// Token decoder
+	implementation group: 'cljsjs', name: 'jwt-decode', version: '2.1.0-0'
+	implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 }
 
 tasks.named('test') {
