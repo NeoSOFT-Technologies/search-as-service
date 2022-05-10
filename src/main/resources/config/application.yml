@@ -17,37 +17,5 @@ keycloak:
   ssl-required: external
   public-client: false
   use-resource-role-mappings: true
-#keycloak:
-#  realm: ${KEYCLOAK_REALM_NAME:saas-realm}
-#  credentials: 
-#    secret: ${KEYCLOAK_CLIENT_SECRET:dFLZ4mRutQUTK3GdjK1uezJS4jmWCNjS}
-#  resource: ${KEYCLOAK_CLIENT_NAME:saas-admin}
-#  auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
-#  ssl-required: external
-#  public-client: false
-#  use-resource-role-mappings: true
-#keycloak:
-#  realm: ${KEYCLOAK_REALM_NAME:saas-realm}
-#  credentials: 
-#    secret: ${KEYCLOAK_CLIENT_SECRET:2GcVuiVsmMxkDU9cp8YCNsB4HD0WEg7O}
-#  resource: ${KEYCLOAK_CLIENT_NAME:realm-management}
-#  auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
-#  ssl-required: external
-#  public-client: false
-#  use-resource-role-mappings: true
-
-mykc:
-  res: saas-client
-  sec: Fn7lKppwFB7J9kCWD6g9cuF6pSvfEAdk
 
 #================================================================
-#Keycloack UserName and Password For Ingress Token
-base-ingress-ms-url: http://localhost:8081
-token-username: demo
-token-password : demo
-token-url: /user/token
-keycloak-url:
-  realm: /admin/realms
-keycloak-config:
-  client-id: saas-client
-  tenant-id-1: 1d68fd1b-7f05-4856-b268-7b19cd572dab
