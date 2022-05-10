@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
+import com.searchservice.app.domain.port.api.PublicKeyServicePort;
 import com.searchservice.app.domain.port.api.UserServicePort;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 public class UserResource {
 	
 	private final UserServicePort userServicePort;
+
 
     public UserResource(UserServicePort userServicePort) {
         this.userServicePort = userServicePort;
@@ -34,4 +36,6 @@ public class UserResource {
         }
 
     }
+	
+
 }

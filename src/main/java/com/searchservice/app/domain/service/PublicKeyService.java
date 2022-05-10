@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.domain.port.api.PublicKeyServicePort;
-import lombok.Data;
+
 
 @Service
-@Data
 public class PublicKeyService implements PublicKeyServicePort{
 
 	private static final String CACHE_NAME = "publicKeyCache";
@@ -47,7 +46,6 @@ public class PublicKeyService implements PublicKeyServicePort{
 	
 	public String getPublicKeyFromServer(String realmName) {
 		String publicKey = "";
-		
 		try {
 			log.debug("Obtaining Public Key Value For Realm: {}",realmName);
 			ResponseEntity<String> result = restTemplate.getForEntity(authConfigProperties.getKeyUrl()
@@ -58,18 +56,21 @@ public class PublicKeyService implements PublicKeyServicePort{
 				log.debug("Public Key Obtained Successfully");
 			}
 		} catch (Exception e) {
-			log.error("Something Went Wrong While Obtaining Public Key",e);
+			log.error("Something Went Wrong While Obtaining Public Key");
 		}
 		return publicKey;
 	}
 
-	public void checkIfPublicKeyExistsInCache() {
+	public boolean checkIfPublicKeyExistsInCache() {
+		boolean isPublicKeyPresent = false;
 		String realmName = authConfigProperties.getRealmName();
 		Cache cache = cacheManager.getCache(PublicKeyService.CACHE_NAME);
 		if(cache.get(authConfigProperties.getRealmName())!=null) {
 			log.debug("Public Key Found in Cache For Realm: {}",realmName);
 			updatePublicKey(realmName);
+			isPublicKeyPresent = true;
 		}
+		return isPublicKeyPresent;
 	}
 	
 	
