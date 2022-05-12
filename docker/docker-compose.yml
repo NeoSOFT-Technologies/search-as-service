@@ -157,3 +157,5 @@ services:
 
 networks:
   saas-network:
+    name: saas-network-external
+    driver: bridge
