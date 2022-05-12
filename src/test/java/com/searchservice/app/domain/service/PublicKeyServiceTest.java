@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -34,7 +35,7 @@ class PublicKeyServiceTest {
 	
 	@Autowired
 	private AuthConfigProperties authConfigProperties;
-	
+
 	@Mock
     private RestTemplate restTemplate;
 	
@@ -42,7 +43,7 @@ class PublicKeyServiceTest {
 	private CacheManager cache;
 	
 	private String expectedPublicKeyJson = "{\"realm\":\"master\",\"public_key\":\"Public-Key-Test\"}";
-	ConcurrentMapCache keyCache = new ConcurrentMapCache("publicKeyCache");
+	ConcurrentMapCache keyCache = new ConcurrentMapCache("${cache-name}");
 	
 	@BeforeAll
 	void setUp() {
@@ -53,7 +54,7 @@ class PublicKeyServiceTest {
 		Mockito.lenient().when(this.restTemplate.getForEntity(authConfigProperties.getKeyUrl()
 				+ authConfigProperties.getRealmName(), String.class)).
 		thenReturn(new ResponseEntity<String>(expectedPublicKeyJson, HttpStatus.OK));
-		Mockito.when(cache.getCache("publicKeyCache")).thenReturn(keyCache);	
+		Mockito.when(cache.getCache("${cache-name}")).thenReturn(keyCache);	
 	}
 	
 	void setErrorResponse() {

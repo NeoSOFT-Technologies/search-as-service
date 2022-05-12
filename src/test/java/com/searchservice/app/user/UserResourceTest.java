@@ -18,6 +18,7 @@ import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.service.UserService;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -38,7 +39,7 @@ class UserResourceTest {
 	
 	public void setMockitoBadResponse() {
 		Response tokenResponseDTO = new Response();
-		tokenResponseDTO.setStatusCode(400);
+		tokenResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		tokenResponseDTO.setMessage("Invalid Credentials");	
 		Mockito.when(userService.getToken(Mockito.any())).thenReturn(tokenResponseDTO);
 	}

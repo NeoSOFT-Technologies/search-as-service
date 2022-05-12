@@ -17,17 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.CustomException;
 
 @Service
-
-@Transactional
 public class TableDeleteService implements TableDeleteServicePort {
 
 	@Value("${table-delete-file.path}")
@@ -92,7 +89,6 @@ public class TableDeleteService implements TableDeleteServicePort {
 		File newFile = new File(deleteRecordFilePath.substring(0, deleteRecordFilePath.length()-4)+"Temp.csv");
 		int lineNumber = 0;
 		int delRecordCount = 0;
-
 		try (BufferedReader br = new BufferedReader(new FileReader(existingFile));
 				PrintWriter pw = new PrintWriter(new FileWriter(newFile))) {
 			String currentDeleteRecord;
@@ -114,7 +110,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 				lineNumber++;
 			}
 			pw.flush();
-
+			pw.close();
+			br.close();
 			makeDeleteTableFileChangesForDelete(newFile, existingFile, delRecordCount);
 
 		} catch (IOException exception) {
@@ -126,8 +123,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	public void makeDeleteTableFileChangesForDelete(File newFile, File existingFile, int delRecordCount) {
-		File deleteRecordFile = new File(deleteRecordFilePath);
-		if (existingFile.delete() && newFile.renameTo(deleteRecordFile)) {
+		if (existingFile.delete() && newFile.renameTo(existingFile)) {
 			checkTableDeletionStatus(delRecordCount);
 		}
 	}
@@ -142,15 +138,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 			performUndoDeleteResponse = performUndoTableDeletion(tableName);
 		} else {
 			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
-
 			performUndoDeleteResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			performUndoDeleteResponse.setMessage(TABLE_DELETE_UNDO_ERROR_MSG);
 		}
 
 		return performUndoDeleteResponse;
 	}
-
-	
 
 	public Response performUndoTableDeletion(String tableName) {
 		String actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
@@ -193,9 +186,15 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	public boolean performTableDeletion(String tableRecord) {
 		String tableName = tableRecord.split(",")[1];
-		Response tableDeleteResponse = manageTableServicePort.deleteTable(tableName);
-
-		return (tableDeleteResponse.getStatusCode() == 200);
+		try {
+		 Response tableResponseDTO = manageTableServicePort.deleteTable(tableName);
+		 logger.debug("{}",tableResponseDTO.getMessage());
+		 return (tableResponseDTO.getStatusCode() == 200);
+		}
+		catch(CustomException e) {
+			logger.error("Error Occured While Performing Deletion : {}",e.getExceptionMessage());
+			return false;
+		}	
 	}
 
 	public Response getUndoDeleteResponse(int undoRecordNumber, String tableName) {

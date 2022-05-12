@@ -18,7 +18,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
+import com.searchservice.app.domain.utils.HttpStatusCode;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -27,7 +29,6 @@ class InputDocumentResourceTest {
 	// String apiEndpoint = "/api/v1";
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
-	int statusCode=0;
 	String name;
 	String message="";
 	int tenantId = 101;
@@ -41,19 +42,16 @@ class InputDocumentResourceTest {
 	String inputString = "[{\"shares\":20000,\"manufacture\":\"warren buffet\",\"website\":\"flipkart.com\",\"color\":\"blue\",\"author\":\"dhanashree\",\"id\":24}]";
 
     @Autowired
-        MockMvc restAMockMvc;
+    MockMvc restAMockMvc;
 
-	
 	@MockBean
 	InputDocumentService inputDocumentService;
-	
-
-	
+		
 	@MockBean
 	ManageTableServicePort manageTableServicePort;
 
 	public void setMockitoSucccessResponseForService() {
-		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 		responseDTO.setStatusCode(200);
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.anyBoolean(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
@@ -61,17 +59,16 @@ class InputDocumentResourceTest {
 	}
 
 	public void setMockitoBadResponseForService() {
-		ThrottlerResponse responseDTO = new ThrottlerResponse(statusCode, message);
+		ThrottlerResponse responseDTO = new ThrottlerResponse();
 		responseDTO.setStatusCode(400);
 		Mockito.when(inputDocumentService.addDocuments(Mockito.anyBoolean(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		
 		ResponseEntity<ThrottlerResponse> responseEntity = new ResponseEntity<ThrottlerResponse>(
 				HttpStatus.BAD_REQUEST);
 		Mockito.when(inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName)).thenReturn(responseEntity);
 	}
-
+	
 	@Test
 	void testInputDocumentNRTAPI() throws Exception {
 		
@@ -119,18 +116,7 @@ class InputDocumentResourceTest {
 		restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 				.content(inputString))
-				.andExpect(status().isBadRequest());
-	
-		
-	}
-	
-
-	
-	
-
-	
-	
-
-	
+				.andExpect(status().isBadRequest());	
+	}	
 	
 }

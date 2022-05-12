@@ -12,3 +12,4 @@ spring:
 authentication:
   realmName: master
   keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
+

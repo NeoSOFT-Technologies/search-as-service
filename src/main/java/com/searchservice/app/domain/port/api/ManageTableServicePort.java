@@ -3,6 +3,7 @@ package com.searchservice.app.domain.port.api;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
@@ -12,6 +13,7 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 
 @Component
+@Repository
 public interface ManageTableServicePort {
 
 	/*
@@ -59,5 +61,7 @@ public interface ManageTableServicePort {
 	boolean isColumnNameValid(List<SchemaField> columns);
 	
 	Boolean isValidFormatDataTypeForMultivalued(List<SchemaField> columns);
+	
+	void checkForSchemaDeletion();
 
 }

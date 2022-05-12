@@ -18,7 +18,7 @@ import com.searchservice.app.domain.port.api.PublicKeyServicePort;
 @Service
 public class PublicKeyService implements PublicKeyServicePort{
 
-	private static final String CACHE_NAME = "publicKeyCache";
+	
 
 	private final Logger log = LoggerFactory.getLogger(PublicKeyService.class);
 	
@@ -30,15 +30,15 @@ public class PublicKeyService implements PublicKeyServicePort{
 	
 	@Autowired
 	private CacheManager cacheManager;
-		
+	
 	@Override	
-	@Cacheable(cacheNames = {PublicKeyService.CACHE_NAME}, key = "#realmName")
+	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
 	public String retirevePublicKey(String realmName) {
 		log.info("Adding Public Key Value in Cache for Realm: {}", realmName);
 		return getPublicKeyFromServer(realmName);
 	}
 	
-	@CachePut(cacheNames = {PublicKeyService.CACHE_NAME}, key = "#realmName")
+	@CachePut(cacheNames = {"${cache-name}"}, key = "#realmName")
 	public String updatePublicKey(String realmName) {
 		log.info("Updating Public Key Value in Cache for Realm: {}", realmName);
 		return getPublicKeyFromServer(realmName);
@@ -61,10 +61,11 @@ public class PublicKeyService implements PublicKeyServicePort{
 		return publicKey;
 	}
 
+	@Override
 	public boolean checkIfPublicKeyExistsInCache() {
 		boolean isPublicKeyPresent = false;
 		String realmName = authConfigProperties.getRealmName();
-		Cache cache = cacheManager.getCache(PublicKeyService.CACHE_NAME);
+		Cache cache = cacheManager.getCache("${cache-name}");
 		if(cache.get(authConfigProperties.getRealmName())!=null) {
 			log.debug("Public Key Found in Cache For Realm: {}",realmName);
 			updatePublicKey(realmName);

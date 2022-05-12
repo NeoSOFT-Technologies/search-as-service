@@ -23,9 +23,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	
 
 	@Value("${base-search-url}")
-	private String searchNonStatic;
-	// Init configurations
-	private  static String searchURL;
+	private String searchURL;
 
      @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
@@ -35,11 +33,6 @@ public class InputDocumentService implements InputDocumentServicePort {
  	
  	@Autowired
  	public TableDeleteServicePort tableDeleteServicePort;
-     
-	@Autowired
-	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
-		searchURL = solrURLNonStatic;
-	}
 
 	public InputDocumentService(ManageTableServicePort manageTableServicePort, 
 			TableDeleteServicePort tableDeleteServicePort) {
@@ -47,7 +40,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 		this.tableDeleteServicePort = tableDeleteServicePort;
 
 	}
-
 	
 	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {		
 		if (response.isDocumentUploaded()) {

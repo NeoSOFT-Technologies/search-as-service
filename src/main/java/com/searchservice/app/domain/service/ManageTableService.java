@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
@@ -61,11 +59,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Service
+
 @Transactional
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Service
 public class ManageTableService implements ManageTableServicePort {
 	
 	// Schema
@@ -93,8 +92,8 @@ public class ManageTableService implements ManageTableServicePort {
 	@Value("${table-schema-attributes.delete-file-path}")
 
 	private String deleteSchemaAttributesFilePathNonStatic;
+	
 	@Value("${table-schema-attributes.days}")
-
 	private long schemaDeleteDurationNonStatic;
 
 	// Init configurations
@@ -215,11 +214,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
+		
+		Response apiResponseDTO = new Response();
 		if (!isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
-		// Delete table
-		Response apiResponseDTO = new Response();
+//		// Delete table
 
 		boolean response = searchJAdapter.deleteTableFromSolrj(tableName);
 		if (response) {

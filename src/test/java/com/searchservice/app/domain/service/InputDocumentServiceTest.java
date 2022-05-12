@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
@@ -23,7 +25,6 @@ import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearc
 import com.searchservice.app.rest.errors.CustomException;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
-
 @SpringBootTest
 class InputDocumentServiceTest {
 
@@ -145,7 +146,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testDocumentInjectWithInvalidTableName() {
 		ResponseEntity<ThrottlerResponse> responseEntity = inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName);
-		assertEquals(400, responseEntity.getStatusCodeValue());
+		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), responseEntity.getStatusCodeValue());
 	}
 	
 	@Test
