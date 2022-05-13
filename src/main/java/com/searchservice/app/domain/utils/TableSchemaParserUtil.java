@@ -161,8 +161,6 @@ public class TableSchemaParserUtil {
 	
 	public static void setFieldsAsPerTheSchema(SchemaField searchFieldDTO, Map<String, Object> schemaField) {
 		
-		
-		
 		if(schemaField.containsKey(INDEXED))
 			searchFieldDTO.setFilterable((boolean)schemaField.get(INDEXED));
 		if(schemaField.containsKey(MULTIVALUED))

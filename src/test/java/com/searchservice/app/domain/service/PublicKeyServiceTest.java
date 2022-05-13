@@ -9,12 +9,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,6 +28,11 @@ import org.junit.jupiter.api.BeforeAll;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
+@TestPropertySource(
+        properties = {
+           "cache-name: cacheTest"
+        }
+)
 class PublicKeyServiceTest {
 
 	@InjectMocks
@@ -41,7 +46,7 @@ class PublicKeyServiceTest {
 	
 	@Mock
 	private CacheManager cache;
-	
+		
 	private String expectedPublicKeyJson = "{\"realm\":\"master\",\"public_key\":\"Public-Key-Test\"}";
 	ConcurrentMapCache keyCache = new ConcurrentMapCache("${cache-name}");
 	

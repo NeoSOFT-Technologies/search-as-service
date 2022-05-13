@@ -260,6 +260,12 @@ class ManageTableTest {
 				.put(apiEndpoint + "/manage/table"+ "/" + tableName+ "/?tenantId="+tenantId)
 				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
 				.andExpect(status().isOk());
+		
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders
+				.put(apiEndpoint + "/manage/table"+ "/" + tableName+ "/?tenantId="+tenantId)
+				.contentType(MediaType.APPLICATION_PROBLEM_JSON).content(TestUtil.convertObjectToJsonBytes(schemaDTO)))
+				.andExpect(status().isBadRequest());
 
 		// Update Schema for non-existing table
 		setMockitoForTableNotExist();
@@ -347,7 +353,7 @@ class ManageTableTest {
 		
 	}
 	
-@Test
+  @Test
 	void testGetTableInfo() throws Exception {
 		setMockitoSuccessResponseForService();
 		restAMockMvc

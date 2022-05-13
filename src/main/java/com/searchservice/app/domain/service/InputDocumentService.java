@@ -34,7 +34,7 @@ public class InputDocumentService implements InputDocumentServicePort {
  	@Autowired
  	public TableDeleteServicePort tableDeleteServicePort;
 
-	public InputDocumentService(ManageTableServicePort manageTableServicePort, 
+	public InputDocumentService(ManageTableServicePort manageTableServicePort,
 			TableDeleteServicePort tableDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 		this.tableDeleteServicePort = tableDeleteServicePort;

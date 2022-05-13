@@ -509,6 +509,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response apiResponseDTO = new Response();
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
+		
 		try {
 			searchJAdapter.addAliasTableInSolrj(searchClientActive, request);
 			apiResponseDTO.setStatusCode(200);
