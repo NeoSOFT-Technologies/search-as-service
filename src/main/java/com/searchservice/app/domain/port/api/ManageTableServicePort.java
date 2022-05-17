@@ -22,7 +22,9 @@ public interface ManageTableServicePort {
 	// GET request
 
 	CapacityPlanResponse capacityPlans();
-
+	
+	Response getAllTables(int startRecord, int pageSize);
+	
 	Response getTables(int tenantId);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);

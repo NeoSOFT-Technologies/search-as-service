@@ -124,6 +124,7 @@ class ManageTableTest {
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
+        Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
         //Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(true);
 	}
 
@@ -164,7 +165,7 @@ class ManageTableTest {
 				.thenReturn(responseDTO);
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
-		
+		 Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
 
 	}
 
@@ -290,11 +291,15 @@ class ManageTableTest {
 	void testGetTablesWithTenantId() throws Exception {
 
 		setMockitoSuccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables")
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 		
 		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables")
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+		
+		Mockito.when(manageTableService.getTables(Mockito.anyInt())).thenReturn(null);
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
 	}
@@ -302,13 +307,17 @@ class ManageTableTest {
 
 	@Test
 	void testGetAllTables() throws Exception {
-
+		
 		setMockitoSuccessResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables"+ "?pageNumber=1&pageSize=5")
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 		
 		setMockitoBadResponseForService();
-		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables"+ "?pageNumber=1&pageSize=5")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+		
+		Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(null);
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables"+ "?pageNumber=1&pageSize=5")
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
 	}

@@ -138,18 +138,14 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
         List<String> data = new ArrayList<>();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		if(tenantId < 0) {
-			data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-		}else {
 		    data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
 				tenantId);
-		}
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
 
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+			getListItemsResponseDTO.setMessage("Successfully retrieved all tables having tenantId: "+tenantId);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
@@ -159,6 +155,18 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 
 		return getListItemsResponseDTO;
+	}
+
+	@Override
+	public Response getAllTables(int pageNumber, int pageSize) {
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
+		Response getAllTableListResposnse = new Response();
+		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
+        List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+        getAllTableListResposnse.setData(getPaginatedTabaleList(data,pageNumber, pageSize));
+        getAllTableListResposnse.setStatusCode(200);
+        getAllTableListResposnse.setMessage("Successfully retrieved all tables");
+        return getAllTableListResposnse;
 	}
 
 	@Override
@@ -732,6 +740,15 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 		return multiValueCheck;
 		}
+	}
+	
+	public List<String> getPaginatedTabaleList(List<String> data,int pageNumber, int pageSize){
+		List<String> paginatedTableList = new ArrayList<>();
+		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
+	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+	    	paginatedTableList.add(data.get(currIdx + i));
+	    }
+		return paginatedTableList;
 	}
 
 }

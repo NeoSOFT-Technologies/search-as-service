@@ -81,9 +81,10 @@ public class ManageTableResource {
 	
 	@GetMapping("/all-tables")
 	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> getALLTables() {
+	public ResponseEntity<Response> getALLTables(@RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize) {
 
-		Response getListItemsResponseDTO = manageTableServicePort.getTables(-1);
+		Response getListItemsResponseDTO = manageTableServicePort.getAllTables(pageNumber, pageSize);
 		if (getListItemsResponseDTO == null)
 			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
@@ -110,7 +111,6 @@ public class ManageTableResource {
 
 			// GET tableSchema
 			TableSchema tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
-
 			if (tableInfoResponseDTO == null)
 				throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
 						HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());

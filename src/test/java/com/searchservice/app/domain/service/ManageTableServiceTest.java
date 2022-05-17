@@ -313,7 +313,7 @@ class ManageTableServiceTest {
 	@Test
 	void testGetAllTables() {
 		setMockitoSuccessResponseForService();
-		Response resp = manageTableService.getTables(-1);
+		Response resp = manageTableService.getAllTables(1, 2);
 		assertEquals(200, resp.getStatusCode());
 
 	}
