@@ -100,6 +100,8 @@ public class ManageTableService implements ManageTableServicePort {
 	private static String searchURL;
 	private static String deleteSchemaAttributesFilePath;
 	private static long schemaDeleteDuration;
+	
+	private static final String COLLECTIONS = "collections";
 
 	@Autowired
 	public ManageTableService(@Value("${base-search-url}") String solrURLNonStatic,
@@ -134,11 +136,14 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response getTables(int tenantId) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-
+        List<String> data = new ArrayList<>();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+		if(tenantId < 0) {
+			data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+		}else {
+		    data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
 				tenantId);
-
+		}
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
 
@@ -270,7 +275,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		try {
 			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());

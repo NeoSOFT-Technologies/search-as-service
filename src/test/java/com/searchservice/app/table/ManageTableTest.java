@@ -287,7 +287,21 @@ class ManageTableTest {
 	}
 
 	@Test
-	void testGetTables() throws Exception {
+	void testGetTablesWithTenantId() throws Exception {
+
+		setMockitoSuccessResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/all-tables")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+	}
+	
+
+	@Test
+	void testGetAllTables() throws Exception {
 
 		setMockitoSuccessResponseForService();
 		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId="+tenantId)

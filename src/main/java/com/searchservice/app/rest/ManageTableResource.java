@@ -78,6 +78,27 @@ public class ManageTableResource {
 		}
 	}
 
+	
+	@GetMapping("/all-tables")
+	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<Response> getALLTables() {
+
+		Response getListItemsResponseDTO = manageTableServicePort.getTables(-1);
+		if (getListItemsResponseDTO == null)
+			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		if (getListItemsResponseDTO.getStatusCode() == 200) {
+			List<String> existingTablesList = getListItemsResponseDTO.getData();
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
+			getListItemsResponseDTO.setData(existingTablesList);
+			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
+		} else {
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables From The Server"));
+		}
+	}
+
+	
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {

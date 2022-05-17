@@ -308,6 +308,15 @@ class ManageTableServiceTest {
 		assertEquals(200, resp.getStatusCode());
 
 	}
+	
+
+	@Test
+	void testGetAllTables() {
+		setMockitoSuccessResponseForService();
+		Response resp = manageTableService.getTables(-1);
+		assertEquals(200, resp.getStatusCode());
+
+	}
 
 	@Test
 	void getSchemaNonExistingTable() {
