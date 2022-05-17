@@ -746,7 +746,7 @@ public class ManageTableService implements ManageTableServicePort {
 		List<String> paginatedTableList = new ArrayList<>();
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
 	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-	    	paginatedTableList.add(data.get(currIdx + i));
+	    	paginatedTableList.add(data.get(currIdx + i).split("_")[0]);
 	    }
 		return paginatedTableList;
 	}

@@ -390,6 +390,12 @@ class ManageTableTest {
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isBadRequest());
 
+		Mockito.when(manageTableService.getCurrentTableSchema(Mockito.anyInt(), Mockito.anyString())).thenReturn(null);
+		restAMockMvc
+		.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table" + "/" + tableName+ "/?tenantId="+tenantId)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isBadRequest());
+		
 		// Accessing Table Under Deletion
 		setMockitoForTableUnderDeletion();
 		restAMockMvc
