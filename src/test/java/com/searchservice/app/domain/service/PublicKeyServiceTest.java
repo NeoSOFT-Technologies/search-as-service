@@ -77,5 +77,8 @@ class PublicKeyServiceTest {
 		setErrorResponse();
 		assertEquals("",publicKeyService.retirevePublicKey(authConfigProperties.getRealmName()));
 		
+		Mockito.when(cache.getCache("${cache-name}")).thenReturn(null);	
+		assertFalse(publicKeyService.checkIfPublicKeyExistsInCache());
+		
 	}
 }
