@@ -9,6 +9,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.searchservice.app.config.AuthConfigProperties;
@@ -28,6 +29,9 @@ public class PublicKeyService implements PublicKeyServicePort{
 	
 	@Autowired
 	private CacheManager cacheManager;
+	
+	@Nullable
+	Cache cache;
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
@@ -63,16 +67,14 @@ public class PublicKeyService implements PublicKeyServicePort{
 	public boolean checkIfPublicKeyExistsInCache() {
 		boolean isPublicKeyPresent = false;
 		String realmName = authConfigProperties.getRealmName();
-		try {
-		Cache cache = cacheManager.getCache("${cache-name}");
-		if(cache.get(authConfigProperties.getRealmName())!=null) {
-			log.debug("Public Key Found in Cache For Realm: {}",realmName);
-			updatePublicKey(realmName);
-			isPublicKeyPresent = true;
-		}
-		}catch(Exception e) {
-			log.error("Something Went Wrong While Fetching Cache Value", e);
-		}
+	    cache = cacheManager.getCache("${cache-name}");
+	    if(cache!=null) {
+	    	if(cache.get(authConfigProperties.getRealmName())!=null) {
+				log.debug("Public Key Found in Cache For Realm: {}",realmName);
+				updatePublicKey(realmName);
+				isPublicKeyPresent = true;
+			}
+	    }
 		return isPublicKeyPresent;
 	}
 	
