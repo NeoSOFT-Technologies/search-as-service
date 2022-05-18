@@ -24,6 +24,7 @@ import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.rest.errors.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -69,7 +70,7 @@ public class ManageTableResource {
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
-			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion().getData());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
@@ -90,12 +91,31 @@ public class ManageTableResource {
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
-			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion());
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion().getData());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables From The Server"));
+		}
+	}
+	
+	@GetMapping("/deletion/all-tables")
+	@Operation(summary = "GET ALL THE TABLES UNDER DELETION.", security = @SecurityRequirement(name = "bearerAuth"))
+	public ResponseEntity<Response> getALLTablesUnderDeletion(@RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize) {
+
+		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTableUnderDeletion();
+		if (getDeleteTableListResponseDTO == null)
+			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		if (getDeleteTableListResponseDTO.getStatusCode() == 200) {
+			List<String> existingTablesList = getDeleteTableListResponseDTO.getData();
+			getDeleteTableListResponseDTO.setData(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			return ResponseEntity.status(HttpStatus.OK).body(getDeleteTableListResponseDTO);
+		} else {
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion"));
 		}
 	}
 

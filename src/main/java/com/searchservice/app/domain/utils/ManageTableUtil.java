@@ -18,6 +18,15 @@ public class ManageTableUtil {
 		return false;
 	}
 
+	public static List<String> getPaginatedTabaleList(List<String> data,int pageNumber, int pageSize){
+		List<String> paginatedTableList = new ArrayList<>();
+		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
+	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+	    	paginatedTableList.add(data.get(currIdx + i).split("_")[0]);
+	    }
+		return paginatedTableList;
+	}
+	
 	public static Map<String, SchemaField> removeExistingFields(
 													Map<String, SchemaField> newFieldsHashMap, 
 													List<SchemaField> newFields, 

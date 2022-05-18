@@ -163,7 +163,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getAllTableListResposnse = new Response();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
         List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-        getAllTableListResposnse.setData(getPaginatedTabaleList(data,pageNumber, pageSize));
+        getAllTableListResposnse.setData(ManageTableUtil.getPaginatedTabaleList(data,pageNumber, pageSize));
         getAllTableListResposnse.setStatusCode(200);
         getAllTableListResposnse.setMessage("Successfully retrieved all tables");
         return getAllTableListResposnse;
@@ -742,13 +742,5 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 	}
 	
-	public List<String> getPaginatedTabaleList(List<String> data,int pageNumber, int pageSize){
-		List<String> paginatedTableList = new ArrayList<>();
-		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
-	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-	    	paginatedTableList.add(data.get(currIdx + i).split("_")[0]);
-	    }
-		return paginatedTableList;
-	}
 
 }

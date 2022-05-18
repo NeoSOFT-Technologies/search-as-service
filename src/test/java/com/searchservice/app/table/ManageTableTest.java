@@ -102,6 +102,11 @@ class ManageTableTest {
 		getTablesResponseDTO.setStatusCode(200);
 		getTablesResponseDTO.setMessage("Testing");
 		getTablesResponseDTO.setData(mockGetTableList);
+		
+		Response getDeletedTablesResponseDTO = new Response();
+		getDeletedTablesResponseDTO.setStatusCode(200);
+		getDeletedTablesResponseDTO.setMessage("Testing");
+		getDeletedTablesResponseDTO.setData(mockGetTableList);
 
 		CapacityPlanResponse capacityPlanResponseDTO = new CapacityPlanResponse();
 
@@ -125,6 +130,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
         Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
+        Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(getDeletedTablesResponseDTO);
         //Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(true);
 	}
 
@@ -145,6 +151,10 @@ class ManageTableTest {
 		Response getTablesResponseDTO = new Response();
 		getTablesResponseDTO.setStatusCode(400);
 		getTablesResponseDTO.setMessage("Testing");
+		
+		Response getDeletedTablesResponseDTO = new Response();
+		getDeletedTablesResponseDTO.setStatusCode(400);
+		getDeletedTablesResponseDTO.setMessage("Testing");
 
 		CapacityPlanResponse capacityPlanResponseDTO = new CapacityPlanResponse();
 		Mockito.when(manageTableService.getCurrentTableSchema(Mockito.anyInt(), Mockito.anyString())).thenReturn(tableInfoResponseDTO);
@@ -166,7 +176,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		 Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
-
+		 Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(getDeletedTablesResponseDTO);
 	}
 
 	@Test

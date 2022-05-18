@@ -28,7 +28,7 @@ public interface TableDeleteServicePort {
 
 	public boolean isTableUnderDeletion(String tableName);
 
-	public List<String> getTableUnderDeletion();
+	public Response getTableUnderDeletion();
 
 	public boolean checkIfTableDeleteFileExist(File file);
 

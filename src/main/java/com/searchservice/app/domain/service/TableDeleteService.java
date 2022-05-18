@@ -227,7 +227,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		boolean res = false;
 		List<String> listofTablesUnderDeletion;
 
-		listofTablesUnderDeletion = getTableUnderDeletion();
+		listofTablesUnderDeletion = getTableUnderDeletion().getData();
 		if (listofTablesUnderDeletion.contains(tableName))
 			res = true;
 
@@ -235,7 +235,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public List<String> getTableUnderDeletion() {
+	public Response getTableUnderDeletion() {
+		Response deleteTablesResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
 		checkIfTableDeleteFileExist(existingFile);
@@ -249,11 +250,17 @@ public class TableDeleteService implements TableDeleteServicePort {
 				}
 				lineNumber++;
 			}
-
-		} catch (Exception e) {
-			logger.error("Some Error Occured While Getting Table", e);
+			deleteTablesResponse.setStatusCode(200);
+			deleteTablesResponse.setData(tableUnderDeletionList);
+			deleteTablesResponse.setMessage("Successfully Retrieved All Tables Under Deletion");
+			
 		}
-		return tableUnderDeletionList;
+		catch (Exception e) {
+			deleteTablesResponse.setStatusCode(400);
+			logger.error("Some Error Occured While Getting Table's Under Deletion ", e);
+			
+		}
+		return deleteTablesResponse;
 	}
 
 	@Override

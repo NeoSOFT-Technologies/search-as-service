@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -156,8 +157,8 @@ class TableDeleteServiceTest {
 
 	@Test
 	void getTableUndeDeletionTest() {
-		List<String> tableUnderDeletion = tableDeleteService.getTableUnderDeletion();
-		Assertions.assertNotNull(tableUnderDeletion);
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion();
+		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 
 	@Test
@@ -239,7 +240,6 @@ class TableDeleteServiceTest {
 				bw.write("TenantID,TableName,RequestTime\n");
 				bw.write("101,Testing_101,17-3-2022 12:56:56\n");
 				bw.write("102,Testing_102,"+DateUtil.getFormattedDate(formatter)+"\n");
-				System.out.println(">>>"+"Testing");
 			}catch (Exception e) {
 				e.printStackTrace();		
 			} 
@@ -247,6 +247,15 @@ class TableDeleteServiceTest {
 	}
 	
 	@AfterAll
+	@Order(1)
+	void getTableUndeDeletionTestInvalid() {
+		testTableDeleteInitializeInvalidFile();
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion();
+		Assertions.assertEquals(400, tableUnderDeletion.getStatusCode());
+	}
+	
+	@AfterAll
+	@Order(2)
 	void deleteAllTestFiles() {
 		File file = new File("src/test/resources");
 		for(File f: file.listFiles()) {
