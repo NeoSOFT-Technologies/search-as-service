@@ -163,7 +163,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getAllTableListResposnse = new Response();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
         List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-        getAllTableListResposnse.setData(ManageTableUtil.getPaginatedTabaleList(data,pageNumber, pageSize));
+        getAllTableListResposnse.setData(data);
         getAllTableListResposnse.setStatusCode(200);
         getAllTableListResposnse.setMessage("Successfully retrieved all tables");
         return getAllTableListResposnse;

@@ -70,7 +70,7 @@ public class ManageTableResource {
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
-			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion().getData());
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion(false).getData());
 			getListItemsResponseDTO.setData(existingTablesList);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
@@ -91,8 +91,9 @@ public class ManageTableResource {
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
-			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion().getData());
-			getListItemsResponseDTO.setData(existingTablesList);
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion(true).getData());
+			getListItemsResponseDTO.setTableList(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			getListItemsResponseDTO.setData(null);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
@@ -105,21 +106,22 @@ public class ManageTableResource {
 	public ResponseEntity<Response> getALLTablesUnderDeletion(@RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
 
-		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTableUnderDeletion();
+		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTableUnderDeletion(true);
 		if (getDeleteTableListResponseDTO == null)
 			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getDeleteTableListResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getDeleteTableListResponseDTO.getData();
-			getDeleteTableListResponseDTO.setData(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			getDeleteTableListResponseDTO.setTableList(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			getDeleteTableListResponseDTO.setData(null);
 			return ResponseEntity.status(HttpStatus.OK).body(getDeleteTableListResponseDTO);
+			
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion"));
 		}
 	}
 
-	
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {

@@ -62,16 +62,13 @@ public class TableDeleteService implements TableDeleteServicePort {
 						+ "\n";
 				fw.write(newRecord);
 				fw.flush();
-
 				deleteRecordInsertionResponse.setStatusCode(200);
-
 				deleteRecordInsertionResponse
 						.setMessage("Table:" + actualTableName + " Successfully Initialized For Deletion ");
 
 			} catch (Exception e) {
 				logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName, e);
 				deleteRecordInsertionResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-
 				deleteRecordInsertionResponse
 						.setMessage("Error While Initializing Deletion For Table: " + actualTableName);
 			}
@@ -227,7 +224,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 		boolean res = false;
 		List<String> listofTablesUnderDeletion;
 
-		listofTablesUnderDeletion = getTableUnderDeletion().getData();
+		listofTablesUnderDeletion = getTableUnderDeletion(false).getData();
 		if (listofTablesUnderDeletion.contains(tableName))
 			res = true;
 
@@ -235,7 +232,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public Response getTableUnderDeletion() {
+	public Response getTableUnderDeletion(boolean forDeleteTableList) {
 		Response deleteTablesResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
@@ -246,7 +243,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
 					String currentTableName = st.split(",")[1];
-					tableUnderDeletionList.add(currentTableName.split("_")[0]);
+					if(forDeleteTableList) {
+						tableUnderDeletionList.add(currentTableName);
+					}else {
+						tableUnderDeletionList.add(currentTableName.split("_")[0]);
+					}
+					
 				}
 				lineNumber++;
 			}

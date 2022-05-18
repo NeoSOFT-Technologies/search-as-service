@@ -157,7 +157,13 @@ class TableDeleteServiceTest {
 
 	@Test
 	void getTableUndeDeletionTest() {
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion();
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
+		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
+	}
+	
+	@Test
+	void getAllTableUndeDeletionTest() {
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(true);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 
@@ -250,7 +256,7 @@ class TableDeleteServiceTest {
 	@Order(1)
 	void getTableUndeDeletionTestInvalid() {
 		testTableDeleteInitializeInvalidFile();
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion();
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
 		Assertions.assertEquals(400, tableUnderDeletion.getStatusCode());
 	}
 	

@@ -93,6 +93,11 @@ class ManageTableTest {
 		List<String> mockGetTableList = new ArrayList<>();
 		mockGetTableList.add("Testing1");
 		mockGetTableList.add("Test2");
+		mockGetTableList.add("Testing_101");
+		
+		List<String> mockGetAllTableList = new ArrayList<>();
+		mockGetAllTableList.add("Testing1_102");
+		mockGetAllTableList.add("Testing_101");
 
 		Response responseDTOisCollectionExists = new Response();
 		responseDTOisCollectionExists.setStatusCode(200);
@@ -101,12 +106,12 @@ class ManageTableTest {
 		Response getTablesResponseDTO = new Response();
 		getTablesResponseDTO.setStatusCode(200);
 		getTablesResponseDTO.setMessage("Testing");
-		getTablesResponseDTO.setData(mockGetTableList);
+		getTablesResponseDTO.setData(mockGetAllTableList);
 		
 		Response getDeletedTablesResponseDTO = new Response();
 		getDeletedTablesResponseDTO.setStatusCode(200);
 		getDeletedTablesResponseDTO.setMessage("Testing");
-		getDeletedTablesResponseDTO.setData(mockGetTableList);
+		getDeletedTablesResponseDTO.setData(mockGetAllTableList);
 
 		CapacityPlanResponse capacityPlanResponseDTO = new CapacityPlanResponse();
 
@@ -130,7 +135,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
         Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
-        Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(getDeletedTablesResponseDTO);
+        Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(getDeletedTablesResponseDTO);
         //Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(true);
 	}
 
@@ -176,7 +181,7 @@ class ManageTableTest {
 		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		 Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
-		 Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(getDeletedTablesResponseDTO);
+		 Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(getDeletedTablesResponseDTO);
 	}
 
 	@Test
@@ -343,7 +348,7 @@ class ManageTableTest {
 		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/deletion/all-tables"+ "?pageNumber=1&pageSize=5")
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 		
-		Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(null);
+		Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(null);
 		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/deletion/all-tables"+ "?pageNumber=1&pageSize=5")
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
