@@ -51,12 +51,11 @@ public class RestControllerAdvice {
 		if(exception.getCause() instanceof UnrecognizedPropertyException) {
 			UnrecognizedPropertyException ex = (UnrecognizedPropertyException)exception.getCause();
 			fieldName = ex.getPropertyName();
-			return new ResponseEntity<Object>(new RestApiErrorHandling(
+			return new ResponseEntity<>(new RestApiErrorHandling(
 
 					HttpStatusCode.UNRECOGNIZED_FIELD.getCode(), HttpStatusCode.UNRECOGNIZED_FIELD,
 					HttpStatusCode.UNRECOGNIZED_FIELD.getMessage()+ " : "+fieldName), HttpStatus.BAD_REQUEST);
 		}else if(exception.getCause() instanceof InvalidFormatException) {
-			//String targetType = "";
 			InvalidFormatException ex = (InvalidFormatException)exception.getCause();
 			if (ex.getPath() != null && !ex.getPath().isEmpty()) {
 		        JsonMappingException.Reference path = ex.getPath().get(ex.getPath().size() - 1);
@@ -72,7 +71,7 @@ public class RestControllerAdvice {
 				return frameRestApiException(new RestApiError(HttpStatus.BAD_REQUEST, exc.getExceptionMessage()));
 			}
 			else if(ex.getCause() instanceof CustomException &&  exc.getExceptionCode()==HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode()) {
-				return new ResponseEntity<Object>(new RestApiErrorHandling(
+				return new ResponseEntity<>(new RestApiErrorHandling(
 						
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(), HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,
 						HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getMessage()),HttpStatus.BAD_REQUEST);
@@ -98,8 +97,12 @@ public class RestControllerAdvice {
 		String fieldName = "";
 		String requiredType = "";
 		if (exception.getCause() instanceof NumberFormatException) {
+			try {
 			fieldName = exception.getName();
-			requiredType = exception.getRequiredType().getName();
+			requiredType = (null != exception.getRequiredType())?exception.getRequiredType().getName():"";
+			}catch(Exception e) {
+				log.error("Something Went Wrong!" ,e);
+			}
 		}
 		return frameRestApiException(
 				new RestApiError(HttpStatus.BAD_REQUEST, fieldName + " must be of type " + requiredType));
