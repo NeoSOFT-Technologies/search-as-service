@@ -45,7 +45,7 @@ Deploy:
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     - install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     - mkdir ~/.kube
-    - cat $KUBE_CONFIG > ~/.kube/config
+    - cat $KUBE_CONFIG 
     - kubectl rollout restart deploy/search-as-service -n coe-search
   only:
     - main
