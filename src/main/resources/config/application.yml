@@ -7,13 +7,15 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
- # Keycloak Server Configurations
-keycloak:
-  realm: ${KEYCLOAK_REALM_NAME:saas-realm}
-  credentials: 
-    secret: ${KEYCLOAK_CLIENT_SECRET:Fn7lKppwFB7J9kCWD6g9cuF6pSvfEAdk}
-  resource: ${KEYCLOAK_CLIENT_NAME:saas-client}
-  auth-server-url: http://${KEYCLOAK_CONTAINER_NAME:localhost}:8080/auth
-  ssl-required: external
-  public-client: false
-  use-resource-role-mappings: true
+
+# Authentication Server Configurations
+authentication:
+  realmName: master
+  keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
+
+cache-name: publicKeyCacheIngress
+
+schedular-durations:
+   public-key-update: 300000
+   table-deletion: 0 15 8 * * ?
+   column-deletion: 0 15 8 * * ?

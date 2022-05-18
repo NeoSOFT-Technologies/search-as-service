@@ -2,6 +2,7 @@
 #================================================================
 #Search Configurations
 base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
+base-token-url: https://iam-dev.neosofttech.com/api/login
 #================================================================
 
 

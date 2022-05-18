@@ -59,5 +59,7 @@ public interface ManageTableServicePort {
 	boolean isColumnNameValid(List<SchemaField> columns);
 	
 	Boolean isValidFormatDataTypeForMultivalued(List<SchemaField> columns);
+	
+	void checkForSchemaDeletion();
 
 }

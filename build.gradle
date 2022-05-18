@@ -102,7 +102,7 @@ dependencies {
 	//JSON
 	implementation group: 'org.json', name: 'json', version: '20200518'
 
-
+    implementation group: 'org.jboss.logging', name: 'jboss-logging', version: '3.5.0.Final'
 
 	// Rate Limiter
 	// https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot2
@@ -112,11 +112,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
 	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
 	
-	//Keycloak
-	implementation group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '11.0.2'
-	
 	// Spring Security
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.6.3'
+	
+	//For Public Key Verification
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+  
+   //Inmemory Cache
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
 	
 }
 
