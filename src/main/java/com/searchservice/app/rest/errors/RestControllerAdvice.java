@@ -56,7 +56,6 @@ public class RestControllerAdvice {
 					HttpStatusCode.UNRECOGNIZED_FIELD.getCode(), HttpStatusCode.UNRECOGNIZED_FIELD,
 					HttpStatusCode.UNRECOGNIZED_FIELD.getMessage()+ " : "+fieldName), HttpStatus.BAD_REQUEST);
 		}else if(exception.getCause() instanceof InvalidFormatException) {
-
 			InvalidFormatException ex = (InvalidFormatException)exception.getCause();
 			if (ex.getPath() != null && !ex.getPath().isEmpty()) {
 		        JsonMappingException.Reference path = ex.getPath().get(ex.getPath().size() - 1);
@@ -100,9 +99,12 @@ public class RestControllerAdvice {
 		if (exception.getCause() instanceof NumberFormatException) {
 			try {
 			fieldName = exception.getName();
-			requiredType = exception.getRequiredType().getName();
+			Class<?> exceptionRequiredType=exception.getRequiredType();
+			if(exceptionRequiredType!=null){
+				requiredType = exceptionRequiredType.getName();
+			}
 			}catch(Exception e) {
-				log.error("Something Went Wrong!", e);
+				log.error("Something Went Wrong!" , e);
 			}
 		}
 		return frameRestApiException(

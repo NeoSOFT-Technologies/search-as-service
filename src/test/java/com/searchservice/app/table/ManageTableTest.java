@@ -331,6 +331,23 @@ class ManageTableTest {
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
 	}
+	
+	@Test
+	void testGetAllTablesUnderDeletion() throws Exception {
+		
+		setMockitoSuccessResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/deletion/all-tables"+ "?pageNumber=1&pageSize=5")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		
+		setMockitoBadResponseForService();
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/deletion/all-tables"+ "?pageNumber=1&pageSize=5")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+		
+		Mockito.when(tableDeleteService.getTableUnderDeletion()).thenReturn(null);
+		restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/deletion/all-tables"+ "?pageNumber=1&pageSize=5")
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+	}
 
 	@Test
 	void testGetCapacityPlans() throws Exception {
