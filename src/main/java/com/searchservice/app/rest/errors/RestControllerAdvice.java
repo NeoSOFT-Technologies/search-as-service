@@ -97,12 +97,16 @@ public class RestControllerAdvice {
 		String fieldName = "";
 		String requiredType = "";
 		if (exception.getCause() instanceof NumberFormatException) {
+			try {
 			fieldName = exception.getName();
 			requiredType = (null != exception.getRequiredType())?exception.getRequiredType().getName():"";
-		}return frameRestApiException(
+			}catch(Exception e) {
+				log.error("Something Went Wrong!" ,e);
+			}
+		}
+		return frameRestApiException(
 				new RestApiError(HttpStatus.BAD_REQUEST, fieldName + " must be of type " + requiredType));
 	}
 	
 	
-	}
-
+}
