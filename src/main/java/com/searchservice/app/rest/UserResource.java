@@ -17,7 +17,8 @@ import io.swagger.v3.oas.annotations.Operation;
 @RequestMapping("/user/token")
 public class UserResource {
 	
-	private final UserServicePort userServicePort;
+	private UserServicePort userServicePort;
+
 
     public UserResource(UserServicePort userServicePort) {
         this.userServicePort = userServicePort;
@@ -26,7 +27,7 @@ public class UserResource {
 	@PostMapping
     @Operation(summary = "/ GET AUTHORIZED TOKEN BY PROVIDING USERNAME AND PASSWORD ")
     public ResponseEntity<Response> getToken(@RequestBody User userDTO) {
-        Response responseDTO = userServicePort.getToken(userDTO.getUserName(), userDTO.getPassword());
+        Response responseDTO = userServicePort.getToken(userDTO);
         if(responseDTO.getStatusCode()==200){
             return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
         }else{
@@ -34,4 +35,6 @@ public class UserResource {
         }
 
     }
+	
+
 }
