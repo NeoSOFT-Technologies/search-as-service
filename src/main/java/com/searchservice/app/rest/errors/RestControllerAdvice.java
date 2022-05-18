@@ -101,7 +101,7 @@ public class RestControllerAdvice {
 			fieldName = exception.getName();
 			requiredType = exception.getRequiredType().getName();
 			}catch(Exception e) {
-				log.error("Something Went Wrong!" ,e);
+				log.error("Something Went Wrong!" , e);
 			}
 		}
 		return frameRestApiException(
