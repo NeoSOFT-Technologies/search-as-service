@@ -68,12 +68,10 @@ public class PublicKeyService implements PublicKeyServicePort{
 		boolean isPublicKeyPresent = false;
 		String realmName = authConfigProperties.getRealmName();
 	    cache = cacheManager.getCache("${cache-name}");
-	    if(cache!=null) {
-	    	if(cache.get(authConfigProperties.getRealmName())!=null) {
+	    if(cache!=null && cache.get(authConfigProperties.getRealmName())!=null) {
 				log.debug("Public Key Found in Cache For Realm: {}",realmName);
 				updatePublicKey(realmName);
 				isPublicKeyPresent = true;
-			}
 	    }
 		return isPublicKeyPresent;
 	}
