@@ -99,7 +99,7 @@ public class RestControllerAdvice {
 		if (exception.getCause() instanceof NumberFormatException) {
 			try {
 			fieldName = exception.getName();
-			requiredType = (null != exception.getRequiredType())?exception.getRequiredType().getName():"";
+			requiredType = exception.getRequiredType().getName();
 			}catch(Exception e) {
 				log.error("Something Went Wrong!" ,e);
 			}
