@@ -145,7 +145,7 @@ public class TableSchemaParserUtil {
 	
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
-    	return java.util.regex.Pattern.compile(FIELD_NAME_PATTERN).matcher(
+    	return java.util.regex.Pattern.compile("^(_)" +"+([a-zA-Z_$]" + "[a-zA-Z\\d_$]" +"*)(_)+$").matcher(
 				fieldName).matches() || fieldName.equals("id");
 	}
 	
