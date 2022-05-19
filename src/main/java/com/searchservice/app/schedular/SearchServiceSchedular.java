@@ -21,7 +21,7 @@ public class SearchServiceSchedular {
     
     @Autowired
 	PublicKeyServicePort publicKeyServicePort;
-    
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Scheduled(cron = "${schedular-durations.table-deletion}")
@@ -38,7 +38,7 @@ public class SearchServiceSchedular {
 	
 	@Scheduled(fixedRateString = "${schedular-durations.public-key-update}")
 	public void checkPublicKeyUpdation() {
-		logger.debug("Check for Public Key Updation in Cache Started");
+		logger.debug("Check for Public Key Updation in Cache Started ");
 		publicKeyServicePort.checkIfPublicKeyExistsInCache();
 	}
 
