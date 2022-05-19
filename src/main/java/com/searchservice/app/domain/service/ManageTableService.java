@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
@@ -59,12 +61,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Service
 @Transactional
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Service
 public class ManageTableService implements ManageTableServicePort {
 	
 	// Schema
@@ -75,7 +76,9 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
-	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	
+	private static final String COLLECTIONS = "collections";
 	@Value("${base-search-url}")
 
 	private String searchNonStatic;
@@ -92,16 +95,14 @@ public class ManageTableService implements ManageTableServicePort {
 	@Value("${table-schema-attributes.delete-file-path}")
 
 	private String deleteSchemaAttributesFilePathNonStatic;
-	
 	@Value("${table-schema-attributes.days}")
+
 	private long schemaDeleteDurationNonStatic;
 
 	// Init configurations
 	private static String searchURL;
 	private static String deleteSchemaAttributesFilePath;
 	private static long schemaDeleteDuration;
-	
-	private static final String COLLECTIONS = "collections";
 
 	@Autowired
 	public ManageTableService(@Value("${base-search-url}") String solrURLNonStatic,
@@ -136,16 +137,17 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response getTables(int tenantId) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-        List<String> data = new ArrayList<>();
+
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		    data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
+		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
 				tenantId);
+
 		try {
 			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
 
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all tables having tenantId: "+tenantId);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
 
 		} catch (Exception e) {
 			logger.error(e.toString());
@@ -168,7 +170,7 @@ public class ManageTableService implements ManageTableServicePort {
         getAllTableListResposnse.setMessage("Successfully retrieved all tables");
         return getAllTableListResposnse;
 	}
-
+	
 	@Override
 	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
@@ -227,12 +229,11 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
-		
-		Response apiResponseDTO = new Response();
 		if (!isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
-//		// Delete table
+		// Delete table
+		Response apiResponseDTO = new Response();
 
 		boolean response = searchJAdapter.deleteTableFromSolrj(tableName);
 		if (response) {
@@ -283,7 +284,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		try {
 			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
@@ -522,7 +523,6 @@ public class ManageTableService implements ManageTableServicePort {
 		Response apiResponseDTO = new Response();
 		CollectionAdminRequest.Rename request = CollectionAdminRequest.renameCollection(tableOriginalName, tableAlias);
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
-		
 		try {
 			searchJAdapter.addAliasTableInSolrj(searchClientActive, request);
 			apiResponseDTO.setStatusCode(200);
@@ -600,6 +600,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return deletedSchemaAttributes;
 	}
 
+	@Override
 	public void checkForSchemaDeletion() {
 		File existingSchemaFile = new File(deleteSchemaAttributesFilePath);
 		checkIfSchemaFileExist(existingSchemaFile);
@@ -741,6 +742,5 @@ public class ManageTableService implements ManageTableServicePort {
 		return multiValueCheck;
 		}
 	}
-	
 
 }

@@ -3,15 +3,11 @@ package com.searchservice.app.domain.utils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 
@@ -143,10 +139,8 @@ public class TableSchemaParserUtil {
 	
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
-		Pattern pattern = Pattern.compile("^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$");
-        Matcher matcher = pattern.matcher(fieldName);
-
-		return matcher.matches() || fieldName.equals("id");
+    	return (fieldName.startsWith("_")
+    			 && fieldName.endsWith("_")) || fieldName.equals("id");
 	}
 	
 	
