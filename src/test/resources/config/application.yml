@@ -13,3 +13,10 @@ authentication:
   realmName: master
   keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
 
+cache-name: publicKeyCacheIngress
+
+schedular-durations:
+   public-key-update: 300000
+   table-deletion: 0 15 8 * * ?
+   column-deletion: 0 15 8 * * ?
+  

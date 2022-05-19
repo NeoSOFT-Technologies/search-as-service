@@ -139,3 +139,5 @@ table-schema-attributes:
   delete-file-path: DeletedRecordFiles/SchemaDeleteRecord.csv
   days: 15
 #=================================================================
+cors:
+  header-value: "*"
