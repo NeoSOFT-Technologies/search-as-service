@@ -145,10 +145,8 @@ public class TableSchemaParserUtil {
 	
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
-		Pattern pattern = Pattern.compile(FIELD_NAME_PATTERN);
-        Matcher matcher = pattern.matcher(fieldName);
-
-		return matcher.matches() || fieldName.equals("id");
+    	return java.util.regex.Pattern.compile(FIELD_NAME_PATTERN).matcher(
+				fieldName).matches() || fieldName.equals("id");
 	}
 	
 	
