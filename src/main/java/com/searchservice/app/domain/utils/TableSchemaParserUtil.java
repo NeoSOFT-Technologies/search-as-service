@@ -3,9 +3,6 @@ package com.searchservice.app.domain.utils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +141,7 @@ public class TableSchemaParserUtil {
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
     	return (fieldName.startsWith("_")
-    			 && fieldName.startsWith("_")) || fieldName.equals("id");
+    			 && fieldName.endsWith("_")) || fieldName.equals("id");
 	}
 	
 	
