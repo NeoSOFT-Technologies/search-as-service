@@ -31,6 +31,8 @@ public class TableSchemaParserUtil {
 	public static Map<String, Object> partialSearchFieldTypeAttrs = new HashMap<>();
 	private static final Logger logger = LoggerFactory.getLogger(TableSchemaParserUtil.class);
 	
+	private static final String FIELD_NAME_PATTERN = "^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$";
+	
 	@Value("${base-search-url}")
 	public String searchURL;
 	
@@ -143,7 +145,7 @@ public class TableSchemaParserUtil {
 	
 	
 	public static boolean isFieldUnchangeable(String fieldName) {
-		Pattern pattern = Pattern.compile("^(_)+([a-zA-Z_$][a-zA-Z\\d_$]*)(_)+$");
+		Pattern pattern = Pattern.compile(FIELD_NAME_PATTERN);
         Matcher matcher = pattern.matcher(fieldName);
 
 		return matcher.matches() || fieldName.equals("id");

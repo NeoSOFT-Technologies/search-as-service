@@ -3,6 +3,7 @@ package com.searchservice.app.schedular;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class SearchServiceSchedular {
     
     @Autowired
 	PublicKeyServicePort publicKeyServicePort;
-    
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Scheduled(cron = "${schedular-durations.table-deletion}")
@@ -38,7 +39,7 @@ public class SearchServiceSchedular {
 	
 	@Scheduled(fixedRateString = "${schedular-durations.public-key-update}")
 	public void checkPublicKeyUpdation() {
-		logger.debug("Check for Public Key Updation in Cache Started");
+		logger.debug("Check for Public Key Updation in Cache Started ");
 		publicKeyServicePort.checkIfPublicKeyExistsInCache();
 	}
 
