@@ -139,7 +139,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
 
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
 				tenantId);
 
 		try {
@@ -284,7 +284,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		try {
 			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
