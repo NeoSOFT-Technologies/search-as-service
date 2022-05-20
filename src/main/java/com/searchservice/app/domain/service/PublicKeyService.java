@@ -31,7 +31,8 @@ public class PublicKeyService implements PublicKeyServicePort{
 	private CacheManager cacheManager;
 	
 	@Nullable
-	Cache cache;
+	private Cache cache;
+
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
@@ -75,6 +76,5 @@ public class PublicKeyService implements PublicKeyServicePort{
 	    }
 		return isPublicKeyPresent;
 	}
-	
-	
 }
+

@@ -20,8 +20,4 @@ public class SearchServiceApplication {
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
-
-		
-
-
 }

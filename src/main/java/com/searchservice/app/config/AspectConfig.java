@@ -2,7 +2,6 @@ package com.searchservice.app.config;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.utils.DateUtil;

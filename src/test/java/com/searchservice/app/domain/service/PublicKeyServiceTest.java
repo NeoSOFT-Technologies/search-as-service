@@ -76,7 +76,6 @@ class PublicKeyServiceTest {
 		
 		setErrorResponse();
 		assertEquals("",publicKeyService.retirevePublicKey(authConfigProperties.getRealmName()));
-		
-		
 	}
 }
+

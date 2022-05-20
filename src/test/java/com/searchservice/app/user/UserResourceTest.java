@@ -1,7 +1,6 @@
 package com.searchservice.app.user;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,3 +55,4 @@ class UserResourceTest {
 				.andExpect(status().isBadRequest());
 	}
 }
+

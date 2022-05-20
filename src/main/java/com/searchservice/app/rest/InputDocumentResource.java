@@ -64,7 +64,7 @@ public class InputDocumentResource {
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, true);
 
-		if (documentInjectionThrottlerResponse.getStatusCode() == 406)
+		if (documentInjectionThrottlerResponse.getStatusCode() == HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode())
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT

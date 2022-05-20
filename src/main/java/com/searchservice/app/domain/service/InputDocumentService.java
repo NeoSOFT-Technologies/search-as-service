@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.rest.errors.CustomException;
@@ -22,26 +23,23 @@ public class InputDocumentService implements InputDocumentServicePort {
 	
 
 	@Value("${base-search-url}")
-	private String searchNonStatic;
-	// Init configurations
-	private  static String searchURL;
+	private String searchURL;
 
      @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
 	
  	@Autowired
  	public  ManageTableServicePort manageTableServicePort;
-     
-	@Autowired
-	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
-		searchURL = solrURLNonStatic;
-	}
+ 	
+ 	@Autowired
+ 	public TableDeleteServicePort tableDeleteServicePort;
 
-	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
+	public InputDocumentService(ManageTableServicePort manageTableServicePort,
+			TableDeleteServicePort tableDeleteServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
+		this.tableDeleteServicePort = tableDeleteServicePort;
 
 	}
-
 	
 	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {		
 		if (response.isDocumentUploaded()) {
@@ -63,8 +61,8 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
-		if (!manageTableServicePort.isTableExists(tableName))
-			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " table doesn't exist");
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0]))
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " is "+ HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
@@ -94,7 +92,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 				return false;
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-			// JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 			objectMapper.readTree(jsonString);
 		} catch (JsonProcessingException ex) {
 			valid = false;

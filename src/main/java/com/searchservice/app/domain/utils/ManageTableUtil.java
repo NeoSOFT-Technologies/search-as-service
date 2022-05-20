@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.SchemaField;
 
 public class ManageTableUtil {
@@ -18,6 +19,16 @@ public class ManageTableUtil {
 		return false;
 	}
 
+	public static List<Response.TableListResponse> getPaginatedTabaleList(List<String> data,int pageNumber, int pageSize){
+		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
+		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
+	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+	    	paginatedTableList.add(new Response.TableListResponse(Integer.parseInt(data.get(i).split("_")[1]),
+	    			data.get(i).split("_")[0]));
+	    }
+		return paginatedTableList;
+	}
+	
 	public static Map<String, SchemaField> removeExistingFields(
 													Map<String, SchemaField> newFieldsHashMap, 
 													List<SchemaField> newFields, 

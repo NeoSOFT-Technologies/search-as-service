@@ -76,7 +76,9 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
-	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	
+	private static final String COLLECTIONS = "collections";
 	@Value("${base-search-url}")
 
 	private String searchNonStatic;
@@ -137,7 +139,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Response getListItemsResponseDTO = new Response();
 
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
 				tenantId);
 
 		try {
@@ -157,6 +159,18 @@ public class ManageTableService implements ManageTableServicePort {
 		return getListItemsResponseDTO;
 	}
 
+	@Override
+	public Response getAllTables(int pageNumber, int pageSize) {
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
+		Response getAllTableListResposnse = new Response();
+		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
+        List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+        getAllTableListResposnse.setData(data);
+        getAllTableListResposnse.setStatusCode(200);
+        getAllTableListResposnse.setMessage("Successfully retrieved all tables");
+        return getAllTableListResposnse;
+	}
+	
 	@Override
 	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
@@ -270,7 +284,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		try {
 			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());

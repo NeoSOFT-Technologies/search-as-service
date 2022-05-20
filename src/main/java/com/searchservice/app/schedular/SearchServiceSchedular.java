@@ -17,7 +17,7 @@ public class SearchServiceSchedular {
 	TableDeleteServicePort tableDeleteService;
 	
 	@Autowired
-    ManageTableServicePort manageTableService;
+   ManageTableServicePort manageTableService;
     
     @Autowired
 	PublicKeyServicePort publicKeyServicePort;
@@ -38,7 +38,7 @@ public class SearchServiceSchedular {
 	
 	@Scheduled(fixedRateString = "${schedular-durations.public-key-update}")
 	public void checkPublicKeyUpdation() {
-		logger.debug("Check for Public Key Updation in Cache Started ");
+		logger.debug("Check for Public Key Updation in Cache Started");
 		publicKeyServicePort.checkIfPublicKeyExistsInCache();
 	}
 

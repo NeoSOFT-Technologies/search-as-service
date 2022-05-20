@@ -30,7 +30,7 @@ public class UserService implements UserServicePort {
 	
 	@Value("${base-token-url}")
 	private String baseTokenUrl;
-	
+
 	@Override
 	public Response getToken(User user) {
 		if (user.getUsername().isBlank() || user.getUsername().isEmpty() || user.getPassword().isBlank() || user.getPassword().isEmpty()) {
@@ -44,7 +44,7 @@ public class UserService implements UserServicePort {
 	    try {
 			response = restTemplate.postForEntity(baseTokenUrl, request, String.class);
 		} catch (Exception e) {
-			log.error("Something Went Wrong while Obtaining Token" ,e);
+			log.error("Something Went Wrong Whil Obtaining Token Value", e);
 			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		JSONObject obj = new JSONObject(response.getBody());

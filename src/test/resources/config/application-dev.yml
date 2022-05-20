@@ -5,7 +5,6 @@ base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 base-token-url: https://iam-dev.neosofttech.com/api/login
 #================================================================
 
-
 #================================================================
 #Logger
 logging:
@@ -24,7 +23,10 @@ logging:
     org.hibernate: "error"
     org: "error"
 #================================================================
-
+scheular-period:
+  table-delete: 0 15 8 * * ?
+  column-delete: 0 15 8 * * ?
+  public-key-update: 6000
 
 #================================================================
 #Swagger
