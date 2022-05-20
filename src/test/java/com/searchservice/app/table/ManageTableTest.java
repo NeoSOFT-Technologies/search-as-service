@@ -264,6 +264,14 @@ class ManageTableTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
 				.andExpect(status().isBadRequest());
+		
+		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
+		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(false);
+		restAMockMvc
+				.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/manage/table"+"/" + tableName+"/?tenantId="+tenantId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test

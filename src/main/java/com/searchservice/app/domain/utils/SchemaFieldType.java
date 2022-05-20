@@ -3,6 +3,7 @@ package com.searchservice.app.domain.utils;
 public class SchemaFieldType {
 
 	private static final String BOOLEAN = "boolean";
+	private static final String BOOLEAN_MULTIVALUE = "booleans";
 	
     public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
     
@@ -17,7 +18,7 @@ public class SchemaFieldType {
 
             case BOOLEAN:
                 if (isMultivalue)
-                    return BOOLEAN + "s";
+                    return BOOLEAN_MULTIVALUE;
                 else
                     return BOOLEAN;
             case "long":
@@ -63,8 +64,8 @@ public class SchemaFieldType {
         switch (fieldType) {
             case BOOLEAN:
             	return BOOLEAN;
-            case BOOLEAN + "s":
-            	return BOOLEAN + "s";
+            case BOOLEAN_MULTIVALUE:
+            	return BOOLEAN_MULTIVALUE;
             case "plong":
             	return "long";
             case "plongs":
