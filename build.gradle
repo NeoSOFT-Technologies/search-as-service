@@ -120,6 +120,14 @@ dependencies {
 	
    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
 	
+	//For Public Key Verification
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+  
+   //Inmemory Cache
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
+	
 }
 
 tasks.named('test') {

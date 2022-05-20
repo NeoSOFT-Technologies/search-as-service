@@ -40,7 +40,7 @@ spec:
           image: neosoftcoe/search-service-ingress:latest
           name: ssi-container
           ports:
-            - containerPort: 8081
+            - containerPort: 8083
           resources: {}
           volumeMounts:
             - mountPath: /usr/app/DeletedRecordFiles
