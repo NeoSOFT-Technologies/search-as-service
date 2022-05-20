@@ -50,3 +50,13 @@ TenantID,TableName,RequestTime,ColumnName
 303,bugtest4,20-4-2022 06:54:23,is_available
 303,bugtest4,22-4-2022 12:45:16,is_available
 2,testtable2,28-4-2022 05:27:24,testfield
+111,Tes,19-5-2022 07:50:49,_default_
+111,Tes,19-5-2022 07:50:49,_p
+111,Tes,19-5-2022 07:51:50,_default_
+111,Tes,19-5-2022 07:51:50,_p
+111,Tes,19-5-2022 07:52:19,_default_
+111,Tes,19-5-2022 07:52:19,_p
+111,Tes,19-5-2022 07:52:49,_default_
+111,Tes,19-5-2022 07:52:49,_p
+111,Tes,19-5-2022 07:53:53,_default_
+111,Tes,19-5-2022 07:53:53,_p

@@ -190,8 +190,11 @@ class TableDeleteServiceTest {
 	@Test
 	void underDeletionTableTest() {
 		intializeTableforTesting();
-		boolean b = tableDeleteService.isTableUnderDeletion("TestTable");
-		assertTrue(b);
+		boolean tableWithTenantID = tableDeleteService.isTableUnderDeletion("TestTable");
+		assertTrue(tableWithTenantID);
+		
+		boolean tableWithoutTenantID = tableDeleteService.isTableUnderDeletion("TestTable_101");
+		assertTrue(tableWithoutTenantID);
 	}
 
 	@Test

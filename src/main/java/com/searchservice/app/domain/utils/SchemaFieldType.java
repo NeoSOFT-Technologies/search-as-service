@@ -2,6 +2,8 @@ package com.searchservice.app.domain.utils;
 
 public class SchemaFieldType {
 
+	private static final String BOOLEAN = "boolean";
+	
     public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
     
     	StringBuilder newDataType = new StringBuilder();
@@ -13,11 +15,11 @@ public class SchemaFieldType {
     	
         switch (newDataType.toString().toLowerCase()) {
 
-            case "boolean":
+            case BOOLEAN:
                 if (isMultivalue)
-                    return "booleans";
+                    return BOOLEAN + "s";
                 else
-                    return "boolean";
+                    return BOOLEAN;
             case "long":
                 if (isMultivalue)
                     return "plongs";
@@ -59,10 +61,10 @@ public class SchemaFieldType {
 
     public static String fromSearchFieldTypeToStandardDataType(String fieldType, Object isMultivalue) {
         switch (fieldType) {
-            case "boolean":
-            	return "boolean";
-            case "booleans":
-            	return "booleans";
+            case BOOLEAN:
+            	return BOOLEAN;
+            case BOOLEAN + "s":
+            	return BOOLEAN + "s";
             case "plong":
             	return "long";
             case "plongs":

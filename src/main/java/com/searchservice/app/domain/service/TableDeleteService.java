@@ -64,7 +64,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 				fw.flush();
 				deleteRecordInsertionResponse.setStatusCode(200);
 				deleteRecordInsertionResponse
-						.setMessage("Table:" + actualTableName + " Successfully Initialized For Deletion ");
+						.setMessage("Table:" + actualTableName + " Having TenantID: "+tenantId+" is Successfully Initialized For Deletion ");
 
 			} catch (Exception e) {
 				logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName, e);
@@ -223,8 +223,11 @@ public class TableDeleteService implements TableDeleteServicePort {
 	public boolean isTableUnderDeletion(String tableName) {
 		boolean res = false;
 		List<String> listofTablesUnderDeletion;
-
-		listofTablesUnderDeletion = getTableUnderDeletion(false).getData();
+		if(tableName.contains("_")) {
+			listofTablesUnderDeletion = getTableUnderDeletion(true).getData();
+		}else {
+			listofTablesUnderDeletion = getTableUnderDeletion(false).getData();
+		}
 		if (listofTablesUnderDeletion.contains(tableName))
 			res = true;
 

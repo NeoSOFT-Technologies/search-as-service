@@ -79,7 +79,8 @@ public class JwtTokenFilterService extends OncePerRequestFilter {
     		Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
     		 isTokenValid = true;
     		 log.debug("Token Validation Successfull");
-    		 } catch (Exception e) {
+    		 } 
+    	catch (Exception e) {
     			 log.debug("Token Validation Failed",e);
     	}
     	return isTokenValid;

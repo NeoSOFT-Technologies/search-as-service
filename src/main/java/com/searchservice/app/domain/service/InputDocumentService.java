@@ -61,7 +61,7 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
-		if (tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0]))
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName))
 			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " is "+ HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
