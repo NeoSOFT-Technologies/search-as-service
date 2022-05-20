@@ -19,8 +19,6 @@ import com.searchservice.app.domain.port.api.PublicKeyServicePort;
 @Service
 public class PublicKeyService implements PublicKeyServicePort{
 
-	
-
 	private final Logger log = LoggerFactory.getLogger(PublicKeyService.class);
 	
 	@Autowired
@@ -34,6 +32,7 @@ public class PublicKeyService implements PublicKeyServicePort{
 	
 	@Nullable
 	private Cache cache;
+
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
@@ -77,6 +76,5 @@ public class PublicKeyService implements PublicKeyServicePort{
 	    }
 		return isPublicKeyPresent;
 	}
-
-	
 }
+

@@ -14,7 +14,7 @@ services:
     image: neosoftcoe/search-service-ingress:latest
     container_name: ssi-container
     ports:
-      - "8081:8081"
+      - "8083:8083"
     volumes:
       - ./docker-container-data/DeletedRecordFiles:/usr/app/DeletedRecordFiles
     environment:
@@ -23,6 +23,8 @@ services:
       - KEYCLOAK_REALM_NAME=saas-realm
       - KEYCLOAK_CLIENT_NAME=saas-client
       - KEYCLOAK_CLIENT_SECRET=Fn7lKppwFB7J9kCWD6g9cuF6pSvfEAdk
+      - MAX_ALLOWED_REQUEST_SIZE_NRT=10000000kB
+      - MAX_ALLOWED_REQUEST_SIZE_BATCH=100000000kB
     networks:
       - saas-network
     depends_on:
@@ -157,3 +159,5 @@ services:
 
 networks:
   saas-network:
+    name: saas-network-external
+    driver: bridge

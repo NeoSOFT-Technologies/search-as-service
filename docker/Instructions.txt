@@ -4,6 +4,7 @@ docker-compose -f docker-compose-keycloak.yml up
 
 #CREATE REALM, CLIENT & USER USING KEYCLOAK DASHBOARD AT PORT 8080
 #ADD THE CREDENTIALS IN "docker-compose.yml" ENVIRONMENT VARIABLES OF INGRESS AND EGRESS CONTAINERS
+#http://sse-container:8083/*
 
 docker-compose -f docker-compose-keycloak.yml down
 
