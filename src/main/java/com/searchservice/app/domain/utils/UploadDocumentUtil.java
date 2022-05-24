@@ -65,7 +65,7 @@ public class UploadDocumentUtil {
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
-			return new UploadDocumentSearchUtilRespnse(true, "Document not Uploaded ! Something Went Wrong");
+			return new UploadDocumentSearchUtilRespnse(true, "Document not uploaded! Something went wrong");
 		}
 	}
 
