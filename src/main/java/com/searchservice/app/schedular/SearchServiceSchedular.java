@@ -17,11 +17,11 @@ public class SearchServiceSchedular {
 	TableDeleteServicePort tableDeleteService;
 	
 	@Autowired
-    ManageTableServicePort manageTableService;
+   ManageTableServicePort manageTableService;
     
     @Autowired
 	PublicKeyServicePort publicKeyServicePort;
-    
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Scheduled(cron = "${schedular-durations.table-deletion}")

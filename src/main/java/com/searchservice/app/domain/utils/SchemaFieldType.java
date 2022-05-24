@@ -4,7 +4,6 @@ public class SchemaFieldType {
 
 	private static final String BOOLEAN = "boolean";
 	private static final String BOOLEAN_MULTIVALUE = "booleans";
-	
     public static String fromStandardDataTypeToSearchFieldType(String dataType, boolean isMultivalue) {
     
     	StringBuilder newDataType = new StringBuilder();

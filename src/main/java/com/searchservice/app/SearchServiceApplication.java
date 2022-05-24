@@ -1,6 +1,5 @@
 package com.searchservice.app;
 
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -21,5 +20,4 @@ public class SearchServiceApplication {
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
-	
 }

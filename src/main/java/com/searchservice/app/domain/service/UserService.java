@@ -1,7 +1,6 @@
 package com.searchservice.app.domain.service;
 
 import java.util.Arrays;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +23,14 @@ public class UserService implements UserServicePort {
 
 	private static final String ERROR = "error";
 
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
+	
 	@Autowired
 	RestTemplate restTemplate;
 	
 	@Value("${base-token-url}")
 	private String baseTokenUrl;
-	
-	private final Logger log = LoggerFactory.getLogger(UserService.class);
-	
+
 	@Override
 	public Response getToken(User user) {
 		if (user.getUsername().isBlank() || user.getUsername().isEmpty() || user.getPassword().isBlank() || user.getPassword().isEmpty()) {

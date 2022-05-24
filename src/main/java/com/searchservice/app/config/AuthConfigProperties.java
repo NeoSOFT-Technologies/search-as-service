@@ -13,5 +13,5 @@ public class AuthConfigProperties {
 	
 	private String realmName;
 	private String keyUrl;
-
 }
+
