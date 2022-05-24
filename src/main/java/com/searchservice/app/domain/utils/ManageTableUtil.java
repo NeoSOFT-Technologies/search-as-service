@@ -24,7 +24,7 @@ public class ManageTableUtil {
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
 	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
 	    	paginatedTableList.add(new Response.TableListResponse(Integer.parseInt(data.get(i).split("_")[1]),
-	    			data.get(i).split("_")[0]));
+	    			data.get(i + currIdx).split("_")[0]));
 	    }
 		return paginatedTableList;
 	}

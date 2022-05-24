@@ -126,11 +126,10 @@ public class ManageTableResource {
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
-		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_"+ tenantId)) {
 			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
 					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		} else {
-
 			// GET tableSchema
 			TableSchema tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 			if (tableInfoResponseDTO == null)
@@ -185,10 +184,8 @@ public class ManageTableResource {
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		tableName = tableName + "_" + tenantId;
-		if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
-
+		if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 			if (tableDeleteServicePort.checkTableExistensce(tableName)) {
-
 				Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(tenantId, tableName);
 				if (apiResponseDTO.getStatusCode() == 200) {
 
@@ -212,11 +209,9 @@ public class ManageTableResource {
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> restoreTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
-
 		tableName = tableName + "_" + tenantId;
-		 if(tableDeleteServicePort.isTableUnderDeletion(tableNameForMessage)) {
+		 if(tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 		Response apiResponseDTO = tableDeleteServicePort.undoTableDeleteRecord(tableName);
-
 		if (apiResponseDTO.getStatusCode() == 200) {
 
 			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
@@ -242,7 +237,7 @@ public class ManageTableResource {
 					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "",
 							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
 		} else {
-			if (!tableDeleteServicePort.isTableUnderDeletion(tableName.split("_")[0])) {
+			if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
 				newTableSchemaDTO.setTableName(tableName);
 
 				Response apiResponseDTO = manageTableServicePort.updateTableSchema(tenantId, tableName.split("_")[0],
