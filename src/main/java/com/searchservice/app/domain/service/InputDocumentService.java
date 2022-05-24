@@ -62,7 +62,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName))
-			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " is "+ HttpStatusCode.UNDER_DELETION_PROCESS.getMessage());
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.UNDER_DELETION_PROCESS,
+					String.format("Table %s Having TenantID %s is %s", tableName.split("_")[0],
+							tableName.split("_")[1], HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE

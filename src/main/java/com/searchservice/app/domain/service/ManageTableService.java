@@ -147,12 +147,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables Having TenantID: "+tenantId);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for TenantID: "+tenantId);
 
 		}
 
@@ -167,7 +167,7 @@ public class ManageTableService implements ManageTableServicePort {
         List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
         getAllTableListResposnse.setData(data);
         getAllTableListResposnse.setStatusCode(200);
-        getAllTableListResposnse.setMessage("Successfully retrieved all tables");
+        getAllTableListResposnse.setMessage("Successfully retrieved all Tables From The Server");
         return getAllTableListResposnse;
 	}
 	

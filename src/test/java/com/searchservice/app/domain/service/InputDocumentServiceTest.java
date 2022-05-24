@@ -29,7 +29,7 @@ import com.searchservice.app.rest.errors.CustomException;
 class InputDocumentServiceTest {
 
 	int tenantId = 1;
-	String tableName = "book";
+	String tableName = "book_101";
 	String tableNames = "";
 	String payload = "[{\"shares\":20000,\"manufacture\":\"warren buffet\",\"website\":\"flipkart.com\",\"color\":\"blue\",\"author\":\"dhanashree\",\"id\":24}]";
 	int statusCode = 0;
