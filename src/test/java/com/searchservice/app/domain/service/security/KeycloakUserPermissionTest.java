@@ -97,8 +97,9 @@ class KeycloakUserPermissionTest {
 		assertTrue(keycloakUserPermission.isDeletePermissionEnabled());
 		
 		setErrorResponse();
+		String myViewPermission = userPermissionConfigProperties.getView();
 		CustomException exception = assertThrows(CustomException.class, () -> {
-			keycloakUserPermission.getUserPermissionFromCache(userPermissionConfigProperties.getView());
+			keycloakUserPermission.getUserPermissionFromCache(myViewPermission);
 		});
 		assertEquals(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), exception.getExceptionCode());
 	}
