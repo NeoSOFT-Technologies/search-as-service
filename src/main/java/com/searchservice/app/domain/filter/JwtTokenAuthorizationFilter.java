@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,20 +41,11 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
+		
 		Map<String, Object> errorDetails = new HashMap<>();
+		
 		// Get authorization header and validate
-		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : {}",header);
-		if (null == header || header.isEmpty() || !header.startsWith("Bearer ")) {
-			errorDetails.put("Unauthorized", "Access token not found");
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			mapper.writeValue(response.getWriter(), errorDetails);
-			return;
-		}
-
-		// Get jwt token and validate
-		final String token = header.split(" ")[1].trim();
+		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper, errorDetails);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
 		if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()))) {
