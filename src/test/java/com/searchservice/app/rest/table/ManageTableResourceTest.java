@@ -36,7 +36,7 @@ import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc	//(addFilters = false)
-class ManageTableTest {
+class ManageTableResourceTest {
 
 	@Value("${custom-mock.jwt-token}")
 	private String accessToken;
@@ -206,7 +206,13 @@ class ManageTableTest {
 	void testGetCapacityPlans() throws Exception {
 
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			restAMockMvc.perform(MockMvcRequestBuilders.get("/api/v1" + "/manage/table" + "/capacity-plans")
@@ -218,7 +224,13 @@ class ManageTableTest {
 	@Test
 	void testGetTablesWithTenantId() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
@@ -241,7 +253,13 @@ class ManageTableTest {
 	@Test
 	void testGetAllTables() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
@@ -268,7 +286,13 @@ class ManageTableTest {
 	@Test
 	void testGetAllTablesUnderDeletion() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
@@ -294,7 +318,13 @@ class ManageTableTest {
 	@Test
 	void testGetTableInfo() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
@@ -329,7 +359,13 @@ class ManageTableTest {
 	@Test
 	void testCreateTable() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			CreateTable createTableDTO = new CreateTable(tableName, "B", attributes);
@@ -386,7 +422,13 @@ class ManageTableTest {
 	@Test
 	void testDeleteTable() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			CreateTable createTableForDeletion = new CreateTable(tableName, "B", attributes);
@@ -435,7 +477,13 @@ class ManageTableTest {
 	@Test
 	void testUpdateTableSchema() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			// Update Schema
@@ -494,7 +542,13 @@ class ManageTableTest {
 	@Test
 	void testUndoDeleteTable() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 
 			mockPreAuthorizedService();
 			Response undoDeleteTableDTO = new Response();

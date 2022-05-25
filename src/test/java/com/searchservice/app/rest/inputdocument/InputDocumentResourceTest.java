@@ -89,8 +89,13 @@ class InputDocumentResourceTest {
 	@Test
 	void testInputDocumentNRTAPI() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
-					.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 			
 			mockPreAuthorizedService();
 			setMockitoSucccessResponseForService();
@@ -123,8 +128,13 @@ class InputDocumentResourceTest {
 	@Test
 	void testInputDocumentBatchAPI() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
-			mockedUtility.when(() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
-					.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
 			
 			mockPreAuthorizedService();
 			TimeUnit.SECONDS.sleep(10);
