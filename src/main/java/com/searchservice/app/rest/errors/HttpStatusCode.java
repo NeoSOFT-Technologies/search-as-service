@@ -1,7 +1,8 @@
-package com.searchservice.app.domain.utils;
+package com.searchservice.app.rest.errors;
 
 public enum HttpStatusCode {
 	
+	// With Custom Error Status Code
 	INVALID_TABLE_NAME(101,"invalid table name"),
 	
 	INVALID_SKU_NAME(102,"Invalid SKU name"),
@@ -20,6 +21,14 @@ public enum HttpStatusCode {
 	
 	TABLE_NOT_UNDER_DELETION(109, "not under deletion"),
 	
+	TABLE_ALREADY_EXISTS(110, "already exists"),
+	
+	INVALID_COLUMN_NAME(111, "invalid column name provided"),
+	
+	WRONG_DATA_TYPE(112, "wrong datatype selected for non multivalued field"),
+	
+	IO_EXCEPTION(113, "i/o exception occurred"),
+	
 	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
 	
 	NULL_POINTER_EXCEPTION(404,"Received Null response"),
@@ -30,17 +39,13 @@ public enum HttpStatusCode {
 	
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	
+	FORBIDDEN_EXCEPTION(403, "Forbidden access attempted"),
+	
 	INTERNAL_SERVER_ERROR (500, "Internal Server Error Occured"),
 	
 	PROCESSING_NOT_COMPLETED (202, "Request cannot be Processed"),
 	
-	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable"),
-	
-	TABLE_ALREADY_EXISTS(110, "already exists"),
-	
-	INVALID_COLUMN_NAME(111, "invalid column name provided"),
-	
-	WRONG_DATA_TYPE(112, "wrong datatype selected for non multivalued field");
+	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable");
 	
 	private int code;
 	private String message;

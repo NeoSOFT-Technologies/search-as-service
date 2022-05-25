@@ -1,8 +1,8 @@
 package com.searchservice.app.domain.dto.table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

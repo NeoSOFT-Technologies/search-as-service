@@ -1,6 +1,7 @@
 package com.searchservice.app.rest.user;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.service.UserService;
-import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)

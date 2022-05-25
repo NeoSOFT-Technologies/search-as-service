@@ -45,9 +45,9 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 		Map<String, Object> errorDetails = new HashMap<>();
 		// Get authorization header and validate
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		 log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : {}",header);
+		log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : {}",header);
 		if (null == header || header.isEmpty() || !header.startsWith("Bearer ")) {
-			errorDetails.put("Unauthorized", "Invalid token");
+			errorDetails.put("Unauthorized", "Access token not found");
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			mapper.writeValue(response.getWriter(), errorDetails);

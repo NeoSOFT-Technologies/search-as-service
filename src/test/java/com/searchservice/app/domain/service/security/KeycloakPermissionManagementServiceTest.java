@@ -34,8 +34,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.searchservice.app.config.UserPermissionConfigProperties;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

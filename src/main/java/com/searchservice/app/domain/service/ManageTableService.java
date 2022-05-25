@@ -1,8 +1,6 @@
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
-
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -39,15 +37,14 @@ import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.CreateTable;
-import com.searchservice.app.domain.dto.table.SchemaLabel;
-import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
 import com.searchservice.app.domain.utils.BasicUtil;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
@@ -56,7 +53,9 @@ import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

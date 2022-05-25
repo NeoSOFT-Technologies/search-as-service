@@ -1,7 +1,6 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,14 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.searchservice.app.domain.dto.table.SchemaLabel;
-import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.ManageTable;
-import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -13,8 +13,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.searchservice.app.config.UserPermissionConfigProperties;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -43,12 +43,7 @@ public class KeycloakUserPermission {
 	private boolean isCreatePermissionEnabled;
 	private boolean isEditPermissionEnabled;
 	private boolean isDeletePermissionEnabled;
-	
-	
-	// testing
-	public boolean isWritePermissionEnabled() {
-		return false;
-	}
+
 	
 	public boolean isViewPermissionEnabled() {
 		if(checkIfUserPermissionExistsInCache(userPermissionConfigProperties.getView())) {
@@ -57,7 +52,7 @@ public class KeycloakUserPermission {
 		}
 		return isViewPermissionEnabled;
 	}
-	@Cacheable(cacheNames = USER_PERMISSIONS, key = "#authority", unless="#result == null")
+	@Cacheable(cacheNames = USER_PERMISSIONS, key = "#authority", condition = "#authority!=null")
 	public boolean setViewPermissionEnabled(String authority, boolean viewPermission) {
 		this.isViewPermissionEnabled = viewPermission;
 		return viewPermission;
@@ -83,7 +78,7 @@ public class KeycloakUserPermission {
 		}
 		return isEditPermissionEnabled;
 	}
-	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", unless="#result == null")
+	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", condition = "#authority!=null")
 	public boolean setEditPermissionEnabled(String authority, boolean editPermission) {
 		this.isEditPermissionEnabled = editPermission;
 		return editPermission;
@@ -96,7 +91,7 @@ public class KeycloakUserPermission {
 		}
 		return isDeletePermissionEnabled;
 	}
-	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", unless="#result == null")
+	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", condition = "#authority!=null")
 	public boolean setDeletePermissionEnabled(String authority, boolean deletePermission) {
 		this.isDeletePermissionEnabled = deletePermission;
 		return deletePermission;
