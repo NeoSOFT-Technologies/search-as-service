@@ -9,7 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.searchservice.app.domain.filter.JwtTokenFilterService;
+
+import com.searchservice.app.domain.filter.JwtTokenAuthorizationFilter;
 import com.searchservice.app.domain.service.PublicKeyService;
 
 @Configuration
@@ -39,7 +40,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and();
         
-        // Add JWT token filter
-       http = http.addFilterBefore(new JwtTokenFilterService(authConfigProperties, publicKeyService), UsernamePasswordAuthenticationFilter.class);
+		// Add JWT token filter
+		http.addFilterBefore(new JwtTokenAuthorizationFilter(authConfigProperties, publicKeyService),
+				UsernamePasswordAuthenticationFilter.class);
     }
 }

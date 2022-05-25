@@ -13,10 +13,17 @@ authentication:
   realmName: master
   keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
 
+# InMemoryCache configs
 cache-name: publicKeyCacheIngress
+user-cache:
+  name: userPermissionCacheIngress
+  key: userPermissions
+  view: viewPermission
+  create: createPermission
+  edit: editPermission
+  delete: deletePermission
 
 schedular-durations:
    public-key-update: 300000
    table-deletion: 0 15 8 * * ?
    column-deletion: 0 15 8 * * ?
-

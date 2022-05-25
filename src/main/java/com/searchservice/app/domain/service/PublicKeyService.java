@@ -36,7 +36,7 @@ public class PublicKeyService implements PublicKeyServicePort{
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
-	public String retirevePublicKey(String realmName) {
+	public String retrievePublicKey(String realmName) {
 		log.info("Adding Public Key Value in Cache for Realm: {}", realmName);
 		return getPublicKeyFromServer(realmName);
 	}
@@ -77,4 +77,3 @@ public class PublicKeyService implements PublicKeyServicePort{
 		return isPublicKeyPresent;
 	}
 }
-
