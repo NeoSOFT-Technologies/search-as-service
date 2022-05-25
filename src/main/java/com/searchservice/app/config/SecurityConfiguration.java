@@ -2,6 +2,7 @@ package com.searchservice.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -9,7 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.searchservice.app.domain.filter.JwtTokenFilterService;
+
+import com.searchservice.app.domain.filter.JwtTokenAuthorizationFilter;
 import com.searchservice.app.domain.service.PublicKeyService;
 
 @Configuration
@@ -30,16 +32,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Disable CSRF
-        http = http.csrf().disable();
+		
+		// Disable CSRF
+		http = http.csrf().disable();
 
-        // Set session management to stateless
-        http = http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+		// Set session management to stateless
+		http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
+    	
+    	http.authorizeRequests()
+    		.antMatchers("/user/token/**").permitAll()
+    		.antMatchers(HttpMethod.GET, "/api/v1/manage/table/**").permitAll()
+    		.antMatchers("/api/v1/manage/table/**", "/api/v1/ingest/**", "/api/v1/ingest-nrt/**").permitAll()
+    		.anyRequest().permitAll();
         
-        // Add JWT token filter
-       http = http.addFilterBefore(new JwtTokenFilterService(authConfigProperties, publicKeyService), UsernamePasswordAuthenticationFilter.class);
+		// Add JWT token filter
+		http.addFilterBefore(new JwtTokenAuthorizationFilter(authConfigProperties, publicKeyService),
+				UsernamePasswordAuthenticationFilter.class);
     }
 }

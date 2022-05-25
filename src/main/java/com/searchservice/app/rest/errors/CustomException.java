@@ -2,8 +2,6 @@ package com.searchservice.app.rest.errors;
 
 import org.springframework.stereotype.Component;
 
-import com.searchservice.app.domain.utils.HttpStatusCode;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,9 +1,12 @@
 package com.searchservice.app.rest.errors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 
 class RestApiErrorHandlingTest {
 

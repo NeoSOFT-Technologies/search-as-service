@@ -15,11 +15,11 @@ public class SearchServiceSchedular {
 
 	@Autowired
 	TableDeleteServicePort tableDeleteService;
-	
+
 	@Autowired
-   ManageTableServicePort manageTableService;
-    
-    @Autowired
+	ManageTableServicePort manageTableService;
+
+	@Autowired
 	PublicKeyServicePort publicKeyServicePort;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -35,7 +35,7 @@ public class SearchServiceSchedular {
 		logger.debug("Check For Table Schema Deletion Operation Started");
 		manageTableService.checkForSchemaDeletion();
 	}
-	
+
 	@Scheduled(fixedRateString = "${schedular-durations.public-key-update}")
 	public void checkPublicKeyUpdation() {
 		logger.debug("Check for Public Key Updation in Cache Started");

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.CreateTable;
@@ -23,9 +25,10 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -53,6 +56,7 @@ public class ManageTableResource {
     
 	@GetMapping("/capacity-plans")
 	@Operation(summary = "GET ALL THE CAPACITY PLANS AVAILABLE FOR TABLE CREATION.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<CapacityPlanResponse> capacityPlans() {
 		log.debug("Get capacity plans");
 
@@ -61,6 +65,7 @@ public class ManageTableResource {
 
 	@GetMapping("/")
 	@Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getTables(@RequestParam int tenantId) {
 
 		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
@@ -78,10 +83,10 @@ public class ManageTableResource {
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantId));
 		}
 	}
-
 	
 	@GetMapping("/all-tables")
 	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getALLTables(@RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
 
@@ -103,6 +108,7 @@ public class ManageTableResource {
 	
 	@GetMapping("/deletion/all-tables")
 	@Operation(summary = "GET ALL THE TABLES UNDER DELETION.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getALLTablesUnderDeletion(@RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
 
@@ -124,6 +130,7 @@ public class ManageTableResource {
 
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<TableSchema> getTable(@RequestParam int tenantId, @PathVariable String tableName) {
 
 		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_"+ tenantId)) {
@@ -147,6 +154,7 @@ public class ManageTableResource {
 
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
 	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTableDTO) {
 
 		if (manageTableServicePort.checkIfTableNameisValid(createTableDTO.getTableName())) {
@@ -182,6 +190,7 @@ public class ManageTableResource {
 		
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isDeletePermissionEnabled()")
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		tableName = tableName + "_" + tenantId;
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
@@ -207,6 +216,7 @@ public class ManageTableResource {
 
 	@PutMapping("/restore/{tableName}")
 	@Operation(summary = "RESTORE A DELETED TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isEditPermissionEnabled()")
 	public ResponseEntity<Response> restoreTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		String tableNameForMessage = tableName;
 		tableName = tableName + "_" + tenantId;
@@ -228,6 +238,7 @@ public class ManageTableResource {
 
 	@PutMapping("/{tableName}")
 	@Operation(summary = "REPLACE SCHEMA OF AN EXISTING TABLE.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isEditPermissionEnabled()")
 	public ResponseEntity<Response> updateTableSchema(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody ManageTable newTableSchemaDTO) {
 

@@ -1,4 +1,4 @@
-package com.searchservice.app.throttler;
+package com.searchservice.app.domain.service.throttler;
 
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;

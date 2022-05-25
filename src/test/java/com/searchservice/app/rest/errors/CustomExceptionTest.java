@@ -1,8 +1,10 @@
 package com.searchservice.app.rest.errors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 
 class CustomExceptionTest {
 

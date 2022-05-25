@@ -1,5 +1,9 @@
 package com.searchservice.app.domain.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,11 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
-import com.searchservice.app.domain.utils.HttpStatusCode;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Arrays;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

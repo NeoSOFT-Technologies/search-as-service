@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.service;
 
 import java.util.Arrays;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.port.api.UserServicePort;
-import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 public class UserService implements UserServicePort {

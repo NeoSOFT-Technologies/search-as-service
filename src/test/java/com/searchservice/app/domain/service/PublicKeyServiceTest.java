@@ -71,11 +71,11 @@ class PublicKeyServiceTest {
 	@Test
 	void publicKeyServiceTest() {
 		setPublicKeyResponse();
-		assertEquals("Public-Key-Test",publicKeyService.retirevePublicKey(authConfigProperties.getRealmName()));
+		assertEquals("Public-Key-Test",publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()));
 		assertTrue(publicKeyService.checkIfPublicKeyExistsInCache());
 		
 		setErrorResponse();
-		assertEquals("",publicKeyService.retirevePublicKey(authConfigProperties.getRealmName()));
+		assertEquals("",publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()));
 	}
 }
 
