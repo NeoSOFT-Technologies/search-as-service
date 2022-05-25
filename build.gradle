@@ -89,7 +89,7 @@ dependencies {
 	//SolrJ
 	implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
 	
-	// https://mvnrepository.com/artifact/joda-time/joda-time
+	// Date-time util
 	implementation group: 'joda-time', name: 'joda-time', version: '2.10.13'
 	
 
@@ -101,15 +101,11 @@ dependencies {
 
 	//JSON
 	implementation group: 'org.json', name: 'json', version: '20200518'
-
     implementation group: 'org.jboss.logging', name: 'jboss-logging', version: '3.5.0.Final'
 
 	// Rate Limiter
-	// https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot2
 	implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.5.0'
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.5.4'
-	// https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
 	implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
 	
 	// Spring Security
@@ -118,15 +114,19 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 	
-   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
-	
 	//For Public Key Verification
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
   
-   //Inmemory Cache
-   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
+   	//Inmemory Cache
+  	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.6.7'
+	  
+  	// Token decoder
+	implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+  
+	// Static Mocks
+	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.8.0'
 	
 }
 
