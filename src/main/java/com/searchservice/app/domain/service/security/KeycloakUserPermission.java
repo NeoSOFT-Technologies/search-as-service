@@ -57,7 +57,7 @@ public class KeycloakUserPermission {
 		}
 		return isViewPermissionEnabled;
 	}
-	@Cacheable(cacheNames = USER_PERMISSIONS, key = "#authority")
+	@Cacheable(cacheNames = USER_PERMISSIONS, key = "#authority", unless="#result == null")
 	public boolean setViewPermissionEnabled(String authority, boolean viewPermission) {
 		this.isViewPermissionEnabled = viewPermission;
 		return viewPermission;
@@ -83,7 +83,7 @@ public class KeycloakUserPermission {
 		}
 		return isEditPermissionEnabled;
 	}
-	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority")
+	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", unless="#result == null")
 	public boolean setEditPermissionEnabled(String authority, boolean editPermission) {
 		this.isEditPermissionEnabled = editPermission;
 		return editPermission;
@@ -96,7 +96,7 @@ public class KeycloakUserPermission {
 		}
 		return isDeletePermissionEnabled;
 	}
-	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority")
+	@Cacheable(cacheNames = {USER_PERMISSIONS}, key = "#authority", unless="#result == null")
 	public boolean setDeletePermissionEnabled(String authority, boolean deletePermission) {
 		this.isDeletePermissionEnabled = deletePermission;
 		return deletePermission;
@@ -105,21 +105,34 @@ public class KeycloakUserPermission {
 	
 	public boolean getUserPermissionFromCache(String permission) {
 	    cache = cacheManager.getCache(userPermissionConfigProperties.getKey());
-	    Optional<ValueWrapper> permissionValueWrapper = Optional.ofNullable(cache.get(permission));
-
-	    if(permissionValueWrapper.isEmpty() || permissionValueWrapper.get().get() == null)
+	    if(cache == null)
 	    	throw new CustomException(
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
-	    else
-	    	return (boolean)permissionValueWrapper.get().get();
+	    else {
+		    Optional<ValueWrapper> permissionValueWrapper = Optional.ofNullable(cache.get(permission));
+
+		    if(permissionValueWrapper.isEmpty() || permissionValueWrapper.get().get() == null)
+		    	throw new CustomException(
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		    else
+		    	return (boolean)permissionValueWrapper.get().get();
+	    }
 	}
 	
 	public boolean checkIfUserPermissionExistsInCache(String permission) {
 	    cache = cacheManager.getCache(userPermissionConfigProperties.getKey());
-
-	    return (cache.get(permission)!=null);
+	    if(cache == null)
+	    	throw new CustomException(
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+	    else {
+	    	return (cache.get(permission)!=null);
+	    }
 	}
 	
 }
