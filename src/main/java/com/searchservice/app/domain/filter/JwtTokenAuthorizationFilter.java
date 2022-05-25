@@ -45,7 +45,7 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 		Map<String, Object> errorDetails = new HashMap<>();
 		
 		// Get authorization header and validate
-		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper, errorDetails);
+		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
 		if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()))) {

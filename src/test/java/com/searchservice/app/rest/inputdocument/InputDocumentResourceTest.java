@@ -94,7 +94,7 @@ class InputDocumentResourceTest {
 			.thenReturn(true);
 			mockedUtility.when(
 					() -> SecurityUtil.getTokenFromRequestHeader(
-							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+							Mockito.any(), Mockito.any(), Mockito.any()))
 			.thenReturn(accessToken);
 			
 			mockPreAuthorizedService();
@@ -133,7 +133,7 @@ class InputDocumentResourceTest {
 			.thenReturn(true);
 			mockedUtility.when(
 					() -> SecurityUtil.getTokenFromRequestHeader(
-							Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+							Mockito.any(), Mockito.any(), Mockito.any()))
 			.thenReturn(accessToken);
 			
 			mockPreAuthorizedService();

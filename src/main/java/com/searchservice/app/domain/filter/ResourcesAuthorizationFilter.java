@@ -1,8 +1,6 @@
 package com.searchservice.app.domain.filter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,11 +38,9 @@ public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		
-		Map<String, Object> errorDetails = new HashMap<>();
-		
+
 		// Get authorization header and validate
-		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper, errorDetails);
+		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
 		keycloakPermissionManagementService.validateAndSetActiveUserAuthorities(token);

@@ -47,10 +47,9 @@ public class SecurityUtil {
 	public static String getTokenFromRequestHeader(
 			HttpServletRequest request, 
 			HttpServletResponse response, 
-			ObjectMapper mapper, 
-			Map<String, Object> errorDetails) throws ServletException, IOException {
+			ObjectMapper mapper) throws ServletException, IOException {
 		
-		errorDetails = new HashMap<>();
+		Map<String, Object> errorDetails = new HashMap<>();
 		// Get authorization header and validate
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 		log.info("[JwtTokenFilterService][doFilterInternal] Authorization Header Value : {}",header);
