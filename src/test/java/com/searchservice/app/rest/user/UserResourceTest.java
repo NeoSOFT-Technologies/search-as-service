@@ -1,4 +1,4 @@
-package com.searchservice.app.user;
+package com.searchservice.app.rest.user;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.Test;

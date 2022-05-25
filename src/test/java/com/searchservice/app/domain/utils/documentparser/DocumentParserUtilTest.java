@@ -1,4 +1,4 @@
-package com.searchservice.app.documentparser;
+package com.searchservice.app.domain.utils.documentparser;
 
 
 import com.searchservice.app.IntegrationTest;

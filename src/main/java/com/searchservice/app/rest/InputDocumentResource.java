@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,6 +54,7 @@ public class InputDocumentResource {
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest-nrt/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA. NEAR REAL-TIME API.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
 	public ResponseEntity<ThrottlerResponse> addDocumentsNRT(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
@@ -79,6 +81,7 @@ public class InputDocumentResource {
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
 	@PostMapping("/ingest/{tableName}")
 	@Operation(summary = "ADD DOCUMENTS IN THE TABLE OF THE GIVEN TENANT ID. INPUT SHOULD BE A LIST OF DOCUMENTS SATISFYING THE TABLE SCHEMA.", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
 	public ResponseEntity<ThrottlerResponse> addDocumentsBatch(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
 
