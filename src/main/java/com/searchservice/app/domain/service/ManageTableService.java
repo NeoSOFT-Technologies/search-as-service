@@ -414,9 +414,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response addSchemaFields(ManageTable newTableSchemaDTO) {
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
-
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(
+				searchURL,
 				newTableSchemaDTO.getTableName());
+
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
 

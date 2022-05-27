@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -20,8 +19,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
-//@Order(Ordered.HIGHEST_PRECEDENCE)
-//@EnableWebMvc
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestControllerAdvice extends ResponseEntityExceptionHandler {
 
@@ -83,15 +81,24 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler {
 						new RestApiErrorHandling(
 								HttpStatusCode.JSON_PARSE_EXCEPTION.getCode(), 
 								HttpStatusCode.JSON_PARSE_EXCEPTION, 
-								HttpStatusCode.JSON_PARSE_EXCEPTION.getMessage() +". Check the input json format and try again"), 
+								HttpStatusCode.JSON_PARSE_EXCEPTION.getMessage() +". Check the input json format/value and try again"), 
 						HttpStatus.BAD_REQUEST);
 			} else {
-				return new ResponseEntity<>(
-						new RestApiErrorHandling(
-								HttpStatusCode.INVALID_JSON_INPUT.getCode(), 
-								HttpStatusCode.INVALID_JSON_INPUT, 
-								HttpStatusCode.INVALID_JSON_INPUT.getMessage() +". Check the input json format and try again"), 
-						HttpStatus.BAD_REQUEST);
+
+				CustomException customException = (CustomException)jsonMappingException.getCause();
+				if(jsonMappingException.getCause() instanceof CustomException) {
+					
+					return new ResponseEntity<>(
+							new RestApiErrorHandling(
+									customException.getExceptionCode(), 
+									customException.getStatus(), 
+									HttpStatusCode.INVALID_JSON_INPUT.getMessage() +" : "+ customException.getExceptionMessage()), 
+							HttpStatus.BAD_REQUEST);
+				} else {
+					return new ResponseEntity<>(new RestApiErrorHandling(
+							HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
+							HttpStatusCode.INVALID_JSON_INPUT.getMessage()), HttpStatus.BAD_REQUEST);
+				}
 			}
 		} else {
 			return new ResponseEntity<>(new RestApiErrorHandling(
