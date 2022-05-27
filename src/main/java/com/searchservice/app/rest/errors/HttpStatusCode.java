@@ -11,7 +11,7 @@ public enum HttpStatusCode {
 	
 	NULL_COLUMN(104,"column is null,Provide atleast one Column"),
 	
-	INVALID_JSON_INPUT(105,"invalid json input or json format"),
+	INVALID_JSON_INPUT(105,"invalid JSON input or JSON format"),
 	
 	UNRECOGNIZED_FIELD(106,"check sequence of fields or field name"),
 	
@@ -27,7 +27,9 @@ public enum HttpStatusCode {
 	
 	WRONG_DATA_TYPE(112, "wrong datatype selected for non multivalued field"),
 	
-	IO_EXCEPTION(113, "i/o exception occurred"),
+	IO_EXCEPTION(113, "i/o exception occurred"), 
+	
+	JSON_PARSE_EXCEPTION(114, "JSON parse error occurred"), 
 	
 	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
 	
