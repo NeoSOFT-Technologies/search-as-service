@@ -3,17 +3,17 @@ package com.searchservice.app.rest.errors;
 public enum HttpStatusCode {
 	
 	// With Custom Error Status Code
-	INVALID_TABLE_NAME(101,"Invalid table name"),
+	INVALID_TABLE_NAME(101, "Invalid table name"),
 	
-	INVALID_SKU_NAME(102,"Invalid SKU name"),
+	INVALID_SKU_NAME(102, "Invalid SKU name"),
 	
 	INVALID_COLUMN_ATTRIBUTE(103, "Invalid column attribute is provided"), 
 	
-	INVALID_JSON_INPUT(105,"Invalid JSON input or JSON format"),
+	INVALID_JSON_INPUT(105, "Invalid JSON input or JSON format"),
 	
-	UNRECOGNIZED_FIELD(106,"Check sequence of fields or field name"),
+	UNRECOGNIZED_FIELD(106, "Check sequence of fields or field name"),
 	
-	UNDER_DELETION_PROCESS(107,"Under deletion process"),
+	UNDER_DELETION_PROCESS(107, "Under deletion process"),
 	
 	TABLE_NOT_FOUND(108, "Does not exist"),
 	
@@ -29,13 +29,16 @@ public enum HttpStatusCode {
 	
 	JSON_PARSE_EXCEPTION(114, "JSON parse error occurred"), 
 	
-	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
+	INVALID_FIELD_VALUE(116, "Value for field : {} is not expected as : {}"), 
 	
-	NULL_POINTER_EXCEPTION(404,"Received Null response"),
+	// With Primitive Error Status Code
+	BAD_REQUEST_EXCEPTION(400, "Bad Request Occuured"),
 	
-	SERVER_UNAVAILABLE(503,"Unable to Connect To the Server"),
+	NULL_POINTER_EXCEPTION(500, "Received Null response"),
 	
-	OPERATION_NOT_ALLOWED(405,"Operation is Not Allowed"),
+	SERVER_UNAVAILABLE(503, "Unable to Connect To the Server"),
+	
+	OPERATION_NOT_ALLOWED(405, "Operation is Not Allowed"),
 	
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	

@@ -24,6 +24,10 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 public class RestControllerAdvice extends ResponseEntityExceptionHandler {
 
 	private final Logger log = LoggerFactory.getLogger(RestControllerAdvice.class);
+
+	private ResponseEntity<Object> frameRestApiException(RestApiError err) {
+		return new ResponseEntity<>(err, err.getStatus());
+	}
 	
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<Object> handleGenericException(CustomException exception) {
@@ -39,14 +43,23 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaughtException(Exception exception) {
 		log.error("Uncaught Error Occured: {}", exception.getMessage());
+
+		if(exception.getMessage() != null && exception.getMessage().toLowerCase().contains("access is denied")) {
+			return frameRestApiException(
+					new RestApiError(
+							HttpStatus.FORBIDDEN, 
+							exception.getMessage()));
+		} else if(exception.getMessage() == null)
+			return new ResponseEntity<>(new RestApiErrorHandling(
+					HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION, 
+					HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage()),
+					HttpStatus.BAD_REQUEST);
+
 		return frameRestApiException(
 				new RestApiError(
 						HttpStatus.BAD_REQUEST, 
 						exception.getMessage()));
-	}
-
-	private ResponseEntity<Object> frameRestApiException(RestApiError err) {
-		return new ResponseEntity<>(err, err.getStatus());
 	}
 	
 	@Override
@@ -69,10 +82,17 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler {
 		    }
 			String value = (null != ex.getValue())?ex.getValue().toString():"";
 			
-			return frameRestApiException(
-					new RestApiError(
-							HttpStatus.BAD_REQUEST, 
-							"Value for field : "+fieldName+" is not expected as : "+value));
+			if(!fieldName.isEmpty() && !value.isEmpty())
+				return new ResponseEntity<>(
+						new RestApiErrorHandling(
+								HttpStatusCode.INVALID_FIELD_VALUE.getCode(),
+								HttpStatusCode.INVALID_FIELD_VALUE,
+								String.format(HttpStatusCode.INVALID_FIELD_VALUE.getMessage(), fieldName, value)),
+						HttpStatus.BAD_REQUEST);
+			else
+				return frameRestApiException(
+						new RestApiError(HttpStatus.EXPECTATION_FAILED, "Invalid input format"));
+			
 		} else if(exception.getCause() instanceof JsonMappingException) {
 
 			JsonMappingException jsonMappingException = (JsonMappingException)exception.getCause();
