@@ -19,12 +19,15 @@ public class ManageTableUtil {
 		return false;
 	}
 
-	public static List<Response.TableListResponse> getPaginatedTabaleList(List<String> data,int pageNumber, int pageSize){
+	public static List<Response.TableListResponse> getPaginatedTableList(
+			List<String> data, int pageNumber, int pageSize){
 		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
 	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-	    	paginatedTableList.add(new Response.TableListResponse(Integer.parseInt(data.get(i).split("_")[1]),
-	    			data.get(i + currIdx).split("_")[0]));
+			paginatedTableList.add(
+					new Response.TableListResponse(
+						Integer.parseInt(data.get(i).split("_")[1]),
+						data.get(i + currIdx).split("_")[0]));
 	    }
 		return paginatedTableList;
 	}
@@ -62,6 +65,5 @@ public class ManageTableUtil {
 		}
 		return newFieldsHashMap;
 	}
-
 
 }

@@ -3,39 +3,42 @@ package com.searchservice.app.rest.errors;
 public enum HttpStatusCode {
 	
 	// With Custom Error Status Code
-	INVALID_TABLE_NAME(101,"invalid table name"),
+	INVALID_TABLE_NAME(101, "Invalid table name"),
 	
-	INVALID_SKU_NAME(102,"Invalid SKU name"),
+	INVALID_SKU_NAME(102, "Invalid SKU name"),
 	
-	INVALID_COLUMN_ATTRIBUTE(103,"invalid column attribute value"),
+	INVALID_COLUMN_ATTRIBUTE(103, "Invalid column attribute is provided"), 
 	
-	NULL_COLUMN(104,"column is null,Provide atleast one Column"),
+	INVALID_JSON_INPUT(105, "Invalid JSON input or JSON format"),
 	
-	INVALID_JSON_INPUT(105,"invalid json input or json format"),
+	UNRECOGNIZED_FIELD(106, "Check sequence of fields or field name"),
 	
-	UNRECOGNIZED_FIELD(106,"check sequence of fields or field name"),
+	UNDER_DELETION_PROCESS(107, "Under deletion process"),
 	
-	UNDER_DELETION_PROCESS(107,"under deletion process"),
+	TABLE_NOT_FOUND(108, "Does not exist"),
 	
-	TABLE_NOT_FOUND(108, "does not exist"),
+	TABLE_NOT_UNDER_DELETION(109, "Not under deletion"),
 	
-	TABLE_NOT_UNDER_DELETION(109, "not under deletion"),
+	TABLE_ALREADY_EXISTS(110, "Already exists"),
 	
-	TABLE_ALREADY_EXISTS(110, "already exists"),
+	INVALID_COLUMN_NAME(111, "Invalid column name provided"),
 	
-	INVALID_COLUMN_NAME(111, "invalid column name provided"),
+	WRONG_DATA_TYPE(112, "Wrong datatype selected for non multivalued field"),
 	
-	WRONG_DATA_TYPE(112, "wrong datatype selected for non multivalued field"),
+	IO_EXCEPTION(113, "I/O exception occurred"), 
 	
-	IO_EXCEPTION(113, "i/o exception occurred"),
+	JSON_PARSE_EXCEPTION(114, "JSON parse error occurred"), 
 	
-	BAD_REQUEST_EXCEPTION(400,"Bad Request Occuured"),
+	INVALID_FIELD_VALUE(116, "Value for field : {} is not expected as : {}"), 
 	
-	NULL_POINTER_EXCEPTION(404,"Received Null response"),
+	// With Primitive Error Status Code
+	BAD_REQUEST_EXCEPTION(400, "Bad Request Occuured"),
 	
-	SERVER_UNAVAILABLE(503,"Unable to Connect To the Server"),
+	NULL_POINTER_EXCEPTION(500, "Received Null response"),
 	
-	OPERATION_NOT_ALLOWED(405,"Operation is Not Allowed"),
+	SERVER_UNAVAILABLE(503, "Unable to Connect To the Server"),
+	
+	OPERATION_NOT_ALLOWED(405, "Operation is Not Allowed"),
 	
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	

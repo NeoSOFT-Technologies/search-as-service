@@ -48,14 +48,16 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
-		if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()))) {
-			errorDetails.put("Unauthorized", "Invalid token");
-			response.setStatus(HttpStatus.FORBIDDEN.value());
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			mapper.writeValue(response.getWriter(), errorDetails);
+		if (token != null) {
+			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()))) {
+				errorDetails.put("Unauthorized", "Invalid token");
+				response.setStatus(HttpStatus.FORBIDDEN.value());
+				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+				mapper.writeValue(response.getWriter(), errorDetails);
 
-		} else {
-			chain.doFilter(request, response);
+			} else {
+				chain.doFilter(request, response);
+			}
 		}
 	}
 

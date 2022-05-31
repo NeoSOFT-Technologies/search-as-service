@@ -8,7 +8,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +46,7 @@ public class SecurityUtil {
 	public static String getTokenFromRequestHeader(
 			HttpServletRequest request, 
 			HttpServletResponse response, 
-			ObjectMapper mapper) throws ServletException, IOException {
+			ObjectMapper mapper) throws IOException {
 		
 		Map<String, Object> errorDetails = new HashMap<>();
 		// Get authorization header and validate

@@ -97,7 +97,8 @@ public class ManageTableResource {
 		if (getListItemsResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getListItemsResponseDTO.getData();
 			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion(true).getData());
-			getListItemsResponseDTO.setTableList(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			getListItemsResponseDTO.setTableList(ManageTableUtil.getPaginatedTableList(
+					existingTablesList, pageNumber, pageSize));
 			getListItemsResponseDTO.setData(null);
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
@@ -118,7 +119,7 @@ public class ManageTableResource {
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (getDeleteTableListResponseDTO.getStatusCode() == 200) {
 			List<String> existingTablesList = getDeleteTableListResponseDTO.getData();
-			getDeleteTableListResponseDTO.setTableList(ManageTableUtil.getPaginatedTabaleList(existingTablesList, pageNumber, pageSize));
+			getDeleteTableListResponseDTO.setTableList(ManageTableUtil.getPaginatedTableList(existingTablesList, pageNumber, pageSize));
 			getDeleteTableListResponseDTO.setData(null);
 			return ResponseEntity.status(HttpStatus.OK).body(getDeleteTableListResponseDTO);
 			
