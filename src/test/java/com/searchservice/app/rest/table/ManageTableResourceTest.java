@@ -221,6 +221,7 @@ class ManageTableResourceTest {
 		}
 	}
 
+	
 	@Test
 	void testGetTablesWithTenantId() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
@@ -539,6 +540,7 @@ class ManageTableResourceTest {
 		Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(false);
 	}
 
+	
 	@Test
 	void testUndoDeleteTable() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
