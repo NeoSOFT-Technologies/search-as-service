@@ -191,7 +191,7 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
-
+		
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
 					TABLE + createTableDTO.getTableName().split("_")[0] + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
