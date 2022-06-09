@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.runner.RunWith;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +21,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import com.searchservice.app.SearchServiceApplication;
 import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
@@ -33,20 +30,21 @@ import com.searchservice.app.domain.port.api.UserServicePort;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
 
-@RunWith(SpringRunner.class)
 @TestInstance(Lifecycle.PER_CLASS)
-@TestPropertySource(
-        properties = {
-                "username: admin",
-                "password: adminPassword@1"
-        }
-)
 @SpringBootTest(classes =SearchServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class InputDocumentResourceIntegrationTest {
+class InputDocumentIntegrationTest {
 	
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
+	
+	@Value("${base-url.request}")
+	private String hostURL;
+	
+	private static final String INGEST_NRT_API = "/ingest-nrt/";
+	private static final String INGEST_BATCH_API = "/ingest/";
+	private static final String TENANT_ID = "?tenantId=";
+	private static final String STATUS_CODE = "statusCode";
 	
 	@LocalServerPort
 	private int port;
@@ -57,10 +55,10 @@ class InputDocumentResourceIntegrationTest {
 	@Autowired
 	UserServicePort userServicePort;
 	
-	@Value("${username}")
+	@Value("${adminUserName}")
 	private String username;
 	
-	@Value("${password}")
+	@Value("${adminPassword}")
 	private String password;
 
 	TestRestTemplate restTemplate = new TestRestTemplate();
@@ -108,7 +106,7 @@ class InputDocumentResourceIntegrationTest {
 	}
 	
 	private String createURLWithPort(String uri) {
-		return "http://localhost:" + port + uri;
+		return hostURL +":" + port + uri;
 	}
 	
 	
@@ -116,61 +114,60 @@ class InputDocumentResourceIntegrationTest {
 	int addDocumentsNRT() {
 		HttpEntity<String> entity = new HttpEntity<>(successPayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest-nrt" + "/" + tableName+ "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + INGEST_NRT_API + tableName+ TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
 	
 	int addDocumentsNRTWithInvalidJSONInput() {
 		HttpEntity<String> entity = new HttpEntity<>(invalidPayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest-nrt" + "/" + tableName+ "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + INGEST_NRT_API + tableName+ TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
 	
 	int addDocumentsNRTRequestSizeLimiting() {
 		HttpEntity<String> entity = new HttpEntity<>(largeSizePayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest-nrt" + "/" + tableName+ "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + "/ingest-nrt" + "/" + tableName+ TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
 	
 	int addDocumentsNRTTableNotFound() {
 		HttpEntity<String> entity = new HttpEntity<>(successPayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest-nrt" + "/" + invalidTableName+ "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + INGEST_NRT_API + invalidTableName+ TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
 	
 	
 	int addDocumentsBatchSuccess() {
 		HttpEntity<String> entity = new HttpEntity<>(largeSizePayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest/" + tableName + "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint +INGEST_BATCH_API + tableName + TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");	
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);	
 	}
 	
 	int addDocumentsBatchInvalidJsonInput() {
 		HttpEntity<String> entity = new HttpEntity<>(invalidPayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest/" + tableName + "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + INGEST_BATCH_API + tableName + TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");	
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);	
 	}
 	
 	int addDocumentsBatchTableNotFound() {
 		HttpEntity<String> entity = new HttpEntity<>(successPayloadString, headers);
 		ResponseEntity<String> response = restTemplate.postForEntity(
-				createURLWithPort(apiEndpoint + "/ingest/" + invalidTableName + "?tenantId="+tenantId )
+				createURLWithPort(apiEndpoint + INGEST_BATCH_API + invalidTableName + TENANT_ID+tenantId )
 				,entity, String.class);
-	    return new JSONObject(response.getBody()).getInt("statusCode");	
+	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);	
 	}
 	
-	// Test cases
 	@Order(1)
 	@Test 
 	void testAddDocumentsNRTSuccessTest()

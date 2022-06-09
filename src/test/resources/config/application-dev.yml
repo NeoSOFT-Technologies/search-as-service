@@ -5,6 +5,9 @@ base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 base-token-url: https://iam-dev.neosofttech.com/api/login
 #================================================================
 
+adminUserName: admin
+adminPassword: adminPassword@1
+
 
 #================================================================
 #Logger
@@ -120,6 +123,7 @@ basic-auth:
 #================================================================
 #API endpoints & ObjectMapperVersioning configurations
 base-url:
+  request: http://localhost
   api-endpoint:
     home: /api/v1
     versioned-home: /api-versioned/v1

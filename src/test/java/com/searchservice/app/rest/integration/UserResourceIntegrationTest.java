@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -13,31 +12,25 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import com.searchservice.app.SearchServiceApplication;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes =SearchServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(
-        properties = {
-                "username: admin",
-                "password: adminPassword@1"
-        }
-)
-public class UserResourceIntegrationTest {
+class UserResourceIntegrationTest {
 
 	@LocalServerPort
 	private int port;
 
-	@Value("${username}")
+	@Value("${adminUserName}")
 	private String username;
 	
-	@Value("${password}")
+	@Value("${adminPassword}")
 	private String password;
+	
+	@Value("${base-url.request}")
+	private String hostURL;
 	
 	TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -51,19 +44,20 @@ public class UserResourceIntegrationTest {
 		return new JSONObject(response.getBody()).getInt("statusCode");
 	}
 	@Test
-	public void successGetToken() {
+	void successGetToken() {
+		
 		User user = new User(username, password);
 		assertEquals(200, getToken(user));
 	}
 	
 	@Test
-	public void invallidCredTest() {
+	void invallidCredTest() {
 		User user = new User(username, password+"12");
 		assertEquals(400, getToken(user));
 	}
 	
 	private String createURLWithPort(String uri) {
-		return "http://localhost:" + port + uri;
+		return hostURL +":" + port + uri;
 	}
 
 }

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,8 +21,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import com.searchservice.app.SearchServiceApplication;
 import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.ManageTable;
@@ -33,14 +30,8 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.service.UserService;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
-@RunWith(SpringRunner.class)
+
 @TestInstance(Lifecycle.PER_CLASS)
-@TestPropertySource(
-        properties = {
-                "username: admin",
-                "password: adminPassword@1"
-        }
-)
 @SpringBootTest(classes =SearchServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ManageTableResourceIntegrationTest {
@@ -48,10 +39,10 @@ class ManageTableResourceIntegrationTest {
 	@LocalServerPort
 	private int port;
 
-	@Value("${username}")
+	@Value("${adminUserName}")
 	private String username;
 	
-	@Value("${password}")
+	@Value("${adminPassword}")
 	private String password;
 
 	TestRestTemplate restTemplate = new TestRestTemplate();
@@ -64,7 +55,10 @@ class ManageTableResourceIntegrationTest {
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
 	
-	private static final String MANAGE_TABLE = "/manage/table";
+	@Value("${base-url.request}")
+	private String hostURL;
+	
+	private static final String MANAGE_TABLE = "/manage/table/";
 	private static final String STATUS_CODE = "statusCode";
 	private static final String TENANT_ID = "/?tenantId=";
 	private String accessToken;
@@ -109,7 +103,7 @@ class ManageTableResourceIntegrationTest {
 	String getCapacityPlans() {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers); 
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/capacity-plans"),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "capacity-plans"),
 				HttpMethod.GET, entity, String.class);
 		return  new JSONObject(response.getBody()).toString();
 	}
@@ -125,16 +119,16 @@ class ManageTableResourceIntegrationTest {
 	int getAllTables() {
 	    HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/all-tables" + "?pageNumber=1&pageSize=5"),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "all-tables" + "?pageNumber=1&pageSize=5"),
 				HttpMethod.GET, entity, String.class);
        	return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
 	
-	int updateTable() {
+	int updateTable(String tableName) {
 		ManageTable schemaDTO = new ManageTable(tableName, attributes);
 		HttpEntity<ManageTable> entity = new HttpEntity<>(schemaDTO, headers);
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/" + tableName + TENANT_ID + tenantId),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE  + tableName + TENANT_ID + tenantId),
 				HttpMethod.PUT, entity, String.class);
 	    return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
@@ -142,7 +136,7 @@ class ManageTableResourceIntegrationTest {
 	int tableDelete(String tableName) {
 		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/" + tableName + "/?tenantId=" + tenantId),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE + tableName + TENANT_ID + tenantId),
 				HttpMethod.DELETE, entity, String.class);	
 		return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
@@ -150,7 +144,7 @@ class ManageTableResourceIntegrationTest {
 	int getAllTablesUnderDeletion() {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/deletion/all-tables" + "?pageNumber=1&pageSize=5"),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "deletion/all-tables" + "?pageNumber=1&pageSize=5"),
 				HttpMethod.GET, entity, String.class);
 		return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
@@ -158,7 +152,7 @@ class ManageTableResourceIntegrationTest {
 	int restoreTable() {
 		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 		ResponseEntity<String> response = restTemplate.exchange(
-				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "/restore/" + "/" + tableName + TENANT_ID + tenantId),
+				createURLWithPort(apiEndpoint+ MANAGE_TABLE + "restore/" + "/" + tableName + TENANT_ID + tenantId),
 				HttpMethod.PUT, entity, String.class);
 		return new JSONObject(response.getBody()).getInt(STATUS_CODE);
 	}
@@ -205,7 +199,7 @@ class ManageTableResourceIntegrationTest {
 	@Test
 	void updatetabletest()
 	{
-		assertEquals(200, updateTable());
+		assertEquals(200, updateTable(tableName));
 		
 	}
 	
@@ -226,7 +220,7 @@ class ManageTableResourceIntegrationTest {
 	
 	@Order(9)
 	@Test
-	void tableInvalidName()
+	void createTableInvalidName()
 	{	
 		assertEquals(HttpStatusCode.INVALID_TABLE_NAME.getCode(),  createTable(tableName+"_90"));
 		
@@ -241,47 +235,53 @@ class ManageTableResourceIntegrationTest {
 
 	@Order(11)
 	@Test
-	void getInfoDeleteTable()
+	void getTableInfoUnderDeletion()
 	{	
 		assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), getTableInfo(tableName));
 	}
 	
 	@Order(12)
 	@Test
-	void getInfoTableNotFound()
+	void getInfoNonExistingTable()
 	{
 		assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), getTableInfo(tableName+"123"));
 	}
 	
 	@Order(13)
 	@Test
-	void deleteTableNotFound()
+	void deleteNonExistingTable()
 	{
 		assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), tableDelete(tableName + "90"));
 	}
 	
 	@Order(14)
 	@Test
-	void testTableUnderDeletion()
+	void deleteTableUnderDeletion()
 	{
 		assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), tableDelete(tableName));
 	}
 	
 	@Order(15)
 	@Test
-	void getInfoTableUnderDeletion()
-	{
-		assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),  getTableInfo(tableName));
+	void updateNonExistingTable() {
+		assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), updateTable(tableName + "111"));
 	}
 	
-	 @Order(16)
+	@Order(16)
+	@Test
+	void updateTableUnderDeletion() {
+		assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), updateTable(tableName));
+	}
+	
+	
+	@Order(17)
 	@Test
 	void testRestoreDeleteTable() 
 	{
 	   	assertEquals(200, restoreTable());		
 	}
 	
-	@Order(17)
+	@Order(18)
 	@Test
 	void restoreTestTableNotUnderDeletion()
 	{
@@ -289,7 +289,7 @@ class ManageTableResourceIntegrationTest {
 	}
 	
 	private String createURLWithPort(String uri) {
-		return "http://localhost:" + port + uri;
+		return hostURL +":" + port + uri;
 	}
 	
 	@AfterAll
