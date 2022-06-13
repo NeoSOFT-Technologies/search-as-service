@@ -24,12 +24,16 @@ public class KeycloakPermissionManagementService {
 	
 	@Autowired
 	KeycloakUserPermission keycloakUserPermission;
+	
+	private static final String PERMISSION = "permission";
 
 	public JSONObject getDecodedTokenPayloadJson(String token) {
 
 		String payload = token.split("\\.")[1];
 
 		String decodedPayload = new String(Base64.decodeBase64(payload), StandardCharsets.UTF_8);
+		
+		
 
 		try {
 			return new JSONObject(decodedPayload);
@@ -40,7 +44,7 @@ public class KeycloakPermissionManagementService {
 	}
 
 	public List<String> getActiveUserPermissions(JSONObject tokenPayload) {
-		JSONArray permissions = tokenPayload.getJSONArray("permission");
+		JSONArray permissions = tokenPayload.getJSONArray(PERMISSION);
 
 		return permissions.toList().stream().map(p -> Objects.toString(p, null)).collect(Collectors.toList());
 	}
