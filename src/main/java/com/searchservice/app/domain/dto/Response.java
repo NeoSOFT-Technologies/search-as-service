@@ -16,6 +16,7 @@ public class Response extends BaseResponse{
 
 	private List<String> data;
 	private String token;
+	private int dataSize;
 	private List<TableListResponse> tableList;
 
 	public Response(String token) {
@@ -31,6 +32,11 @@ public class Response extends BaseResponse{
 		this.token = token;
 	}
 	
+	public Response(int statusCode, String message, int dataSize) {
+		super(statusCode, message);
+		this.dataSize = dataSize;
+	}
+	
 	
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Data
@@ -39,6 +45,7 @@ public class Response extends BaseResponse{
 	public static class TableListResponse {
 		private int tenantId;
 		private String tableName;
+		
 	}
 
 }

@@ -88,7 +88,7 @@ public class ManageTableResource {
 	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getALLTables(@RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "5") int pageSize) {
+            @RequestParam(defaultValue = "6") int pageSize) {
 
 		Response getListItemsResponseDTO = manageTableServicePort.getAllTables(pageNumber, pageSize);
 		if (getListItemsResponseDTO == null)
@@ -100,6 +100,7 @@ public class ManageTableResource {
 			getListItemsResponseDTO.setTableList(ManageTableUtil.getPaginatedTableList(
 					existingTablesList, pageNumber, pageSize));
 			getListItemsResponseDTO.setData(null);
+			getListItemsResponseDTO.setDataSize(existingTablesList.size());
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
@@ -111,7 +112,7 @@ public class ManageTableResource {
 	@Operation(summary = "GET ALL THE TABLES UNDER DELETION.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getALLTablesUnderDeletion(@RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "5") int pageSize) {
+            @RequestParam(defaultValue = "6") int pageSize) {
 
 		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTableUnderDeletion(true);
 		if (getDeleteTableListResponseDTO == null)
@@ -121,6 +122,7 @@ public class ManageTableResource {
 			List<String> existingTablesList = getDeleteTableListResponseDTO.getData();
 			getDeleteTableListResponseDTO.setTableList(ManageTableUtil.getPaginatedTableList(existingTablesList, pageNumber, pageSize));
 			getDeleteTableListResponseDTO.setData(null);
+			getDeleteTableListResponseDTO.setDataSize(existingTablesList.size());
 			return ResponseEntity.status(HttpStatus.OK).body(getDeleteTableListResponseDTO);
 			
 		} else {
