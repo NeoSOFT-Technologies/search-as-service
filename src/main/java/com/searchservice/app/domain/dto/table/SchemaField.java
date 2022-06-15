@@ -72,7 +72,7 @@ public class SchemaField {
 	
 	public void setPartialSearch(Object value) {
 		if (value instanceof Boolean) {
-			this.isSortable = (Boolean) value;
+			this.isPartialSearch = (Boolean) value;
 		} else {
 			throw new CustomException(HttpStatusCode.INVALID_COLUMN_ATTRIBUTE.getCode(),
 					HttpStatusCode.INVALID_COLUMN_ATTRIBUTE,"Value for partialSearch is expected as : true/false");
