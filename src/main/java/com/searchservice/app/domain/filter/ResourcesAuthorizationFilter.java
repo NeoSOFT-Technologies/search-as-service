@@ -19,7 +19,10 @@ import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 @Component
 public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
-
+	/**
+	 * User Permission Authorization Filter
+	 */
+	
 	private final Logger log = LoggerFactory.getLogger(ResourcesAuthorizationFilter.class);
 	
 	private ObjectMapper mapper = new ObjectMapper();
@@ -38,7 +41,6 @@ public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-
 		// Get authorization header and validate
 		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);

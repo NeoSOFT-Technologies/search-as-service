@@ -141,17 +141,6 @@ public class SearchJAdapter {
 		return schemaResponse;
 	}
 
-	public void createConfigSetInSolrj(ConfigSetAdminRequest.Create configSetRequest,
-			HttpSolrClient searchClientActive) {
-
-		try {
-			configSetRequest.process(searchClientActive);
-		} catch (SolrServerException | IOException e) {
-			logger.error(e.getMessage());
-		} finally {
-			SearchUtil.closeSearchClientConnection(searchClientActive);
-		}
-	}
 
 	public void createTableInSolrj(CollectionAdminRequest.Create request, HttpSolrClient searchClientActive) {
 
