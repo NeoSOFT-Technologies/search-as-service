@@ -70,8 +70,6 @@ public class InputDocumentResource {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-		manageTableServicePort.checkIfSearchServerDown();
-		
 		tableName = tableName + "_" + tenantId;
 		if (manageTableServicePort.isTableExists(tableName)) {
 			return inputDocumentServicePort.performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
@@ -104,8 +102,6 @@ public class InputDocumentResource {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-		manageTableServicePort.checkIfSearchServerDown();
-		
 		if (manageTableServicePort.isTableExists(tableName)) {
 			return inputDocumentServicePort.performDocumentInjection(false, tableName, payload, documentInjectionThrottlerResponse);
 		} else {

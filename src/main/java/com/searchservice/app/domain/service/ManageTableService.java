@@ -7,8 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +136,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response getTables(int tenantId) {
 		
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
@@ -167,7 +165,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response getAllTables(int pageNumber, int pageSize) {
 		
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getAllTableListResposnse = new Response();
@@ -182,7 +180,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
@@ -204,7 +202,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
@@ -243,7 +241,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response deleteTable(String tableName) {
 		
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		if (!isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
@@ -270,7 +268,7 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public Response updateTableSchema(int tenantId, String tableName, ManageTable tableSchemaDTO) {
 		
-		checkIfSearchServerDown();
+		searchJAdapter.checkIfSearchServerDown();
 		
 		if (!isTableExists(tableName + "_" + tenantId)) {
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
@@ -304,24 +302,6 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
-	public boolean checkIfSearchServerDown() {
-		try {
-			URL url = new URL(searchURL);
-			
-			HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-			httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
-			httpURLConnection.connect();
-			
-		} catch (Exception e) {		//possible cause: MalformedURLException
-			throw new CustomException(
-					HttpStatusCode.CONNECTION_REFUSED.getCode(), 
-					HttpStatusCode.CONNECTION_REFUSED, 
-					HttpStatusCode.CONNECTION_REFUSED.getMessage());
-		}
-		
-		return false;
-	}
-	
 	@Override
 	public boolean isTableExists(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);

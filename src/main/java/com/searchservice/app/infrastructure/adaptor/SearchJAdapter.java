@@ -1,6 +1,8 @@
 package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -141,7 +143,6 @@ public class SearchJAdapter {
 		return schemaResponse;
 	}
 
-
 	public void createTableInSolrj(CollectionAdminRequest.Create request, HttpSolrClient searchClientActive) {
 
 		try {
@@ -187,7 +188,6 @@ public class SearchJAdapter {
 		} 
 		return addFieldResponse;
 	}
-
 
 	public UpdateResponse updateSchemaLogic(HttpSolrClient searchClientActive,
 			SchemaRequest.ReplaceField updateFieldsRequest) {
@@ -273,7 +273,6 @@ public class SearchJAdapter {
 		}
 	}
 	
-	
 	public Map<String, Object> createPartialSearchFieldTypeIfNotPresent(ManageTable tableSchemaDTO) {
 		Map<String, Object> fieldTypeAttributes = TableSchemaParserUtil.partialSearchFieldTypeAttrs;
 		if (!isPartialSearchFieldTypePresent(tableSchemaDTO.getTableName())) {
@@ -295,8 +294,7 @@ public class SearchJAdapter {
 		
 		return fieldTypeAttributes;
 	}
-	
-	
+
 	public List<Map<String, Object>> parseSchemaFieldDtosToListOfMaps(ManageTable tableSchemaDTO) {
 		List<Map<String, Object>> schemaFieldsListOfMap = new ArrayList<>();
 
@@ -323,8 +321,7 @@ public class SearchJAdapter {
 		}
 		return schemaFieldsListOfMap;
 	}
-	
-	
+
 	public void partialSearchUpdate(ManageTable tableSchemaDTO, SchemaField fieldDto, Map<String, Object> fieldDtoMap) {
 		// if partial search enabled
 		if (fieldDto.isPartialSearch()) {
@@ -342,4 +339,22 @@ public class SearchJAdapter {
 		}
 	}
 	
+	// Utility methods
+	public boolean checkIfSearchServerDown() {
+		try {
+			URL url = new URL(searchURL);
+			
+			HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+			httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
+			httpURLConnection.connect();
+			
+		} catch (Exception e) {		//possible cause: MalformedURLException
+			throw new CustomException(
+					HttpStatusCode.CONNECTION_REFUSED.getCode(), 
+					HttpStatusCode.CONNECTION_REFUSED, 
+					HttpStatusCode.CONNECTION_REFUSED.getMessage());
+		}
+		
+		return false;
+	}
 }

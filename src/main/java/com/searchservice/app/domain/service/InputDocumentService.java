@@ -15,6 +15,7 @@ import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
+import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
@@ -33,6 +34,9 @@ public class InputDocumentService implements InputDocumentServicePort {
  	
  	@Autowired
  	public TableDeleteServicePort tableDeleteServicePort;
+ 	
+	@Autowired
+	SearchJAdapter searchJAdapter;
 
 	public InputDocumentService(ManageTableServicePort manageTableServicePort,
 			TableDeleteServicePort tableDeleteServicePort) {
@@ -105,6 +109,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ResponseEntity<ThrottlerResponse> performDocumentInjection(boolean isNrt, String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		ThrottlerResponse documentInjectionResponse = addDocuments(isNrt, tableName, payload);
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());

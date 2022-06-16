@@ -232,7 +232,7 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.deleteTableFromSolrj(Mockito.any())).thenReturn(true);
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
 		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
-
+		Mockito.when(searchJAdapter.checkIfSearchServerDown()).thenReturn(false);
 	}
 	
 	public void setUpManageTable(int validColumn, int multiValueCheck) {
