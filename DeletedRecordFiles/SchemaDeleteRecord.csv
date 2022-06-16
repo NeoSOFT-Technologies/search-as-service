@@ -60,3 +60,5 @@ TenantID,TableName,RequestTime,ColumnName
 445,test3,14-6-2022 11:52:58,field1
 445,test3,14-6-2022 11:55:47,field1
 445,test3,14-6-2022 11:57:06,field1
+443,load1000,15-6-2022 12:33:24,starRating
+443,load1000,15-6-2022 12:34:22,starRating

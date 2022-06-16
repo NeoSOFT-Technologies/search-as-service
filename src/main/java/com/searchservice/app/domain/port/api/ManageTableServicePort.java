@@ -42,6 +42,8 @@ public interface ManageTableServicePort {
 	 * Auxiliary TableServices
 	 */
 
+	boolean checkIfSearchServerDown();
+	
 	boolean isTableExists(String tableName);
 
 	TableSchema getTableSchema(String tableName);

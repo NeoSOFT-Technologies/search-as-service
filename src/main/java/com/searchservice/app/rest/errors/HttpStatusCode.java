@@ -31,6 +31,8 @@ public enum HttpStatusCode {
 	
 	INVALID_FIELD_VALUE(116, "Value for field : {} is not expected as : {}"), 
 	
+	CONNECTION_REFUSED(117, "Connection is refused from the server"), 
+	
 	// With Primitive Error Status Code
 	BAD_REQUEST_EXCEPTION(400, "Bad Request Occuured"),
 	
