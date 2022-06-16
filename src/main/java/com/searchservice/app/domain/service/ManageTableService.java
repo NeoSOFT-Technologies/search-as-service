@@ -74,6 +74,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
+	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	
@@ -134,6 +135,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response getTables(int tenantId) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
 
@@ -160,6 +164,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response getAllTables(int pageNumber, int pageSize) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getAllTableListResposnse = new Response();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
@@ -173,6 +180,8 @@ public class ManageTableService implements ManageTableServicePort {
 	@Override
 	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
+		searchJAdapter.checkIfSearchServerDown();
+		
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
@@ -189,9 +198,12 @@ public class ManageTableService implements ManageTableServicePort {
 		return schemaResponse;
 	}
 
+
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
+		searchJAdapter.checkIfSearchServerDown();
+		
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
 					TABLE + createTableDTO.getTableName().split("_")[0] + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
@@ -228,6 +240,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		if (!isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
@@ -252,6 +267,15 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response updateTableSchema(int tenantId, String tableName, ManageTable tableSchemaDTO) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
+		if (!isTableExists(tableName + "_" + tenantId)) {
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "",
+							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
+		}
+		
 		Response apiResponseDTO = new Response();
 
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
@@ -291,9 +315,10 @@ public class ManageTableService implements ManageTableServicePort {
 					&& (HttpHostConnectException) e.getCause() instanceof HttpHostConnectException)
 				throw new CustomException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION,
 						"Could not connect to Solr server");
-			else
+			else {
 				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 						HttpStatusCode.BAD_REQUEST_EXCEPTION, "Connection Refused by the Backend Server!!");
+			}
 		}
 	}
 

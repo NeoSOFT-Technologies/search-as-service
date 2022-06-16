@@ -246,32 +246,25 @@ public class ManageTableResource {
 			@RequestBody ManageTable newTableSchemaDTO) {
 
 		tableName = tableName + "_" + tenantId;
-		if (!manageTableServicePort.isTableExists(tableName)) {
-			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
-					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "",
-							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
-		} else {
-			if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
-				newTableSchemaDTO.setTableName(tableName);
+		if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+			newTableSchemaDTO.setTableName(tableName);
 
-				Response apiResponseDTO = manageTableServicePort.updateTableSchema(tenantId, tableName.split("_")[0],
-						newTableSchemaDTO);
+			Response apiResponseDTO = manageTableServicePort.updateTableSchema(tenantId, tableName.split("_")[0],
+					newTableSchemaDTO);
 
-				if (apiResponseDTO.getStatusCode() == 200) {
+			if (apiResponseDTO.getStatusCode() == 200) {
 
-					apiResponseDTO.setMessage("Table is updated successfully");
-					return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-				} else {
-
-					throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-							HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
-				}
+				apiResponseDTO.setMessage("Table is updated successfully");
+				return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
 			} else {
-				throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-						HttpStatusCode.UNDER_DELETION_PROCESS,
-						String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ",
-								HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+
+				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+						HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
 			}
+		} else {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS, String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0],
+							tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
 

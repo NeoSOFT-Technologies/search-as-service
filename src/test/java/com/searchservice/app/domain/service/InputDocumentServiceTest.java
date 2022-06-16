@@ -20,6 +20,7 @@ import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
 import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
+import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +54,8 @@ class InputDocumentServiceTest {
 	@MockBean
 	UploadDocumentUtil uploadDocumentUtil;
 	
+	@MockBean
+	SearchJAdapter searchJAdapter;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -70,7 +73,7 @@ class InputDocumentServiceTest {
 		response = new UploadDocumentSearchUtilRespnse(true, "Testing");
 		Mockito.when(uploadDocumentUtil.commit()).thenReturn(response);
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
-	
+		Mockito.when(searchJAdapter.checkIfSearchServerDown()).thenReturn(false);
 	}
 
 	public void setMockitoBadResponseForService() {
