@@ -16,15 +16,15 @@ import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.domain.service.PublicKeyService;
+import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
-	private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private PublicKeyService publicKeyService;
+	private KeycloakPermissionManagementService kpmService;
 	
 	private final Logger log = LoggerFactory.getLogger(JwtTokenAuthorizationFilter.class);
 	
@@ -32,9 +32,11 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 		super();
 	}
 
-	public JwtTokenAuthorizationFilter(AuthConfigProperties authConfigProperties,PublicKeyService publicKeyService) {
+	public JwtTokenAuthorizationFilter(
+			KeycloakPermissionManagementService kpmService, 
+			PublicKeyService publicKeyService) {
 		super();
-		this.authConfigProperties = authConfigProperties;
+		this.kpmService = kpmService;
 		this.publicKeyService = publicKeyService;
 	}
 
@@ -49,7 +51,8 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
 		if (token != null) {
-			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(authConfigProperties.getRealmName()))) {
+			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(
+					kpmService.getRealmNameFromToken(token)))) {
 				errorDetails.put("Unauthorized", "Invalid token");
 				response.setStatus(HttpStatus.FORBIDDEN.value());
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);

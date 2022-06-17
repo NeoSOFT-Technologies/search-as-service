@@ -9,9 +9,16 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class User {
 	
+	private String tenantName;
 	private String username;
 	private String password;
 
+	public User(String tenantName, String username, String password) {
+		this.tenantName = tenantName;
+		this.username = username;
+		this.password = password;
+	}
+	
 	public User(String username, String password) {
 		this.username = username;
 		this.password = password;

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.config.UserPermissionConfigProperties;
 import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
@@ -24,18 +25,30 @@ public class KeycloakPermissionManagementService {
 	
 	@Autowired
 	KeycloakUserPermission keycloakUserPermission;
-
+	
+	@Autowired
+	AuthConfigProperties authConfigProperties;
+	
+	
 	public JSONObject getDecodedTokenPayloadJson(String token) {
 
-		String payload = token.split("\\.")[1];
-
-		String decodedPayload = new String(Base64.decodeBase64(payload), StandardCharsets.UTF_8);
-
 		try {
+			String payload = token.split("\\.")[1];
+			
+			String decodedPayload = new String(Base64.decodeBase64(payload), StandardCharsets.UTF_8);
+
 			return new JSONObject(decodedPayload);
+
 		} catch (JSONException e) {
-			throw new CustomException(HttpStatusCode.INVALID_JSON_INPUT.getCode(), HttpStatusCode.INVALID_JSON_INPUT,
+			throw new CustomException(
+					HttpStatusCode.INVALID_JSON_INPUT.getCode(), 
+					HttpStatusCode.INVALID_JSON_INPUT, 
 					HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		} catch(Exception e) {
+			throw new CustomException(
+					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), 
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, 
+					"Invalid token!");
 		}
 	}
 
@@ -107,4 +120,15 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
+	public String getRealmNameFromToken(String token) {
+		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
+		String iss = (String)tokenPayload.get("iss");
+		String [] splitUrl = iss.split("/");
+		String realmName = splitUrl[splitUrl.length-1];
+		
+		authConfigProperties.setRealmName(realmName);
+
+		return splitUrl[splitUrl.length-1];
+	}
+	
 }

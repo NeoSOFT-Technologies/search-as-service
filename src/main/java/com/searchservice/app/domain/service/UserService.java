@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.Response;
@@ -45,9 +47,24 @@ public class UserService implements UserServicePort {
 	    ResponseEntity<String> response = new ResponseEntity<>(HttpStatus.OK);
 	    try {
 			response = restTemplate.postForEntity(baseTokenUrl, request, String.class);
+		} catch (NotFound e) {
+			log.error("Invalid credentials provided");
+			return createResponse(
+					null, 
+					HttpStatusCode.INVALID_CREDENTIALS.getMessage(), 
+					HttpStatusCode.INVALID_CREDENTIALS.getCode());
+		} catch (Unauthorized e) {
+			log.error("Unauthorized access attempt");
+			return createResponse(
+					null, 
+					HttpStatus.UNAUTHORIZED.getReasonPhrase(), 
+					HttpStatus.UNAUTHORIZED.value());
 		} catch (Exception e) {
-			log.error("Something Went Wrong Whil Obtaining Token Value", e);
-			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
+			log.error("Something Went Wrong While Obtaining Token Value", e);
+			return createResponse(
+					null, 
+					HttpStatusCode.SAAS_SERVER_ERROR.getMessage(), 
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode());
 		}
 		JSONObject obj = new JSONObject(response.getBody());
 		if (obj.has("access_token")) {

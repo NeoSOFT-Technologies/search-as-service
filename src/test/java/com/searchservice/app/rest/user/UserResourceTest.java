@@ -45,7 +45,7 @@ class UserResourceTest {
 	@Test
 	void getTokenTest() throws Exception{
 		
-		User user = new User("test","123");
+		User user = new User("testRealm", "test", "123");
 		setMockitoSuccessResponse();
 		restMockMvc.perform(MockMvcRequestBuilders.post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
