@@ -13,9 +13,14 @@ public class User {
 	private String username;
 	private String password;
 
-	public User(String username, String password, String tenantName) {
+	public User(String tenantName, String username, String password) {
+		this.tenantName = tenantName;
 		this.username = username;
 		this.password = password;
-		this.tenantName = tenantName;
+	}
+	
+	public User(String username, String password) {
+		this.username = username;
+		this.password = password;
 	}
 }

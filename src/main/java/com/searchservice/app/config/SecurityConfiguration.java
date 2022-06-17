@@ -19,10 +19,7 @@ import com.searchservice.app.domain.service.security.KeycloakPermissionManagemen
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
-	
-	@Autowired 
-	AuthConfigProperties authConfigProperties;
-	
+
 	@Autowired
 	private PublicKeyService publicKeyService;
 	

@@ -29,16 +29,16 @@ public class SecurityUtil {
 	
 	public static boolean validate(String token, String rsaPublicKey) {
         boolean isTokenValid = false;
-    	try {
-    		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
-    		KeyFactory kf = KeyFactory.getInstance("RSA");
-    		PublicKey publicKey= kf.generatePublic(keySpec);
-    		Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
-    		 isTokenValid = true;
-    		 log.debug("Token Validation Successfull");
-    		 } catch (Exception e) {
-    			 log.debug("Token Validation Failed",e);
-    	}
+		try {
+			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			PublicKey publicKey = kf.generatePublic(keySpec);
+			Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
+			isTokenValid = true;
+			log.debug("Token Validation Successfull");
+		} catch (Exception e) {
+			log.error("Token Validation Failed", e);
+		}
     	return isTokenValid;
         
 	}

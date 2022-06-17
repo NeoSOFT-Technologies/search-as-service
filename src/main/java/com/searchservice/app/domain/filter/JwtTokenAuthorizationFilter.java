@@ -22,7 +22,6 @@ import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
-	//private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private PublicKeyService publicKeyService;
 	private KeycloakPermissionManagementService kpmService;
@@ -35,11 +34,9 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
 	public JwtTokenAuthorizationFilter(
 			KeycloakPermissionManagementService kpmService, 
-			//AuthConfigProperties authConfigProperties, 
 			PublicKeyService publicKeyService) {
 		super();
 		this.kpmService = kpmService;
-		//this.authConfigProperties = authConfigProperties;
 		this.publicKeyService = publicKeyService;
 	}
 
@@ -55,7 +52,6 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
 		if (token != null) {
 			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(
-					//authConfigProperties.getRealmName()
 					kpmService.getRealmNameFromToken(token)))) {
 				errorDetails.put("Unauthorized", "Invalid token");
 				response.setStatus(HttpStatus.FORBIDDEN.value());

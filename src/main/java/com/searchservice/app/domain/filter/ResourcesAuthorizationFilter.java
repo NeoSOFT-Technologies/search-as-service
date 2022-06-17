@@ -46,6 +46,7 @@ public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
 		keycloakPermissionManagementService.validateAndSetActiveUserAuthorities(token);
+		keycloakPermissionManagementService.getRealmNameFromToken(token);
 
 		chain.doFilter(request, response);
 

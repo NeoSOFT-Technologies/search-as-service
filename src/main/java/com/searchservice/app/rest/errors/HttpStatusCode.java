@@ -33,6 +33,10 @@ public enum HttpStatusCode {
 	
 	CONNECTION_REFUSED(117, "Connection is refused from the server"), 
 	
+	INVALID_CREDENTIALS(118, "Invalid credentials provided"), 
+	
+	SAAS_SERVER_ERROR(119, "This feature is currently down. Try again later"), 
+	
 	// With Primitive Error Status Code
 	BAD_REQUEST_EXCEPTION(400, "Bad Request Occuured"),
 	
