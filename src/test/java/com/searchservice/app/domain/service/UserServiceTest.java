@@ -112,7 +112,7 @@ class UserServiceTest {
 		user.setPassword(password+"p0");
 		setMockitoExceptionResponse();
 		Response tokenResponse = userService.getToken(user);
-		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), tokenResponse.getStatusCode());
+		assertEquals(HttpStatusCode.SAAS_SERVER_ERROR.getCode(), tokenResponse.getStatusCode());
 		 
 	}
 	
