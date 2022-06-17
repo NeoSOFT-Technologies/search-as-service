@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.searchservice.app.domain.filter.JwtTokenAuthorizationFilter;
 import com.searchservice.app.domain.service.PublicKeyService;
+import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +25,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
 	private PublicKeyService publicKeyService;
+	
+//	@Autowired
+//	private KeycloakPermissionManagementService kpmService;
 
     @Override
 	public void configure(WebSecurity web) throws Exception {

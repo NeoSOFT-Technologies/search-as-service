@@ -107,4 +107,13 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
+	public String getRealmNameFromToken(String token) {
+		
+		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
+		String iss = (String)tokenPayload.get("iss");
+		String [] splitUrl = iss.split("/");
+		
+		return splitUrl[splitUrl.length-1];
+	}
+	
 }

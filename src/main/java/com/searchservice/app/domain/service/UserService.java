@@ -46,7 +46,7 @@ public class UserService implements UserServicePort {
 	    try {
 			response = restTemplate.postForEntity(baseTokenUrl, request, String.class);
 		} catch (Exception e) {
-			log.error("Something Went Wrong Whil Obtaining Token Value", e);
+			log.error("Something Went Wrong While Obtaining Token Value", e);
 			return createResponse(null, "Invalid credentials", HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 		}
 		JSONObject obj = new JSONObject(response.getBody());
