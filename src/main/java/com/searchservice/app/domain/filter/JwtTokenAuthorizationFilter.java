@@ -16,17 +16,16 @@ import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.domain.service.PublicKeyService;
 import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
-	private AuthConfigProperties authConfigProperties;
+	//private AuthConfigProperties authConfigProperties;
 	private ObjectMapper mapper = new ObjectMapper();
 	private PublicKeyService publicKeyService;
-	//private KeycloakPermissionManagementService kpmService;
+	private KeycloakPermissionManagementService kpmService;
 	
 	private final Logger log = LoggerFactory.getLogger(JwtTokenAuthorizationFilter.class);
 	
@@ -35,13 +34,13 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	public JwtTokenAuthorizationFilter(
-			//KeycloakPermissionManagementService kpmService, 
-			AuthConfigProperties authConfigProperties, 
+			KeycloakPermissionManagementService kpmService, 
+			//AuthConfigProperties authConfigProperties, 
 			PublicKeyService publicKeyService) {
 		super();
-		this.authConfigProperties = authConfigProperties;
+		this.kpmService = kpmService;
+		//this.authConfigProperties = authConfigProperties;
 		this.publicKeyService = publicKeyService;
-		//this.kpmService = kpmService;
 	}
 
 	@Override
@@ -56,8 +55,8 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
 		if (token != null) {
 			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(
-					//kpmService.getRealmNameFromToken(token)
-					authConfigProperties.getRealmName()))) {
+					//authConfigProperties.getRealmName()
+					kpmService.getRealmNameFromToken(token)))) {
 				errorDetails.put("Unauthorized", "Invalid token");
 				response.setStatus(HttpStatus.FORBIDDEN.value());
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);

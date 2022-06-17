@@ -26,8 +26,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private PublicKeyService publicKeyService;
 	
-//	@Autowired
-//	private KeycloakPermissionManagementService kpmService;
+	@Autowired
+	private KeycloakPermissionManagementService kpmService;
 
     @Override
 	public void configure(WebSecurity web) throws Exception {
@@ -50,7 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     		.anyRequest().permitAll();
         
 		// Add JWT token filter
-		http.addFilterBefore(new JwtTokenAuthorizationFilter(authConfigProperties, publicKeyService),
+		http.addFilterBefore(new JwtTokenAuthorizationFilter(kpmService, publicKeyService),
 				UsernamePasswordAuthenticationFilter.class);
     }
 }
