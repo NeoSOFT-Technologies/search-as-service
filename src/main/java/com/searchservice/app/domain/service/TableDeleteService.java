@@ -2,6 +2,7 @@
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -37,6 +38,8 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
+	
+	
 	public TableDeleteService(ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 
@@ -217,13 +220,10 @@ public class TableDeleteService implements TableDeleteServicePort {
 		return (deleteRecordCount > 0);
 	}
 
-	@Override
-	public boolean checkTableExistensce(String tableName) {
-		return manageTableServicePort.isTableExists(tableName);
-	}
 
 	@Override
 	public boolean isTableUnderDeletion(String tableName) {
+	    
 		boolean res = false;
 		List<String> listofTablesUnderDeletion;
 		if(tableName.contains("_")) {

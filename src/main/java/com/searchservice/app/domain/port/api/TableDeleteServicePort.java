@@ -20,9 +20,6 @@ public interface TableDeleteServicePort {
 	// To Check Status of Table Deletion Process
 	public boolean checkTableDeletionStatus(int deleteRecordCount);
 
-	// To Check if a Table Exist or Not Before Deletion
-	public boolean checkTableExistensce(String tableName);
-
 	public boolean isTableUnderDeletion(String tableName);
 
 	public Response getTableUnderDeletion(boolean forDeleteTableList);

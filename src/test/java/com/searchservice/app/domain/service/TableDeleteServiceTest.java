@@ -227,7 +227,7 @@ class TableDeleteServiceTest {
 	@Test
 	void isTableExsist() {
 		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		boolean b = tableDeleteService.checkTableExistensce("Testing101");
+		boolean b = manageTableServicePort.isTableExists("Testing101");
 		assertTrue(b);
 	}
 

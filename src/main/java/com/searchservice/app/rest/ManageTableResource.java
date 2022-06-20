@@ -197,7 +197,7 @@ public class ManageTableResource {
 	public ResponseEntity<Response> deleteTable(@RequestParam int tenantId, @PathVariable String tableName) {
 		tableName = tableName + "_" + tenantId;
 		if (!tableDeleteServicePort.isTableUnderDeletion(tableName)) {
-			if (tableDeleteServicePort.checkTableExistensce(tableName)) {
+			if (manageTableServicePort.isTableExists(tableName)) {
 				Response apiResponseDTO = tableDeleteServicePort.initializeTableDelete(tenantId, tableName);
 				if (apiResponseDTO.getStatusCode() == 200) {
 
