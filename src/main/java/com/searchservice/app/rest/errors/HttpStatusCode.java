@@ -31,11 +31,11 @@ public enum HttpStatusCode {
 	
 	INVALID_FIELD_VALUE(116, "Value for field : {} is not expected as : {}"), 
 	
-	CONNECTION_REFUSED(117, "Connection is refused from the server"), 
-	
-	INVALID_CREDENTIALS(118, "Invalid credentials provided"), 
-	
 	SAAS_SERVER_ERROR(119, "This feature is currently down. Try again later"), 
+	
+	CONNECTION_REFUSED(120, "Connection is refused from the server"), 
+	
+	INVALID_CREDENTIALS(121, "Invalid credentials provided"), 
 	
 	// With Primitive Error Status Code
 	BAD_REQUEST_EXCEPTION(400, "Bad Request Occuured"),
