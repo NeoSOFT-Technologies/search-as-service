@@ -140,7 +140,6 @@ class ManageTableResourceTest {
 	//	Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
-		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
 		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
@@ -188,7 +187,6 @@ class ManageTableResourceTest {
 		Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString())).thenReturn(unodDeleteResponseDTO);
 		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
 				.thenReturn(responseDTO);
-		Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(true);
 		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		 Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
 		 Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(getDeletedTablesResponseDTO);
@@ -389,33 +387,12 @@ class ManageTableResourceTest {
 
 			// DELETE THE CREATED COLLECTION
 			Response deleteTableDTO = new Response();
-
 			setMockitoSuccessResponseForService();
 			restAMockMvc.perform(MockMvcRequestBuilders
 					.delete(apiEndpoint + "/manage/table" + "/" + "/" + tableName + "/?tenantId=" + tenantId)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
 					.content(TestUtil.convertObjectToJsonBytes(deleteTableDTO))).andExpect(status().isOk());
-
-			// CREATING COLLECTION WITH INVALID TABLE NAME
-			Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(true);
-			createTableDTO.setTableName("Testing_123");
-			restAMockMvc
-					.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" + "/" + "/?tenantId=" + tenantId)
-							.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
-					.andExpect(status().isBadRequest());
-
-			// CREATING COLLECTION WITH NAME OF TABLE UNDER DELETION
-			Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
-			Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
-			createTableDTO.setTableName("TableTesting");
-			restAMockMvc
-					.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" + "/" + "/?tenantId=" + tenantId)
-							.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
-					.andExpect(status().isBadRequest());
+			
 		}
 	}
 
@@ -456,21 +433,6 @@ class ManageTableResourceTest {
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
 					.content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO))).andExpect(status().isOk());
 
-			// TRY TO DELETE TABLE UNDER DELETION
-			setMockitoForTableUnderDeletion();
-			restAMockMvc.perform(MockMvcRequestBuilders
-					.delete(apiEndpoint + "/manage/table" + "/" + tableName + "/?tenantId=" + tenantId)
-					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
-					.content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
-					.andExpect(status().isBadRequest());
-
-			Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
-			Mockito.when(tableDeleteService.checkTableExistensce(Mockito.anyString())).thenReturn(false);
-			restAMockMvc.perform(MockMvcRequestBuilders
-					.delete(apiEndpoint + "/manage/table" + "/" + tableName + "/?tenantId=" + tenantId)
-					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
-					.content(TestUtil.convertObjectToJsonBytes(deleteTableResponseDTO)))
-					.andExpect(status().isBadRequest());
 		}
 	}
 

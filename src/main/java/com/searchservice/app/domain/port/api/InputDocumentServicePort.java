@@ -10,6 +10,4 @@ public interface InputDocumentServicePort {
 
 	ResponseEntity<ThrottlerResponse> performDocumentInjection(boolean isNrt, String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse);
-	
-	ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName);
 }

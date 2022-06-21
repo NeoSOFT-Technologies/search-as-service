@@ -76,6 +76,13 @@ class InputDocumentServiceTest {
 		Mockito.when(searchJAdapter.checkIfSearchServerDown()).thenReturn(false);
 	}
 
+	public void setMockitoTableExists() {
+		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(true);
+	}
+	
+	public void setMockitoTableNotExists() {
+		Mockito.when(manageTableServiceport.isTableExists(Mockito.anyString())).thenReturn(false);
+	}
 	public void setMockitoBadResponseForService() {
 		responseDTO = new ThrottlerResponse(statusCode, message);
 		responseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
@@ -97,6 +104,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testAddDocumentsNrt() {
 		tableNotUnderDeletion();
+		setMockitoTableExists();
 		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
 		ThrottlerResponse response = inputDocumentService.addDocuments(true,tableName, payload);
@@ -104,8 +112,8 @@ class InputDocumentServiceTest {
 	}
 	
 	@Test
-
 	void testAddDocumentsBatch() {
+		setMockitoTableExists();
 		tableNotUnderDeletion();
 		response.setDocumentUploaded(true);
 		setMockitoSucccessResponseForService();
@@ -115,15 +123,45 @@ class InputDocumentServiceTest {
 	}
 	
 	@Test
+	void testAddDocumentsBatchInvalidJson() {
+		setMockitoTableExists();
+		tableNotUnderDeletion();
+		setMockitoTableExists();
+		setMockitoSucccessResponseForService();
+		try {
+			   inputDocumentService.addDocuments(false,tableName, "[{}");
+			}
+			catch(CustomException e) {
+				assertEquals(HttpStatusCode.INVALID_JSON_INPUT.getCode(), e.getExceptionCode());
+			}
+
+	}
+	
+	@Test
 	void testBadAddDocumentsForNRT() {
+		setMockitoTableExists();
 		setMockitoBadResponseForService();
 		tableNotUnderDeletion();
 		ThrottlerResponse response =inputDocumentService.addDocuments(true,tableName, payload);
 		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), response.getStatusCode());
 	}
+	
+	@Test
+	void testTableNotExistNRT() {
+		setMockitoSucccessResponseForService();
+		tableNotUnderDeletion();
+		setMockitoTableNotExists();
+		try {
+		   inputDocumentService.addDocuments(true,tableName, payload);
+		}
+		catch(CustomException e) {
+			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+		}
+	}
 
 	@Test
 	void testBadAddDocumentsWithoutNRT() {
+		setMockitoTableExists();
 		setMockitoBadResponseForService();
 		tableNotUnderDeletion();
 		ThrottlerResponse response =inputDocumentService.addDocuments(false,tableName, payload);
@@ -144,12 +182,6 @@ class InputDocumentServiceTest {
 		assertTrue(b);
 
 	}
-
-	@Test
-	void testDocumentInjectWithInvalidTableName() {
-		ResponseEntity<ThrottlerResponse> responseEntity = inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName);
-		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), responseEntity.getStatusCodeValue());
-	}
 	
 	@Test
 	void testAddDocumentsNRTTableUnderDeletion() {
@@ -164,6 +196,7 @@ class InputDocumentServiceTest {
 	@Test
 	void testAddDocumentsWihtoutNRTTableUnderDeletion() {
 		tableUnderDeletion();
+		setMockitoTableExists();
 		try {
 			inputDocumentService.addDocuments(true,tableName, payload);
 		}catch(CustomException e) {
@@ -173,6 +206,7 @@ class InputDocumentServiceTest {
 	
 	@Test
 	void testPerformDocumentInjectionSuccess() {
+		setMockitoTableExists();
 		tableNotUnderDeletion();
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
 		ResponseEntity<ThrottlerResponse> responseEntityBatch = inputDocumentService.performDocumentInjection(false, tableName, payload, responseDTO);
@@ -190,6 +224,7 @@ class InputDocumentServiceTest {
 	
 	@Test
 	void testPerformDocumentInjectionBadRequest() {
+		setMockitoTableExists();
 		tableNotUnderDeletion();
 		response.setDocumentUploaded(false);
 		Mockito.when(uploadDocumentUtil.softcommit()).thenReturn(response);
