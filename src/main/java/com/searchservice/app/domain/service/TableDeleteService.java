@@ -129,8 +129,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Override
 	public Response undoTableDeleteRecord(String tableName) {
 	 if(isTableUnderDeletion(tableName)) {
-		Response performUndoDeleteResponse = new Response();
-			performUndoDeleteResponse = performUndoTableDeletion(tableName);
+		Response performUndoDeleteResponse = performUndoTableDeletion(tableName);
 		return performUndoDeleteResponse;
 	 }else {
         	throw new CustomException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),HttpStatusCode.TABLE_NOT_UNDER_DELETION,
