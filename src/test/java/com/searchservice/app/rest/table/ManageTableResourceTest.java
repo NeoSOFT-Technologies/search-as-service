@@ -138,10 +138,7 @@ class ManageTableResourceTest {
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		finalResponseMap.put("Random message", "Data is returned");
 	//	Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
-		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
-				.thenReturn(responseDTO);
 		Mockito.when(manageTableService.checkIfTableNameisValid(Mockito.anyString())).thenReturn(false);
-		Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
         Mockito.when(manageTableService.isTableExists(Mockito.anyString())).thenReturn(true);
         Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
         Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(getDeletedTablesResponseDTO);
@@ -184,12 +181,8 @@ class ManageTableResourceTest {
 		Map<Object, Object> finalResponseMap = new HashMap<>();
 		finalResponseMap.put("Error", "Error connecting to cluster.");
 	//	Mockito.when(manageTableService.getTableDetails(Mockito.any())).thenReturn(finalResponseMap);
-		Mockito.when(tableDeleteService.undoTableDeleteRecord(Mockito.anyString())).thenReturn(unodDeleteResponseDTO);
-		Mockito.when(tableDeleteService.initializeTableDelete(Mockito.anyInt(), Mockito.anyString()))
-				.thenReturn(responseDTO);
 		Mockito.when(manageTableService.isColumnNameValid(Mockito.anyList())).thenReturn(false);
 		 Mockito.when(manageTableService.getAllTables(Mockito.anyInt(), Mockito.anyInt())).thenReturn(getTablesResponseDTO);
-		 Mockito.when(tableDeleteService.getTableUnderDeletion(Mockito.anyBoolean())).thenReturn(getDeletedTablesResponseDTO);
 	}
 
 	public void mockPreAuthorizedService() {
