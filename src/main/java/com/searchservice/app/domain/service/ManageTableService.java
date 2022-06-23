@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -32,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
@@ -43,6 +41,7 @@ import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
 import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.DateUtil;
@@ -123,6 +122,9 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SearchAPIPort searchAPIPort;
 
+    @Autowired
+    TableDeleteServicePort tableDeleteServicePort;
+    
 	@Autowired
 	SearchJAdapter searchJAdapter;
 
@@ -186,6 +188,11 @@ public class ManageTableService implements ManageTableServicePort {
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_"+ tenantId)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
+		
 		// GET tableSchema at Search cloud
 		TableSchema tableSchema = getTableSchema(tableName + "_" + tenantId);
 
@@ -203,10 +210,18 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
 		searchJAdapter.checkIfSearchServerDown();
-		
+		String tableName = createTableDTO.getTableName().split("_")[0];
+		if(checkIfTableNameisValid(tableName)) {
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + tableName + " is Provided");
+		}
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table With Same Name %s %s%s", tableName,"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
-					TABLE + createTableDTO.getTableName().split("_")[0] + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
+					TABLE + tableName + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
 							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
         
 		if(!isColumnNameValid(createTableDTO.getColumns())) {
@@ -276,6 +291,11 @@ public class ManageTableService implements ManageTableServicePort {
 							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
 		}
 		
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS, String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0],
+							tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
 		Response apiResponseDTO = new Response();
 
 		// Compare tableSchema locally Vs. tableSchema at solr cloud

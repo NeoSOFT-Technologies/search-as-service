@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -38,7 +36,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
 import com.searchservice.app.domain.dto.Response;
@@ -47,6 +44,7 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
@@ -102,6 +100,9 @@ class ManageTableServiceTest {
 
 	@MockBean
 	SchemaRequest schemaRequest;
+	
+	@MockBean
+	TableDeleteServicePort tableDeleteServicePort;
 	
 	
 	CreateTable manageTable = new CreateTable();
@@ -397,7 +398,7 @@ class ManageTableServiceTest {
 			assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), e.getExceptionCode());
 		}
 	}
-
+	
 	@Test
 	void addAliasTable() {
 
@@ -513,8 +514,63 @@ class ManageTableServiceTest {
 
 		setMockitoSuccessResponseForService();
 		setUpManageTable(1,0);
+		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
+	}
+	
+	@Test
+	void createTableIfNotPresentUnderDeletion() {
+
+		setMockitoSuccessResponseForService();
+		setUpManageTable(1,0);
+		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
+		try {
+		   manageTableService.createTableIfNotPresent(manageTable);
+		}catch(CustomException e)
+		{
+			assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), e.getExceptionCode());
+		}
+	}
+	
+	@Test
+	void createTableIfNotPresentInvalidTableName() {
+
+		setMockitoSuccessResponseForService();
+		setUpManageTable(1,0);
+		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
+		manageTable.setTableName(tableName+"@3");
+		try {
+		   manageTableService.createTableIfNotPresent(manageTable);
+		}catch(CustomException e)
+		{
+			assertEquals(HttpStatusCode.INVALID_TABLE_NAME.getCode(), e.getExceptionCode());
+		}
+	}
+	
+	@Test
+	void updateSchemaNonExistingTable() {
+		setMockitoSuccessResponseForService();
+		try {
+			manageTableService.updateTableSchema(tenantId, tableName+"1230", newTableSchemaDTO);
+		}
+		catch(CustomException e)
+		{
+			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+		}
+	}
+	
+	@Test
+	void updateSchemaTableUnderDeletion() {
+		setMockitoSuccessResponseForService();
+		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
+		try {
+			manageTableService.updateTableSchema(tenantId, tableName, newTableSchemaDTO);
+		}
+		catch(CustomException e)
+		{
+			assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), e.getExceptionCode());
+		}
 	}
 	
 	
@@ -531,6 +587,7 @@ class ManageTableServiceTest {
 		}
 		
 	}
+
 	
 	@Test
 	void createTableIfNotPresentInvalidColumnName() {

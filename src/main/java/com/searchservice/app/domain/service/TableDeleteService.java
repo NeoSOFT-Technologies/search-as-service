@@ -11,13 +11,12 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
@@ -34,53 +33,52 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Value("${table-delete-duration.days}")
 	long tableDeleteDuration;
 
-	@Autowired
 	ManageTableServicePort manageTableServicePort;
 
-	public TableDeleteService(ManageTableServicePort manageTableServicePort) {
+	@Autowired
+	public TableDeleteService(@Lazy ManageTableServicePort manageTableServicePort) {
 		this.manageTableServicePort = manageTableServicePort;
 
 	}
-
+	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private static final String TABLE_DELETE_INITIALIZE_ERROR_MSG = "Error While Initializing Deletion For Table: {}";
-	private static final String TABLE_DELETE_UNDO_ERROR_MSG = "Undo Table Delete Failed , Invalid CLient ID Provided";
 	private static final String TABLE_FILE_CREATE_ERROR = "Error File Creating File {}";
 	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	
 	
 	@Override
 	public Response initializeTableDelete(int tenantId, String tableName) {
-
-		Response deleteRecordInsertionResponse = new Response();
-		String actualTableName = "";
-
-		if ((tenantId > 0) && (tableName != null && tableName.length() != 0)) {
-			File file = new File(deleteRecordFilePath);
-			checkIfTableDeleteFileExist(file);
-			try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
-				actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
-				String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate(formatter)
+      if(!isTableUnderDeletion(tableName)) {  	
+    	  if(manageTableServicePort.isTableExists(tableName)) {
+    		  Response deleteRecordInsertionResponse = new Response();
+    		  String actualTableName = "";
+    		  File file = new File(deleteRecordFilePath);
+    		  checkIfTableDeleteFileExist(file);
+    		  try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
+    			  actualTableName = tableName.substring(0, tableName.lastIndexOf("_"));
+    			  String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate(formatter)
 						+ "\n";
-				fw.write(newRecord);
-				fw.flush();
-				deleteRecordInsertionResponse.setStatusCode(200);
-				deleteRecordInsertionResponse
+    			  fw.write(newRecord);
+    			  fw.flush();
+    			  deleteRecordInsertionResponse.setStatusCode(200);
+    			  deleteRecordInsertionResponse
 						.setMessage("Table:" + actualTableName + " Having TenantID: "+tenantId+" is Successfully Initialized For Deletion ");
 
-			} catch (Exception e) {
-				logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName, e);
-				deleteRecordInsertionResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-				deleteRecordInsertionResponse
-						.setMessage("Error While Initializing Deletion For Table: " + actualTableName);
-			}
-		} else {
-			logger.debug(TABLE_DELETE_INITIALIZE_ERROR_MSG, actualTableName);
-			deleteRecordInsertionResponse.setStatusCode(400);
-			deleteRecordInsertionResponse.setMessage("Invalid Client ID or Table Name Provided");
+    		  } catch (Exception e) {
+    			  setIntializeDeleteExceptionResponse(e, tableName, deleteRecordInsertionResponse);
+    		  }
+    		  return deleteRecordInsertionResponse;
+    	  }
+    	  else {
+    		  throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "", HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
+    	  }
+         }else {
+        	 throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
-		return deleteRecordInsertionResponse;
 	}
 
 	@Override
@@ -130,19 +128,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 
 	@Override
 	public Response undoTableDeleteRecord(String tableName) {
-
-		Response performUndoDeleteResponse = new Response();
-
-		if (tableName != null) {
-
-			performUndoDeleteResponse = performUndoTableDeletion(tableName);
-		} else {
-			logger.debug(TABLE_DELETE_UNDO_ERROR_MSG);
-			performUndoDeleteResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			performUndoDeleteResponse.setMessage(TABLE_DELETE_UNDO_ERROR_MSG);
-		}
-
-		return performUndoDeleteResponse;
+	 if(isTableUnderDeletion(tableName)) {
+		return performUndoTableDeletion(tableName);
+	 }else {
+        	throw new CustomException(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(),HttpStatusCode.TABLE_NOT_UNDER_DELETION,
+        			String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], Integer.parseInt(tableName.split("_")[1]), "is ", HttpStatusCode.TABLE_NOT_UNDER_DELETION.getMessage()));
+        }
 	}
 
 	public Response performUndoTableDeletion(String tableName) {
@@ -218,11 +209,6 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public boolean checkTableExistensce(String tableName) {
-		return manageTableServicePort.isTableExists(tableName);
-	}
-
-	@Override
 	public boolean isTableUnderDeletion(String tableName) {
 		boolean res = false;
 		List<String> listofTablesUnderDeletion;
@@ -288,4 +274,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 			return false;
 		}
 	}
+	
+	public void setIntializeDeleteExceptionResponse(Exception e , String tableName, Response deleteRecordInsertionResponse) {
+		logger.error(TABLE_DELETE_INITIALIZE_ERROR_MSG, tableName, e);
+		deleteRecordInsertionResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
+		deleteRecordInsertionResponse
+				.setMessage("Error While Initializing Deletion For Table: " + tableName);
+	}
+
 }

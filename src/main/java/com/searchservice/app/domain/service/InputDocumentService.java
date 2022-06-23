@@ -28,22 +28,22 @@ public class InputDocumentService implements InputDocumentServicePort {
 
      @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
-	
+     
+    @Autowired
+  	public  ManageTableServicePort manageTableServicePort;
+  	
+  	@Autowired
+  	public TableDeleteServicePort tableDeleteServicePort;
+  	
  	@Autowired
- 	public  ManageTableServicePort manageTableServicePort;
- 	
- 	@Autowired
- 	public TableDeleteServicePort tableDeleteServicePort;
- 	
-	@Autowired
-	SearchJAdapter searchJAdapter;
+ 	SearchJAdapter searchJAdapter;
 
-	public InputDocumentService(ManageTableServicePort manageTableServicePort,
-			TableDeleteServicePort tableDeleteServicePort) {
-		this.manageTableServicePort = manageTableServicePort;
-		this.tableDeleteServicePort = tableDeleteServicePort;
+ 	public InputDocumentService(ManageTableServicePort manageTableServicePort,
+ 			TableDeleteServicePort tableDeleteServicePort) {
+ 		this.manageTableServicePort = manageTableServicePort;
+ 		this.tableDeleteServicePort = tableDeleteServicePort;
 
-	}
+ 	}
 	
 	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {		
 		if (response.isDocumentUploaded()) {
@@ -69,6 +69,15 @@ public class InputDocumentService implements InputDocumentServicePort {
 			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.UNDER_DELETION_PROCESS,
 					String.format("Table %s Having TenantID %s is %s", tableName.split("_")[0],
 							tableName.split("_")[1], HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		if (!isValidJsonArray(payload))
+			throw new CustomException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		
+		if (!manageTableServicePort.isTableExists(tableName)) {
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
+					HttpStatusCode.TABLE_NOT_FOUND, "Table "+tableName.split("_")[0]+" For Tenant ID: "+ tableName.split("_")[1]+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+		}
+		
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
@@ -123,15 +132,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 		}
-	}
-
-	
-	@Override
-	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
-		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
-		documentInjectionThrottlerResponse.setStatusCode(HttpStatusCode.TABLE_NOT_FOUND.getCode());
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
-    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
 }

@@ -2,9 +2,7 @@ package com.searchservice.app.rest.inputdocument;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -18,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
 import com.searchservice.app.domain.service.security.KeycloakUserPermission;
 import com.searchservice.app.domain.utils.security.SecurityUtil;
+
 
 @IntegrationTest
 @AutoConfigureMockMvc	//(addFilters = false)
@@ -63,20 +61,16 @@ class InputDocumentResourceTest {
 	public void setMockitoSucccessResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 		responseDTO.setStatusCode(200);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.anyBoolean(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
+		Mockito.when(inputDocumentService.performDocumentInjection(Mockito.anyBoolean(), Mockito.anyString(), 
+				   Mockito.anyString(), Mockito.any())).thenReturn(ResponseEntity.status(HttpStatus.OK).body(responseDTO));
 	}
 
 	public void setMockitoBadResponseForService() {
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 		responseDTO.setStatusCode(400);
-		Mockito.when(inputDocumentService.addDocuments(Mockito.anyBoolean(),Mockito.any(), Mockito.any())).thenReturn(responseDTO);
-		Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(true);
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		ResponseEntity<ThrottlerResponse> responseEntity = new ResponseEntity<ThrottlerResponse>(
-				HttpStatus.BAD_REQUEST);
-		Mockito.when(inputDocumentService.documentInjectWithInvalidTableName(tenantId, tableName)).thenReturn(responseEntity);
+		Mockito.when(inputDocumentService.performDocumentInjection(Mockito.anyBoolean(), Mockito.anyString(), 
+		   Mockito.anyString(), Mockito.any())).thenReturn(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDTO));
+	
 	}
 	
 	public void mockPreAuthorizedService() {
@@ -102,26 +96,15 @@ class InputDocumentResourceTest {
 			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-					.content(inputString))
-					.andExpect(status().isOk());
-			
-			TimeUnit.SECONDS.sleep(10);
+					.content(inputString)).
+			andExpect(status().isOk());
 			
 			setMockitoBadResponseForService();
-			Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
 			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt" + "/" + tableName+ "/?tenantId="+tenantId )
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 					.content(inputString))
-					.andExpect(status().isBadRequest());
-			
-			setMockitoBadResponseForService();
-			Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(false);
-			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest-nrt/" + "/" + tableName+ "/?tenantId="+tenantId )
-					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-					.content(inputString))
-					.andExpect(status().isBadRequest());
+			.andExpect(status().isBadRequest());
 		}
 	}
 
@@ -142,7 +125,7 @@ class InputDocumentResourceTest {
 			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(inputString)).andExpect(status().isOk());
+					.content(inputString)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 			
 			setMockitoBadResponseForService();
 			Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
@@ -151,15 +134,7 @@ class InputDocumentResourceTest {
 					.contentType(MediaType.APPLICATION_PROBLEM_JSON)
 					.content(inputString))
 					.andExpect(status().isBadRequest());
-			
-			TimeUnit.SECONDS.sleep(10);
-			setMockitoBadResponseForService();
-			Mockito.when(inputDocumentService.isValidJsonArray(Mockito.any())).thenReturn(false);
-			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/ingest/" + "/" + tableName+ "/?tenantId="+tenantId )
-					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-					.contentType(MediaType.APPLICATION_PROBLEM_JSON)
-					.content(inputString))
-					.andExpect(status().isBadRequest());
+		
 		}
 	}	
 	

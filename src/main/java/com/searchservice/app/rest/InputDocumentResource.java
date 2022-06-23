@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.ThrottlerServicePort;
 import com.searchservice.app.domain.service.InputDocumentService;
-import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -40,13 +37,11 @@ public class InputDocumentResource {
 
 	public final InputDocumentServicePort inputDocumentServicePort;
 	public final ThrottlerServicePort throttlerServicePort;
-	public final ManageTableServicePort manageTableServicePort;
 
 	public InputDocumentResource(InputDocumentServicePort inputDocumentServicePort,
-			ThrottlerServicePort throttlerServicePort, ManageTableServicePort manageTableServicePort) {
+			ThrottlerServicePort throttlerServicePort) {
 		this.inputDocumentServicePort = inputDocumentServicePort;
 		this.throttlerServicePort = throttlerServicePort;
-		this.manageTableServicePort = manageTableServicePort;
 
 	}
 
@@ -57,11 +52,6 @@ public class InputDocumentResource {
 	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
 	public ResponseEntity<ThrottlerResponse> addDocumentsNRT(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
-
-		if (!inputDocumentService.isValidJsonArray(payload))
-			throw new CustomException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
-					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, true);
@@ -71,11 +61,8 @@ public class InputDocumentResource {
 
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
 		tableName = tableName + "_" + tenantId;
-		if (manageTableServicePort.isTableExists(tableName)) {
-			return inputDocumentServicePort.performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
-		} else {
-			return inputDocumentServicePort.documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
-		}
+		return inputDocumentServicePort.performDocumentInjection(true,tableName, payload, documentInjectionThrottlerResponse);
+		
 	}
 
 	@RateLimiter(name = DOCUMENT_INJECTION_THROTTLER_SERVICE, fallbackMethod = "documentInjectionRateLimiterFallback")
@@ -84,11 +71,6 @@ public class InputDocumentResource {
 	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
 	public ResponseEntity<ThrottlerResponse> addDocumentsBatch(@RequestParam int tenantId, @PathVariable String tableName,
 			@RequestBody String payload) {
-
-		if (!inputDocumentService.isValidJsonArray(payload))
-			throw new CustomException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
-					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
-
 		// Apply RequestSizeLimiting Throttler on payload before service the request
 		ThrottlerResponse documentInjectionThrottlerResponse = throttlerServicePort
 				.documentInjectionRequestSizeLimiter(payload, false);
@@ -100,18 +82,12 @@ public class InputDocumentResource {
 		tableName = tableName + "_" + tenantId;
 		if (documentInjectionThrottlerResponse.getStatusCode() == HttpStatusCode.NOT_ACCEPTABLE_ERROR.getCode())
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(documentInjectionThrottlerResponse);
-
 		// Control will reach here ONLY IF REQUESTBODY SIZE IS UNDER THE SPECIFIED LIMIT
-		if (manageTableServicePort.isTableExists(tableName)) {
-			return inputDocumentServicePort.performDocumentInjection(false, tableName, payload, documentInjectionThrottlerResponse);
-		} else {
-			return inputDocumentServicePort.documentInjectWithInvalidTableName(tenantId, tableName.split("_")[0]);
-		}
+		return inputDocumentServicePort.performDocumentInjection(false, tableName, payload, documentInjectionThrottlerResponse);
 	}
 
 	// Rate Limiter(Throttler) FALLBACK method
-	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(int tenantId, String tableName,
-			String payload, RequestNotPermitted exception) {
+	public ResponseEntity<ThrottlerResponse> documentInjectionRateLimiterFallback(RequestNotPermitted exception) {
 		log.error("Max request rate limit fallback triggered. Exception: ", exception);
 
 		// prepare Rate Limiting Response DTO

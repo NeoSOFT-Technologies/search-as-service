@@ -94,6 +94,13 @@ class TableDeleteServiceTest {
 		ReflectionTestUtils.setField(tableDeleteService,"tableDeleteDuration",tableDurationDays);
 	}
 	
+	void setMockitoTableExisits() {
+		 Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
+	}
+	
+	void setMockitoTableNotExists() {
+		 Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
+	}
 	@Test
 	void testTableDeletion() {
 		
@@ -108,36 +115,55 @@ class TableDeleteServiceTest {
 	}
 	
 	void intializeTableforTesting() {
+		setMockitoTableExisits();
 		tableDeleteService.initializeTableDelete(101, "TestTable_101");
 	}
 	
 	@Test
-	void testTableDeleteInitializeInvalid() {
-		
+	@Order(1)
+	void testInitializeDeleteNonExistingTable() {
+		//intializeTableforTesting();
 		logger.info("Table Delete Intialization test cases getting executed..");
 		// For Valid Client ID and Table Name
+		setMockitoTableNotExists();
+		try {
+			tableDeleteService.initializeTableDelete(101, "Testing_103");
+		}catch(CustomException e) {
+			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+		}
 
-		// Checking With CLient ID as 0
-		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), tableDeleteService.initializeTableDelete(0, "Testing1_0").getStatusCode());
-
-		// Checking With Table Name as Null
-		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), tableDeleteService.initializeTableDelete(101, "").getStatusCode());
 
 	}
 	
 	@Test
 	void testTableDeleteInitializeValid() {
-		
-		assertEquals(200, tableDeleteService.initializeTableDelete(101, "Testing_101").getStatusCode());
+		setMockitoTableExisits();
+		assertEquals(200, tableDeleteService.initializeTableDelete(101, "Testing_103").getStatusCode());
 
 	}
 	
 	@Test
-	void testTableDeleteInitializeInvalidFile() {
-		ReflectionTestUtils.setField(tableDeleteService,"deleteRecordFilePath",deleteRecordFilePath+"/Testing");
-		assertEquals(400, tableDeleteService.initializeTableDelete(101, "Testing_101").getStatusCode());
+	void testTableDeleteInitializeBadRequest() {
+		setMockitoTableExisits();
+		assertEquals(400, tableDeleteService.initializeTableDelete(101, "Testing23").getStatusCode());
 
 	}
+	
+	@Test
+	void testInitializeTableUnderDeletion() {
+		try {
+			tableDeleteService.initializeTableDelete(101, "Testing_101");
+		}catch(CustomException e) {
+			assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), e.getExceptionCode());
+		}
+
+	}
+	
+//	void testTableDeleteInitializeInvalidFile() {
+//		ReflectionTestUtils.setField(tableDeleteService,"deleteRecordFilePath",deleteRecordFilePath+"/Testing");
+//		assertEquals(400, tableDeleteService.initializeTableDelete(101, "Testing_101").getStatusCode());
+//
+//	}
 
 	@Test
 	void getUndoResponseTest() {
@@ -214,7 +240,20 @@ class TableDeleteServiceTest {
 	@Test
      void testTableDeletionUndoBadRequest() {
 			//Checking For Invalid Table Name As Empty String 
-			assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), tableDeleteService.undoTableDeleteRecord(null).getStatusCode());
+		try {
+			tableDeleteService.undoTableDeleteRecord("Testing_108");
+		}catch(CustomException e) {
+			assertEquals(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(), e.getExceptionCode());
+		}
+					
+	}
+	
+	@Test
+    void testTableDeletionUndoSuccess() {
+			//Checking For Invalid Table Name As Empty String 
+		intializeTableforTesting();
+		Response undoResponse = tableDeleteService.undoTableDeleteRecord("TestTable_101");
+		assertEquals(200 , undoResponse.getStatusCode());
 					
 	}
 	
@@ -225,13 +264,6 @@ class TableDeleteServiceTest {
 	}
 	
 	@Test
-	void isTableExsist() {
-		Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
-		boolean b = tableDeleteService.checkTableExistensce("Testing101");
-		assertTrue(b);
-	}
-
-	@Test
 	void performUndoTableDeletionSuccess() {
 		intializeTableforTesting();
 		Response undoResponse =tableDeleteService.performUndoTableDeletion("TestTable_101");
@@ -241,7 +273,7 @@ class TableDeleteServiceTest {
 	
 	@Test
 	void performUndoTableDeletionBadRequest() {
-		Response undoResponse =tableDeleteService.performUndoTableDeletion("TestTable_101");
+		Response undoResponse = tableDeleteService.performUndoTableDeletion("TestTing_101");
 		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),undoResponse.getStatusCode());
 	}
 	
@@ -257,13 +289,18 @@ class TableDeleteServiceTest {
 		 }while(false);
 	}
 	
-	@AfterAll
-	@Order(1)
-	void getTableUndeDeletionTestInvalid() {
-		testTableDeleteInitializeInvalidFile();
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
-		Assertions.assertEquals(400, tableUnderDeletion.getStatusCode());
-	}
+//	@AfterAll
+//	@Order(1)
+//	 public void setInvalidDeleteFile() {
+//		testTableDeleteInitializeInvalidFile();
+//	}
+//	@AfterAll
+//	@Order(1)
+//	void getTableUndeDeletionTestInvalid() {
+//		testTableDeleteInitializeInvalidFile();
+//		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
+//		Assertions.assertEquals(400, tableUnderDeletion.getStatusCode());
+//	}
 	
 	@AfterAll
 	@Order(2)
