@@ -150,7 +150,7 @@ public class ManageTableResource {
 			
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion"));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion For TenantID: {}",tenantId));
 		}
 	}
 
