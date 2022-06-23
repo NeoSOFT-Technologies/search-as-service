@@ -130,6 +130,29 @@ public class ManageTableResource {
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion"));
 		}
 	}
+	
+	@GetMapping("/deletion")
+	@Operation(summary = "GET ALL THE TABLES UNDER DELETION WITH TENANT ID", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
+	public ResponseEntity<Response> getALLTablesUnderDeletionByTenantId(@RequestParam int tenantId, @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "6") int pageSize) {
+
+		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTableUnderDeletionWithTenantId(tenantId);
+		if (getDeleteTableListResponseDTO == null)
+			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		if (getDeleteTableListResponseDTO.getStatusCode() == 200) {
+			List<String> existingTablesList = getDeleteTableListResponseDTO.getData();
+			getDeleteTableListResponseDTO.setTableList(ManageTableUtil.getPaginatedTableList(existingTablesList, pageNumber, pageSize));
+			getDeleteTableListResponseDTO.setData(null);
+			getDeleteTableListResponseDTO.setDataSize(existingTablesList.size());
+			return ResponseEntity.status(HttpStatus.OK).body(getDeleteTableListResponseDTO);
+			
+		} else {
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables Under Deletion"));
+		}
+	}
 
 	@GetMapping("/{tableName}")
 	@Operation(summary = "GET SCHEMA OF A TABLE.", security = @SecurityRequirement(name = "bearerAuth"))

@@ -25,5 +25,7 @@ public interface TableDeleteServicePort {
 	public Response getTableUnderDeletion(boolean forDeleteTableList);
 
 	public boolean checkIfTableDeleteFileExist(File file);
+	
+	Response getTableUnderDeletionWithTenantId(int tenantId);
 
 }

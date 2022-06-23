@@ -256,6 +256,37 @@ public class TableDeleteService implements TableDeleteServicePort {
 		}
 		return deleteTablesResponse;
 	}
+	
+	@Override
+	public Response getTableUnderDeletionWithTenantId(int tenantId) {
+		Response deleteTablesByTenantIdResponse = new Response();
+		List<String> tableUnderDeletionList = new ArrayList<>();
+		File existingFile = new File(deleteRecordFilePath);
+		checkIfTableDeleteFileExist(existingFile);
+		int lineNumber = 0;
+		try (FileReader fr = new FileReader(existingFile); BufferedReader br = new BufferedReader(fr);) {
+			String st;
+			while ((st = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					int deleteTableTenantId = Integer.parseInt(st.split(",")[0]);
+					if(tenantId == deleteTableTenantId) {
+						tableUnderDeletionList.add(st.split(",")[1]);
+					}										
+				}
+				lineNumber++;
+			}
+			deleteTablesByTenantIdResponse.setStatusCode(200);
+			deleteTablesByTenantIdResponse.setData(tableUnderDeletionList);
+			deleteTablesByTenantIdResponse.setMessage("Successfully Retrieved All Tables Under Deletion For TenantId: "+tenantId);
+			
+		}
+		catch (Exception e) {
+			deleteTablesByTenantIdResponse.setStatusCode(400);
+			logger.error("Some Error Occured While Getting Table's Under Deletion For TenantId  "+tenantId, e);
+			
+		}
+		return deleteTablesByTenantIdResponse;
+	}
 
 	@Override
 	public boolean checkIfTableDeleteFileExist(File file) {
