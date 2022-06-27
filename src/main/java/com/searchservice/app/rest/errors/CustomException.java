@@ -1,27 +1,18 @@
 package com.searchservice.app.rest.errors;
 
-import org.springframework.stereotype.Component;
-
-import com.searchservice.app.domain.utils.HttpStatusCode;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Component
 public class CustomException extends RuntimeException{
 
 		private static final long serialVersionUID = 1L;
-		private int exceptionCode;
-		private HttpStatusCode status;
-		private String exceptionMessage;
-		
-		
-		
+		private final int exceptionCode;
+		private final HttpStatusCode status;
+		private final String exceptionMessage;
+
 	}
 

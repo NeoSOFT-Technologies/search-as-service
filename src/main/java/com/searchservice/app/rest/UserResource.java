@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.user.User;
 import com.searchservice.app.domain.port.api.UserServicePort;
@@ -25,7 +24,7 @@ public class UserResource {
     }
 	
 	@PostMapping
-    @Operation(summary = "/ GET AUTHORIZED TOKEN BY PROVIDING USERNAME AND PASSWORD ")
+    @Operation(summary = "GET AUTHORIZED TOKEN BY PROVIDING USERNAME AND PASSWORD ")
     public ResponseEntity<Response> getToken(@RequestBody User userDTO) {
         Response responseDTO = userServicePort.getToken(userDTO);
         if(responseDTO.getStatusCode()==200){

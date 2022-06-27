@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8083
 
 spring:
   profiles:
@@ -13,7 +13,15 @@ authentication:
   realmName: master
   keyUrl: https://iam-keycloak.neosofttech.com/auth/realms/
 
+# InMemoryCache configs
 cache-name: publicKeyCacheIngress
+user-cache:
+  name: userPermissionCacheIngress
+  key: userPermissions
+  view: viewPermission
+  create: createPermission
+  edit: editPermission
+  delete: deletePermission
 
 schedular-durations:
    public-key-update: 300000

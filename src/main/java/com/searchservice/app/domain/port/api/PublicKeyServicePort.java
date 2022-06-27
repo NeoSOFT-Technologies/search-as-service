@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface PublicKeyServicePort {
-	String retirevePublicKey(String realmName);
+	String retrievePublicKey(String realmName);
 	boolean checkIfPublicKeyExistsInCache();
+
 }
+

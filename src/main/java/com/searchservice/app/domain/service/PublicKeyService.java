@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import com.searchservice.app.config.AuthConfigProperties;
 import com.searchservice.app.domain.port.api.PublicKeyServicePort;
 
@@ -31,11 +32,12 @@ public class PublicKeyService implements PublicKeyServicePort{
 	private CacheManager cacheManager;
 	
 	@Nullable
-	Cache cache;
+	private Cache cache;
+
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")
-	public String retirevePublicKey(String realmName) {
+	public String retrievePublicKey(String realmName) {
 		log.info("Adding Public Key Value in Cache for Realm: {}", realmName);
 		return getPublicKeyFromServer(realmName);
 	}
@@ -50,8 +52,8 @@ public class PublicKeyService implements PublicKeyServicePort{
 		String publicKey = "";
 		try {
 			log.debug("Obtaining Public Key Value For Realm: {}",realmName);
-			ResponseEntity<String> result = restTemplate.getForEntity(authConfigProperties.getKeyUrl()
-					+ realmName, String.class);
+			ResponseEntity<String> result = restTemplate.getForEntity(
+					authConfigProperties.getKeyUrl() + realmName, String.class);
 			JSONObject obj = new JSONObject(result.getBody());
 			if (obj.has("public_key")) {
 				publicKey = obj.getString("public_key");
@@ -66,15 +68,14 @@ public class PublicKeyService implements PublicKeyServicePort{
 	@Override
 	public boolean checkIfPublicKeyExistsInCache() {
 		boolean isPublicKeyPresent = false;
+
 		String realmName = authConfigProperties.getRealmName();
-	    cache = cacheManager.getCache("${cache-name}");
-	    if(cache!=null && cache.get(authConfigProperties.getRealmName())!=null) {
-				log.debug("Public Key Found in Cache For Realm: {}",realmName);
+		cache = cacheManager.getCache("${cache-name}");
+	    if(cache!=null && cache.get(realmName)!=null) {
+				log.debug("Public Key Found in Cache For Realm: {}", realmName);
 				updatePublicKey(realmName);
 				isPublicKeyPresent = true;
 	    }
 		return isPublicKeyPresent;
 	}
-	
-	
 }

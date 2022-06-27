@@ -13,35 +13,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.InputDocumentServicePort;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.utils.HttpStatusCode;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.UploadDocumentUtil;
+import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 
 @Service
 public class InputDocumentService implements InputDocumentServicePort {
 	
 
 	@Value("${base-search-url}")
-	private String searchNonStatic;
-	// Init configurations
-	private  static String searchURL;
+	private String searchURL;
 
      @Autowired
 	UploadDocumentUtil uploadDocumentUtil;
-	
- 	@Autowired
- 	public  ManageTableServicePort manageTableServicePort;
      
-	@Autowired
-	public InputDocumentService(@Value("${base-search-url}") String solrURLNonStatic) {
-		searchURL = solrURLNonStatic;
-	}
+    @Autowired
+  	public  ManageTableServicePort manageTableServicePort;
+  	
+  	@Autowired
+  	public TableDeleteServicePort tableDeleteServicePort;
+  	
+ 	@Autowired
+ 	SearchJAdapter searchJAdapter;
 
-	public InputDocumentService(ManageTableServicePort manageTableServicePort) {
-		this.manageTableServicePort = manageTableServicePort;
+ 	public InputDocumentService(ManageTableServicePort manageTableServicePort,
+ 			TableDeleteServicePort tableDeleteServicePort) {
+ 		this.manageTableServicePort = manageTableServicePort;
+ 		this.tableDeleteServicePort = tableDeleteServicePort;
 
-	}
-
+ 	}
 	
 	private void documentUploadResponse(ThrottlerResponse responseDTO, UploadDocumentUtil.UploadDocumentSearchUtilRespnse response) {		
 		if (response.isDocumentUploaded()) {
@@ -63,8 +65,19 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ThrottlerResponse addDocuments(boolean isNRT,String tableName, String payload) {
 
-		if (!manageTableServicePort.isTableExists(tableName))
-			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,tableName.split("_")[0] + " table doesn't exist");
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName))
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),HttpStatusCode.UNDER_DELETION_PROCESS,
+					String.format("Table %s Having TenantID %s is %s", tableName.split("_")[0],
+							tableName.split("_")[1], HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		if (!isValidJsonArray(payload))
+			throw new CustomException(HttpStatusCode.INVALID_JSON_INPUT.getCode(),
+					HttpStatusCode.INVALID_JSON_INPUT,HttpStatusCode.INVALID_JSON_INPUT.getMessage());
+		
+		if (!manageTableServicePort.isTableExists(tableName)) {
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),
+					HttpStatusCode.TABLE_NOT_FOUND, "Table "+tableName.split("_")[0]+" For Tenant ID: "+ tableName.split("_")[1]+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
+		}
+		
 		ThrottlerResponse responseDTO = new ThrottlerResponse();
 
 		// CODE COMES HERE ONLY AFTER IT'S VERIFIED THAT THE PAYLOAD AND THE SCHEMAARE
@@ -94,7 +107,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 				return false;
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-			// JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 			objectMapper.readTree(jsonString);
 		} catch (JsonProcessingException ex) {
 			valid = false;
@@ -106,6 +118,9 @@ public class InputDocumentService implements InputDocumentServicePort {
 	@Override
 	public ResponseEntity<ThrottlerResponse> performDocumentInjection(boolean isNrt, String tableName, String payload,
 			ThrottlerResponse documentInjectionThrottlerResponse) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		ThrottlerResponse documentInjectionResponse = addDocuments(isNrt, tableName, payload);
 
 		documentInjectionThrottlerResponse.setMessage(documentInjectionResponse.getMessage());
@@ -117,15 +132,6 @@ public class InputDocumentService implements InputDocumentServicePort {
 
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 		}
-	}
-
-	
-	@Override
-	public ResponseEntity<ThrottlerResponse> documentInjectWithInvalidTableName(int tenantId, String tableName){
-		ThrottlerResponse documentInjectionThrottlerResponse= new ThrottlerResponse();
-		documentInjectionThrottlerResponse.setStatusCode(HttpStatusCode.TABLE_NOT_FOUND.getCode());
-    	documentInjectionThrottlerResponse.setMessage("Table "+tableName+" For Tenant ID: "+tenantId+ " "+ HttpStatusCode.TABLE_NOT_FOUND.getMessage());
-    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(documentInjectionThrottlerResponse);
 	}
 
 }
