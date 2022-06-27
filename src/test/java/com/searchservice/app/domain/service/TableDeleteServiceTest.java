@@ -49,6 +49,7 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
         }
 )
 class TableDeleteServiceTest {
+	
 
 	@Value("${table-delete-duration.days}")
 	long tableDurationDays;
@@ -186,6 +187,14 @@ class TableDeleteServiceTest {
 	@Test
 	void getTableUndeDeletionTest() {
 		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
+		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
+	}
+	
+	
+
+	@Test
+	void getTableUndeDeletionByTenantIdTest() {
+		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletionWithTenantId(101);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 	
