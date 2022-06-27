@@ -1,8 +1,6 @@
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
-
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -17,7 +15,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -34,20 +31,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.CreateTable;
-import com.searchservice.app.domain.dto.table.SchemaLabel;
-import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.ManageTable;
+import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.SchemaLabel;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
+import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
 import com.searchservice.app.domain.utils.BasicUtil;
-import com.searchservice.app.domain.utils.HttpStatusCode;
 import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
@@ -56,7 +52,9 @@ import com.searchservice.app.domain.utils.TableSchemaParserUtil;
 import com.searchservice.app.domain.utils.TypeCastingUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.searchservice.app.rest.errors.OperationIncompleteException;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -75,8 +73,11 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String SCHEMA_UPDATE_SUCCESS = "Schema is updated successfully";
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
+	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
-	private   SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+	
+	private static final String COLLECTIONS = "collections";
 	@Value("${base-search-url}")
 
 	private String searchNonStatic;
@@ -121,6 +122,9 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SearchAPIPort searchAPIPort;
 
+    @Autowired
+    TableDeleteServicePort tableDeleteServicePort;
+    
 	@Autowired
 	SearchJAdapter searchJAdapter;
 
@@ -133,11 +137,14 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response getTables(int tenantId) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
 
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"),
+		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
 				tenantId);
 
 		try {
@@ -145,12 +152,12 @@ public class ManageTableService implements ManageTableServicePort {
 
 			getListItemsResponseDTO.setData(data);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all tables");
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables Having TenantID: "+tenantId);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			getListItemsResponseDTO.setMessage("Unable to retrieve tables");
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for TenantID: "+tenantId);
 
 		}
 
@@ -158,12 +165,34 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
+	public Response getAllTables(int pageNumber, int pageSize) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
+		Response getAllTableListResposnse = new Response();
+		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
+        List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+        getAllTableListResposnse.setData(data);
+        getAllTableListResposnse.setStatusCode(200);
+        getAllTableListResposnse.setMessage("Successfully retrieved all Tables From The Server");
+        return getAllTableListResposnse;
+	}
+	
+	@Override
 	public TableSchema getCurrentTableSchema(int tenantId, String tableName) {
 
+		searchJAdapter.checkIfSearchServerDown();
+		
 		if (!isTableExists(tableName + "_" + tenantId))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName + " having TenantID: " + tenantId +" "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
 
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName + "_"+ tenantId)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format(TABLE_RESPONSE_MSG, tableName, tenantId, " is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
+		
 		// GET tableSchema at Search cloud
 		TableSchema tableSchema = getTableSchema(tableName + "_" + tenantId);
 
@@ -176,12 +205,23 @@ public class ManageTableService implements ManageTableServicePort {
 		return schemaResponse;
 	}
 
+
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
+		searchJAdapter.checkIfSearchServerDown();
+		String tableName = createTableDTO.getTableName().split("_")[0];
+		if(checkIfTableNameisValid(tableName)) {
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + tableName + " is Provided");
+		}
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table With Same Name %s %s%s", tableName,"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
-					TABLE + createTableDTO.getTableName().split("_")[0] + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
+					TABLE + tableName + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
 							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
         
 		if(!isColumnNameValid(createTableDTO.getColumns())) {
@@ -215,6 +255,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response deleteTable(String tableName) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
 		if (!isTableExists(tableName))
 			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(),HttpStatusCode.TABLE_NOT_FOUND,
 					TABLE + tableName.split("_")[0] + " having TenantID: " + tableName.split("_")[1] + " "+HttpStatusCode.TABLE_NOT_FOUND.getMessage());
@@ -239,6 +282,20 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response updateTableSchema(int tenantId, String tableName, ManageTable tableSchemaDTO) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
+		if (!isTableExists(tableName + "_" + tenantId)) {
+			throw new CustomException(HttpStatusCode.TABLE_NOT_FOUND.getCode(), HttpStatusCode.TABLE_NOT_FOUND,
+					String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0], tenantId, "",
+							HttpStatusCode.TABLE_NOT_FOUND.getMessage()));
+		}
+		
+		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS, String.format(TABLE_RESPONSE_MSG, tableName.split("_")[0],
+							tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
 		Response apiResponseDTO = new Response();
 
 		// Compare tableSchema locally Vs. tableSchema at solr cloud
@@ -270,7 +327,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		try {
 			CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get("collections"));
+			List<String> allTables = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
 			return allTables.contains(tableName);
 		} catch (Exception e) {
 			logger.error(e.toString());
@@ -278,9 +335,10 @@ public class ManageTableService implements ManageTableServicePort {
 					&& (HttpHostConnectException) e.getCause() instanceof HttpHostConnectException)
 				throw new CustomException(HttpStatusCode.SERVER_UNAVAILABLE.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION,
 						"Could not connect to Solr server");
-			else
+			else {
 				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-						HttpStatusCode.BAD_REQUEST_EXCEPTION, "Table Search operation could not be completed");
+						HttpStatusCode.BAD_REQUEST_EXCEPTION, "Connection Refused by the Backend Server!!");
+			}
 		}
 	}
 
@@ -401,9 +459,10 @@ public class ManageTableService implements ManageTableServicePort {
 
 	@Override
 	public Response addSchemaFields(ManageTable newTableSchemaDTO) {
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
-
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(
+				searchURL,
 				newTableSchemaDTO.getTableName());
+
 		SchemaRequest schemaRequest = new SchemaRequest();
 		Response tableSchemaResponseDTO = new Response();
 

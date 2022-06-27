@@ -3,6 +3,7 @@ package com.searchservice.app.domain.port.api;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
@@ -12,6 +13,7 @@ import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 
 @Component
+@Repository
 public interface ManageTableServicePort {
 
 	/*
@@ -20,7 +22,9 @@ public interface ManageTableServicePort {
 	// GET request
 
 	CapacityPlanResponse capacityPlans();
-
+	
+	Response getAllTables(int startRecord, int pageSize);
+	
 	Response getTables(int tenantId);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);
@@ -37,7 +41,6 @@ public interface ManageTableServicePort {
 	/*
 	 * Auxiliary TableServices
 	 */
-
 	boolean isTableExists(String tableName);
 
 	TableSchema getTableSchema(String tableName);

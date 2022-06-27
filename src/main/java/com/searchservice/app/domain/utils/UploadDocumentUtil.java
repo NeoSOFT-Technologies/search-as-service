@@ -2,12 +2,12 @@ package com.searchservice.app.domain.utils;
 
 import java.io.IOException;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import com.searchservice.app.rest.errors.CustomException;
+import com.searchservice.app.rest.errors.HttpStatusCode;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -65,7 +65,7 @@ public class UploadDocumentUtil {
 			}
 		} catch (IOException e) {
 			log.error(e.toString());
-			return new UploadDocumentSearchUtilRespnse(true, "Document upload operation completed.");
+			return new UploadDocumentSearchUtilRespnse(true, "Document not uploaded! Something went wrong");
 		}
 	}
 

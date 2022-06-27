@@ -5,6 +5,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.searchservice.app.domain.filter.ResourcesAuthorizationFilter;
 import com.searchservice.app.domain.filter.ThrottlerFilterBatch;
 import com.searchservice.app.domain.filter.ThrottlerFilterNRT;
 
@@ -16,6 +17,9 @@ public class FilterConfig {
 	
 	@Autowired
 	ThrottlerFilterBatch throttlerFilterBatch;
+	
+	@Autowired
+	ResourcesAuthorizationFilter resourcesAuthorizationFilter;
 	
 	@Bean
 	public FilterRegistrationBean<ThrottlerFilterNRT> registrationBeanNRT() {
@@ -39,4 +43,17 @@ public class FilterConfig {
 		
 		return registrationBean;
 	}
+	
+	
+	@Bean
+	public FilterRegistrationBean<ResourcesAuthorizationFilter> registrationBeanResourcesAuthorization() {
+		
+		FilterRegistrationBean<ResourcesAuthorizationFilter> registrationBean = new FilterRegistrationBean<>();
+		
+		registrationBean.setFilter(resourcesAuthorizationFilter);
+		registrationBean.addUrlPatterns("/api/v1/*");
+		
+		return registrationBean;
+	}
+
 }

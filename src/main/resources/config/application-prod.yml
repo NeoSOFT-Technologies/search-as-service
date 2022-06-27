@@ -5,7 +5,6 @@ base-search-url: http://${SOLR_CONTAINER_NAME:localhost}:8983/solr
 base-token-url: https://iam-dev.neosofttech.com/api/login
 #================================================================
 
-
 #================================================================
 #Logger
 logging:
@@ -71,8 +70,8 @@ capacity-plan:
 # Throttler configurations
 throttler:
   maxRequestSizeLimiter:
-    maxAllowedRequestSizeNRT: 10kB
-    maxAllowedRequestSizeBatch: 100kB
+    maxAllowedRequestSizeNRT: ${MAX_ALLOWED_REQUEST_SIZE_NRT:10kB}
+    maxAllowedRequestSizeBatch: ${MAX_ALLOWED_REQUEST_SIZE_BATCH:1000kB}
 resilience4j.ratelimiter:
   instances:
     documentInjectionRateLimitThrottler:
@@ -137,3 +136,5 @@ table-schema-attributes:
   delete-file-path: DeletedRecordFiles/SchemaDeleteRecord.csv
   days: 15
 #=================================================================
+cors:
+  header-value: "*"

@@ -1,10 +1,7 @@
 package com.searchservice.app.domain.port.api;
 
 import java.io.File;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
-
 import com.searchservice.app.domain.dto.Response;
 
 @Component
@@ -23,13 +20,12 @@ public interface TableDeleteServicePort {
 	// To Check Status of Table Deletion Process
 	public boolean checkTableDeletionStatus(int deleteRecordCount);
 
-	// To Check if a Table Exist or Not Before Deletion
-	public boolean checkTableExistensce(String tableName);
-
 	public boolean isTableUnderDeletion(String tableName);
 
-	public List<String> getTableUnderDeletion();
+	public Response getTableUnderDeletion(boolean forDeleteTableList);
 
 	public boolean checkIfTableDeleteFileExist(File file);
+	
+	Response getTableUnderDeletionWithTenantId(int tenantId);
 
 }

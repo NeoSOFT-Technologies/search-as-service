@@ -143,9 +143,6 @@ public class AspectConfig {
 		} else {
 			log.info("Error While Initializing Deletion For Table: {}", tableName);
 		}
-
 	}
-
-	
 
 }
