@@ -80,6 +80,7 @@ public class ManageTableUtil {
 
 		// Extract No. of shards
 		JSONObject shardsObject = myCollectionObject.getJSONObject("shards");
+		
 		int shardsCounter = 1;
 		int noOfShards = 0;
 		JSONObject shardJsonTemp = shardsObject.getJSONObject("shard"+shardsCounter);

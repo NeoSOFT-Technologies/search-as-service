@@ -79,6 +79,25 @@ public class SearchJAdapter {
 
 	}
 	
+	// testing
+	public CollectionAdminResponse getCollectionAdminResponseProperties(HttpSolrClient searchClientActive) {
+		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
+		CollectionAdminResponse response = null;
+
+		try {
+			response = request.process(searchClientActive);
+			
+			
+
+		} catch (SolrServerException | IOException e) {
+			logger.error(e.getMessage());
+		} finally {
+			SearchUtil.closeSearchClientConnection(searchClientActive);
+		}
+		return response;
+
+	}
+	
 	
 	public String getClusterStatusFromSolrjCluster(HttpSolrClient searchClientActive) {
 
@@ -156,7 +175,13 @@ public class SearchJAdapter {
 	public void createTableInSolrj(CollectionAdminRequest.Create request, HttpSolrClient searchClientActive) {
 
 		try {
-			request.process(searchClientActive);
+			CollectionAdminResponse resp = request.process(searchClientActive);
+			
+			Map<String, Map<String, String>> map = resp.getAliasProperties();
+			
+			System.out.println("prop map @@@@@@@@@@ >>> "+map);
+			
+			
 		} catch (SolrServerException | IOException e) {
 			logger.error(e.getMessage());
 

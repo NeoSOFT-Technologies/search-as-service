@@ -7,11 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.KeyStore.Entry;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -441,6 +443,16 @@ public class ManageTableService implements ManageTableServicePort {
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
+		
+		// testing
+		Properties oldProps = request.getProperties();
+		System.out.println("oldProps >>> "+oldProps);
+		
+		request.setProperties(Map.of("tenantName", "Tenant-9911"));
+		
+		Properties newProps = request.getProperties();
+		System.out.println("newProps >>> "+newProps);
+		
 		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
