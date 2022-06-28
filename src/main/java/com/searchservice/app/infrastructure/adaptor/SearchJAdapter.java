@@ -2,6 +2,7 @@ package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
@@ -56,6 +59,9 @@ public class SearchJAdapter {
 	@Autowired
 	private SearchAPIAdapter searchAPIAdapter;
 	
+	@Autowired
+	RestTemplate restTemplate;
+	
 	
 	public CollectionAdminResponse getCollectionAdminRequestList(HttpSolrClient searchClientActive) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
@@ -74,19 +80,23 @@ public class SearchJAdapter {
 	}
 	
 	
-	public CollectionAdminResponse getTableDetailsFromSolrjCluster(HttpSolrClient searchClientActive) {
+	public String getClusterStatusFromSolrjCluster(HttpSolrClient searchClientActive) {
 
-		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
-		CollectionAdminResponse response = null;
+		ResponseEntity<String> response = null;
+		String clusterStatusResponseString = null;
 		try {
-			response = clusterStatus.process(searchClientActive);
-		} catch (SolrServerException | IOException e) {
-			logger.error(e.getMessage());
+			String url = "http://localhost:8983/solr/admin/collections?action=CLUSTERSTATUS";
+			response = restTemplate.getForEntity(new URI(url), String.class);
+			
+			clusterStatusResponseString = response.getBody();
+
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching cluster status: ", e);
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 
-		return response;
+		return clusterStatusResponseString;
 	}
 	
 	

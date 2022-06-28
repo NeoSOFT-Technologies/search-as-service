@@ -22,6 +22,7 @@ public class TableSchema extends BaseResponse {
 	@NoArgsConstructor
 	public static class TableSchemaData {
 		private String tableName;
+		private TableInfo tableInfo;
 		private List<SchemaField> columns;
 
 		public String getTableName() {

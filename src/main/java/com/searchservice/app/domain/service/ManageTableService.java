@@ -40,6 +40,7 @@ import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.SchemaLabel;
+import com.searchservice.app.domain.dto.table.TableInfo;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
@@ -192,12 +193,14 @@ public class ManageTableService implements ManageTableServicePort {
 		// Compare tableSchema locally Vs. tableSchema at Search cloud
 		TableSchema schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(tableName, tenantId,
 				tableSchema);
-		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream()
-				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
+		schemaResponse.getData().setColumns(
+				schemaResponse.getData().getColumns()
+				.stream()
+				.filter(s -> !s.getName().startsWith("_"))
+				.collect(Collectors.toList()));
 
 		return schemaResponse;
 	}
-
 
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
@@ -301,6 +304,21 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	@Override
+	public TableInfo getTableDetails(String tableName) {
+		
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
+		TableInfo tableInfo = new TableInfo();
+		try {
+			String clusterStatusResponseString = searchJAdapter.getClusterStatusFromSolrjCluster(searchClientActive);
+			tableInfo = ManageTableUtil.getTableInfoFromClusterStatus(clusterStatusResponseString, tableName);			
+		} catch(Exception e) {
+			logger.error("Error occurred while fetching table details: ", e);
+		}
+		
+		return tableInfo;
+	}
+	
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
 	@Override
 	public boolean isTableExists(String tableName) {
@@ -345,6 +363,7 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaAttributesToSkipNames.add(dto.getName());
 		}
 		data.setColumns(schemaAttributesFinal);
+		data.setTableInfo(tableSchema.getData().getTableInfo());
 		tableSchema.setData(data);
 
 		return tableSchema;
@@ -358,7 +377,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
 		try {
 			SchemaResponse schemaResponse = searchJAdapter.getSchemaFields(searchClientActive);
-
+			
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			tableSchemaResponseDTO.setStatusCode(200);
 
@@ -380,10 +399,14 @@ public class ManageTableService implements ManageTableServicePort {
 				solrSchemaFieldDTOs.add(solrFieldDTO);
 
 			}
+			
+			// Get TableInfo
+			TableInfo tableInfo = getTableDetails(tableName);
 
-			// prepare response dto
+			// Prepare response dto
 			data.setTableName(tableName.split("_")[0]);
 			data.setColumns(solrSchemaFieldDTOs);
+			data.setTableInfo(tableInfo);
 			tableSchemaResponseDTO.setData(data);
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");

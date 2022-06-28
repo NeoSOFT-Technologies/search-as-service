@@ -267,5 +267,5 @@ public class ManageTableResource {
 							tenantId, "is ", HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 	}
-
+	
 }

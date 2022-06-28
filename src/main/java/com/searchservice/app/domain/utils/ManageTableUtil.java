@@ -6,8 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableInfo;
 
 public class ManageTableUtil {
 	private ManageTableUtil() {}
@@ -66,6 +70,33 @@ public class ManageTableUtil {
 			}
 		}
 		return newFieldsHashMap;
+	}
+	
+	public static TableInfo getTableInfoFromClusterStatus(String clusterStatusResponseString, String tableName) {
+		JSONObject clusterStatusJson = new JSONObject(clusterStatusResponseString);
+		JSONObject clusterObject = clusterStatusJson.getJSONObject("cluster");
+		JSONObject collectionsObject = clusterObject.getJSONObject("collections");
+		JSONObject myCollectionObject = collectionsObject.getJSONObject(tableName);
+
+		// Extract No. of shards
+		JSONObject shardsObject = myCollectionObject.getJSONObject("shards");
+		int shardsCounter = 1;
+		int noOfShards = 0;
+		JSONObject shardJsonTemp = shardsObject.getJSONObject("shard"+shardsCounter);
+		while(shardJsonTemp != null) {
+			noOfShards = shardsCounter;
+			try {
+				shardJsonTemp = shardsObject.getJSONObject("shard"+(++shardsCounter));
+			} catch(JSONException e) {
+				break;
+			}
+		}
+		
+		TableInfo tableInfo = new TableInfo();
+		tableInfo.setReplicationFactor(Integer.parseInt(myCollectionObject.get("replicationFactor").toString()));
+		tableInfo.setNoOfShards(noOfShards);
+		
+		return tableInfo;
 	}
 
 }
