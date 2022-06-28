@@ -252,6 +252,38 @@ class ManageTableResourceTest {
 	}
 	
 	@Test
+	void testGetTablesWithTenantIdWithPagination() throws Exception {
+		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
+			mockedUtility.when(
+					() -> SecurityUtil.validate(Mockito.anyString(), Mockito.anyString()))
+			.thenReturn(true);
+			mockedUtility.when(
+					() -> SecurityUtil.getTokenFromRequestHeader(
+							Mockito.any(), Mockito.any(), Mockito.any()))
+			.thenReturn(accessToken);
+
+			mockPreAuthorizedService();
+			setMockitoSuccessResponseForService();
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+					+"&pageNumber=1&pageSize=5")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk());
+
+			setMockitoBadResponseForService();
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+					+"&pageNumber=1&pageSize=5")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest());
+
+			Mockito.when(manageTableService.getTables(Mockito.anyInt())).thenReturn(null);
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+					+"&pageNumber=1&pageSize=5")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isBadRequest());
+		}
+	}
+	
+	@Test
 	void testGetAllTables() throws Exception {
 		try (MockedStatic<SecurityUtil> mockedUtility = Mockito.mockStatic(SecurityUtil.class)) {
 			mockedUtility.when(
@@ -283,6 +315,7 @@ class ManageTableResourceTest {
 
 		}
 	}
+	
 
 	@Test
 	void testGetAllTablesUnderDeletion() throws Exception {
