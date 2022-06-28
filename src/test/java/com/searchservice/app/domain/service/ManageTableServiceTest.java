@@ -409,9 +409,9 @@ class ManageTableServiceTest {
 
 	@Test
 	void initializeSchemaDeletion() {
-
+		setMockitoSuccessResponseForService();
 		try {
-			manageTableService.initializeSchemaDeletion(tenantId, tableName, searchUrl);
+			manageTableService.initializeSchemaDeletion(tenantId, tableName, schemaField);
 		} catch (CustomException e) {
 			assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), e.getExceptionCode());
 		}
