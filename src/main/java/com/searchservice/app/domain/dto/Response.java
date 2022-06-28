@@ -16,7 +16,7 @@ public class Response extends BaseResponse{
 
 	private List<String> data;
 	private String token;
-	private int dataSize;
+	private Integer dataSize;
 	private List<TableListResponse> tableList;
 
 	public Response(String token) {
@@ -43,8 +43,12 @@ public class Response extends BaseResponse{
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class TableListResponse {
-		private int tenantId;
+		private Integer tenantId;
 		private String tableName;
+		
+		public TableListResponse(String tableName) {
+			this.tableName = tableName;
+		}
 		
 	}
 
