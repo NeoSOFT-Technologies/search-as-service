@@ -1,5 +1,7 @@
 package com.searchservice.app.domain.dto.table;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -16,9 +18,11 @@ public class TableInfo {
 	
 	private int replicationFactor;
 	private int noOfShards;
+	private Map<String, String> tenantInfo;
 
-	public TableInfo(TableInfo schemaDTO) {
-		this.replicationFactor = schemaDTO.getReplicationFactor();
-		this.replicationFactor = schemaDTO.getNoOfShards();
+	public TableInfo(TableInfo tableInfoDto) {
+		this.replicationFactor = tableInfoDto.getReplicationFactor();
+		this.replicationFactor = tableInfoDto.getNoOfShards();
+		this.tenantInfo = tableInfoDto.getTenantInfo();
 	}
 }

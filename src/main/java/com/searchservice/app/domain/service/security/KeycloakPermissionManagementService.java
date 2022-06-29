@@ -3,6 +3,7 @@ package com.searchservice.app.domain.service.security;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
@@ -10,9 +11,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.Cache.ValueWrapper;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.searchservice.app.config.AuthConfigProperties;
+import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.config.UserPermissionConfigProperties;
 import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
@@ -20,6 +27,9 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 @Service
 public class KeycloakPermissionManagementService {
 
+	private static final String TENANT_KEY = "tenantInfo";
+	private static final String TENANT_NAME = "tenantName";
+	
 	@Autowired 
 	private UserPermissionConfigProperties userPermissionConfigProperties;
 	
@@ -29,6 +39,14 @@ public class KeycloakPermissionManagementService {
 	@Autowired
 	AuthConfigProperties authConfigProperties;
 	
+	@Autowired
+	TenantInfoConfigProperties tenantInfoConfigProperties;
+	
+	@Autowired
+	private CacheManager cacheManager;
+	
+	@Nullable
+	Cache cache;
 	
 	public JSONObject getDecodedTokenPayloadJson(String token) {
 
@@ -120,7 +138,10 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
-	public String getRealmNameFromToken(String token) {
+	
+	// Add Realm Name in cache
+	@Cacheable(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
+	public String getRealmNameFromToken(String tenant, String token) {
 		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
 		String iss = (String)tokenPayload.get("iss");
 		String [] splitUrl = iss.split("/");
@@ -128,7 +149,41 @@ public class KeycloakPermissionManagementService {
 		
 		authConfigProperties.setRealmName(realmName);
 
-		return splitUrl[splitUrl.length-1];
+		return realmName;
+	}
+	
+	// Fetch Realm Name from cache if present
+	public String getRealmNameFromCache(String tenantName) {
+	    cache = cacheManager.getCache(tenantInfoConfigProperties.getKey());
+	    if(cache == null)
+	    	throw new CustomException(
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+	    else {
+		    Optional<ValueWrapper> tenantInfoValueWrapper = Optional.ofNullable(cache.get(tenantName));
+
+		    if(tenantInfoValueWrapper.isEmpty() || tenantInfoValueWrapper.get().get() == null)
+		    	throw new CustomException(
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
+		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		    else {
+		    	return tenantInfoValueWrapper.get().get().toString();
+		    }
+	    }
+	}
+	
+	public boolean checkIfRealmNameExistsInCache(String tenantName) {
+	    cache = cacheManager.getCache(tenantInfoConfigProperties.getKey());
+	    if(cache == null)
+	    	throw new CustomException(
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
+	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+	    else {
+	    	return (cache.get(tenantName)!=null);
+	    }
 	}
 	
 }

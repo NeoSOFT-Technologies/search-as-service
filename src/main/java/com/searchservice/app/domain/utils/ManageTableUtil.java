@@ -3,6 +3,7 @@ package com.searchservice.app.domain.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -100,4 +101,20 @@ public class ManageTableUtil {
 		return tableInfo;
 	}
 
+	public static Map<String, String> getUserPropsFromJsonResponse(String response) {
+		JSONObject configOverlayJson = new JSONObject(response);
+		JSONObject overlayObject = configOverlayJson.getJSONObject("overlay");
+		JSONObject userPropsObject = overlayObject.getJSONObject("userProps");
+
+		Map<String, String> userPropsMap = new HashMap<>();
+		Iterator<String> itr = userPropsObject.keys();
+		while(itr.hasNext()) {
+			String key = itr.next();
+			String value = userPropsObject.get(key).toString();
+			userPropsMap.put(key, value);
+		}
+
+		return userPropsMap;
+	}
+	
 }
