@@ -84,6 +84,33 @@ public class ManageTableResource {
 		}
 	}
 	
+
+	@GetMapping("/tablesList")
+	@Operation(summary = "GET TABLES FOR THE GIVEN TENANT ID ALONG WITH PAGINATION", security = @SecurityRequirement(name = "bearerAuth"))
+	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
+	public ResponseEntity<Response> getTablesByTenantIdPagination(@RequestParam int tenantId, @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "6") int pageSize) {
+
+		Response getListItemsResponseDTO = manageTableServicePort.getTables(tenantId);
+		if (getListItemsResponseDTO == null)
+			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
+					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+		if (getListItemsResponseDTO.getStatusCode() == 200) {
+			List<String> existingTablesList = getListItemsResponseDTO.getData();
+			existingTablesList.removeAll(tableDeleteServicePort.getTableUnderDeletion(false).getData());
+			getListItemsResponseDTO.setTableList(ManageTableUtil.getPaginatedTableListWithTenantId(
+					existingTablesList, pageNumber, pageSize, tenantId));
+			getListItemsResponseDTO.setData(null);
+			getListItemsResponseDTO.setDataSize(existingTablesList.size());
+			getListItemsResponseDTO.setDataSize(existingTablesList.size());
+			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
+		} else {
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching List of Tables Having TenantID; %d",tenantId));
+		}
+	}
+	
+
 	@GetMapping("/all-tables")
 	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")

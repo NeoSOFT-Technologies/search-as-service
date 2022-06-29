@@ -58,7 +58,7 @@ public interface ManageTableServicePort {
 	TableSchema compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
 			TableSchema tableSchema);
 
-	// Validatio methods
+	// Validation methods
 	boolean isTableExists(String tableName);
 	
 	boolean checkIfTableNameisValid(String tableName);

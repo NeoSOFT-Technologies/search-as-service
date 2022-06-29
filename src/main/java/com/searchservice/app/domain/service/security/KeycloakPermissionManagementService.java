@@ -28,7 +28,7 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 public class KeycloakPermissionManagementService {
 
 	private static final String TENANT_KEY = "tenantInfo";
-	
+
 	@Autowired 
 	private UserPermissionConfigProperties userPermissionConfigProperties;
 	
@@ -37,7 +37,7 @@ public class KeycloakPermissionManagementService {
 	
 	@Autowired
 	AuthConfigProperties authConfigProperties;
-	
+
 	@Autowired
 	TenantInfoConfigProperties tenantInfoConfigProperties;
 	
@@ -46,9 +46,9 @@ public class KeycloakPermissionManagementService {
 	
 	@Nullable
 	Cache cache;
+
 	
 	public JSONObject getDecodedTokenPayloadJson(String token) {
-
 		try {
 			String payload = token.split("\\.")[1];
 			
@@ -137,7 +137,7 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
-	
+
 	// Add Realm Name in cache
 	@Cacheable(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
 	public String getRealmNameFromToken(String tenant, String token) {

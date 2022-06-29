@@ -30,7 +30,7 @@ tenant-cache:
   key: tenantInfo
   tenant: tenantName
 
-
+#Schedular configs
 schedular-durations:
    public-key-update: 300000
    table-deletion: 0 15 8 * * ?

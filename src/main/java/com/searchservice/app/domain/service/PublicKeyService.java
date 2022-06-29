@@ -81,5 +81,4 @@ public class PublicKeyService implements PublicKeyServicePort{
 	    }
 		return isPublicKeyPresent;
 	}
-	
 }

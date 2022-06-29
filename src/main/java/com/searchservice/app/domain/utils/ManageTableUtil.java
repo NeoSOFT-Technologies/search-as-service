@@ -30,15 +30,28 @@ public class ManageTableUtil {
 		
 		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
-	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-			paginatedTableList.add(
-					new Response.TableListResponse(
-						Integer.parseInt(data.get(i + currIdx).split("_")[1]),
-						data.get(i + currIdx).split("_")[0]) );
-	    }
+
+		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+			paginatedTableList.add(new Response.TableListResponse(Integer.parseInt(data.get(i + currIdx).split("_")[1]),
+					data.get(i + currIdx).split("_")[0]));
+		}
+	    	
 		return paginatedTableList;
 	}
 	
+	public static List<Response.TableListResponse> getPaginatedTableListWithTenantId(
+			List<String> data, int pageNumber, int pageSize, int tenantId){
+		List<Response.TableListResponse> paginatedTableListWithTenantId = new ArrayList<>();
+		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
+	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {		
+	    	paginatedTableListWithTenantId.add(new Response.TableListResponse(
+							tenantId, data.get(i + currIdx)));
+	    	
+	    }
+		return paginatedTableListWithTenantId;
+	}
+	
+
 	public static Map<String, SchemaField> removeExistingFields(
 													Map<String, SchemaField> newFieldsHashMap, 
 													List<SchemaField> newFields, 
@@ -116,5 +129,5 @@ public class ManageTableUtil {
 
 		return userPropsMap;
 	}
-	
+
 }
