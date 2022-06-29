@@ -25,6 +25,12 @@ user-cache:
   edit: editPermission
   delete: deletePermission
 
+tenant-cache:
+  name: tenantInfoCacheIngress
+  key: tenantInfo
+  tenant: tenantName
+
+
 schedular-durations:
    public-key-update: 300000
    table-deletion: 0 15 8 * * ?
