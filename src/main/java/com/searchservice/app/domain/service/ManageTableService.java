@@ -482,6 +482,7 @@ public class ManageTableService implements ManageTableServicePort {
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
 			searchJAdapter.createTableInSolrj(request, searchClientActive);
+			apiResponseDTO.setStatusCode(200);
 			
 			// Set User Properties to Config Overlay
 			String tenantName = null;
@@ -505,9 +506,7 @@ public class ManageTableService implements ManageTableServicePort {
 						HttpStatusCode.SAAS_SERVER_ERROR, 
 						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
 			}
-
 			
-			apiResponseDTO.setStatusCode(200);
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
 			logger.error(e.toString());

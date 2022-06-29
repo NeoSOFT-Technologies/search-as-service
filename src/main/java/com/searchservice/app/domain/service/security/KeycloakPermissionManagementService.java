@@ -28,7 +28,6 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 public class KeycloakPermissionManagementService {
 
 	private static final String TENANT_KEY = "tenantInfo";
-	private static final String TENANT_NAME = "tenantName";
 	
 	@Autowired 
 	private UserPermissionConfigProperties userPermissionConfigProperties;
@@ -155,22 +154,31 @@ public class KeycloakPermissionManagementService {
 	// Fetch Realm Name from cache if present
 	public String getRealmNameFromCache(String tenantName) {
 	    cache = cacheManager.getCache(tenantInfoConfigProperties.getKey());
+	    
+	    String realmName = null;
 	    if(cache == null)
 	    	throw new CustomException(
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
 	    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 	    else {
-		    Optional<ValueWrapper> tenantInfoValueWrapper = Optional.ofNullable(cache.get(tenantName));
-
-		    if(tenantInfoValueWrapper.isEmpty() || tenantInfoValueWrapper.get().get() == null)
+	    	try {
+	    		Optional<ValueWrapper> tenantInfoValueWrapper = Optional.of(cache.get(tenantName));
+	    		ValueWrapper tenantInfoValue = tenantInfoValueWrapper.get();
+	    		if(tenantInfoValue.get() != null) {
+	    			Object obj = tenantInfoValue.get();
+	    			if(obj != null)
+	    				realmName = obj.toString();
+	    		}
+	    	} catch(Exception e) {
 		    	throw new CustomException(
 		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 		    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
 		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
-		    else {
-		    	return tenantInfoValueWrapper.get().get().toString();
-		    }
+	    	}
+
+
+		    return realmName;
 	    }
 	}
 	
