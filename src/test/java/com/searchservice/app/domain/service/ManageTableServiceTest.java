@@ -45,6 +45,7 @@ import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
+import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
 import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
@@ -58,7 +59,8 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 @TestInstance(Lifecycle.PER_CLASS)
 @TestPropertySource(
         properties = {
-           "schema-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv"
+           "schema-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv",
+           "tenant-cache.tenant: tenantName"
         }
 )
 class ManageTableServiceTest {
@@ -94,6 +96,9 @@ class ManageTableServiceTest {
 
 	@MockBean
 	SearchJAdapter searchJAdapter;
+	
+	@MockBean
+	KeycloakPermissionManagementService kpmService;
 	
 	@InjectMocks
 	ManageTableService manageTableService;
@@ -146,7 +151,8 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.getSchemaFields(Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.processSchemaRequest(Mockito.any(), Mockito.any())).thenReturn(schemaResponse);
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
-
+		Mockito.when(kpmService.checkIfRealmNameExistsInCache(Mockito.any())).thenReturn(true);
+		Mockito.when(kpmService.getRealmNameFromCache(Mockito.any())).thenReturn("Tenant1");
 	}
 
 	public void setMockitoTableNotExist() {
@@ -234,6 +240,8 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(Mockito.any())).thenReturn(testing(schemaField));
 		Mockito.when(searchJAdapter.updateSchemaLogic(Mockito.any(),Mockito.any())).thenReturn(updatedResponse);
 		Mockito.when(searchJAdapter.checkIfSearchServerDown()).thenReturn(false);
+		Mockito.when(kpmService.checkIfRealmNameExistsInCache(Mockito.any())).thenReturn(true);
+		Mockito.when(kpmService.getRealmNameFromCache(Mockito.any())).thenReturn("Tenant1");
 	}
 	
 	public void setUpManageTable(int validColumn, int multiValueCheck) {

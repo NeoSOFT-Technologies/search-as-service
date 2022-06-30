@@ -9,6 +9,7 @@ import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableInfo;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.TableSchema;
 
@@ -28,7 +29,7 @@ public interface ManageTableServicePort {
 	Response getTables(int tenantId);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);
-
+	
 	// CREATE requests
 	Response createTableIfNotPresent(CreateTable manageTableDTO);
 
@@ -41,10 +42,10 @@ public interface ManageTableServicePort {
 	/*
 	 * Auxiliary TableServices
 	 */
-	boolean isTableExists(String tableName);
-
 	TableSchema getTableSchema(String tableName);
 
+	TableInfo getTableDetails(String tableName);
+	
 	Response createTable(CreateTable manageTableDTO);
 
 	Response addSchemaFields(ManageTable tableSchemaDTO);
@@ -57,6 +58,9 @@ public interface ManageTableServicePort {
 	TableSchema compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
 			TableSchema tableSchema);
 
+	// Validation methods
+	boolean isTableExists(String tableName);
+	
 	boolean checkIfTableNameisValid(String tableName);
 	
 	boolean isColumnNameValid(List<SchemaField> columns);

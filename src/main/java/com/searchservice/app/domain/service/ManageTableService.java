@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,17 +34,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.searchservice.app.config.CapacityPlanProperties;
+import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
 import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.SchemaLabel;
+import com.searchservice.app.domain.dto.table.TableInfo;
 import com.searchservice.app.domain.dto.table.TableSchema;
 import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.port.spi.SearchAPIPort;
+import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.BasicUtil;
 import com.searchservice.app.domain.utils.DateUtil;
 import com.searchservice.app.domain.utils.ManageTableUtil;
@@ -75,6 +79,8 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String FILE_CREATE_ERROR = "Error File Creating File {}";
 	private static final String TABLE = "Table ";
 	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
+	private static final String FROM_CACHE = "[{}] is being fetched from cache";
+
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	
@@ -89,6 +95,9 @@ public class ManageTableService implements ManageTableServicePort {
 
 	private String basicAuthPasswordNonStatic;
 
+	@Autowired
+	TenantInfoConfigProperties tenantInfoConfigProperties;
+	
 	private String baseConfigSetNonStatic;
 
 	// UPDATE Table
@@ -129,6 +138,10 @@ public class ManageTableService implements ManageTableServicePort {
 	@Autowired
 	SearchJAdapter searchJAdapter;
 
+	@Autowired
+	private KeycloakPermissionManagementService kpmService;
+	
+	
 	@Override
 	public CapacityPlanResponse capacityPlans() {
 		List<CapacityPlanProperties.Plan> capacityPlans = capacityPlanProperties.getPlans();
@@ -200,8 +213,11 @@ public class ManageTableService implements ManageTableServicePort {
 		// Compare tableSchema locally Vs. tableSchema at Search cloud
 		TableSchema schemaResponse = compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(tableName, tenantId,
 				tableSchema);
-		schemaResponse.getData().setColumns(schemaResponse.getData().getColumns().stream()
-				.filter(s -> !s.getName().startsWith("_")).collect(Collectors.toList()));
+		schemaResponse.getData().setColumns(
+				schemaResponse.getData().getColumns()
+				.stream()
+				.filter(s -> !s.getName().startsWith("_"))
+				.collect(Collectors.toList()));
 
 		return schemaResponse;
 	}
@@ -322,6 +338,25 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	@Override
+	public TableInfo getTableDetails(String tableName) {
+		
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
+		TableInfo tableInfo = new TableInfo();
+		try {
+			String clusterStatusResponseString = searchJAdapter.getClusterStatusFromSolrjCluster(searchClientActive);			
+			tableInfo = ManageTableUtil.getTableInfoFromClusterStatus(clusterStatusResponseString, tableName);	
+			
+			// Add TenantInfo to TableInfo
+			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
+			tableInfo.setTenantInfo(userPropsResponseMap);
+		} catch(Exception e) {
+			logger.error("Error occurred while fetching table details: ", e);
+		}
+		
+		return tableInfo;
+	}
+	
 	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
 	@Override
 	public boolean isTableExists(String tableName) {
@@ -366,6 +401,7 @@ public class ManageTableService implements ManageTableServicePort {
 			schemaAttributesToSkipNames.add(dto.getName());
 		}
 		data.setColumns(schemaAttributesFinal);
+		data.setTableInfo(tableSchema.getData().getTableInfo());
 		tableSchema.setData(data);
 
 		return tableSchema;
@@ -379,7 +415,7 @@ public class ManageTableService implements ManageTableServicePort {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
 		try {
 			SchemaResponse schemaResponse = searchJAdapter.getSchemaFields(searchClientActive);
-
+			
 			List<Map<String, Object>> schemaFields = schemaResponse.getSchemaRepresentation().getFields();
 			tableSchemaResponseDTO.setStatusCode(200);
 
@@ -401,10 +437,14 @@ public class ManageTableService implements ManageTableServicePort {
 				solrSchemaFieldDTOs.add(solrFieldDTO);
 
 			}
+			
+			// Get TableInfo
+			TableInfo tableInfo = getTableDetails(tableName);
 
-			// prepare response dto
+			// Prepare response dto
 			data.setTableName(tableName.split("_")[0]);
 			data.setColumns(solrSchemaFieldDTOs);
+			data.setTableInfo(tableInfo);
 			tableSchemaResponseDTO.setData(data);
 			tableSchemaResponseDTO.setStatusCode(200);
 			tableSchemaResponseDTO.setMessage("Schema is retrieved successfully");
@@ -439,12 +479,37 @@ public class ManageTableService implements ManageTableServicePort {
 
 		CollectionAdminRequest.Create request = CollectionAdminRequest.createCollection(manageTableDTO.getTableName(),
 				selectedCapacityPlan.getShards(), selectedCapacityPlan.getReplicas());
+		
 		HttpSolrClient searchClientActive = new HttpSolrClient.Builder(searchURL).build();
 
 		request.setMaxShardsPerNode(selectedCapacityPlan.getShards() * selectedCapacityPlan.getReplicas());
 		try {
 			searchJAdapter.createTableInSolrj(request, searchClientActive);
 			apiResponseDTO.setStatusCode(200);
+			
+			// Set User Properties to Config Overlay
+			String tenantName = null;
+			String tenantKey = "";
+			if(tenantInfoConfigProperties != null)
+				tenantKey = tenantInfoConfigProperties.getTenant();
+			if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
+				logger.info(FROM_CACHE, tenantKey);
+				tenantName = kpmService.getRealmNameFromCache(tenantKey);
+
+				if(tenantName == null)
+					throw new CustomException(
+							HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+							HttpStatusCode.SAAS_SERVER_ERROR, 
+							"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+				Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
+				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+			} else {
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			}
+			
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
 			logger.error(e.toString());

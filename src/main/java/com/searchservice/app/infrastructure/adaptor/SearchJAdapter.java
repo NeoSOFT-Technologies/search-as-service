@@ -2,9 +2,12 @@ package com.searchservice.app.infrastructure.adaptor;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +21,22 @@ import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.UpdateResponse;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.table.ManageTable;
 import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.SchemaLabel;
+import com.searchservice.app.domain.utils.ManageTableUtil;
 import com.searchservice.app.domain.utils.SchemaFieldType;
 import com.searchservice.app.domain.utils.SearchUtil;
 import com.searchservice.app.domain.utils.TableSchemaParserUtil;
@@ -56,6 +66,9 @@ public class SearchJAdapter {
 	@Autowired
 	private SearchAPIAdapter searchAPIAdapter;
 	
+	@Autowired
+	RestTemplate restTemplate;
+	
 	
 	public CollectionAdminResponse getCollectionAdminRequestList(HttpSolrClient searchClientActive) {
 		CollectionAdminRequest.List request = new CollectionAdminRequest.List();
@@ -74,21 +87,82 @@ public class SearchJAdapter {
 	}
 	
 	
-	public CollectionAdminResponse getTableDetailsFromSolrjCluster(HttpSolrClient searchClientActive) {
+	public String getClusterStatusFromSolrjCluster(HttpSolrClient searchClientActive) {
 
-		CollectionAdminRequest.ClusterStatus clusterStatus = new CollectionAdminRequest.ClusterStatus();
-		CollectionAdminResponse response = null;
+		ResponseEntity<String> response = null;
+		String clusterStatusResponseString = null;
 		try {
-			response = clusterStatus.process(searchClientActive);
-		} catch (SolrServerException | IOException e) {
-			logger.error(e.getMessage());
+			String url = searchURL+ "/admin/collections?action=CLUSTERSTATUS";
+			response = restTemplate.getForEntity(new URI(url), String.class);
+			
+			clusterStatusResponseString = response.getBody();
+
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching cluster status: ", e);
 		} finally {
 			SearchUtil.closeSearchClientConnection(searchClientActive);
 		}
 
-		return response;
+		return clusterStatusResponseString;
 	}
 	
+	
+	public Map<String, String> getUserPropsFromCollectionConfig(String tableNameWithTenantId) {
+		
+		ResponseEntity<String> response = null;
+		Map<String, String> userPropsResponseMap = null;
+		try {
+			String url = searchURL+ "/" +tableNameWithTenantId+ "/config/overlay?omitHeader=true";
+			response = restTemplate.getForEntity(new URI(url), String.class);
+			
+			userPropsResponseMap = ManageTableUtil.getUserPropsFromJsonResponse(response.getBody());
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
+		}
+
+		return userPropsResponseMap;
+	}
+	
+	
+	public void setUserPropertiesInCollectionConfig(Map<String, String> propsMap, String tableNameWithTenantId) {
+		
+		String setUserPropsUrl = searchURL + "/" +tableNameWithTenantId+ "/config";
+		JSONObject setPropsJson = new JSONObject();
+		JSONObject jsonProp = new JSONObject();
+		
+		// Prepare RequestBodyJson
+		Iterator<String> itr = propsMap.keySet().iterator();
+		while(itr.hasNext()) {
+			String key = itr.next();
+			jsonProp.put(key, propsMap.get(key));
+		}
+		setPropsJson.put("set-user-property", jsonProp);
+
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+	    HttpEntity<String> request = new HttpEntity<>(setPropsJson.toString(), headers);
+	    String responseString = "";
+	    try {
+	    	responseString = restTemplate.postForObject(setUserPropsUrl, request, String.class);
+		} catch (Exception e) {
+			logger.error("Something Went Wrong While Setting User Properties", e);
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					"User Properties could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+		}
+	    
+	    // Validate response
+		JSONObject responseObj = new JSONObject(responseString);
+		JSONObject responseHeaderObject = responseObj.getJSONObject("responseHeader");
+		int status = Integer.parseInt(responseHeaderObject.get("status").toString());
+		if(status != 0)
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					"User Properties could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+	}
+
 	
 	public Boolean deleteTableFromSolrj(String tableName) {
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
@@ -146,7 +220,8 @@ public class SearchJAdapter {
 	public void createTableInSolrj(CollectionAdminRequest.Create request, HttpSolrClient searchClientActive) {
 
 		try {
-			request.process(searchClientActive);
+			request.process(searchClientActive);			
+			
 		} catch (SolrServerException | IOException e) {
 			logger.error(e.getMessage());
 

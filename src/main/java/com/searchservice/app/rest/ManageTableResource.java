@@ -84,6 +84,7 @@ public class ManageTableResource {
 		}
 	}
 	
+
 	@GetMapping("/tablesList")
 	@Operation(summary = "GET TABLES FOR THE GIVEN TENANT ID ALONG WITH PAGINATION", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
@@ -109,6 +110,7 @@ public class ManageTableResource {
 		}
 	}
 	
+
 	@GetMapping("/all-tables")
 	@Operation(summary = "GET ALL THE TABLES FROM THE SERVER.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
@@ -263,5 +265,5 @@ public class ManageTableResource {
 						HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
 	    }
 	}
-
+	
 }
