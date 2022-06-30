@@ -3,11 +3,16 @@ package com.searchservice.app.domain.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.SchemaField;
+import com.searchservice.app.domain.dto.table.TableInfo;
 
 public class ManageTableUtil {
 	private ManageTableUtil() {}
@@ -67,5 +72,49 @@ public class ManageTableUtil {
 		}
 		return newFieldsHashMap;
 	}
+	
+	public static TableInfo getTableInfoFromClusterStatus(String clusterStatusResponseString, String tableName) {
+		JSONObject clusterStatusJson = new JSONObject(clusterStatusResponseString);
+		JSONObject clusterObject = clusterStatusJson.getJSONObject("cluster");
+		JSONObject collectionsObject = clusterObject.getJSONObject("collections");
+		JSONObject myCollectionObject = collectionsObject.getJSONObject(tableName);
 
+		// Extract No. of shards
+		JSONObject shardsObject = myCollectionObject.getJSONObject("shards");
+		
+		int shardsCounter = 1;
+		int noOfShards = 0;
+		JSONObject shardJsonTemp = shardsObject.getJSONObject("shard"+shardsCounter);
+		while(shardJsonTemp != null) {
+			noOfShards = shardsCounter;
+			try {
+				shardJsonTemp = shardsObject.getJSONObject("shard"+(++shardsCounter));
+			} catch(JSONException e) {
+				break;
+			}
+		}
+		
+		TableInfo tableInfo = new TableInfo();
+		tableInfo.setReplicationFactor(Integer.parseInt(myCollectionObject.get("replicationFactor").toString()));
+		tableInfo.setNoOfShards(noOfShards);
+		
+		return tableInfo;
+	}
+
+	public static Map<String, String> getUserPropsFromJsonResponse(String response) {
+		JSONObject configOverlayJson = new JSONObject(response);
+		JSONObject overlayObject = configOverlayJson.getJSONObject("overlay");
+		JSONObject userPropsObject = overlayObject.getJSONObject("userProps");
+
+		Map<String, String> userPropsMap = new HashMap<>();
+		Iterator<String> itr = userPropsObject.keys();
+		while(itr.hasNext()) {
+			String key = itr.next();
+			String value = userPropsObject.get(key).toString();
+			userPropsMap.put(key, value);
+		}
+
+		return userPropsMap;
+	}
+	
 }

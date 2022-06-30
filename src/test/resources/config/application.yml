@@ -7,6 +7,13 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+#  main:
+#    allow-bean-definition-overriding: true
+#  mvc:
+#    throw-exception-if-no-handler-found: true
+#  web:
+#    resources:
+#      add-mappings: false
 
 # Authentication Server Configurations
 authentication:
@@ -22,6 +29,12 @@ user-cache:
   create: createPermission
   edit: editPermission
   delete: deletePermission
+
+tenant-cache:
+  name: tenantInfoCacheIngress
+  key: tenantInfo
+  tenant: tenantName
+
 
 schedular-durations:
    public-key-update: 300000

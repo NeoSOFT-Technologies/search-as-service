@@ -238,5 +238,5 @@ public class ManageTableResource {
 						HttpStatusCode.BAD_REQUEST_EXCEPTION, BAD_REQUEST_MSG);
 	    }
 	}
-
+	
 }
