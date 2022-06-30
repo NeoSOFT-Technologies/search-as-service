@@ -315,7 +315,6 @@ class ManageTableResourceTest {
 
 		}
 	}
-	
 
 	@Test
 	void testGetAllTablesUnderDeletion() throws Exception {

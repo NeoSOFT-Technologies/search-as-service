@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
@@ -34,6 +35,8 @@ public class PublicKeyService implements PublicKeyServicePort{
 	@Nullable
 	private Cache cache;
 
+	@Value("${cache-name}")
+	private String cacheName;
 	
 	@Override	
 	@Cacheable(cacheNames = {"${cache-name}"}, key = "#realmName")

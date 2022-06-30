@@ -49,7 +49,7 @@ public class Response extends BaseResponse{
 		public TableListResponse(String tableName) {
 			this.tableName = tableName;
 		}
-		
+
 	}
 
 }
