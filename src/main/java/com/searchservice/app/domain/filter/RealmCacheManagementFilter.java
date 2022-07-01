@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.security.SecurityUtil;
 
@@ -29,6 +30,9 @@ public class RealmCacheManagementFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private KeycloakPermissionManagementService keycloakPermissionManagementService;
+	
+	@Autowired
+	TenantInfoConfigProperties tenantInfoConfigProperties;
 	
 	public RealmCacheManagementFilter() {
 		super();
@@ -50,13 +54,13 @@ public class RealmCacheManagementFilter extends OncePerRequestFilter {
 		 *  Set Tenant Name(~ Realm Name) in cache
 		 */
 		// Evict Realm Info cache before adding new Realm Info
-		keycloakPermissionManagementService.evictRealmNameFromCache("tenantName");
+		keycloakPermissionManagementService.evictRealmNameFromCache(tenantInfoConfigProperties.getTenant());
 		if(request.getRequestURI().equals("/api/v1/manage/table/")
 				&& "POST".equalsIgnoreCase(request.getMethod())
 				&& 
-				!keycloakPermissionManagementService.checkIfRealmNameExistsInCache("tenantName")) {
+				!keycloakPermissionManagementService.checkIfRealmNameExistsInCache(tenantInfoConfigProperties.getTenant())) {
 
-			keycloakPermissionManagementService.setRealmNameInCache("tenantName", token);
+			keycloakPermissionManagementService.setRealmNameInCache(tenantInfoConfigProperties.getTenant(), token);
 		}
 			
 

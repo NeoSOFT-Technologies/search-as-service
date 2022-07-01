@@ -71,6 +71,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
 	
+	private static final String TENANT_INFO_ERROR_MSG = "Tenant Info could not be set. ";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
@@ -221,7 +222,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		return schemaResponse;
 	}
-
 
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
@@ -521,14 +521,27 @@ public class ManageTableService implements ManageTableServicePort {
 				throw new CustomException(
 						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
 						HttpStatusCode.SAAS_SERVER_ERROR, 
-						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
-			searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			try {
+				Map<String, String> userPropsMap = null;
+				if(tenantInfoConfigProperties != null) {
+					userPropsMap = Collections.singletonMap(
+							tenantInfoConfigProperties.getTenant(), tenantName);
+				} else
+					throw new NullPointerException();
+				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+			} catch(Exception e) {
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			}
+
 		} else {
 			throw new CustomException(
 					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
 					HttpStatusCode.SAAS_SERVER_ERROR, 
-					"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+					TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
 		}
 	}
 
