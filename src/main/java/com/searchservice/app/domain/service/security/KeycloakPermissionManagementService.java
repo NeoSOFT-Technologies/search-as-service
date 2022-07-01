@@ -10,10 +10,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,8 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 public class KeycloakPermissionManagementService {
 
 	private static final String TENANT_KEY = "tenantInfo";
+
+	private final Logger log = LoggerFactory.getLogger(KeycloakPermissionManagementService.class);
 	
 	@Autowired 
 	private UserPermissionConfigProperties userPermissionConfigProperties;
@@ -37,7 +43,7 @@ public class KeycloakPermissionManagementService {
 	
 	@Autowired
 	AuthConfigProperties authConfigProperties;
-	
+
 	@Autowired
 	TenantInfoConfigProperties tenantInfoConfigProperties;
 	
@@ -46,9 +52,9 @@ public class KeycloakPermissionManagementService {
 	
 	@Nullable
 	Cache cache;
+
 	
 	public JSONObject getDecodedTokenPayloadJson(String token) {
-
 		try {
 			String payload = token.split("\\.")[1];
 			
@@ -137,10 +143,7 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
-	
-	// Add Realm Name in cache
-	@Cacheable(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
-	public String getRealmNameFromToken(String tenant, String token) {
+	public String getRealmNameFromToken(String token) {
 		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
 		String iss = (String)tokenPayload.get("iss");
 		String [] splitUrl = iss.split("/");
@@ -149,6 +152,39 @@ public class KeycloakPermissionManagementService {
 		authConfigProperties.setRealmName(realmName);
 
 		return realmName;
+	}
+	
+	// Add Realm Name in cache
+	@Cacheable(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
+	public String setRealmNameInCache(String tenant, String token) {
+		log.info("Adding Realm Name in cache");
+		
+		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
+		String iss = (String)tokenPayload.get("iss");
+		String [] splitUrl = iss.split("/");
+
+		return splitUrl[splitUrl.length-1];
+	}
+	
+	// Update Realm Name in cache
+	@CachePut(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
+	public String updateRealmNameInCache(String tenant, String token) {
+		
+		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
+		String iss = (String)tokenPayload.get("iss");
+		String [] splitUrl = iss.split("/");
+		String realmName = splitUrl[splitUrl.length-1];
+
+		log.info("Realm Name in cache is updated");
+		
+		return realmName;
+	}
+	
+	@CacheEvict(cacheNames = TENANT_KEY, key = "#tenant", allEntries = true, condition = "#tenant!=null")
+	public String evictRealmNameFromCache(String tenant) {
+		log.info("Realm Name in cache is evicted successfully");
+		
+		return tenant;
 	}
 	
 	// Fetch Realm Name from cache if present
@@ -176,10 +212,23 @@ public class KeycloakPermissionManagementService {
 		    			HttpStatusCode.NULL_POINTER_EXCEPTION, 
 		    			HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 	    	}
-
-
+	    	
 		    return realmName;
 	    }
+	}
+	
+	// If Realm Name already present Update it
+	public boolean isRealmNamePresentInCache(String tenantName, String token) {
+		boolean isRealmNamePresent = false;
+
+		cache = cacheManager.getCache(tenantInfoConfigProperties.getKey());
+		if(cache != null && cache.get(tenantName)!=null) {
+			log.info("Realm Name is found in cache, will be updated");
+			updateRealmNameInCache(tenantName, token);
+			isRealmNamePresent = true;
+		}
+		
+		return isRealmNamePresent;
 	}
 	
 	public boolean checkIfRealmNameExistsInCache(String tenantName) {
