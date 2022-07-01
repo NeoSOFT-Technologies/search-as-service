@@ -71,6 +71,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
 	
+	private static final String TENANT_INFO_ERROR_MSG = "Tenant Info could not be set. ";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
@@ -222,7 +223,6 @@ public class ManageTableService implements ManageTableServicePort {
 		return schemaResponse;
 	}
 
-
 	@Override
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
@@ -350,6 +350,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// Add TenantInfo to TableInfo
 			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
 			tableInfo.setTenantInfo(userPropsResponseMap);
+			
 		} catch(Exception e) {
 			logger.error("Error occurred while fetching table details: ", e);
 		}
@@ -488,27 +489,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setStatusCode(200);
 			
 			// Set User Properties to Config Overlay
-			String tenantName = null;
-			String tenantKey = "";
-			if(tenantInfoConfigProperties != null)
-				tenantKey = tenantInfoConfigProperties.getTenant();
-			if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
-				logger.info(FROM_CACHE, tenantKey);
-				tenantName = kpmService.getRealmNameFromCache(tenantKey);
-
-				if(tenantName == null)
-					throw new CustomException(
-							HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-							HttpStatusCode.SAAS_SERVER_ERROR, 
-							"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-				Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
-				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
-			} else {
-				throw new CustomException(
-						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-						HttpStatusCode.SAAS_SERVER_ERROR, 
-						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			}
+			fetchTenantNameFromCacheAndSetInCollectionConfig(manageTableDTO);
 			
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
@@ -521,6 +502,47 @@ public class ManageTableService implements ManageTableServicePort {
 
 		}
 		return apiResponseDTO;
+	}
+
+	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
+		String tenantName = null;
+		String tenantKey = "";
+		if(tenantInfoConfigProperties != null)
+			tenantKey = tenantInfoConfigProperties.getTenant();
+
+		if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
+			logger.info(FROM_CACHE, tenantKey);
+
+			tenantName = kpmService.getRealmNameFromCache(tenantKey);
+			// Remove tenantName entry from cache after this service call
+			kpmService.evictRealmNameFromCache(tenantKey);
+			
+			if(tenantName == null)
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			try {
+				Map<String, String> userPropsMap = null;
+				if(tenantInfoConfigProperties != null) {
+					userPropsMap = Collections.singletonMap(
+							tenantInfoConfigProperties.getTenant(), tenantName);
+				} else
+					throw new NullPointerException();
+				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+			} catch(Exception e) {
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			}
+
+		} else {
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+		}
 	}
 
 	@Override
