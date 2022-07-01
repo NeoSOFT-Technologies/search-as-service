@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManageTableService implements ManageTableServicePort {
 	
+	private static final String TENANT_INFO_ERROR_MSG = "Tenant Info could not be set. ";
 	// Schema
 	private static final String SEARCH_EXCEPTION_MSG = "The table - {} is Not Found in the Search Cloud!";
 	private static final String SEARCH_SCHEMA_EXCEPTION_MSG = "There's been an error in executing {} operation via schema API. "
@@ -79,6 +81,7 @@ public class ManageTableService implements ManageTableServicePort {
 	private static final String TABLE = "Table ";
 	private static final String TABLE_RESPONSE_MSG = "Table %s Having TenantID: %d %s%s";
 	private static final String FROM_CACHE = "[{}] is being fetched from cache";
+
 	private final Logger logger = LoggerFactory.getLogger(ManageTableService.class);
 	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 	
@@ -347,6 +350,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// Add TenantInfo to TableInfo
 			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
 			tableInfo.setTenantInfo(userPropsResponseMap);
+			
 		} catch(Exception e) {
 			logger.error("Error occurred while fetching table details: ", e);
 		}
@@ -485,27 +489,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setStatusCode(200);
 			
 			// Set User Properties to Config Overlay
-			String tenantName = null;
-			String tenantKey = "";
-			if(tenantInfoConfigProperties != null)
-				tenantKey = tenantInfoConfigProperties.getTenant();
-			if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
-				logger.info(FROM_CACHE, tenantKey);
-				tenantName = kpmService.getRealmNameFromCache(tenantKey);
-
-				if(tenantName == null)
-					throw new CustomException(
-							HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-							HttpStatusCode.SAAS_SERVER_ERROR, 
-							"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-				Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
-				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
-			} else {
-				throw new CustomException(
-						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-						HttpStatusCode.SAAS_SERVER_ERROR, 
-						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			}
+			fetchTenantNameFromCacheAndSetInCollectionConfig(manageTableDTO);
 			
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
@@ -518,6 +502,47 @@ public class ManageTableService implements ManageTableServicePort {
 
 		}
 		return apiResponseDTO;
+	}
+
+	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
+		String tenantName = null;
+		String tenantKey = "";
+		if(tenantInfoConfigProperties != null)
+			tenantKey = tenantInfoConfigProperties.getTenant();
+
+		if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
+			logger.info(FROM_CACHE, tenantKey);
+
+			tenantName = kpmService.getRealmNameFromCache(tenantKey);
+			// Remove tenantName entry from cache after this service call
+			kpmService.evictRealmNameFromCache(tenantKey);
+			
+			if(tenantName == null)
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			try {
+				Map<String, String> userPropsMap = null;
+				if(tenantInfoConfigProperties != null) {
+					userPropsMap = Collections.singletonMap(
+							tenantInfoConfigProperties.getTenant(), tenantName);
+				} else
+					throw new NullPointerException();
+				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+			} catch(Exception e) {
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			}
+
+		} else {
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+		}
 	}
 
 	@Override
@@ -581,7 +606,6 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-
 	public Response updateSchemaFields(ManageTable newTableSchemaDTO) {
 		// Prepare SearchClient instance
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
@@ -617,12 +641,31 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (SolrException e) {
 			apiResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
 			apiResponseDTO.setMessage("Schema could not be updated");
-
 			logger.error(SEARCH_EXCEPTION_MSG + " Existing schema fields couldn't be updated!",
 					newTableSchemaDTO.getTableName(), e.getMessage());
 
 		}
 		return apiResponseDTO;
+	}
+	
+	public void updateSofDeleteSchemaFieldRequiredFalse(ManageTable newTableSchemaDTO) {
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL,
+				newTableSchemaDTO.getTableName());
+		try {
+			List<Map<String, Object>> targetSchemafields = searchJAdapter
+					.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO);
+			for (Map<String, Object> currField : targetSchemafields) {
+				SchemaRequest.ReplaceField updateFieldsRequest = new SchemaRequest.ReplaceField(currField);
+				searchJAdapter.updateSchemaLogic(searchClientActive, updateFieldsRequest);
+				logger.info("Field- {} Required Value Set False ", currField.get(SchemaLabel.NAME.getLabel()));
+			}
+		} catch (NullPointerException e) {
+			logger.error("Null value detected!", e);
+		} catch (SolrException e) {
+			logger.error(SEARCH_EXCEPTION_MSG + " schema field Required Value could not be updated!",
+					newTableSchemaDTO.getTableName(), e.getMessage());
+
+		}
 	}
 
 	@Override
@@ -649,7 +692,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 	// Table schema deletion
 	public void checkForSchemaSoftDeletion(int tenantId, String tableName, List<SchemaField> schemaColumns) {
-
 		List<SchemaField> existingSchemaAttributes = getTableSchema(tableName + "_" + tenantId).getData().getColumns();
 
 		for (SchemaField existingSchemaAttribute : existingSchemaAttributes) {
@@ -660,21 +702,24 @@ public class ManageTableService implements ManageTableServicePort {
 			if (!(exsitingSchemaName.equalsIgnoreCase("_nest_path_") || exsitingSchemaName.equalsIgnoreCase("_root_")
 					|| exsitingSchemaName.equalsIgnoreCase("_text_") || exsitingSchemaName.equalsIgnoreCase("_version_")
 					|| exsitingSchemaName.equalsIgnoreCase("id")) && !isContains) {
-				initializeSchemaDeletion(tenantId, tableName, existingSchemaAttribute.getName());
+				initializeSchemaDeletion(tenantId, tableName, existingSchemaAttribute);
 			}
 		}
 
 	}
 
-	public void initializeSchemaDeletion(int tenantId, String tableName, String columnName) {
+	public void initializeSchemaDeletion(int tenantId, String tableName,SchemaField schemaField) {
 		File file = new File(deleteSchemaAttributesFilePath);
+		String columnName = schemaField.getName();	
 		checkIfSchemaFileExist(file);
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
 			String newRecord = tenantId + "," + tableName + "," + DateUtil.getFormattedDate(formatter) + "," + columnName;
 			bw.write(newRecord);
 			bw.newLine();
-
 			logger.debug("Schema {} Succesfully Initialized For Deletion ", columnName);
+			schemaField.setRequired(false);
+			ManageTable updateSchemaDTO = new ManageTable(tableName + "_" + tenantId, Arrays.asList(schemaField));
+			updateSofDeleteSchemaFieldRequiredFalse(updateSchemaDTO);
 		} catch (IOException e) {
 			logger.error("Error While Intializing Deletion for Schema :{} ", columnName);
 		}

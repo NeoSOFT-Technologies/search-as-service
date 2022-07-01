@@ -14,27 +14,31 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
 import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 @Component
-public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
+public class RealmCacheManagementFilter extends OncePerRequestFilter {
 	/**
 	 * User Permission Authorization Filter
 	 */
 	
-	private final Logger log = LoggerFactory.getLogger(ResourcesAuthorizationFilter.class);
+	private final Logger log = LoggerFactory.getLogger(RealmCacheManagementFilter.class);
 	
 	private ObjectMapper mapper = new ObjectMapper();
 
 	@Autowired
 	private KeycloakPermissionManagementService keycloakPermissionManagementService;
 	
-	public ResourcesAuthorizationFilter() {
+	@Autowired
+	TenantInfoConfigProperties tenantInfoConfigProperties;
+	
+	public RealmCacheManagementFilter() {
 		super();
 	}
 
-	public ResourcesAuthorizationFilter(KeycloakPermissionManagementService keycloakPermissionManagementService) {
+	public RealmCacheManagementFilter(KeycloakPermissionManagementService keycloakPermissionManagementService) {
 		super();
 		this.keycloakPermissionManagementService = keycloakPermissionManagementService;
 	}
@@ -46,7 +50,19 @@ public class ResourcesAuthorizationFilter extends OncePerRequestFilter {
 		final String token = SecurityUtil.getTokenFromRequestHeader(request, response, mapper);
 		log.info("[JwtTokenFilterService][doFilterInternal] Token Value : {}", token);
 
-		keycloakPermissionManagementService.validateAndSetActiveUserAuthorities(token);
+		/**
+		 *  Set Tenant Name(~ Realm Name) in cache
+		 */
+		// Evict Realm Info cache before adding new Realm Info
+		keycloakPermissionManagementService.evictRealmNameFromCache(tenantInfoConfigProperties.getTenant());
+		if(request.getRequestURI().equals("/api/v1/manage/table/")
+				&& "POST".equalsIgnoreCase(request.getMethod())
+				&& 
+				!keycloakPermissionManagementService.checkIfRealmNameExistsInCache(tenantInfoConfigProperties.getTenant())) {
+
+			keycloakPermissionManagementService.setRealmNameInCache(tenantInfoConfigProperties.getTenant(), token);
+		}
+			
 
 		chain.doFilter(request, response);
 

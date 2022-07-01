@@ -5,6 +5,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.searchservice.app.domain.filter.RealmCacheManagementFilter;
 import com.searchservice.app.domain.filter.ResourcesAuthorizationFilter;
 import com.searchservice.app.domain.filter.ThrottlerFilterBatch;
 import com.searchservice.app.domain.filter.ThrottlerFilterNRT;
@@ -20,6 +21,9 @@ public class FilterConfig {
 	
 	@Autowired
 	ResourcesAuthorizationFilter resourcesAuthorizationFilter;
+	
+	@Autowired
+	RealmCacheManagementFilter realmCacheManagementFilter;
 	
 	@Bean
 	public FilterRegistrationBean<ThrottlerFilterNRT> registrationBeanNRT() {
@@ -51,6 +55,18 @@ public class FilterConfig {
 		FilterRegistrationBean<ResourcesAuthorizationFilter> registrationBean = new FilterRegistrationBean<>();
 		
 		registrationBean.setFilter(resourcesAuthorizationFilter);
+		registrationBean.addUrlPatterns("/api/v1/*");
+		
+		return registrationBean;
+	}
+	
+	
+	@Bean
+	public FilterRegistrationBean<RealmCacheManagementFilter> registrationBeanRealmCacheManagement() {
+		
+		FilterRegistrationBean<RealmCacheManagementFilter> registrationBean = new FilterRegistrationBean<>();
+		
+		registrationBean.setFilter(realmCacheManagementFilter);
 		registrationBean.addUrlPatterns("/api/v1/*");
 		
 		return registrationBean;
