@@ -52,7 +52,7 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
 		if (token != null) {
 			if (!SecurityUtil.validate(token, publicKeyService.retrievePublicKey(
-					kpmService.getRealmNameFromToken("tenantName", token)))) {
+					kpmService.getRealmNameFromToken(token)))) {
 				errorDetails.put("Unauthorized", "Invalid token");
 				response.setStatus(HttpStatus.FORBIDDEN.value());
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);

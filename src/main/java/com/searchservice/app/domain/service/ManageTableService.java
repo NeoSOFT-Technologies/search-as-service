@@ -350,6 +350,7 @@ public class ManageTableService implements ManageTableServicePort {
 			// Add TenantInfo to TableInfo
 			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
 			tableInfo.setTenantInfo(userPropsResponseMap);
+			
 		} catch(Exception e) {
 			logger.error("Error occurred while fetching table details: ", e);
 		}
@@ -488,27 +489,7 @@ public class ManageTableService implements ManageTableServicePort {
 			apiResponseDTO.setStatusCode(200);
 			
 			// Set User Properties to Config Overlay
-			String tenantName = null;
-			String tenantKey = "";
-			if(tenantInfoConfigProperties != null)
-				tenantKey = tenantInfoConfigProperties.getTenant();
-			if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
-				logger.info(FROM_CACHE, tenantKey);
-				tenantName = kpmService.getRealmNameFromCache(tenantKey);
-
-				if(tenantName == null)
-					throw new CustomException(
-							HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-							HttpStatusCode.SAAS_SERVER_ERROR, 
-							"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-				Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
-				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
-			} else {
-				throw new CustomException(
-						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-						HttpStatusCode.SAAS_SERVER_ERROR, 
-						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			}
+			fetchTenantNameFromCacheAndSetInCollectionConfig(manageTableDTO);
 			
 			apiResponseDTO.setMessage("Successfully created table: " + manageTableDTO.getTableName());
 		} catch (Exception e) {
@@ -521,6 +502,34 @@ public class ManageTableService implements ManageTableServicePort {
 
 		}
 		return apiResponseDTO;
+	}
+
+	private void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
+		String tenantName = null;
+		String tenantKey = "";
+		if(tenantInfoConfigProperties != null)
+			tenantKey = tenantInfoConfigProperties.getTenant();
+
+		if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
+			logger.info(FROM_CACHE, tenantKey);
+
+			tenantName = kpmService.getRealmNameFromCache(tenantKey);
+			// Remove tenantName entry from cache after this service call
+			kpmService.evictRealmNameFromCache(tenantKey);
+			
+			if(tenantName == null)
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			Map<String, String> userPropsMap = Collections.singletonMap("tenantName", tenantName);
+			searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+		} else {
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					"Tenant Info could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+		}
 	}
 
 	@Override
