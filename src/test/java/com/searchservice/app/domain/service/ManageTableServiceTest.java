@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,6 +39,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.CapacityPlanProperties.Plan;
+import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.dto.table.CreateTable;
 import com.searchservice.app.domain.dto.table.ManageTable;
@@ -100,6 +102,9 @@ class ManageTableServiceTest {
 	@MockBean
 	KeycloakPermissionManagementService kpmService;
 	
+	@MockBean
+	TenantInfoConfigProperties tenantInfoConfigProperties;
+	
 	@InjectMocks
 	ManageTableService manageTableService;
 
@@ -153,6 +158,7 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.parseSchemaFieldDtosToListOfMaps(newTableSchemaDTO)).thenReturn(testing(schemaField));
 		Mockito.when(kpmService.checkIfRealmNameExistsInCache(Mockito.any())).thenReturn(true);
 		Mockito.when(kpmService.getRealmNameFromCache(Mockito.any())).thenReturn("Tenant1");
+		//doNothing().when(manageTableService).fetchTenantNameFromCacheAndSetInCollectionConfig(Mockito.any());
 	}
 
 	public void setMockitoTableNotExist() {
@@ -209,8 +215,6 @@ class ManageTableServiceTest {
 
 		newTableSchemaDTO.setTableName(tableName);
 
-		
-
 		tableSchemav2Data.setColumns(list);
 		List<CapacityPlanProperties.Plan> plan = new ArrayList<>();
 		Plan newPlan = new Plan();
@@ -242,6 +246,7 @@ class ManageTableServiceTest {
 		Mockito.when(searchJAdapter.checkIfSearchServerDown()).thenReturn(false);
 		Mockito.when(kpmService.checkIfRealmNameExistsInCache(Mockito.any())).thenReturn(true);
 		Mockito.when(kpmService.getRealmNameFromCache(Mockito.any())).thenReturn("Tenant1");
+		//doNothing().when(manageTableService).fetchTenantNameFromCacheAndSetInCollectionConfig(Mockito.any());
 	}
 	
 	public void setUpManageTable(int validColumn, int multiValueCheck) {
@@ -376,7 +381,6 @@ class ManageTableServiceTest {
 		assertEquals(200, response.getStatusCode());
 	}
 
-	
 	@Test
 	void checkInvalidTableName() {
 		try {

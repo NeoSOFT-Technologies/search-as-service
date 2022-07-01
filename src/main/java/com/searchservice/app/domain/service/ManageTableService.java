@@ -504,7 +504,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
-	private void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
+	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
 		String tenantName = null;
 		String tenantKey = "";
 		if(tenantInfoConfigProperties != null)
