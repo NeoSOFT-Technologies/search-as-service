@@ -227,32 +227,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response createTableIfNotPresent(CreateTable createTableDTO) {
 
 		searchJAdapter.checkIfSearchServerDown();
-		String tableName = createTableDTO.getTableName().split("_")[0];
-		if(checkIfTableNameisValid(tableName)) {
-			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + tableName + " is Provided");
-		}
-		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
-			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table With Same Name %s %s%s", tableName,"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
-		}
-		if (isTableExists(createTableDTO.getTableName()))
-			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
-					TABLE + tableName + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
-							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
-        
-		if(!isColumnNameValid(createTableDTO.getColumns())) {
-			   throw new CustomException(HttpStatusCode.INVALID_COLUMN_NAME.getCode()
-					   ,HttpStatusCode.INVALID_COLUMN_NAME,HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
-		}
-		
-		if (Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(createTableDTO.getColumns()))) {		
-			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(), HttpStatusCode.WRONG_DATA_TYPE,
-					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
-		}
-
+		checkIfTableIsValidForCreation(createTableDTO);
 		Response apiResponseDTO = createTable(createTableDTO);
-
 		if (apiResponseDTO.getStatusCode() == 200) {
 			// Check if new table columns are to be added(Non-null list of columns)
 			if (createTableDTO.getColumns() == null) {
@@ -270,6 +246,29 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	public void checkIfTableIsValidForCreation(CreateTable createTableDTO) {
+		String tableName = createTableDTO.getTableName().split("_")[0];
+		if(checkIfTableNameisValid(tableName)) {
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + tableName + " is Provided");
+		}
+		else if (tableDeleteServicePort.isTableUnderDeletion(createTableDTO.getTableName())) {
+			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table %s Having TenantID %s %s %s", tableName, createTableDTO.getTableName().split("_")[1] ,"is",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+		}
+		else if (isTableExists(createTableDTO.getTableName()))
+			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
+					String.format("Table %s Having TenantID %s %s %s", tableName, createTableDTO.getTableName().split("_")[1] ,"",HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage()));
+        
+		else if(!isColumnNameValid(createTableDTO.getColumns())) {
+			   throw new CustomException(HttpStatusCode.INVALID_COLUMN_NAME.getCode()
+					   ,HttpStatusCode.INVALID_COLUMN_NAME,HttpStatusCode.INVALID_COLUMN_NAME.getMessage());
+		}	
+		else if(Boolean.FALSE.equals(isValidFormatDataTypeForMultivalued(createTableDTO.getColumns()))) {		
+			throw new CustomException(HttpStatusCode.WRONG_DATA_TYPE.getCode(), HttpStatusCode.WRONG_DATA_TYPE,
+					HttpStatusCode.WRONG_DATA_TYPE.getMessage());
+		}
+	}
 	@Override
 	public Response deleteTable(String tableName) {
 		
