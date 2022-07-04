@@ -232,14 +232,13 @@ public class ManageTableService implements ManageTableServicePort {
 			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
 					HttpStatusCode.INVALID_TABLE_NAME,"Creating Table Failed , as Invalid Table Name " + tableName + " is Provided");
 		}
-		if (tableDeleteServicePort.isTableUnderDeletion(tableName)) {
+		if (tableDeleteServicePort.isTableUnderDeletion(createTableDTO.getTableName())) {
 			throw new CustomException(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(),
-					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table With Same Name %s %s%s", tableName,"is ",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
+					HttpStatusCode.UNDER_DELETION_PROCESS,String.format("Table %s Having TenantID %s %s %s", tableName, createTableDTO.getTableName().split("_")[1] ,"is",HttpStatusCode.UNDER_DELETION_PROCESS.getMessage()));
 		}
 		if (isTableExists(createTableDTO.getTableName()))
 			throw new CustomException(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(),HttpStatusCode.TABLE_ALREADY_EXISTS, 
-					TABLE + tableName + " Having TenantID: "+createTableDTO.getTableName().split("_")[1]
-							+" "+HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage());
+					String.format("Table %s Having TenantID %s %s %s", tableName, createTableDTO.getTableName().split("_")[1] ,"",HttpStatusCode.TABLE_ALREADY_EXISTS.getMessage()));
         
 		if(!isColumnNameValid(createTableDTO.getColumns())) {
 			   throw new CustomException(HttpStatusCode.INVALID_COLUMN_NAME.getCode()
