@@ -73,7 +73,7 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching Tables Having TenantID; %d",tenantName));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching Tables Having TenantID; %d",tenantName));
 		}
 	}
 	
@@ -92,7 +92,7 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching List of Tables Having TenantID; %d",tenantName));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching List of Tables Having TenantID; %d",tenantName));
 		}
 	}
 	
