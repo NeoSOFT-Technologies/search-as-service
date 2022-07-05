@@ -4,17 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeCastingUtil {
-    private TypeCastingUtil() {
-    }
-
-    public static List<String> castToListOfStrings(Object obj, int tenantId) {
-        List<String> resultList = new ArrayList<>();
-        if (obj instanceof List<?>) {
-            for (Object o : (List<?>) obj)
-                if (String.class.cast(o).endsWith("_" + tenantId))
-                    resultList.add(String.class.cast(o));
-        }
-        return resultList;
+    
+	private TypeCastingUtil() {
     }
 
     public static List<String> castToListOfStrings(Object obj) {

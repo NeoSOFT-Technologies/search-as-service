@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.port.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,9 @@ public interface ManageTableServicePort {
 	
 	Response getAllTables(int startRecord, int pageSize);
 	
-	Response getTables(int tenantId);
+	Response getTablesForTenant(String tenantName);
+	
+	Response getTablesForTenantPagination(String tenantName, int startRecord, int pageSize);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);
 	
@@ -45,6 +48,8 @@ public interface ManageTableServicePort {
 	TableSchema getTableSchema(String tableName);
 
 	TableInfo getTableDetails(String tableName);
+	
+	Map<String, String> getAllTableTenantMap(List<String> tablesList);
 	
 	Response createTable(CreateTable manageTableDTO);
 

@@ -2,7 +2,9 @@ package com.searchservice.app.rest.inputdocument;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -16,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
@@ -31,7 +34,6 @@ class InputDocumentResourceTest {
 	@Value("${custom-mock.jwt-token}")
 	private String accessToken;
 	
-	// String apiEndpoint = "/api/v1";
 	@Value("${base-url.api-endpoint.home}")
 	private String apiEndpoint;
 	String name;

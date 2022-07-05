@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response extends BaseResponse{
 
+	private Integer dataSize;
 	private List<String> data;
 	private String token;
-	private Integer dataSize;
 	private List<TableListResponse> tableList;
 
 	public Response(String token) {
@@ -43,6 +43,7 @@ public class Response extends BaseResponse{
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class TableListResponse {
+		private String tenantName;
 		private Integer tenantId;
 		private String tableName;
 		
