@@ -231,7 +231,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 
 	@Override
-	public Response getTablesUnderDeletion(boolean forDeleteTableList) {
+	public Response getTablesUnderDeletion(boolean getDeletedTableListWithTenantId) {
 		Response deleteTablesResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
@@ -242,7 +242,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
 					String currentTableName = st.split(",")[1];
-					if(forDeleteTableList) {
+					if(getDeletedTableListWithTenantId) {
 						tableUnderDeletionList.add(currentTableName);
 					}else {
 						tableUnderDeletionList.add(currentTableName.split("_")[0]);
@@ -265,7 +265,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 	
 	@Override
-	public Response getTablesUnderDeletionPagination(boolean forDeleteTableList, int pageNumber, int pageSize) {
+	public Response getTablesUnderDeletionPagination(boolean getDeletedTableListWithTenantId, int pageNumber, int pageSize) {
 		Response deleteTablesResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
@@ -276,7 +276,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 			while ((st = br.readLine()) != null) {
 				if (lineNumber != 0) {
 					String currentTableName = st.split(",")[1];
-					if(forDeleteTableList) {
+					if(getDeletedTableListWithTenantId) {
 						tableUnderDeletionList.add(currentTableName);
 					}else {
 						tableUnderDeletionList.add(currentTableName.split("_")[0]);
@@ -320,6 +320,9 @@ public class TableDeleteService implements TableDeleteServicePort {
 					String tableName = st.split(",")[1];
 					Map<String, String> userPropsMap = searchJAdapter.getUserPropsFromCollectionConfig(
 							tableName);
+					
+					System.out.println("userPropsMap >>>>>>> "+userPropsMap);
+					
 					String deleteTableTenantName = null;
 					if(userPropsMap != null && !userPropsMap.isEmpty() && userPropsMap.containsKey("tenantName"))
 						deleteTableTenantName = userPropsMap.get("tenantName");

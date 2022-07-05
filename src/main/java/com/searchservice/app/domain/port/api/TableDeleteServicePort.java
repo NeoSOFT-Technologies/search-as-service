@@ -22,9 +22,9 @@ public interface TableDeleteServicePort {
 
 	public boolean isTableUnderDeletion(String tableName);
 
-	public Response getTablesUnderDeletion(boolean forDeleteTableList);
+	public Response getTablesUnderDeletion(boolean getDeletedTableListWithTenantId);
 	
-	public Response getTablesUnderDeletionPagination(boolean forDeleteTableList, int pageNumber, int pageSize);
+	public Response getTablesUnderDeletionPagination(boolean getDeletedTableListWithTenantId, int pageNumber, int pageSize);
 
 	public boolean checkIfTableDeleteFileExist(File file);
 	

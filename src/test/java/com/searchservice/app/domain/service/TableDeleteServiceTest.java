@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -36,6 +37,7 @@ import com.searchservice.app.domain.dto.Response;
 import com.searchservice.app.domain.port.api.ManageTableServicePort;
 import com.searchservice.app.domain.port.api.TableDeleteServicePort;
 import com.searchservice.app.domain.utils.DateUtil;
+import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
 import com.searchservice.app.rest.errors.CustomException;
 import com.searchservice.app.rest.errors.HttpStatusCode;
 
@@ -63,6 +65,9 @@ class TableDeleteServiceTest {
 	@MockBean
 	private ManageTableServicePort manageTableServicePort;
 
+	@MockBean
+	SearchJAdapter searchJAdapter;
+	
 	@InjectMocks
 	private TableDeleteService tableDeleteService;
 	
@@ -102,6 +107,7 @@ class TableDeleteServiceTest {
 	void setMockitoTableNotExists() {
 		 Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(false);
 	}
+	
 	@Test
 	void testTableDeletion() {
 		
@@ -186,21 +192,23 @@ class TableDeleteServiceTest {
 
 	@Test
 	void getTableUndeDeletionTest() {
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(false);
+		Response  tableUnderDeletion = tableDeleteService.getTablesUnderDeletion(false);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 	
 	
 
 	@Test
-	void getTableUndeDeletionByTenantIdTest() {
-		Response  tableUnderDeletion = tableDeleteService.getTablesUnderDeletionForTenant(101);
+	void getTablesUndeDeletionByTenantTest() {
+		Mockito.when(searchJAdapter.getUserPropsFromCollectionConfig(
+				Mockito.any())).thenReturn(Collections.emptyMap());
+		Response  tableUnderDeletion = tableDeleteService.getTablesUnderDeletionForTenant("TestTenant", 1, 1);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 	
 	@Test
 	void getAllTableUndeDeletionTest() {
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletion(true);
+		Response  tableUnderDeletion = tableDeleteService.getTablesUnderDeletion(true);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 
