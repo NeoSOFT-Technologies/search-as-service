@@ -662,9 +662,7 @@ public class ManageTableService implements ManageTableServicePort {
 		Map<String, String> tableTenantMap = new HashMap<>();
 		for(String tableWithTenantId: tablesList) {
 			String table = tableWithTenantId.split("_")[0];
-			
-			System.out.println("table >>>>>>> "+table);
-			
+
 			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableWithTenantId);
 			if(userPropsResponseMap != null 
 					&& !userPropsResponseMap.isEmpty() 
@@ -673,9 +671,6 @@ public class ManageTableService implements ManageTableServicePort {
 				tableTenantMap.put(table, tenantName);
 			} else
 				tableTenantMap.put(table, null);
-			
-			System.out.println("tableTenantMap >>>>>> "+tableTenantMap);
-			
 		}
 		
 		return tableTenantMap;

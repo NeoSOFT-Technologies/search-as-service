@@ -320,9 +320,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 					String tableName = st.split(",")[1];
 					Map<String, String> userPropsMap = searchJAdapter.getUserPropsFromCollectionConfig(
 							tableName);
-					
-					System.out.println("userPropsMap >>>>>>> "+userPropsMap);
-					
+
 					String deleteTableTenantName = null;
 					if(userPropsMap != null && !userPropsMap.isEmpty() && userPropsMap.containsKey("tenantName"))
 						deleteTableTenantName = userPropsMap.get("tenantName");

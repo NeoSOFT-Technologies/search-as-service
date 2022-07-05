@@ -386,7 +386,6 @@ class ManageTableServiceTest {
 	@Test
 	void createTableIfNotPresentNullColumns() {
 	setMockitoBadResponseForService();
-	//setMockitoTableNotExist();
 		Response response = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, response.getStatusCode());
 	}
@@ -402,7 +401,6 @@ class ManageTableServiceTest {
 
 	@Test
 	void testGetCurrentTableSchema() {
-
 		try {
 
 			manageTableService.getCurrentTableSchema(tenantId, tableName);
@@ -459,7 +457,6 @@ class ManageTableServiceTest {
 
 	@Test
 	void deleteTable() {
-		// Mockito.when(manageTableServicePort.isTableExists(Mockito.anyString())).thenReturn(true);
 		setMockitoSuccessResponseForService();
 		Response rs = manageTableService.deleteTable(tableName);
 		assertEquals(200, rs.getStatusCode());
