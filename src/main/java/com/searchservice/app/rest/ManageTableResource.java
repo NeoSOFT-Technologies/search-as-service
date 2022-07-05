@@ -162,14 +162,18 @@ public class ManageTableResource {
 			// GET tableSchema
 		TableSchema tableInfoResponseDTO = manageTableServicePort.getCurrentTableSchema(tenantId, tableName);
 		if (tableInfoResponseDTO == null)
-			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
-						HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
+			throw new CustomException(
+					HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(),
+					HttpStatusCode.NULL_POINTER_EXCEPTION, 
+					"Table Information could not be retrieved. "+HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
 		if (tableInfoResponseDTO.getStatusCode() == 200) {
 			tableInfoResponseDTO.setMessage("Table Information retrieved successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(tableInfoResponseDTO);
 		} else {
-			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-						HttpStatusCode.BAD_REQUEST_EXCEPTION,String.format(ERROR_MSG+ "Fetching Schema Details For Table: %s Having TenantID; %d",tableName, tenantId));
+			throw new CustomException(
+					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, 
+					String.format(ERROR_MSG+ " Fetching Schema Details For Table: %s Having TenantID; %d", tableName, tenantId));
 		}
 	}
 
