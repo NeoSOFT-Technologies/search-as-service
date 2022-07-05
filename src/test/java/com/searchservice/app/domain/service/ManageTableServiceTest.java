@@ -525,6 +525,19 @@ class ManageTableServiceTest {
 		TableSchema getCurrentTableSchema = manageTableService.getCurrentTableSchema(tenantId, tableName);
 		assertEquals(200, getCurrentTableSchema.getStatusCode());
 	}
+	
+	@Test
+	void getSchemaForTableUnderDeletion() {
+
+		setMockitoSuccessResponseForService();
+		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
+		try {
+	           manageTableService.getCurrentTableSchema(tenantId, tableName);
+		}catch(CustomException e)
+		{
+			assertEquals(HttpStatusCode.UNDER_DELETION_PROCESS.getCode(), e.getExceptionCode());
+		}
+	}
 
 	@Test
 	void createTable() {
@@ -541,6 +554,7 @@ class ManageTableServiceTest {
 		setMockitoSuccessResponseForService();
 		setUpManageTable(1,0);
 		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
+		manageTable.setTableName(tableName+"_"+109);
 		Response se = manageTableService.createTableIfNotPresent(manageTable);
 		assertEquals(200, se.getStatusCode());
 	}
@@ -551,6 +565,7 @@ class ManageTableServiceTest {
 		setMockitoSuccessResponseForService();
 		setUpManageTable(1,0);
 		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(true);
+		manageTable.setTableName(tableName+"_"+110);
 		try {
 		   manageTableService.createTableIfNotPresent(manageTable);
 		}catch(CustomException e)
@@ -565,7 +580,7 @@ class ManageTableServiceTest {
 		setMockitoSuccessResponseForService();
 		setUpManageTable(1,0);
 		Mockito.when(tableDeleteServicePort.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
-		manageTable.setTableName(tableName+"@3");
+		manageTable.setTableName(tableName+"@3"+"_101");
 		try {
 		   manageTableService.createTableIfNotPresent(manageTable);
 		}catch(CustomException e)
