@@ -59,6 +59,9 @@ public class SearchJAdapter {
 	
 	@Value("${base-search-url}")
 	private String searchURL;
+	
+	@Value("${manage-table.config-overlay-url}")
+	private String configOverlayUrl;
 
 	@Value("${basic-auth.username}")
 	private String basicAuthUsername;
@@ -114,7 +117,7 @@ public class SearchJAdapter {
 		ResponseEntity<String> response = null;
 		Map<String, String> userPropsResponseMap = null;
 		try {
-			String url = searchURL+ "/" +tableNameWithTenantId+ "/config/overlay?omitHeader=true";
+			String url = searchURL+ "/" +tableNameWithTenantId+ configOverlayUrl;
 			response = restTemplate.getForEntity(new URI(url), String.class);
 
 			userPropsResponseMap = ManageTableUtil.getUserPropsFromJsonResponse(response.getBody());
