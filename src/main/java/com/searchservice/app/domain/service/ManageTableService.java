@@ -9,14 +9,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.searchservice.app.config.CapacityPlanProperties;
 import com.searchservice.app.config.TenantInfoConfigProperties;
 import com.searchservice.app.domain.dto.Response;
@@ -151,33 +153,67 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response getTables(int tenantId) {
+	public Response getTablesForTenant(String tenantName) {
 		
 		searchJAdapter.checkIfSearchServerDown();
 		
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getListItemsResponseDTO = new Response();
-
-		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS),
-				tenantId);
-
 		try {
-			data = data.stream().map(datalist -> datalist.split("_" + tenantId)[0]).collect(Collectors.toList());
+			List<String> existingTablesList = getTablesListFromServer();
 
-			getListItemsResponseDTO.setData(data);
+			// Prepare tables list with corressponding tenantName (fetched from server)
+			Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
+
+			// Prepare final-table-list for given tenantName
+			List<Response.TableListResponse> tableListForGivenTenant = ManageTableUtil.getTableListForTenant(existingTablesList, tableTenantMap, tenantName);
+			getListItemsResponseDTO.setTableList(
+					tableListForGivenTenant);
+			getListItemsResponseDTO.setDataSize(tableListForGivenTenant.size());
+			getListItemsResponseDTO.setData(null);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables Having TenantID: "+tenantId);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantName: " + tenantName);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			getListItemsResponseDTO.setMessage("Unable to retrieve tables for TenantID: "+tenantId);
-
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantName);
 		}
 
 		return getListItemsResponseDTO;
 	}
+	
+	@Override
+	public Response getTablesForTenantPagination(String tenantName, int pageNumber, int pageSize) {
+		
+		searchJAdapter.checkIfSearchServerDown();
+		
+		Response getListItemsResponseDTO = new Response();
+		try {
+			List<String> existingTablesList = getTablesListFromServer();
+
+			// Prepare tables list with corressponding tenantName (fetched from server)
+			Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
+
+			// Get paginated list of tables
+			List<Response.TableListResponse> paginatedTableListForGivenTenant = ManageTableUtil.getPaginatedTableListForTenant(
+					existingTablesList, tableTenantMap, pageNumber, pageSize, tenantName);
+			getListItemsResponseDTO.setTableList(
+					paginatedTableListForGivenTenant);
+			getListItemsResponseDTO.setData(null);
+			getListItemsResponseDTO.setDataSize(paginatedTableListForGivenTenant.size());
+
+			getListItemsResponseDTO.setStatusCode(200);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantName: " + tenantName);
+
+		} catch (Exception e) {
+			logger.error(e.toString());
+			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantName);
+		}
+
+		return getListItemsResponseDTO;
+	}
+	
 
 	@Override
 	public Response getAllTables(int pageNumber, int pageSize) {
@@ -185,13 +221,27 @@ public class ManageTableService implements ManageTableServicePort {
 		searchJAdapter.checkIfSearchServerDown();
 		
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
-		Response getAllTableListResposnse = new Response();
+		Response getAllTableListResponse = new Response();
 		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
         List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-        getAllTableListResposnse.setData(data);
-        getAllTableListResposnse.setStatusCode(200);
-        getAllTableListResposnse.setMessage("Successfully retrieved all Tables From The Server");
-        return getAllTableListResposnse;
+        getAllTableListResponse.setData(data);
+        getAllTableListResponse.setStatusCode(200);
+        getAllTableListResponse.setMessage("Successfully retrieved all Tables From The Server");
+        
+        // Check for tables under deletion
+		List<String> existingTablesList = getAllTableListResponse.getData();
+		existingTablesList.removeAll(tableDeleteServicePort.getTablesUnderDeletion(true).getData());
+		
+		// Prepare tables list with corressponding tenantName (fetched from server)
+		Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
+		
+		// Get paginated list of tables
+		getAllTableListResponse.setTableList(ManageTableUtil.getPaginatedTableList(
+				existingTablesList, tableTenantMap, pageNumber, pageSize));
+		getAllTableListResponse.setData(null);
+		getAllTableListResponse.setDataSize(existingTablesList.size());
+        
+        return getAllTableListResponse;
 	}
 	
 	@Override
@@ -297,6 +347,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
+	
 	@Override
 	public Response updateTableSchema(int tenantId, String tableName, ManageTable tableSchemaDTO) {
 		
@@ -338,27 +389,11 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
-	@Override
-	public TableInfo getTableDetails(String tableName) {
-		
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
-		TableInfo tableInfo = new TableInfo();
-		try {
-			String clusterStatusResponseString = searchJAdapter.getClusterStatusFromSolrjCluster(searchClientActive);			
-			tableInfo = ManageTableUtil.getTableInfoFromClusterStatus(clusterStatusResponseString, tableName);	
-			
-			// Add TenantInfo to TableInfo
-			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
-			tableInfo.setTenantInfo(userPropsResponseMap);
-			
-		} catch(Exception e) {
-			logger.error("Error occurred while fetching table details: ", e);
-		}
-		
-		return tableInfo;
-	}
-	
-	// AUXILIARY methods implementations >>>>>>>>>>>>>>>>>>
+	/**
+	 *  AUXILIARY methods implementations :
+	 */
+	//---------------------------------------------------------------------------
+	// VALIDATION methods
 	@Override
 	public boolean isTableExists(String tableName) {
 		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
@@ -379,6 +414,158 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 	}
 
+	public boolean checkTableDeletionStatus(int schemaDeleteRecordCount) {
+		if (schemaDeleteRecordCount > 0) {
+
+			logger.debug("Total Number of Schema's Found and Deleted: {}", schemaDeleteRecordCount);
+			return true;
+		} else {
+			logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
+
+			return false;
+		}
+	}
+
+	@Override
+	public boolean checkIfTableNameisValid(String tableName) {
+		if (null == tableName || tableName.isBlank() || tableName.isEmpty())
+
+			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
+					HttpStatusCode.INVALID_TABLE_NAME,"Provide valid Table Name");
+		Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+		Matcher matcher = pattern.matcher(tableName);
+		return matcher.find();
+	}
+
+	public boolean checkIfSchemaFileExist(File file) {
+		if (!file.exists()) {
+			try {
+				boolean createFile = file.createNewFile();
+				if (createFile) {
+					logger.debug("File With Name: {} Created Succesfully", file.getName());
+				}
+				return true;
+			} catch (IOException e) {
+				logger.error(FILE_CREATE_ERROR, file.getName(), e);
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean isColumnNameValid(List<SchemaField> columns) {
+		if (columns == null) {
+			return true;
+		} else {
+			Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+			boolean columnNameIsValid = true;
+			for (SchemaField column : columns) {
+				Matcher matcher = pattern.matcher(column.getName());
+				if (matcher.find()) {
+					columnNameIsValid = false;
+					break;
+				}
+
+			}
+			return columnNameIsValid;
+		}
+	}
+	
+	@Override
+	public Boolean isValidFormatDataTypeForMultivalued(List<SchemaField> columns) {
+		if(columns == null) {
+			return true;
+		}else {
+		boolean multiValueCheck = true;
+		for (SchemaField column : columns) {
+			if (Boolean.FALSE.equals(TableSchemaParserUtil.isMultivaluedDataTypePlural(column))) {
+
+				multiValueCheck = false;
+				break;
+			}
+		}
+		return multiValueCheck;
+		}
+	}
+	
+	// table schema deletion
+	public void checkForSchemaSoftDeletion(int tenantId, String tableName, List<SchemaField> schemaColumns) {
+		List<SchemaField> existingSchemaAttributes = getTableSchema(tableName + "_" + tenantId).getData().getColumns();
+
+		for (SchemaField existingSchemaAttribute : existingSchemaAttributes) {
+			String exsitingSchemaName = existingSchemaAttribute.getName();
+			boolean isContains = ManageTableUtil.checkIfListContainsSchemaColumn(schemaColumns,
+					existingSchemaAttribute);
+
+			if (!(exsitingSchemaName.equalsIgnoreCase("_nest_path_") || exsitingSchemaName.equalsIgnoreCase("_root_")
+					|| exsitingSchemaName.equalsIgnoreCase("_text_") || exsitingSchemaName.equalsIgnoreCase("_version_")
+					|| exsitingSchemaName.equalsIgnoreCase("id")) && !isContains) {
+				initializeSchemaDeletion(tenantId, tableName, existingSchemaAttribute);
+			}
+		}
+
+	}
+
+	@Override
+	public void checkForSchemaDeletion() {
+		File existingSchemaFile = new File(deleteSchemaAttributesFilePath);
+		checkIfSchemaFileExist(existingSchemaFile);
+		File newSchemaFile = new File(
+				deleteSchemaAttributesFilePath.substring(0, deleteSchemaAttributesFilePath.length() - 4) + "Temp.csv");
+		int lineNumber = 0;
+		int schemaDeleteRecordCount = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
+				PrintWriter pw = new PrintWriter(new FileWriter(newSchemaFile))) {
+			String currentSchemaDeleteRecord;
+			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
+				if (lineNumber != 0) {
+					long diff = DateUtil.checkDatesDifference(currentSchemaDeleteRecord,formatter);
+					if (diff < schemaDeleteDuration) {
+						pw.println(currentSchemaDeleteRecord);
+					} else {
+						if (performSchemaDeletion(currentSchemaDeleteRecord)) {
+							schemaDeleteRecordCount++;
+
+						} else {
+							pw.println(currentSchemaDeleteRecord);
+						}
+					}
+				} else {
+					pw.println(currentSchemaDeleteRecord);
+				}
+				lineNumber++;
+			}
+			pw.flush();
+			makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
+		} catch (IOException exception) {
+			logger.error("Error While Performing Schema Deletion ", exception);
+		}
+	}
+
+	//---------------------------------------------------------------------------
+	// RETRIEVAL methods
+	@Override
+	public TableInfo getTableDetails(String tableName) {
+		
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClientWithTable(searchURL, tableName);
+		TableInfo tableInfo = new TableInfo();
+		try {
+			String clusterStatusResponseString = searchJAdapter.getClusterStatusFromSolrjCluster(searchClientActive);			
+			tableInfo = ManageTableUtil.getTableInfoFromClusterStatus(clusterStatusResponseString, tableName);	
+			
+			// Add TenantInfo to TableInfo
+			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableName);
+			tableInfo.setTenantInfo(userPropsResponseMap);
+			
+		} catch(Exception e) {
+			logger.error("Error occurred while fetching table details: ", e);
+		}
+		
+		return tableInfo;
+	}
+	
 	@Override
 	public TableSchema compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
 			TableSchema tableSchema) {
@@ -458,8 +645,96 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchemaResponseDTO;
 	}
 
+	
 	@Override
+	public Map<String, String> getAllTableTenantMap(List<String> tablesList) {
+		Map<String, String> tableTenantMap = new HashMap<>();
+		for(String tableWithTenantId: tablesList) {
+			String table = tableWithTenantId.split("_")[0];
+			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableWithTenantId);
+			if(userPropsResponseMap != null) {
+				String tenantName = userPropsResponseMap.get("tenantName");
+				tableTenantMap.put(table, tenantName);
+			} else
+				tableTenantMap.put(table, null);
+		}
+		
+		return tableTenantMap;
+	}
+	
+	
+	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
+		String tenantName = null;
+		String tenantKey = "";
+		if(tenantInfoConfigProperties != null)
+			tenantKey = tenantInfoConfigProperties.getTenant();
 
+		if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
+			logger.info(FROM_CACHE, tenantKey);
+
+			tenantName = kpmService.getRealmNameFromCache(tenantKey);
+			// Remove tenantName entry from cache after this service call
+			kpmService.evictRealmNameFromCache(tenantKey);
+			
+			if(tenantName == null)
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			try {
+				Map<String, String> userPropsMap = null;
+				if(tenantInfoConfigProperties != null) {
+					userPropsMap = Collections.singletonMap(
+							tenantInfoConfigProperties.getTenant(), tenantName);
+				} else
+					throw new NullPointerException();
+				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
+			} catch(Exception e) {
+				throw new CustomException(
+						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+						HttpStatusCode.SAAS_SERVER_ERROR, 
+						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+			}
+
+		} else {
+			throw new CustomException(
+					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
+					HttpStatusCode.SAAS_SERVER_ERROR, 
+					TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
+		}
+	}
+
+	// Soft Delete Table Schema Info Retrieval
+	public List<String> readSchemaInfoFromSchemaDeleteManager(int tenantId, String tableName) {
+		List<String> deletedSchemaAttributes = new ArrayList<>();
+		File file = new File(deleteSchemaAttributesFilePath);
+		checkIfSchemaFileExist(file);
+		try (FileReader fr = new FileReader(file)) {
+			BufferedReader br = new BufferedReader(fr);
+			int lineNumber = 0;
+			String currentDeleteRecordLine;
+			while ((currentDeleteRecordLine = br.readLine()) != null) {
+				if (lineNumber > 0) {
+					String[] currentRecordData = currentDeleteRecordLine.split(",");
+					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(tenantId))
+							&& currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
+						deletedSchemaAttributes.add(currentRecordData[3]);
+					}
+				}
+				lineNumber++;
+			}
+		} catch (Exception e) {
+			logger.error("Soft Delete SchemaInfo could not be retrieved");
+			throw new OperationIncompleteException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(),
+					"Soft Delete SchemaInfo could not be retrieved");
+		}
+
+		return deletedSchemaAttributes;
+	}
+
+	//---------------------------------------------------------------------------
+	// ALTER DATA methods
+	@Override
 	public Response createTable(CreateTable manageTableDTO) {
 		Response apiResponseDTO = new Response();
 
@@ -502,47 +777,6 @@ public class ManageTableService implements ManageTableServicePort {
 
 		}
 		return apiResponseDTO;
-	}
-
-	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
-		String tenantName = null;
-		String tenantKey = "";
-		if(tenantInfoConfigProperties != null)
-			tenantKey = tenantInfoConfigProperties.getTenant();
-
-		if(kpmService.checkIfRealmNameExistsInCache(tenantKey)) {
-			logger.info(FROM_CACHE, tenantKey);
-
-			tenantName = kpmService.getRealmNameFromCache(tenantKey);
-			// Remove tenantName entry from cache after this service call
-			kpmService.evictRealmNameFromCache(tenantKey);
-			
-			if(tenantName == null)
-				throw new CustomException(
-						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-						HttpStatusCode.SAAS_SERVER_ERROR, 
-						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			try {
-				Map<String, String> userPropsMap = null;
-				if(tenantInfoConfigProperties != null) {
-					userPropsMap = Collections.singletonMap(
-							tenantInfoConfigProperties.getTenant(), tenantName);
-				} else
-					throw new NullPointerException();
-				searchJAdapter.setUserPropertiesInCollectionConfig(userPropsMap, manageTableDTO.getTableName());
-			} catch(Exception e) {
-				throw new CustomException(
-						HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-						HttpStatusCode.SAAS_SERVER_ERROR, 
-						TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-			}
-
-		} else {
-			throw new CustomException(
-					HttpStatusCode.SAAS_SERVER_ERROR.getCode(), 
-					HttpStatusCode.SAAS_SERVER_ERROR, 
-					TENANT_INFO_ERROR_MSG+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
-		}
 	}
 
 	@Override
@@ -690,24 +924,7 @@ public class ManageTableService implements ManageTableServicePort {
 		return apiResponseDTO;
 	}
 
-	// Table schema deletion
-	public void checkForSchemaSoftDeletion(int tenantId, String tableName, List<SchemaField> schemaColumns) {
-		List<SchemaField> existingSchemaAttributes = getTableSchema(tableName + "_" + tenantId).getData().getColumns();
-
-		for (SchemaField existingSchemaAttribute : existingSchemaAttributes) {
-			String exsitingSchemaName = existingSchemaAttribute.getName();
-			boolean isContains = ManageTableUtil.checkIfListContainsSchemaColumn(schemaColumns,
-					existingSchemaAttribute);
-
-			if (!(exsitingSchemaName.equalsIgnoreCase("_nest_path_") || exsitingSchemaName.equalsIgnoreCase("_root_")
-					|| exsitingSchemaName.equalsIgnoreCase("_text_") || exsitingSchemaName.equalsIgnoreCase("_version_")
-					|| exsitingSchemaName.equalsIgnoreCase("id")) && !isContains) {
-				initializeSchemaDeletion(tenantId, tableName, existingSchemaAttribute);
-			}
-		}
-
-	}
-
+	// soft deletion
 	public void initializeSchemaDeletion(int tenantId, String tableName,SchemaField schemaField) {
 		File file = new File(deleteSchemaAttributesFilePath);
 		String columnName = schemaField.getName();	
@@ -725,70 +942,18 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 	}
 
-	// Soft Delete Table Schema Info Retrieval
-	public List<String> readSchemaInfoFromSchemaDeleteManager(int tenantId, String tableName) {
-		List<String> deletedSchemaAttributes = new ArrayList<>();
-		File file = new File(deleteSchemaAttributesFilePath);
-		checkIfSchemaFileExist(file);
-		try (FileReader fr = new FileReader(file)) {
-			BufferedReader br = new BufferedReader(fr);
-			int lineNumber = 0;
-			String currentDeleteRecordLine;
-			while ((currentDeleteRecordLine = br.readLine()) != null) {
-				if (lineNumber > 0) {
-					String[] currentRecordData = currentDeleteRecordLine.split(",");
-					if (currentRecordData[0].equalsIgnoreCase(String.valueOf(tenantId))
-							&& currentRecordData[1].equalsIgnoreCase(String.valueOf(tableName))) {
-						deletedSchemaAttributes.add(currentRecordData[3]);
-					}
-				}
-				lineNumber++;
-			}
-		} catch (Exception e) {
-			logger.error("Soft Delete SchemaInfo could not be retrieved");
-			throw new OperationIncompleteException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(),
-					"Soft Delete SchemaInfo could not be retrieved");
-		}
+	private List<String> getTablesListFromServer() {
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 
-		return deletedSchemaAttributes;
+		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
+		List<String> existingTablesList = TypeCastingUtil
+				.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+
+		// Check for tables under deletion
+		existingTablesList.removeAll(tableDeleteServicePort.getTablesUnderDeletion(true).getData());
+		return existingTablesList;
 	}
-
-	@Override
-	public void checkForSchemaDeletion() {
-		File existingSchemaFile = new File(deleteSchemaAttributesFilePath);
-		checkIfSchemaFileExist(existingSchemaFile);
-		File newSchemaFile = new File(
-				deleteSchemaAttributesFilePath.substring(0, deleteSchemaAttributesFilePath.length() - 4) + "Temp.csv");
-		int lineNumber = 0;
-		int schemaDeleteRecordCount = 0;
-		try (BufferedReader br = new BufferedReader(new FileReader(existingSchemaFile));
-				PrintWriter pw = new PrintWriter(new FileWriter(newSchemaFile))) {
-			String currentSchemaDeleteRecord;
-			while ((currentSchemaDeleteRecord = br.readLine()) != null) {
-				if (lineNumber != 0) {
-					long diff = DateUtil.checkDatesDifference(currentSchemaDeleteRecord,formatter);
-					if (diff < schemaDeleteDuration) {
-						pw.println(currentSchemaDeleteRecord);
-					} else {
-						if (performSchemaDeletion(currentSchemaDeleteRecord)) {
-							schemaDeleteRecordCount++;
-
-						} else {
-							pw.println(currentSchemaDeleteRecord);
-						}
-					}
-				} else {
-					pw.println(currentSchemaDeleteRecord);
-				}
-				lineNumber++;
-			}
-			pw.flush();
-			makeDeleteTableFileChangesForDelete(newSchemaFile, existingSchemaFile, schemaDeleteRecordCount);
-		} catch (IOException exception) {
-			logger.error("Error While Performing Schema Deletion ", exception);
-		}
-	}
-
+	
 	public boolean performSchemaDeletion(String schemaDeleteData) {
 		String columnName = schemaDeleteData.split(",")[3];
 		String tableName = schemaDeleteData.split(",")[1];
@@ -818,81 +983,6 @@ public class ManageTableService implements ManageTableServicePort {
 		checkIfSchemaFileExist(schemaDeleteRecordFile);
 		if (existingFile.delete() && newFile.renameTo(schemaDeleteRecordFile)) {
 			checkTableDeletionStatus(schemaDeleteRecordCount);
-		}
-	}
-
-	public boolean checkTableDeletionStatus(int schemaDeleteRecordCount) {
-		if (schemaDeleteRecordCount > 0) {
-
-			logger.debug("Total Number of Schema's Found and Deleted: {}", schemaDeleteRecordCount);
-			return true;
-		} else {
-			logger.debug("No Schema Records Were Found and Deleted With Request More Or Equal To 15 days");
-
-			return false;
-		}
-	}
-
-	@Override
-	public boolean checkIfTableNameisValid(String tableName) {
-		if (null == tableName || tableName.isBlank() || tableName.isEmpty())
-
-			throw new CustomException(HttpStatusCode.INVALID_TABLE_NAME.getCode(),
-					HttpStatusCode.INVALID_TABLE_NAME,"Provide valid Table Name");
-		Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
-		Matcher matcher = pattern.matcher(tableName);
-		return matcher.find();
-	}
-
-	public boolean checkIfSchemaFileExist(File file) {
-		if (!file.exists()) {
-			try {
-				boolean createFile = file.createNewFile();
-				if (createFile) {
-					logger.debug("File With Name: {} Created Succesfully", file.getName());
-				}
-				return true;
-			} catch (IOException e) {
-				logger.error(FILE_CREATE_ERROR, file.getName(), e);
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean isColumnNameValid(List<SchemaField> columns) {
-		if (columns == null) {
-			return true;
-		} else {
-			Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
-			boolean columnNameIsValid = true;
-			for (SchemaField column : columns) {
-				Matcher matcher = pattern.matcher(column.getName());
-				if (matcher.find()) {
-					columnNameIsValid = false;
-					break;
-				}
-
-			}
-			return columnNameIsValid;
-		}
-	}
-	@Override
-	public Boolean isValidFormatDataTypeForMultivalued(List<SchemaField> columns) {
-		if(columns == null) {
-			return true;
-		}else {
-		boolean multiValueCheck = true;
-		for (SchemaField column : columns) {
-			if (Boolean.FALSE.equals(TableSchemaParserUtil.isMultivaluedDataTypePlural(column))) {
-
-				multiValueCheck = false;
-				break;
-			}
-		}
-		return multiValueCheck;
 		}
 	}
 

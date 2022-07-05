@@ -309,14 +309,14 @@ class ManageTableServiceTest {
 	@Test
 	void getTablesInvalidData() {
 		setMockitoBadResponseForService();
-		Response resp = manageTableService.getTables(tenantId);
+		Response resp = manageTableService.getTablesForTenant(tenantId);
 		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), resp.getStatusCode());
 	}
 
 	@Test
 	void testGetTables() {
 		setMockitoSuccessResponseForService();
-		Response resp = manageTableService.getTables(tenantId);
+		Response resp = manageTableService.getTablesForTenant(tenantId);
 
 		assertEquals(200, resp.getStatusCode());
 

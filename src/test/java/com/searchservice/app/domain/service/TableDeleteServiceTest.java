@@ -194,7 +194,7 @@ class TableDeleteServiceTest {
 
 	@Test
 	void getTableUndeDeletionByTenantIdTest() {
-		Response  tableUnderDeletion = tableDeleteService.getTableUnderDeletionWithTenantId(101);
+		Response  tableUnderDeletion = tableDeleteService.getTablesUnderDeletionForTenant(101);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 	

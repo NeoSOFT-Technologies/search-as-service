@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.searchservice.app.domain.dto.table.ManageTable;
@@ -114,8 +116,11 @@ public class SearchJAdapter {
 		try {
 			String url = searchURL+ "/" +tableNameWithTenantId+ "/config/overlay?omitHeader=true";
 			response = restTemplate.getForEntity(new URI(url), String.class);
-			
+
 			userPropsResponseMap = ManageTableUtil.getUserPropsFromJsonResponse(response.getBody());
+		} catch (HttpClientErrorException e) {
+			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
+			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
 		}

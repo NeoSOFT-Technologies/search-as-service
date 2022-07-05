@@ -15,6 +15,7 @@ import com.searchservice.app.domain.dto.table.SchemaField;
 import com.searchservice.app.domain.dto.table.TableInfo;
 
 public class ManageTableUtil {
+	
 	private ManageTableUtil() {}
 	
 	public static boolean checkIfListContainsSchemaColumn(List<SchemaField> list, SchemaField schemaColumn) {
@@ -25,32 +26,56 @@ public class ManageTableUtil {
 		return false;
 	}
 
-	public static List<Response.TableListResponse> getPaginatedTableList(
-			List<String> data, int pageNumber, int pageSize){
-		
+	public static List<Response.TableListResponse> getTableListForTenant(
+			List<String> data, Map<String, String> tableTenantMap, String tenantName){
 		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
-		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
 
-		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-			paginatedTableList.add(new Response.TableListResponse(Integer.parseInt(data.get(i + currIdx).split("_")[1]),
-					data.get(i + currIdx).split("_")[0]));
+		for (String table : data) {
+			String tableName = table.split("_")[0];
+
+			boolean returnThisTable = tableTenantMap.get(tableName) != null && tableTenantMap.containsKey(tableName)
+					&& tableTenantMap.get(tableName).equals(tenantName);
+			if (returnThisTable)
+				paginatedTableList.add(new Response.TableListResponse(tenantName, tableName));
 		}
 	    	
 		return paginatedTableList;
 	}
 	
-	public static List<Response.TableListResponse> getPaginatedTableListWithTenantId(
-			List<String> data, int pageNumber, int pageSize, int tenantId){
-		List<Response.TableListResponse> paginatedTableListWithTenantId = new ArrayList<>();
+	public static List<Response.TableListResponse> getPaginatedTableList(
+			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize){
+		
+		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
-	    for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {		
-	    	paginatedTableListWithTenantId.add(new Response.TableListResponse(
-							tenantId, data.get(i + currIdx)));
+
+		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+			String tableName = data.get(i + currIdx).split("_")[0];
+			paginatedTableList.add(new Response.TableListResponse(
+					tableTenantMap.get(tableName) != null ? tableTenantMap.get(tableName) : "No Tenant Found", 
+					tableName));
+		}
 	    	
-	    }
-		return paginatedTableListWithTenantId;
+		return paginatedTableList;
 	}
-	
+
+	public static List<Response.TableListResponse> getPaginatedTableListForTenant(
+			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize, String tenantName){
+		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
+		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
+
+		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
+			String tableName = data.get(i + currIdx).split("_")[0];
+			
+			// Set table to the result if given tenantName is associated with it
+			boolean returnThisTable = tableTenantMap.get(tableName) != null
+					&& tableTenantMap.containsKey(tableName)
+					&& tableTenantMap.get(tableName).equals(tenantName);
+			if(returnThisTable)
+				paginatedTableList.add(new Response.TableListResponse(tenantName, tableName));
+		}
+	    	
+		return paginatedTableList;
+	}
 
 	public static Map<String, SchemaField> removeExistingFields(
 													Map<String, SchemaField> newFieldsHashMap, 
