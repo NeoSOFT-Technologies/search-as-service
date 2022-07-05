@@ -88,6 +88,7 @@ class ManageTableServiceTest {
 	
 	private String tableName = "automatedTestCollection";
 	private int tenantId = 101;
+	private String tenantName = "TestTenant";
 
 	@MockBean
 	SearchAPIAdapter solrApiAdapterMocked;
@@ -316,7 +317,7 @@ class ManageTableServiceTest {
 	@Test
 	void testGetTables() {
 		setMockitoSuccessResponseForService();
-		Response resp = manageTableService.getTablesForTenant(tenantId);
+		Response resp = manageTableService.getTablesForTenant(tenantName);
 
 		assertEquals(200, resp.getStatusCode());
 

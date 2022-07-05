@@ -220,27 +220,27 @@ public class ManageTableService implements ManageTableServicePort {
 		
 		searchJAdapter.checkIfSearchServerDown();
 		
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
 		Response getAllTableListResponse = new Response();
-		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-        List<String> data = TypeCastingUtil.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-        getAllTableListResponse.setData(data);
-        getAllTableListResponse.setStatusCode(200);
-        getAllTableListResponse.setMessage("Successfully retrieved all Tables From The Server");
-        
-        // Check for tables under deletion
-		List<String> existingTablesList = getAllTableListResponse.getData();
-		existingTablesList.removeAll(tableDeleteServicePort.getTablesUnderDeletion(true).getData());
-		
-		// Prepare tables list with corressponding tenantName (fetched from server)
-		Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
-		
-		// Get paginated list of tables
-		getAllTableListResponse.setTableList(ManageTableUtil.getPaginatedTableList(
-				existingTablesList, tableTenantMap, pageNumber, pageSize));
-		getAllTableListResponse.setData(null);
-		getAllTableListResponse.setDataSize(existingTablesList.size());
-        
+		try {
+			List<String> existingTablesList = getTablesListFromServer();
+			
+			// Prepare tables list with corressponding tenantName (fetched from server)
+			Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
+			
+			// Get paginated list of tables
+			getAllTableListResponse.setTableList(ManageTableUtil.getPaginatedTableList(
+					existingTablesList, tableTenantMap, pageNumber, pageSize));
+			getAllTableListResponse.setData(null);
+			getAllTableListResponse.setDataSize(existingTablesList.size());
+			
+			getAllTableListResponse.setStatusCode(200);
+			getAllTableListResponse.setMessage("Successfully retrieved all Tables from server");
+		} catch(Exception e) {
+			logger.error(e.toString());
+			getAllTableListResponse.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
+			getAllTableListResponse.setMessage("Unable to retrieve tables from server");
+		}
+
         return getAllTableListResponse;
 	}
 	
@@ -645,23 +645,41 @@ public class ManageTableService implements ManageTableServicePort {
 		return tableSchemaResponseDTO;
 	}
 
+	public List<String> getTablesListFromServer() {
+		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
+
+		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
+		List<String> existingTablesList = TypeCastingUtil
+				.castToListOfStrings(response.getResponse().get(COLLECTIONS));
+
+		// Check for tables under deletion
+		existingTablesList.removeAll(tableDeleteServicePort.getTablesUnderDeletion(true).getData());
+		return existingTablesList;
+	}
 	
 	@Override
 	public Map<String, String> getAllTableTenantMap(List<String> tablesList) {
 		Map<String, String> tableTenantMap = new HashMap<>();
 		for(String tableWithTenantId: tablesList) {
 			String table = tableWithTenantId.split("_")[0];
+			
+			System.out.println("table >>>>>>> "+table);
+			
 			Map<String, String> userPropsResponseMap = searchJAdapter.getUserPropsFromCollectionConfig(tableWithTenantId);
-			if(userPropsResponseMap != null) {
+			if(userPropsResponseMap != null 
+					&& !userPropsResponseMap.isEmpty() 
+					&& userPropsResponseMap.containsKey("tenantName")) {
 				String tenantName = userPropsResponseMap.get("tenantName");
 				tableTenantMap.put(table, tenantName);
 			} else
 				tableTenantMap.put(table, null);
+			
+			System.out.println("tableTenantMap >>>>>> "+tableTenantMap);
+			
 		}
 		
 		return tableTenantMap;
 	}
-	
 	
 	public void fetchTenantNameFromCacheAndSetInCollectionConfig(CreateTable manageTableDTO) {
 		String tenantName = null;
@@ -940,18 +958,6 @@ public class ManageTableService implements ManageTableServicePort {
 		} catch (IOException e) {
 			logger.error("Error While Intializing Deletion for Schema :{} ", columnName);
 		}
-	}
-
-	private List<String> getTablesListFromServer() {
-		HttpSolrClient searchClientActive = searchAPIPort.getSearchClient(searchURL);
-
-		CollectionAdminResponse response = searchJAdapter.getCollectionAdminRequestList(searchClientActive);
-		List<String> existingTablesList = TypeCastingUtil
-				.castToListOfStrings(response.getResponse().get(COLLECTIONS));
-
-		// Check for tables under deletion
-		existingTablesList.removeAll(tableDeleteServicePort.getTablesUnderDeletion(true).getData());
-		return existingTablesList;
 	}
 	
 	public boolean performSchemaDeletion(String schemaDeleteData) {

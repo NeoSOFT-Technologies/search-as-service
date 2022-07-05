@@ -44,7 +44,7 @@ public class Response extends BaseResponse{
 	@AllArgsConstructor
 	public static class TableListResponse {
 		private String tenantName;
-		private int tenantId;
+		private Integer tenantId;
 		private String tableName;
 		
 		public TableListResponse(String tableName) {

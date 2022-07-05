@@ -119,10 +119,11 @@ public class SearchJAdapter {
 
 			userPropsResponseMap = ManageTableUtil.getUserPropsFromJsonResponse(response.getBody());
 		} catch (HttpClientErrorException e) {
-			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
+			logger.error("User properties from config overlay could not be fetched: ", e);
 			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
+			return Collections.emptyMap();
 		}
 
 		return userPropsResponseMap;

@@ -110,7 +110,7 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ "Fetching All Tables From The Server"));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching All Tables From The Server"));
 		}
 	}
 	

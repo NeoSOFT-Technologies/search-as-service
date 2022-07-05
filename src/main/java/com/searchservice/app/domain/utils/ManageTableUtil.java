@@ -28,31 +28,36 @@ public class ManageTableUtil {
 
 	public static List<Response.TableListResponse> getTableListForTenant(
 			List<String> data, Map<String, String> tableTenantMap, String tenantName){
-		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
-
+		List<Response.TableListResponse> tableList = new ArrayList<>();
+		
 		for (String table : data) {
 			String tableName = table.split("_")[0];
-
-			boolean returnThisTable = tableTenantMap.get(tableName) != null && tableTenantMap.containsKey(tableName)
+			int tenantId = Integer.parseInt(table.split("_")[1]);
+			boolean returnThisTable = tableTenantMap.containsKey(tableName) 
+					&& tableTenantMap.get(tableName) != null
 					&& tableTenantMap.get(tableName).equals(tenantName);
-			if (returnThisTable)
-				paginatedTableList.add(new Response.TableListResponse(tenantName, tableName));
+			if(returnThisTable)
+				tableList.add(new Response.TableListResponse(
+								tenantName, tenantId, tableName));
 		}
 	    	
-		return paginatedTableList;
+		return tableList;
 	}
 	
 	public static List<Response.TableListResponse> getPaginatedTableList(
 			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize){
-		
 		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
+		
 		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
-
 		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
 			String tableName = data.get(i + currIdx).split("_")[0];
-			paginatedTableList.add(new Response.TableListResponse(
-					tableTenantMap.get(tableName) != null ? tableTenantMap.get(tableName) : "No Tenant Found", 
-					tableName));
+			int tenantId = Integer.parseInt(data.get(i + currIdx).split("_")[1]);
+			paginatedTableList.add(
+					new Response.TableListResponse(
+							(tableTenantMap.containsKey(tableName) && tableTenantMap.get(tableName) != null)
+							? tableTenantMap.get(tableName) : "No Tenant Found", 
+									tenantId, 
+									tableName));
 		}
 	    	
 		return paginatedTableList;
@@ -60,21 +65,22 @@ public class ManageTableUtil {
 
 	public static List<Response.TableListResponse> getPaginatedTableListForTenant(
 			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize, String tenantName){
-		List<Response.TableListResponse> paginatedTableList = new ArrayList<>();
-		int currIdx = pageNumber > 1 ? (pageNumber -1) * pageSize : 0;
-
-		for (int i = 0; i < pageSize && i < data.size() - currIdx; i++) {
-			String tableName = data.get(i + currIdx).split("_")[0];
+		List<Response.TableListResponse> paginatedTableList = getPaginatedTableList(
+				data, tableTenantMap, pageNumber, pageSize);
+		List<Response.TableListResponse> paginatedTableListForTenant = new ArrayList<>();
+		
+		for(Response.TableListResponse table: paginatedTableList) {
+			String tableName = table.getTableName();
 			
 			// Set table to the result if given tenantName is associated with it
-			boolean returnThisTable = tableTenantMap.get(tableName) != null
-					&& tableTenantMap.containsKey(tableName)
+			boolean returnThisTable = tableTenantMap.containsKey(tableName)
+					&& tableTenantMap.get(tableName) != null
 					&& tableTenantMap.get(tableName).equals(tenantName);
 			if(returnThisTable)
-				paginatedTableList.add(new Response.TableListResponse(tenantName, tableName));
+				paginatedTableListForTenant.add(table);
 		}
 	    	
-		return paginatedTableList;
+		return paginatedTableListForTenant;
 	}
 
 	public static Map<String, SchemaField> removeExistingFields(
