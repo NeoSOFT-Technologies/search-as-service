@@ -330,11 +330,18 @@ class ManageTableServiceTest {
 
 	}
 	
-
 	@Test
 	void testGetAllTables() {
 		setMockitoSuccessResponseForService();
 		Response resp = manageTableService.getAllTables(1, 2);
+		assertEquals(200, resp.getStatusCode());
+
+	}
+	
+	@Test
+	void testGetTablesForTenantPagination() {
+		setMockitoSuccessResponseForService();
+		Response resp = manageTableService.getTablesForTenantPagination(tenantName, 1, 2);
 		assertEquals(200, resp.getStatusCode());
 
 	}

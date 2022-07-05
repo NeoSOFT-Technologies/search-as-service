@@ -174,8 +174,14 @@ class TableDeleteServiceTest {
 	}
 
 	@Test
-	void getTableUndeDeletionTest() {
+	void testGetTableUndeDeletion() {
 		Response tableUnderDeletion = tableDeleteService.getTablesUnderDeletion(false);
+		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
+	}
+	
+	@Test
+	void testGetTableUndeDeletionPagination() {
+		Response tableUnderDeletion = tableDeleteService.getTablesUnderDeletionPagination(true, 1, 1);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 
