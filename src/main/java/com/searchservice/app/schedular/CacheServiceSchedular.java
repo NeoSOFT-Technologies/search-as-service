@@ -14,7 +14,7 @@ public class CacheServiceSchedular {
 	
     @Autowired
     CacheManager cacheManager;
-
+    
     public void evictAllCaches() {
         cacheManager.getCacheNames().stream()
           .forEach(cacheName -> cacheManager.getCache(cacheName).clear());

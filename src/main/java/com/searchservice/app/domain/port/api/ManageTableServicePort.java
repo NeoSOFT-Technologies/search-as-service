@@ -1,6 +1,7 @@
 package com.searchservice.app.domain.port.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,9 @@ public interface ManageTableServicePort {
 	
 	Response getAllTables(int startRecord, int pageSize);
 	
-	Response getTables(int tenantId);
+	Response getTablesForTenant(int tenantId);
+	
+	Response getTablesForTenantPagination(int tenantId, int startRecord, int pageSize);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);
 	
@@ -46,6 +49,8 @@ public interface ManageTableServicePort {
 
 	TableInfo getTableDetails(String tableName);
 	
+	Map<String, String> getAllTableTenantMap(List<String> tablesList);
+	
 	Response createTable(CreateTable manageTableDTO);
 
 	Response addSchemaFields(ManageTable tableSchemaDTO);
@@ -58,7 +63,7 @@ public interface ManageTableServicePort {
 	TableSchema compareCloudSchemaWithSoftDeleteSchemaReturnCurrentSchema(String tableName, int tenantId,
 			TableSchema tableSchema);
 
-	// Validatio methods
+	// Validation methods
 	boolean isTableExists(String tableName);
 	
 	boolean checkIfTableNameisValid(String tableName);
