@@ -43,8 +43,13 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
-@TestPropertySource(properties = { "table-delete-duration.days: 15",
-		"table-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv" })
+@TestPropertySource(
+		properties = {
+				"table-delete-duration.days: 15", 
+				"table-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv", 
+				"manage-table.config-overlay-url"
+		}
+)
 class TableDeleteServiceTest {
 
 	@Value("${table-delete-duration.days}")
@@ -67,6 +72,8 @@ class TableDeleteServiceTest {
 
 	private SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 
+	private int tenantId = 101;
+	
 	private Response tableDeleteIntializeResponseDTO;
 	private Response tableDeleteResponseDTO;
 
@@ -186,9 +193,9 @@ class TableDeleteServiceTest {
 	}
 
 	@Test
-	void getTablesUndeDeletionByTenantTest() {
+	void getTablesUnderDeletionByTenantTest() {
 		Mockito.when(searchJAdapter.getUserPropsFromCollectionConfig(Mockito.any())).thenReturn(Collections.emptyMap());
-		Response tableUnderDeletion = tableDeleteService.getTablesUnderDeletionForTenant("TestTenant", 1, 1);
+		Response tableUnderDeletion = tableDeleteService.getTablesUnderDeletionForTenant(tenantId, 1, 1);
 		Assertions.assertEquals(200, tableUnderDeletion.getStatusCode());
 	}
 

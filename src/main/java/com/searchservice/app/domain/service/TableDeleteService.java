@@ -1,4 +1,3 @@
-
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
@@ -233,57 +232,35 @@ public class TableDeleteService implements TableDeleteServicePort {
 	@Override
 	public Response getTablesUnderDeletion(boolean getDeletedTableListWithTenantId) {
 		Response deleteTablesResponse = new Response();
-		List<String> tableUnderDeletionList = new ArrayList<>();
+		
 		File existingFile = new File(deleteRecordFilePath);
-		checkIfTableDeleteFileExist(existingFile);
-		int lineNumber = 0;
 		try (FileReader fr = new FileReader(existingFile); BufferedReader br = new BufferedReader(fr);) {
-			String st;
-			while ((st = br.readLine()) != null) {
-				if (lineNumber != 0) {
-					String currentTableName = st.split(",")[1];
-					if(getDeletedTableListWithTenantId) {
-						tableUnderDeletionList.add(currentTableName);
-					}else {
-						tableUnderDeletionList.add(currentTableName.split("_")[0]);
-					}
-				}
-				lineNumber++;
-			}
+			checkIfTableDeleteFileExist(existingFile);
+			List<String> tableUnderDeletionList = prepareTablesUnderDeletionList(getDeletedTableListWithTenantId, br);
 			
 			deleteTablesResponse.setData(tableUnderDeletionList);
 			deleteTablesResponse.setDataSize(tableUnderDeletionList.size());
 			
 			deleteTablesResponse.setStatusCode(200);
 			deleteTablesResponse.setMessage("Successfully Retrieved All Tables Under Deletion");
+			
+			return deleteTablesResponse;
 		}
 		catch (Exception e) {
 			deleteTablesResponse.setStatusCode(400);
 			logger.error("Some Error Occured While Getting Tables Under Deletion ", e);
+			return deleteTablesResponse;
 		}
-		return deleteTablesResponse;
 	}
 	
 	@Override
 	public Response getTablesUnderDeletionPagination(boolean getDeletedTableListWithTenantId, int pageNumber, int pageSize) {
 		Response deleteTablesResponse = new Response();
-		List<String> tableUnderDeletionList = new ArrayList<>();
+		
 		File existingFile = new File(deleteRecordFilePath);
-		checkIfTableDeleteFileExist(existingFile);
-		int lineNumber = 0;
 		try (FileReader fr = new FileReader(existingFile); BufferedReader br = new BufferedReader(fr);) {
-			String st;
-			while ((st = br.readLine()) != null) {
-				if (lineNumber != 0) {
-					String currentTableName = st.split(",")[1];
-					if(getDeletedTableListWithTenantId) {
-						tableUnderDeletionList.add(currentTableName);
-					}else {
-						tableUnderDeletionList.add(currentTableName.split("_")[0]);
-					}
-				}
-				lineNumber++;
-			}
+			checkIfTableDeleteFileExist(existingFile);
+			List<String> tableUnderDeletionList = prepareTablesUnderDeletionList(getDeletedTableListWithTenantId, br);
 			
 			// Prepare tables list with corresponding tenantName (fetched from server)
 			Map<String, String> tableTenantMap = manageTableServicePort.getAllTableTenantMap(tableUnderDeletionList);
@@ -304,8 +281,28 @@ public class TableDeleteService implements TableDeleteServicePort {
 		return deleteTablesResponse;
 	}
 	
+	public List<String> prepareTablesUnderDeletionList(boolean getDeletedTableListWithTenantId, BufferedReader br)
+			throws IOException {
+		List<String> tableUnderDeletionList = new ArrayList<>();
+		
+		int lineNumber = 0;
+		String st;
+		while ((st = br.readLine()) != null) {
+			if (lineNumber != 0) {
+				String currentTableName = st.split(",")[1];
+				if(getDeletedTableListWithTenantId) {
+					tableUnderDeletionList.add(currentTableName);
+				}else {
+					tableUnderDeletionList.add(currentTableName.split("_")[0]);
+				}
+			}
+			lineNumber++;
+		}
+		return tableUnderDeletionList;
+	}
+	
 	@Override
-	public Response getTablesUnderDeletionForTenant(String tenantName, int pageNumber, int pageSize) {
+	public Response getTablesUnderDeletionForTenant(int tenantId, int pageNumber, int pageSize) {
 		Response deleteTablesByTenantNameResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
@@ -318,17 +315,9 @@ public class TableDeleteService implements TableDeleteServicePort {
 				if (lineNumber != 0) {
 					// Get the tenantName for the current Table
 					String tableName = st.split(",")[1];
-					Map<String, String> userPropsMap = searchJAdapter.getUserPropsFromCollectionConfig(
-							tableName);
-
-					String deleteTableTenantName = null;
-					if(userPropsMap != null && !userPropsMap.isEmpty() && userPropsMap.containsKey("tenantName"))
-						deleteTableTenantName = userPropsMap.get("tenantName");
-					if(deleteTableTenantName == null)
-						continue;
-					else if(tenantName.equals(deleteTableTenantName)) {
+					if(tenantId == Integer.parseInt(st.split(",")[0])) {
 						tableUnderDeletionList.add(tableName);
-					}				
+					}
 				}
 				lineNumber++;
 			}
@@ -343,12 +332,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 			deleteTablesByTenantNameResponse.setDataSize(tableUnderDeletionList.size());
 			
 			deleteTablesByTenantNameResponse.setStatusCode(200);
-			deleteTablesByTenantNameResponse.setMessage("Successfully Retrieved All Tables Under Deletion For Tenant: "+tenantName);
+			deleteTablesByTenantNameResponse.setMessage("Successfully Retrieved All Tables Under Deletion For TenantId: "+tenantId);
 			
 		}
 		catch (Exception e) {
 			deleteTablesByTenantNameResponse.setStatusCode(400);
-			logger.error("Some Error Occured While Getting Tables Under Deletion For Tenant: "+tenantName, e);
+			logger.error("Some Error Occured While Getting Tables Under Deletion For Tenant: "+tenantId, e);
 		}
 		return deleteTablesByTenantNameResponse;
 	}

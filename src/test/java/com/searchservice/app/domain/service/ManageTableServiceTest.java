@@ -64,7 +64,8 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 @TestPropertySource(
         properties = {
            "schema-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv",
-           "tenant-cache.tenant: tenantName"
+           "tenant-cache.tenant: tenantName",
+           "manage-table.config-overlay-url"
         }
 )
 class ManageTableServiceTest {
@@ -88,7 +89,6 @@ class ManageTableServiceTest {
 	
 	private String tableName = "automatedTestCollection";
 	private int tenantId = 101;
-	private String tenantName = "TestTenant";
 
 	@MockBean
 	SearchAPIAdapter solrApiAdapterMocked;
@@ -317,14 +317,14 @@ class ManageTableServiceTest {
 	@Test
 	void getTablesInvalidData() {
 		setMockitoBadResponseForService();
-		Response resp = manageTableService.getTablesForTenant(tenantName);
+		Response resp = manageTableService.getTablesForTenant(tenantId);
 		assertEquals(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(), resp.getStatusCode());
 	}
 
 	@Test
 	void testGetTables() {
 		setMockitoSuccessResponseForService();
-		Response resp = manageTableService.getTablesForTenant(tenantName);
+		Response resp = manageTableService.getTablesForTenant(tenantId);
 
 		assertEquals(200, resp.getStatusCode());
 
@@ -341,7 +341,7 @@ class ManageTableServiceTest {
 	@Test
 	void testGetTablesForTenantPagination() {
 		setMockitoSuccessResponseForService();
-		Response resp = manageTableService.getTablesForTenantPagination(tenantName, 1, 2);
+		Response resp = manageTableService.getTablesForTenantPagination(tenantId, 1, 2);
 		assertEquals(200, resp.getStatusCode());
 
 	}
