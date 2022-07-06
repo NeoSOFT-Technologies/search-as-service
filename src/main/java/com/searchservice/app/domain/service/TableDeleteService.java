@@ -1,4 +1,3 @@
-
 package com.searchservice.app.domain.service;
 
 import java.io.BufferedReader;
@@ -303,7 +302,7 @@ public class TableDeleteService implements TableDeleteServicePort {
 	}
 	
 	@Override
-	public Response getTablesUnderDeletionForTenant(String tenantName, int pageNumber, int pageSize) {
+	public Response getTablesUnderDeletionForTenant(int tenantId, int pageNumber, int pageSize) {
 		Response deleteTablesByTenantNameResponse = new Response();
 		List<String> tableUnderDeletionList = new ArrayList<>();
 		File existingFile = new File(deleteRecordFilePath);
@@ -316,17 +315,9 @@ public class TableDeleteService implements TableDeleteServicePort {
 				if (lineNumber != 0) {
 					// Get the tenantName for the current Table
 					String tableName = st.split(",")[1];
-					Map<String, String> userPropsMap = searchJAdapter.getUserPropsFromCollectionConfig(
-							tableName);
-
-					String deleteTableTenantName = null;
-					if(userPropsMap != null && !userPropsMap.isEmpty() && userPropsMap.containsKey("tenantName"))
-						deleteTableTenantName = userPropsMap.get("tenantName");
-					if(deleteTableTenantName == null)
-						continue;
-					else if(tenantName.equals(deleteTableTenantName)) {
+					if(tenantId == Integer.parseInt(st.split(",")[0])) {
 						tableUnderDeletionList.add(tableName);
-					}				
+					}
 				}
 				lineNumber++;
 			}
@@ -341,12 +332,12 @@ public class TableDeleteService implements TableDeleteServicePort {
 			deleteTablesByTenantNameResponse.setDataSize(tableUnderDeletionList.size());
 			
 			deleteTablesByTenantNameResponse.setStatusCode(200);
-			deleteTablesByTenantNameResponse.setMessage("Successfully Retrieved All Tables Under Deletion For Tenant: "+tenantName);
+			deleteTablesByTenantNameResponse.setMessage("Successfully Retrieved All Tables Under Deletion For TenantId: "+tenantId);
 			
 		}
 		catch (Exception e) {
 			deleteTablesByTenantNameResponse.setStatusCode(400);
-			logger.error("Some Error Occured While Getting Tables Under Deletion For Tenant: "+tenantName, e);
+			logger.error("Some Error Occured While Getting Tables Under Deletion For Tenant: "+tenantId, e);
 		}
 		return deleteTablesByTenantNameResponse;
 	}

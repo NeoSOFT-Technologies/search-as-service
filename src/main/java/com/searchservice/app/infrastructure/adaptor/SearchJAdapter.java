@@ -91,7 +91,6 @@ public class SearchJAdapter {
 
 	}
 	
-	
 	public String getClusterStatusFromSolrjCluster(HttpSolrClient searchClientActive) {
 
 		ResponseEntity<String> response = null;
@@ -111,7 +110,6 @@ public class SearchJAdapter {
 		return clusterStatusResponseString;
 	}
 	
-	
 	public Map<String, String> getUserPropsFromCollectionConfig(String tableNameWithTenantId) {
 		
 		ResponseEntity<String> response = null;
@@ -122,7 +120,7 @@ public class SearchJAdapter {
 
 			userPropsResponseMap = ManageTableUtil.getUserPropsFromJsonResponse(response.getBody());
 		} catch (HttpClientErrorException e) {
-			logger.error("User properties from config overlay could not be fetched: ", e);
+			logger.debug("User properties from config overlay could not be fetched: {}", e.getMessage());
 			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error("Exception occurred while fetching user properties from config overlay: ", e);
@@ -131,7 +129,6 @@ public class SearchJAdapter {
 
 		return userPropsResponseMap;
 	}
-	
 	
 	public void setUserPropertiesInCollectionConfig(Map<String, String> propsMap, String tableNameWithTenantId) {
 		
@@ -172,7 +169,6 @@ public class SearchJAdapter {
 					"User Properties could not be set. "+HttpStatusCode.SAAS_SERVER_ERROR.getMessage());
 	}
 
-	
 	public Boolean deleteTableFromSolrj(String tableName) {
 		CollectionAdminRequest.Delete request = CollectionAdminRequest.deleteCollection(tableName);
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(tableName);
@@ -191,7 +187,6 @@ public class SearchJAdapter {
 		return true;
 	}
 	
-	
 	public ConfigSetAdminResponse getConfigSetFromSolrj(HttpSolrClient searchClientActive) {
 
 		ConfigSetAdminRequest.List configSetRequest = new ConfigSetAdminRequest.List();
@@ -206,7 +201,6 @@ public class SearchJAdapter {
 		}
 		return configSetResponse;
 	}
-
 
 	public SchemaResponse getSchemaFields(HttpSolrClient searchClientActive) {
 
