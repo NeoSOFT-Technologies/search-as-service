@@ -130,7 +130,7 @@ class ManageTableResourceTest {
 		Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(), Mockito.any()))
 				.thenReturn(responseDTO);
-		Mockito.when(manageTableService.getTablesForTenant(Mockito.any())).thenReturn(getTablesResponseDTO);
+		Mockito.when(manageTableService.getTablesForTenant(Mockito.anyInt())).thenReturn(getTablesResponseDTO);
 		Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
 		Mockito.when(manageTableService.getCurrentTableSchema(Mockito.anyInt(), Mockito.anyString())).thenReturn(tableInfoResponseDTO);
 		Map<Object, Object> finalResponseMap = new HashMap<>();
@@ -146,7 +146,7 @@ class ManageTableResourceTest {
 				.thenReturn(getDeletedTablesResponseDTO);
 		Mockito.when(tableDeleteService.getTablesUnderDeletionPagination(Mockito.anyBoolean(), Mockito.anyInt(),
 				Mockito.anyInt())).thenReturn(getDeletedTablesResponseDTO);
-		Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+		Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt()))
 				.thenReturn(getDeletedTablesResponseDTO);
 	}
 
@@ -178,7 +178,7 @@ class ManageTableResourceTest {
 		Mockito.when(manageTableService.deleteTable(Mockito.any())).thenReturn(responseDTO);
 		Mockito.when(manageTableService.updateTableSchema(Mockito.anyInt(), Mockito.any(), Mockito.any()))
 				.thenReturn(responseDTO);
-		Mockito.when(manageTableService.getTablesForTenant(Mockito.any())).thenReturn(getTablesResponseDTO);
+		Mockito.when(manageTableService.getTablesForTenant(Mockito.anyInt())).thenReturn(getTablesResponseDTO);
 		Mockito.when(manageTableService.capacityPlans()).thenReturn(capacityPlanResponseDTO);
 
 		Map<Object, Object> finalResponseMap = new HashMap<>();
@@ -193,7 +193,7 @@ class ManageTableResourceTest {
 				.thenReturn(getDeletedTablesResponseDTO);
 		Mockito.when(tableDeleteService.getTablesUnderDeletionPagination(Mockito.anyBoolean(), Mockito.anyInt(),
 				Mockito.anyInt())).thenReturn(getDeletedTablesResponseDTO);
-		Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+		Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt()))
 				.thenReturn(getDeletedTablesResponseDTO);
 	}
 
@@ -238,7 +238,7 @@ class ManageTableResourceTest {
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
-			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantName=" + tenantName)
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId=" + tenantId)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk());
 
@@ -247,7 +247,7 @@ class ManageTableResourceTest {
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isBadRequest());
 
-			Mockito.when(manageTableService.getTablesForTenant(Mockito.any())).thenReturn(null);
+			Mockito.when(manageTableService.getTablesForTenant(Mockito.anyInt())).thenReturn(null);
 			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/" + "/?tenantId=" + tenantId)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isBadRequest());
@@ -267,19 +267,19 @@ class ManageTableResourceTest {
 
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
-			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "?tenantId=" + tenantId
 					+"&pageNumber=1&pageSize=5")
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk());
 
 			setMockitoBadResponseForService();
-			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tables-list" + "?tenantId=" + tenantId
 					+"&pageNumber=1&pageSize=5")
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isBadRequest());
 
-			Mockito.when(manageTableService.getTablesForTenant(Mockito.any())).thenReturn(null);
-			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tablesList" + "/?tenantId=" + tenantId
+			Mockito.when(manageTableService.getTablesForTenant(Mockito.anyInt())).thenReturn(null);
+			restAMockMvc.perform(MockMvcRequestBuilders.get(apiEndpoint + "/manage/table/tables-list" + "?tenantId=" + tenantId
 					+"&pageNumber=1&pageSize=5")
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isBadRequest());
@@ -365,7 +365,7 @@ class ManageTableResourceTest {
 			mockPreAuthorizedService();
 			setMockitoSuccessResponseForService();
 			restAMockMvc.perform(MockMvcRequestBuilders
-					.get(apiEndpoint + "/manage/table/" + "/deletion" + "?tenantName=" + tenantName +"&pageNumber=1&pageSize=5")
+					.get(apiEndpoint + "/manage/table/" + "/deletion" + "?tenantId=" + tenantId +"&pageNumber=1&pageSize=5")
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk());
 
@@ -376,7 +376,7 @@ class ManageTableResourceTest {
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isBadRequest());
 
-			Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyString(), Mockito.anyInt(),
+			Mockito.when(tableDeleteService.getTablesUnderDeletionForTenant(Mockito.anyInt(), Mockito.anyInt(),
 					Mockito.anyInt())).thenReturn(null);
 			restAMockMvc.perform(MockMvcRequestBuilders
 					.get(apiEndpoint + "/manage/table/" + "/deletion" + "?tenantId=" + tenantId +"&pageNumber=1&pageSize=5")
