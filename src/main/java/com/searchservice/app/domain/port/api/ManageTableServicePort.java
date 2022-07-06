@@ -27,9 +27,9 @@ public interface ManageTableServicePort {
 	
 	Response getAllTables(int startRecord, int pageSize);
 	
-	Response getTablesForTenant(String tenantName);
+	Response getTablesForTenant(int tenantId);
 	
-	Response getTablesForTenantPagination(String tenantName, int startRecord, int pageSize);
+	Response getTablesForTenantPagination(int tenantId, int startRecord, int pageSize);
 
 	TableSchema getCurrentTableSchema(int tenantId, String tableName);
 	

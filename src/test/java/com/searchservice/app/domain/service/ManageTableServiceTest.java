@@ -64,7 +64,8 @@ import com.searchservice.app.rest.errors.HttpStatusCode;
 @TestPropertySource(
         properties = {
            "schema-delete-record-file.testPath: src/test/resources/TableDeleteRecordTest.csv",
-           "tenant-cache.tenant: tenantName"
+           "tenant-cache.tenant: tenantName",
+           "manage-table.config-overlay-url"
         }
 )
 class ManageTableServiceTest {

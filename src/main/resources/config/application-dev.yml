@@ -119,6 +119,14 @@ saas-ms:
 
 
 #================================================================
+#ManageTable feature configs
+manage-table:
+  config-overlay-url: /config/overlay?omitHeader=true
+
+#================================================================
+
+
+#================================================================
 #TableSoftDelete File Path
 table-delete-file:
     path: DeletedRecordFiles/TableDeleteRecord.csv

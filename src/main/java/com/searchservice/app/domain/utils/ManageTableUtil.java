@@ -27,18 +27,15 @@ public class ManageTableUtil {
 	}
 
 	public static List<Response.TableListResponse> getTableListForTenant(
-			List<String> data, Map<String, String> tableTenantMap, String tenantName){
+			List<String> data, Map<String, String> tableTenantMap, int tenantId){
 		List<Response.TableListResponse> tableList = new ArrayList<>();
 		
 		for (String table : data) {
 			String tableName = table.split("_")[0];
-			int tenantId = Integer.parseInt(table.split("_")[1]);
-			boolean returnThisTable = tableTenantMap.containsKey(tableName) 
-					&& tableTenantMap.get(tableName) != null
-					&& tableTenantMap.get(tableName).equals(tenantName);
-			if(returnThisTable)
+			int currentTenantId = Integer.parseInt(table.split("_")[1]);
+			if(tenantId == currentTenantId)
 				tableList.add(new Response.TableListResponse(
-								tenantName, tenantId, tableName));
+						tableTenantMap.get(tableName), currentTenantId, tableName));
 		}
 	    	
 		return tableList;
@@ -64,19 +61,14 @@ public class ManageTableUtil {
 	}
 
 	public static List<Response.TableListResponse> getPaginatedTableListForTenant(
-			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize, String tenantName){
+			List<String> data, Map<String, String> tableTenantMap, int pageNumber, int pageSize, int tenantId){
 		List<Response.TableListResponse> paginatedTableList = getPaginatedTableList(
 				data, tableTenantMap, pageNumber, pageSize);
 		List<Response.TableListResponse> paginatedTableListForTenant = new ArrayList<>();
 		
 		for(Response.TableListResponse table: paginatedTableList) {
-			String tableName = table.getTableName();
-			
-			// Set table to the result if given tenantName is associated with it
-			boolean returnThisTable = tableTenantMap.containsKey(tableName)
-					&& tableTenantMap.get(tableName) != null
-					&& tableTenantMap.get(tableName).equals(tenantName);
-			if(returnThisTable)
+			// Set table to the result if given tenantId is associated with it
+			if(tenantId == table.getTenantId())
 				paginatedTableListForTenant.add(table);
 		}
 	    	

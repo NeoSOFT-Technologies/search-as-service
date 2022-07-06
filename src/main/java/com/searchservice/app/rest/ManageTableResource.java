@@ -61,11 +61,11 @@ public class ManageTableResource {
 	}
 
 	@GetMapping("/")
-	@Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT.", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "GET ALL THE TABLES FOR THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
-	public ResponseEntity<Response> getTablesByTenantName(@RequestParam String tenantName) {
+	public ResponseEntity<Response> getTablesByTenantName(@RequestParam int tenantId) {
 
-		Response getListItemsResponseDTO = manageTableServicePort.getTablesForTenant(tenantName);
+		Response getListItemsResponseDTO = manageTableServicePort.getTablesForTenant(tenantId);
 		if (getListItemsResponseDTO == null)
 			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
@@ -73,18 +73,18 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching Tables Having TenantID; %d",tenantName));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching Tables Having TenantID; %d",tenantId));
 		}
 	}
 	
 	@GetMapping("/tables-list")
-	@Operation(summary = "GET TABLES FOR THE GIVEN TENANT ALONG WITH PAGINATION", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "GET TABLES FOR THE GIVEN TENANT ID WITH PAGINATION", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
-	public ResponseEntity<Response> getTablesByTenantNamePagination(@RequestParam String tenantName, @RequestParam(defaultValue = "1") int pageNumber,
+	public ResponseEntity<Response> getTablesByTenantNamePagination(@RequestParam int tenantId, @RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "6") int pageSize) {
 
 		Response getListItemsResponseDTO = manageTableServicePort.getTablesForTenantPagination(
-				tenantName, pageNumber, pageSize);
+				tenantId, pageNumber, pageSize);
 		if (getListItemsResponseDTO == null)
 			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
@@ -92,7 +92,7 @@ public class ManageTableResource {
 			return ResponseEntity.status(HttpStatus.OK).body(getListItemsResponseDTO);
 		} else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
-					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching List of Tables Having TenantID; %d",tenantName));
+					HttpStatusCode.BAD_REQUEST_EXCEPTION, String.format(ERROR_MSG+ " Fetching List of Tables Having TenantID; %d",tenantId));
 		}
 	}
 	
@@ -133,14 +133,14 @@ public class ManageTableResource {
 	}
 	
 	@GetMapping("/deletion")
-	@Operation(summary = "GET ALL THE TABLES UNDER DELETION FOR GIVEN TENANT", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "GET ALL THE TABLES UNDER DELETION FOR GIVEN TENANT ID", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isViewPermissionEnabled()")
 	public ResponseEntity<Response> getALLTablesUnderDeletionByTenantName(
-			@RequestParam String tenantName, @RequestParam(defaultValue = "1") int pageNumber,
+			@RequestParam int tenantId, @RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "6") int pageSize) {
 
 		Response getDeleteTableListResponseDTO = tableDeleteServicePort.getTablesUnderDeletionForTenant(
-				tenantName, pageNumber, pageSize);
+				tenantId, pageNumber, pageSize);
 		if (getDeleteTableListResponseDTO == null)
 			throw new CustomException(HttpStatusCode.NULL_POINTER_EXCEPTION.getCode(), 
 					HttpStatusCode.NULL_POINTER_EXCEPTION,HttpStatusCode.NULL_POINTER_EXCEPTION.getMessage());
@@ -151,7 +151,7 @@ public class ManageTableResource {
 			throw new CustomException(
 					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, 
-					String.format(ERROR_MSG+ " Fetching All Tables Under Deletion For Tenant: {}", tenantName));
+					String.format(ERROR_MSG+ " Fetching All Tables Under Deletion For Tenant: {}", tenantId));
 		}
 	}
 

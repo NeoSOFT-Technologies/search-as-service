@@ -153,7 +153,7 @@ public class ManageTableService implements ManageTableServicePort {
 	}
 
 	@Override
-	public Response getTablesForTenant(String tenantName) {
+	public Response getTablesForTenant(int tenantId) {
 		
 		searchJAdapter.checkIfSearchServerDown();
 		
@@ -165,25 +165,25 @@ public class ManageTableService implements ManageTableServicePort {
 			Map<String, String> tableTenantMap = getAllTableTenantMap(existingTablesList);
 
 			// Prepare final-table-list for given tenantName
-			List<Response.TableListResponse> tableListForGivenTenant = ManageTableUtil.getTableListForTenant(existingTablesList, tableTenantMap, tenantName);
+			List<Response.TableListResponse> tableListForGivenTenant = ManageTableUtil.getTableListForTenant(existingTablesList, tableTenantMap, tenantId);
 			getListItemsResponseDTO.setTableList(
 					tableListForGivenTenant);
 			getListItemsResponseDTO.setDataSize(tableListForGivenTenant.size());
 			getListItemsResponseDTO.setData(null);
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantName: " + tenantName);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantId: " + tenantId);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantName);
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantId);
 		}
 
 		return getListItemsResponseDTO;
 	}
 	
 	@Override
-	public Response getTablesForTenantPagination(String tenantName, int pageNumber, int pageSize) {
+	public Response getTablesForTenantPagination(int tenantId, int pageNumber, int pageSize) {
 		
 		searchJAdapter.checkIfSearchServerDown();
 		
@@ -196,19 +196,19 @@ public class ManageTableService implements ManageTableServicePort {
 
 			// Get paginated list of tables
 			List<Response.TableListResponse> paginatedTableListForGivenTenant = ManageTableUtil.getPaginatedTableListForTenant(
-					existingTablesList, tableTenantMap, pageNumber, pageSize, tenantName);
+					existingTablesList, tableTenantMap, pageNumber, pageSize, tenantId);
 			getListItemsResponseDTO.setTableList(
 					paginatedTableListForGivenTenant);
 			getListItemsResponseDTO.setData(null);
 			getListItemsResponseDTO.setDataSize(paginatedTableListForGivenTenant.size());
 
 			getListItemsResponseDTO.setStatusCode(200);
-			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantName: " + tenantName);
+			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantId: " + tenantId);
 
 		} catch (Exception e) {
 			logger.error(e.toString());
 			getListItemsResponseDTO.setStatusCode(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode());
-			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantName);
+			getListItemsResponseDTO.setMessage("Unable to retrieve tables for Tenant: "+tenantId);
 		}
 
 		return getListItemsResponseDTO;
@@ -669,7 +669,7 @@ public class ManageTableService implements ManageTableServicePort {
 				String tenantName = userPropsResponseMap.get("tenantName");
 				tableTenantMap.put(table, tenantName);
 			} else
-				tableTenantMap.put(table, null);
+				tableTenantMap.put(table, "No Tenant Found");
 		}
 		
 		return tableTenantMap;

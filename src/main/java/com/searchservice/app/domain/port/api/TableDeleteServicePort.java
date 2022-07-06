@@ -28,6 +28,6 @@ public interface TableDeleteServicePort {
 
 	public boolean checkIfTableDeleteFileExist(File file);
 	
-	Response getTablesUnderDeletionForTenant(String tenantName, int pageNumber, int pageSize);
+	Response getTablesUnderDeletionForTenant(int tenantId, int pageNumber, int pageSize);
 
 }
