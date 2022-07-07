@@ -180,20 +180,24 @@ public class ManageTableResource {
 	@PostMapping("/")
 	@Operation(summary = "CREATE A TABLE UNDER THE GIVEN TENANT ID.", security = @SecurityRequirement(name = "bearerAuth"))
 	@PreAuthorize(value = "@keycloakUserPermission.isCreatePermissionEnabled()")
-	public ResponseEntity<Response> createTable(@RequestParam int tenantId, @RequestBody CreateTable createTableDTO) {
-			createTableDTO.setTableName(createTableDTO.getTableName() + "_" + tenantId);	
-			Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(createTableDTO); 
-			if (apiResponseDTO.getStatusCode() == 200) {
-					apiResponseDTO.setMessage(
-							"Table-" + createTableDTO.getTableName().split("_")[0] + ", is created successfully");
-				return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
-			} else {
-				log.info(TABLE +"could not be created: {}", apiResponseDTO);
-				throw new CustomException(
-					HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),HttpStatusCode.BAD_REQUEST_EXCEPTION,
-							String.format(ERROR_MSG+" Creating Table: %s Having TenantID; %d",createTableDTO.getTableName().split("_")[0], tenantId));
-			}
+	public ResponseEntity<Response> createTable(
+			@RequestParam String tenantName, 
+			@RequestParam int tenantId, 
+			@RequestBody CreateTable createTableDTO) {
+		createTableDTO.setTableName(createTableDTO.getTableName() + "_" + tenantId);
+		Response apiResponseDTO = manageTableServicePort.createTableIfNotPresent(createTableDTO);
+		if (apiResponseDTO.getStatusCode() == 200) {
+			apiResponseDTO
+					.setMessage("Table-" + createTableDTO.getTableName().split("_")[0] + ", is created successfully");
+			return ResponseEntity.status(HttpStatus.OK).body(apiResponseDTO);
+		} else {
+			log.info(TABLE + "could not be created: {}", apiResponseDTO);
+			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
+					HttpStatusCode.BAD_REQUEST_EXCEPTION,
+					String.format(ERROR_MSG + " Creating Table: %s Having TenantID; %d",
+							createTableDTO.getTableName().split("_")[0], tenantId));
 		}
+	}
 		
 	@DeleteMapping("/{tableName}")
 	@Operation(summary = "DELETE A TABLE (SOFT DELETE).", security = @SecurityRequirement(name = "bearerAuth"))

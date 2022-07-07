@@ -444,14 +444,15 @@ class ManageTableResourceTest {
 			setMockitoSuccessResponseForService();
 			Mockito.when(tableDeleteService.isTableUnderDeletion(Mockito.anyString())).thenReturn(false);
 			restAMockMvc.perform(MockMvcRequestBuilders
-					.post(apiEndpoint + "/manage/table" + "/" + "/?tenantId=" + tenantId)
+					.post(apiEndpoint + "/manage/table" + "/?tenantName=" +tenantName+ "&tenantId=" + tenantId)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
 					.content(TestUtil.convertObjectToJsonBytes(createTableDTO))).andExpect(status().isOk());
 
 			// CREATE COLLECTION WITH SAME NAME AND TEST
 			setMockitoBadResponseForService();
 			restAMockMvc
-					.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" + "/" + "/?tenantId=" + tenantId)
+					.perform(MockMvcRequestBuilders
+							.post(apiEndpoint + "/manage/table" + "/?tenantName=" +tenantName+ "&tenantId=" + tenantId)
 							.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 							.contentType(MediaType.APPLICATION_JSON)
 							.content(TestUtil.convertObjectToJsonBytes(createTableDTO)))
@@ -494,7 +495,8 @@ class ManageTableResourceTest {
 
 			// CREATE COLLECTION
 			setMockitoSuccessResponseForService();
-			restAMockMvc.perform(MockMvcRequestBuilders.post(apiEndpoint + "/manage/table" + "/?tenantId=" + tenantId)
+			restAMockMvc.perform(MockMvcRequestBuilders
+					.post(apiEndpoint + "/manage/table" + "/?tenantName=" +tenantName+ "&tenantId=" + tenantId)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
 					.content(TestUtil.convertObjectToJsonBytes(createTableForDeletion))).andExpect(status().isOk());
 

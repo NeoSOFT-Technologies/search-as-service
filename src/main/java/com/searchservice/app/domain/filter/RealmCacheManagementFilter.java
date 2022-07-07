@@ -53,6 +53,7 @@ public class RealmCacheManagementFilter extends OncePerRequestFilter {
 		/**
 		 *  Set Tenant Name(~ Realm Name) in cache
 		 */
+		String tenantNameParameter = request.getParameter("tenantName");
 		// Evict Realm Info cache before adding new Realm Info
 		keycloakPermissionManagementService.evictRealmNameFromCache(tenantInfoConfigProperties.getTenant());
 		if(request.getRequestURI().equals("/api/v1/manage/table/")
@@ -60,9 +61,14 @@ public class RealmCacheManagementFilter extends OncePerRequestFilter {
 				&& 
 				!keycloakPermissionManagementService.checkIfRealmNameExistsInCache(tenantInfoConfigProperties.getTenant())) {
 
-			keycloakPermissionManagementService.setRealmNameInCache(tenantInfoConfigProperties.getTenant(), token);
+			// Validate User: if admin, then take tenantName from request param
+			if(keycloakPermissionManagementService.isActiveUserAdmin(token))
+				keycloakPermissionManagementService.setRealmNameInCache(
+						tenantInfoConfigProperties.getTenant(), token, tenantNameParameter);
+			else
+				keycloakPermissionManagementService.setRealmNameInCache(
+						tenantInfoConfigProperties.getTenant(), token, "");
 		}
-			
 
 		chain.doFilter(request, response);
 
