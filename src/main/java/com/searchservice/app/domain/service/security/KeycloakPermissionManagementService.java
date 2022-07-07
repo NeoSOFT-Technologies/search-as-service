@@ -80,6 +80,14 @@ public class KeycloakPermissionManagementService {
 
 		return permissions.toList().stream().map(p -> Objects.toString(p, null)).collect(Collectors.toList());
 	}
+	
+	public boolean isActiveUserAdmin(String token) {
+		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
+		JSONObject realmAccessObject = tokenPayload.getJSONObject("realm_access");
+		JSONArray roles = realmAccessObject.getJSONArray("roles");
+
+		return roles.toList().stream().anyMatch(r -> r.equals("admin"));
+	}
 
 	public boolean isViewPermissionGranted(String token) {
 
@@ -143,6 +151,7 @@ public class KeycloakPermissionManagementService {
 		
 	}
 
+	// Realm Name management methods
 	public String getRealmNameFromToken(String token) {
 		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
 		String iss = (String)tokenPayload.get("iss");
@@ -156,14 +165,16 @@ public class KeycloakPermissionManagementService {
 	
 	// Add Realm Name in cache
 	@Cacheable(cacheNames = TENANT_KEY, key = "#tenant", condition = "#tenant!=null")
-	public String setRealmNameInCache(String tenant, String token) {
+	public String setRealmNameInCache(String tenant, String token, String tenantNameFromRequestParam) {
 		log.info("Adding Realm Name in cache");
 		
 		JSONObject tokenPayload = getDecodedTokenPayloadJson(token);
-		String iss = (String)tokenPayload.get("iss");
-		String [] splitUrl = iss.split("/");
-
-		return splitUrl[splitUrl.length-1];
+		if(tenantNameFromRequestParam.isEmpty()) {
+			String iss = (String)tokenPayload.get("iss");
+			String [] splitUrl = iss.split("/");
+			return splitUrl[splitUrl.length-1];
+		} else
+			return tenantNameFromRequestParam;
 	}
 	
 	// Update Realm Name in cache
