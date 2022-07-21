@@ -168,7 +168,7 @@ public class ManageTableService implements ManageTableServicePort {
 			List<Response.TableListResponse> tableListForGivenTenant = ManageTableUtil.getTableListForTenant(existingTablesList, tableTenantMap, tenantId);
 			getListItemsResponseDTO.setTableList(
 					tableListForGivenTenant);
-			getListItemsResponseDTO.setDataSize(tableListForGivenTenant.size());
+			getListItemsResponseDTO.setDataSize(tableCountForTenantId(tenantId, existingTablesList));
 			getListItemsResponseDTO.setData(null);
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantId: " + tenantId);
@@ -180,6 +180,16 @@ public class ManageTableService implements ManageTableServicePort {
 		}
 
 		return getListItemsResponseDTO;
+	}
+	
+	public int tableCountForTenantId(int tenantId, List<String> tableList) {
+		int tableCount = 0;
+		for(String table : tableList) {
+			if(Integer.parseInt(table.split("_")[1]) == tenantId) {
+				tableCount ++;
+			}
+		}
+		return tableCount;
 	}
 	
 	@Override
@@ -200,8 +210,8 @@ public class ManageTableService implements ManageTableServicePort {
 			getListItemsResponseDTO.setTableList(
 					paginatedTableListForGivenTenant);
 			getListItemsResponseDTO.setData(null);
-			getListItemsResponseDTO.setDataSize(paginatedTableListForGivenTenant.size());
-
+			getListItemsResponseDTO.setDataSize(tableCountForTenantId(tenantId, existingTablesList));
+          
 			getListItemsResponseDTO.setStatusCode(200);
 			getListItemsResponseDTO.setMessage("Successfully retrieved all Tables With TenantId: " + tenantId);
 
