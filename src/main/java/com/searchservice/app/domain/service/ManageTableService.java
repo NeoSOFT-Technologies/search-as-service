@@ -196,8 +196,8 @@ public class ManageTableService implements ManageTableServicePort {
 	public Response getTablesForTenantPagination(int tenantId, int pageNumber, int pageSize) {
 		
 		searchJAdapter.checkIfSearchServerDown();
-		
 		Response getListItemsResponseDTO = new Response();
+		
 		try {
 			List<String> existingTablesList = getTablesListFromServer();
 
@@ -207,6 +207,11 @@ public class ManageTableService implements ManageTableServicePort {
 			// Get paginated list of tables
 			List<Response.TableListResponse> paginatedTableListForGivenTenant = ManageTableUtil.getPaginatedTableListForTenant(
 					existingTablesList, tableTenantMap, pageNumber, pageSize, tenantId);
+			logger.debug("Page Number: {}", pageNumber);
+			logger.debug("Page Size: {}", pageSize);
+			logger.debug("Tenant ID: {}", tenantId);
+			logger.debug("Paginated List Size: {}", paginatedTableListForGivenTenant.size());
+			logger.debug("Paginated Tabe List :{}" , paginatedTableListForGivenTenant);
 			getListItemsResponseDTO.setTableList(
 					paginatedTableListForGivenTenant);
 			getListItemsResponseDTO.setData(null);
