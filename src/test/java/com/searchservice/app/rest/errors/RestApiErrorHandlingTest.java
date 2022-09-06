@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
+import com.neosoft.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.rest.errors.RestApiErrorHandling;
+
 class RestApiErrorHandlingTest {
 
 	//For Null Pointer Exception

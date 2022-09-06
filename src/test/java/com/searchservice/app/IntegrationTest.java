@@ -2,6 +2,8 @@ package com.searchservice.app;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.neosoft.app.SearchServiceApplication;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

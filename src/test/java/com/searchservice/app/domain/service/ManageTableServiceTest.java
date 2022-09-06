@@ -39,22 +39,22 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.searchservice.app.config.CapacityPlanProperties;
-import com.searchservice.app.config.CapacityPlanProperties.Plan;
-import com.searchservice.app.config.TenantInfoConfigProperties;
-import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.CreateTable;
-import com.searchservice.app.domain.dto.table.ManageTable;
-import com.searchservice.app.domain.dto.table.SchemaField;
-import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.dto.table.TableSchema.TableSchemaData;
-import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.service.security.KeycloakPermissionManagementService;
-import com.searchservice.app.domain.utils.SearchUtil;
-import com.searchservice.app.infrastructure.adaptor.SearchAPIAdapter;
-import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
-import com.searchservice.app.rest.errors.CustomException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.config.CapacityPlanProperties;
+import com.neosoft.app.config.TenantInfoConfigProperties;
+import com.neosoft.app.config.CapacityPlanProperties.Plan;
+import com.neosoft.app.domain.dto.Response;
+import com.neosoft.app.domain.dto.table.CreateTable;
+import com.neosoft.app.domain.dto.table.ManageTable;
+import com.neosoft.app.domain.dto.table.SchemaField;
+import com.neosoft.app.domain.dto.table.TableSchema;
+import com.neosoft.app.domain.dto.table.TableSchema.TableSchemaData;
+import com.neosoft.app.domain.port.api.TableDeleteServicePort;
+import com.neosoft.app.domain.service.security.KeycloakPermissionManagementService;
+import com.neosoft.app.domain.utils.SearchUtil;
+import com.neosoft.app.infrastructure.adaptor.SearchAPIAdapter;
+import com.neosoft.app.infrastructure.adaptor.SearchJAdapter;
+import com.neosoft.app.rest.errors.CustomException;
+import com.neosoft.app.rest.errors.HttpStatusCode;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -337,7 +337,7 @@ class ManageTableServiceTest {
 		try {
 			manageTableService.getCurrentTableSchema(tenantId, "InvalidTable_101");
 		} catch (CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(), e.getExceptionCode());
 		}
 	}
 
@@ -354,7 +354,7 @@ class ManageTableServiceTest {
 		try {
 			manageTableService.deleteTable(tableName + "_123");
 		} catch (CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(), e.getExceptionCode());
 		}
 	}
 
@@ -371,7 +371,7 @@ class ManageTableServiceTest {
 		try {
 			manageTableService.createTableIfNotPresent(manageTable);
 		} catch (CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_ALREADY_EXISTS.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_ALREADY_EXISTS.getCode(), e.getExceptionCode());
 		}
 	}
 
@@ -570,7 +570,7 @@ class ManageTableServiceTest {
 		}
 		catch(CustomException e)
 		{
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(), e.getExceptionCode());
 		}
 	}
 	

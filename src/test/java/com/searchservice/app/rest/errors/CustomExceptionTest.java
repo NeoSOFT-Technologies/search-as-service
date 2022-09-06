@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
+import com.neosoft.app.rest.errors.CustomException;
+import com.neosoft.app.rest.errors.HttpStatusCode;
+
 class CustomExceptionTest {
 
 	//For BadRequest

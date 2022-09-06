@@ -25,9 +25,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.user.User;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.domain.dto.Response;
+import com.neosoft.app.domain.dto.user.User;
+import com.neosoft.app.domain.service.UserService;
+import com.neosoft.app.rest.errors.HttpStatusCode;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

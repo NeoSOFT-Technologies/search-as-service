@@ -21,18 +21,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.neosoft.app.domain.dto.Response;
+import com.neosoft.app.domain.dto.table.CapacityPlanResponse;
+import com.neosoft.app.domain.dto.table.CreateTable;
+import com.neosoft.app.domain.dto.table.ManageTable;
+import com.neosoft.app.domain.dto.table.SchemaField;
+import com.neosoft.app.domain.dto.table.TableSchema;
+import com.neosoft.app.domain.service.ManageTableService;
+import com.neosoft.app.domain.service.TableDeleteService;
+import com.neosoft.app.domain.service.security.KeycloakUserPermission;
+import com.neosoft.app.domain.utils.security.SecurityUtil;
 import com.searchservice.app.IntegrationTest;
 import com.searchservice.app.TestUtil;
-import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.dto.table.CapacityPlanResponse;
-import com.searchservice.app.domain.dto.table.CreateTable;
-import com.searchservice.app.domain.dto.table.ManageTable;
-import com.searchservice.app.domain.dto.table.SchemaField;
-import com.searchservice.app.domain.dto.table.TableSchema;
-import com.searchservice.app.domain.service.ManageTableService;
-import com.searchservice.app.domain.service.TableDeleteService;
-import com.searchservice.app.domain.service.security.KeycloakUserPermission;
-import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc	//(addFilters = false)

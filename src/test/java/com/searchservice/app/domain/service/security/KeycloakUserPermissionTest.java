@@ -23,9 +23,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
-import com.searchservice.app.config.UserPermissionConfigProperties;
-import com.searchservice.app.rest.errors.CustomException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.config.UserPermissionConfigProperties;
+import com.neosoft.app.domain.service.security.KeycloakUserPermission;
+import com.neosoft.app.rest.errors.CustomException;
+import com.neosoft.app.rest.errors.HttpStatusCode;
 
 
 @ExtendWith(MockitoExtension.class)

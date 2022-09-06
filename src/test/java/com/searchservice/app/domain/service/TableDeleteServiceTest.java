@@ -32,12 +32,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.searchservice.app.domain.dto.Response;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.utils.DateUtil;
-import com.searchservice.app.rest.errors.CustomException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.domain.dto.Response;
+import com.neosoft.app.domain.port.api.ManageTableServicePort;
+import com.neosoft.app.domain.port.api.TableDeleteServicePort;
+import com.neosoft.app.domain.utils.DateUtil;
+import com.neosoft.app.rest.errors.CustomException;
+import com.neosoft.app.rest.errors.HttpStatusCode;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -130,7 +130,7 @@ class TableDeleteServiceTest {
 		try {
 			tableDeleteService.initializeTableDelete(101, "Testing_103");
 		}catch(CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(), e.getExceptionCode());
 		}
 
 
@@ -242,7 +242,7 @@ class TableDeleteServiceTest {
 	
 	@Test
 	void performTableDeleteTestException() {
-		Mockito.when(manageTableServicePort.deleteTable(Mockito.anyString())).thenThrow(new CustomException(108,HttpStatusCode.TABLE_NOT_FOUND,""));
+		Mockito.when(manageTableServicePort.deleteTable(Mockito.anyString())).thenThrow(new CustomException(108,HttpStatusCode.PRODUCT_NOT_FOUND,""));
 		assertFalse(tableDeleteService.performTableDeletion("1,Testing90"));
 	}
 	
@@ -252,7 +252,7 @@ class TableDeleteServiceTest {
 		try {
 			tableDeleteService.undoTableDeleteRecord("Testing_108");
 		}catch(CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_UNDER_DELETION.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_UNDER_DELETION.getCode(), e.getExceptionCode());
 		}
 					
 	}

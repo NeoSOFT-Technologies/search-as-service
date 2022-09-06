@@ -19,7 +19,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import com.searchservice.app.config.AuthConfigProperties;
+
+import com.neosoft.app.config.AuthConfigProperties;
+import com.neosoft.app.domain.service.PublicKeyService;
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 

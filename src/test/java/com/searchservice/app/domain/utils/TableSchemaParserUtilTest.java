@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.searchservice.app.domain.dto.table.SchemaField;
+import com.neosoft.app.domain.dto.table.SchemaField;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

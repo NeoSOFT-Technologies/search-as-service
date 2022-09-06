@@ -1,9 +1,9 @@
 package com.searchservice.app.domain.service.throttler;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
-import com.searchservice.app.domain.port.api.ThrottlerServicePort;
-import com.searchservice.app.domain.service.ThrottlerService;
-import com.searchservice.app.domain.utils.ThrottlerUtils;
+import com.neosoft.app.domain.dto.throttler.ThrottlerResponse;
+import com.neosoft.app.domain.port.api.ThrottlerServicePort;
+import com.neosoft.app.domain.service.ThrottlerService;
+import com.neosoft.app.domain.utils.ThrottlerUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -121,9 +121,9 @@ class ThrottlerServiceTest {
 		ThrottlerResponse receivedResponse;
 		
 		logger.debug("Expecting status code: {}", 429);
-		when(throttlerServicePort.documentInjectionRateLimiter())
+		when(throttlerServicePort.defaultRateLimiter())
 			.thenReturn(rateLimitResponseDTO);
-		receivedResponse = throttlerService.documentInjectionRateLimiter();
+		receivedResponse = throttlerService.defaultRateLimiter();
 		assertEquals(
 				rateLimitResponseDTO.getStatusCode(), 
 				receivedResponse.getStatusCode());
@@ -140,9 +140,9 @@ class ThrottlerServiceTest {
 		setUpMockitoAcceptanceResponseForReqSizeLimiter();	
 		when(throttlerServicePort.isRequestSizeExceedingLimit(Mockito.any()))
 			.thenReturn(false);
-		when(throttlerServicePort.documentInjectionRequestSizeLimiter("IAmIronMan", false))
+		when(throttlerServicePort.defaultRequestSizeLimiter("IAmIronMan", false))
 			.thenReturn(maxReqSizeResponseDTO);		// isNRT >> false
-		receivedMRSResponse = throttlerService.applyDocumentInjectionRequestSizeLimiter(throttlerMaxReqSizeResponseDTO);
+		receivedMRSResponse = throttlerService.applyDefaultRequestSizeLimiter(throttlerMaxReqSizeResponseDTO);
 		logger.debug("\nRec response: {}", receivedMRSResponse);
 		assertEquals(
 				maxReqSizeResponseDTO.getStatusCode(), 
@@ -153,9 +153,9 @@ class ThrottlerServiceTest {
 		setUpMockitoRejectionResponseForReqSizeLimiter();
 		when(throttlerServicePort.isRequestSizeExceedingLimit(Mockito.any()))
 		.thenReturn(true);
-		when(throttlerServicePort.documentInjectionRequestSizeLimiter("IAmNotIronMan", false))
+		when(throttlerServicePort.defaultRequestSizeLimiter("IAmNotIronMan", false))
 			.thenReturn(maxReqSizeResponseDTO);		// isNRT >> false
-		receivedMRSResponse = throttlerService.applyDocumentInjectionRequestSizeLimiter(throttlerMaxReqSizeResponseDTO);
+		receivedMRSResponse = throttlerService.applyDefaultRequestSizeLimiter(throttlerMaxReqSizeResponseDTO);
 		logger.debug("\nRec response: {}", receivedMRSResponse);
 		assertEquals(
 				maxReqSizeResponseDTO.getStatusCode(), 

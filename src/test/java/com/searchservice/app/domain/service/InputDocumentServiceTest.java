@@ -15,14 +15,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.port.api.TableDeleteServicePort;
-import com.searchservice.app.domain.utils.UploadDocumentUtil;
-import com.searchservice.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
-import com.searchservice.app.infrastructure.adaptor.SearchJAdapter;
-import com.searchservice.app.rest.errors.CustomException;
-import com.searchservice.app.rest.errors.HttpStatusCode;
+import com.neosoft.app.domain.dto.throttler.ThrottlerResponse;
+import com.neosoft.app.domain.port.api.ManageTableServicePort;
+import com.neosoft.app.domain.port.api.TableDeleteServicePort;
+import com.neosoft.app.domain.utils.UploadDocumentUtil;
+import com.neosoft.app.domain.utils.UploadDocumentUtil.UploadDocumentSearchUtilRespnse;
+import com.neosoft.app.infrastructure.adaptor.SearchJAdapter;
+import com.neosoft.app.rest.errors.CustomException;
+import com.neosoft.app.rest.errors.HttpStatusCode;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -155,7 +155,7 @@ class InputDocumentServiceTest {
 		   inputDocumentService.addDocuments(true,tableName, payload);
 		}
 		catch(CustomException e) {
-			assertEquals(HttpStatusCode.TABLE_NOT_FOUND.getCode(), e.getExceptionCode());
+			assertEquals(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(), e.getExceptionCode());
 		}
 	}
 

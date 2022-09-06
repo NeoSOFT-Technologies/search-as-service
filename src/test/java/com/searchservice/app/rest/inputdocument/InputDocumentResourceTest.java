@@ -16,12 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.neosoft.app.domain.dto.throttler.ThrottlerResponse;
+import com.neosoft.app.domain.port.api.ManageTableServicePort;
+import com.neosoft.app.domain.service.InputDocumentService;
+import com.neosoft.app.domain.service.security.KeycloakUserPermission;
+import com.neosoft.app.domain.utils.security.SecurityUtil;
 import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.domain.dto.throttler.ThrottlerResponse;
-import com.searchservice.app.domain.port.api.ManageTableServicePort;
-import com.searchservice.app.domain.service.InputDocumentService;
-import com.searchservice.app.domain.service.security.KeycloakUserPermission;
-import com.searchservice.app.domain.utils.security.SecurityUtil;
 
 
 @IntegrationTest

@@ -9,8 +9,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
+import com.neosoft.app.domain.utils.DocumentParserUtil;
 import com.searchservice.app.IntegrationTest;
-import com.searchservice.app.domain.utils.DocumentParserUtil;
 
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)

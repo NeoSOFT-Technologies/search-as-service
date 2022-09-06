@@ -7,7 +7,7 @@ plugins {
 	id "com.google.cloud.tools.jib"
 }
 
-group = 'com.searchservice'
+group = 'com.neosoft'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -86,12 +86,12 @@ dependencies {
 	//Swagger UI
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.10'
 
-	//SolrJ
-	implementation group: 'org.springframework.data', name: 'spring-data-solr', version: '4.3.14'
+	//Database integration
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.2'
+	implementation 'mysql:mysql-connector-java:8.0.15'
 	
 	// Date-time util
 	implementation group: 'joda-time', name: 'joda-time', version: '2.10.13'
-	
 
 	//Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.22'
