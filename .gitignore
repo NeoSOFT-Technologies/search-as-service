@@ -1,9 +1,9 @@
 docker/docker-container-data/*
 
 # Eclipse Files
-.settings/
-.project
-.classpath
+#.settings/
+# .project
+#.classpath
 
 # Idea Files
 .idea/
@@ -18,9 +18,9 @@ docker/docker-container-data/*
 *.ear
 
 # build dir
-.gradle/
-build/
-target/
+#.gradle/
+#build/
+#target/
 bin/
 out/
 
