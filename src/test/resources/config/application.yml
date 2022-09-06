@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8080
 
 spring:
   profiles:
@@ -8,12 +8,7 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
 #  main:
-#    allow-bean-definition-overriding: true
-#  mvc:
-#    throw-exception-if-no-handler-found: true
-#  web:
-#    resources:
-#      add-mappings: false
+#    allow-bean-definition-overriding: true#  mvc:#    throw-exception-if-no-handler-found: true#  web:#    resources:#      add-mappings: false
 
 # Authentication Server Configurations
 authentication:

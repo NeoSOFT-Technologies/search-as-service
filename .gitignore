@@ -1,9 +1,9 @@
 docker/docker-container-data/*
 
 # Eclipse Files
-#.settings/
-# .project
-#.classpath
+.settings/
+.project
+.classpath
 
 # Idea Files
 .idea/
