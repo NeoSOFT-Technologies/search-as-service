@@ -1,0 +1,14 @@
+
+pluginManagement {
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'org.springframework.boot' version "${springBootVersion}"
+        id 'com.google.cloud.tools.jib' version "${jibPluginVersion}"
+        id 'org.sonarqube' version "${sonarqubePluginVersion}"
+    }
+}
+
+rootProject.name = 'rest-java-springboot-sample'

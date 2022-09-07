@@ -1,0 +1,93 @@
+
+#================================================================
+#Security
+base-token-url: https://iam-dev.neosofttech.com/api/login
+#================================================================
+
+
+#================================================================
+#database configuration:mysql
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/rjsbSample?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #url: jdbc:mysql://localhost:3306/rjsbSample
+    username: root
+    password: achhadata
+    driver-class-name: com.mysql.jdbc.Driver
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL55Dialect
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+#================================================================
+
+
+#================================================================
+#Logger
+logging:
+   #file:
+    #path: logs
+    #name: logs/dailylogs.log
+    #max-history: '30'
+    #max-size: 10MB
+    
+   pattern:
+    console: '%d{"yyyy/MM/dd HH:mm:ss,SSS", UTC} [%thread] %-5level %-50logger{40} : %msg%n'
+    #rolling-file-name: logs/dailylogs-%d{yyyy-MM-dd}.%i.log
+   level:
+    ROOT: DEBUG
+    org.springframework.web: "error"
+    org.hibernate: "error"
+    org: "error"
+#================================================================
+
+
+#================================================================
+#Swagger
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+  documentation:
+    auto-startup: false
+#================================================================
+
+
+#================================================================
+#API endpoints & ObjectMapperVersioning & security configurations
+base-url:
+  api-endpoint:
+    home: /api/v1
+    app-user: /api/v1/app-user
+    login: /api/v1/login
+    product: /api/v1/product
+    versioned-home: /api-versioned/v1
+    manage-table: /api-versioned/v1/manage/table
+
+# {saas-ms.request-header.api-version}
+rjsb-ms:
+  request-header:
+    api-version: X-Api-Version
+  security:
+    token:
+      algo-key: neo-coe-secret
+      accessExpirationTimeInMs: 1800000
+      refreshExpirationTimeInMs: 3600000
+#=================================================================
+
+
+#=================================================================
+cors:
+  header-value: "*"
+#=================================================================
+
+
+#=================================================================
+#Jwt token mock
+custom-mock:
+  jwt-token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJtTjJ1NE1hM2Qtc1BRcDBzYnZTUVp1UXpaT19jWDVTSHFuMTE3U1RaRF9jIn0.eyJleHAiOjE2NTM0MTcxMjcsImlhdCI6MTY1MzM4MTEyNywianRpIjoiYmU3Mjk3NTctZTUxYy00YzdlLTg4NTMtYzk2MzYxY2Y2NDQ5IiwiaXNzIjoiaHR0cHM6Ly9pYW0ta2V5Y2xvYWsubmVvc29mdHRlY2guY29tL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6WyJzYW50b3NoLXJlYWxtIiwiZGVtbzEtcmVhbG0iLCJUZW5hbnQxLXJlYWxtIiwibWFzdGVyLXJlYWxtIiwiVGVuYW50Mi1yZWFsbSIsImFjY291bnQiXSwic3ViIjoiMzgzNjg3NmEtMTI1YS00OTNiLWI0M2QtN2MwMTMxODg1ZTJiIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwic2Vzc2lvbl9zdGF0ZSI6IjcyYjNlNDg2LWZlNjYtNDk0Yy1iMjc1LTFlNTYyOTQ3NzliNCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiY3JlYXRlLXJlYWxtIiwiZGVmYXVsdC1yb2xlcy1tYXN0ZXIiLCJvZmZsaW5lX2FjY2VzcyIsImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJzYW50b3NoLXJlYWxtIjp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJkZW1vMS1yZWFsbSI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsImNyZWF0ZS1jbGllbnQiLCJtYW5hZ2UtdXNlcnMiLCJxdWVyeS1yZWFsbXMiLCJ2aWV3LWF1dGhvcml6YXRpb24iLCJxdWVyeS1jbGllbnRzIiwicXVlcnktdXNlcnMiLCJtYW5hZ2UtZXZlbnRzIiwibWFuYWdlLXJlYWxtIiwidmlldy1ldmVudHMiLCJ2aWV3LXVzZXJzIiwidmlldy1jbGllbnRzIiwibWFuYWdlLWF1dGhvcml6YXRpb24iLCJtYW5hZ2UtY2xpZW50cyIsInF1ZXJ5LWdyb3VwcyJdfSwiVGVuYW50MS1yZWFsbSI6eyJyb2xlcyI6WyJ2aWV3LXJlYWxtIiwidmlldy1pZGVudGl0eS1wcm92aWRlcnMiLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiaW1wZXJzb25hdGlvbiIsImNyZWF0ZS1jbGllbnQiLCJtYW5hZ2UtdXNlcnMiLCJxdWVyeS1yZWFsbXMiLCJ2aWV3LWF1dGhvcml6YXRpb24iLCJxdWVyeS1jbGllbnRzIiwicXVlcnktdXNlcnMiLCJtYW5hZ2UtZXZlbnRzIiwibWFuYWdlLXJlYWxtIiwidmlldy1ldmVudHMiLCJ2aWV3LXVzZXJzIiwidmlldy1jbGllbnRzIiwibWFuYWdlLWF1dGhvcml6YXRpb24iLCJtYW5hZ2UtY2xpZW50cyIsInF1ZXJ5LWdyb3VwcyJdfSwibWFzdGVyLXJlYWxtIjp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJUZW5hbnQyLXJlYWxtIjp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI3MmIzZTQ4Ni1mZTY2LTQ5NGMtYjI3NS0xZTU2Mjk0Nzc5YjQiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJTYW50b3NoIFNoaW5kZSIsInBlcm1pc3Npb24iOlsiY3JlYXRlIiwidmlldyIsImVkaXQiLCJkZWxldGUiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJnaXZlbl9uYW1lIjoiU2FudG9zaCIsImZhbWlseV9uYW1lIjoiU2hpbmRlIiwiZW1haWwiOiJzYW50b3NoLnNoaW5kZUBuZW9zb2Z0dGVjaC5jb20ifQ.P0lQvklFhdy6lB92T1NvdAO50nALhB9bxR_pS4B0eN8yBQcrCxBanoqP7v-4LabluQiH9tHEKkL2hjMeS6ZOdY6WPqQNLaRuFDIMOtcx7SNnNZ8yLNwDSkmEfkd1Bxd0zRyxgDyXy6RWzJrk7c5ekeIt_w1Zp_ChZuCsRr2F0hO3rUvgfwlovf6eNypE9cIhd-T1PhoJfDccjXETjB5xeNRBAwIxJHVBNH6_XKpzGchMvbJQ8up7YN0B2uiAPRUNzs9CtDZIb3yKzW7OGOHdwWuw1hVgBVERzo7QmBk2zGxtoLh7NxUN4CEPP-AYypPzDiDFJ1ZnZe1816zG6RgotQ
+#=================================================================
