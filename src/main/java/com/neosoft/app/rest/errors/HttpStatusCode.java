@@ -43,7 +43,7 @@ public enum HttpStatusCode {
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	
 	FORBIDDEN_EXCEPTION(403, "Forbidden access attempted"),
-	
+		
 	INTERNAL_SERVER_ERROR (500, "Internal Server Error Occured"),
 	
 	PROCESSING_NOT_COMPLETED (202, "Request cannot be Processed"),
