@@ -90,7 +90,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.2'
 	implementation 'mysql:mysql-connector-java:8.0.15'
 	
-	// Date-time util
+	//Date-time util
 	implementation group: 'joda-time', name: 'joda-time', version: '2.10.13'
 
 	//Lombok
@@ -103,7 +103,7 @@ dependencies {
 	implementation group: 'org.json', name: 'json', version: '20200518'
     implementation group: 'org.jboss.logging', name: 'jboss-logging', version: '3.5.0.Final'
 
-	// Spring Security
+	//Spring Security
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.6.3'
 	implementation 'org.springframework.security:spring-security-core'
 	implementation 'org.springframework.security:spring-security-web'
@@ -111,8 +111,10 @@ dependencies {
 	implementation 'com.auth0:java-jwt:4.0.0'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	
+	//DTO mapper
+	implementation "org.modelmapper:modelmapper:2.4.4"
 
-	// Static Mocks
+	//Static Mocks
 	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.8.0'
 	
 }

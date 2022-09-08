@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.neosoft.app.domain.dto.ProductDTO;
 import com.neosoft.app.domain.dto.Response;
 import com.neosoft.app.domain.dto.Response.ProductResponse;
 import com.neosoft.app.domain.port.api.ProductServicePort;
-import com.neosoft.app.infrastructure.entity.Product;
 import com.neosoft.app.rest.errors.CustomException;
 import com.neosoft.app.rest.errors.HttpStatusCode;
 
@@ -87,7 +87,7 @@ public class ProductResource {
 
 	@PostMapping
 	@Operation(summary = "CREATE AND SAVE A PRODUCT IN THE DATABASE.", security = @SecurityRequirement(name = "bearerAuth"))
-	public ResponseEntity<Response> createProduct(@RequestBody Product productDTO) {
+	public ResponseEntity<Response> createProduct(@RequestBody ProductDTO productDTO) {
 		Response createResponseDTO = productServicePort.createProduct(productDTO);
 		if (createResponseDTO.getStatusCode() == 200) {
 			createResponseDTO.setMessage("Product-" + productDTO.getProductName() + ", is saved successfully");
@@ -103,7 +103,7 @@ public class ProductResource {
 	@PutMapping("/{productId}")
 	@Operation(summary = "UPDATE AN EXISTING PRODUCT.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> updateProduct(@PathVariable int productId,
-			@RequestBody Product productDTO) {
+			@RequestBody ProductDTO productDTO) {
 		Response updateResponseDTO = productServicePort.updateProduct(productId, productDTO);
 		if (updateResponseDTO.getStatusCode() == 200) {
 			updateResponseDTO.setMessage("Product is updated successfully");

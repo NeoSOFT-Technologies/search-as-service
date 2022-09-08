@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.neosoft.app.domain.dto.ProductDTO;
 import com.neosoft.app.domain.dto.Response;
 import com.neosoft.app.domain.dto.Response.ProductResponse;
 import com.neosoft.app.domain.port.api.ProductServicePort;
@@ -77,7 +78,7 @@ public class ProductService implements ProductServicePort {
 	}
 
 	@Override
-	public Response createProduct(Product productDTO) {
+	public Response createProduct(ProductDTO productDTO) {
 		Response responseDTO = new Response();
 
 		responseDTO.setDataSize(null);
@@ -100,7 +101,7 @@ public class ProductService implements ProductServicePort {
 	}
 
 	@Override
-	public Response updateProduct(int productId, Product productDTO) {
+	public Response updateProduct(int productId, ProductDTO productDTO) {
 		Response responseDTO = new Response();
 
 		try {

@@ -3,8 +3,8 @@ package com.neosoft.app.domain.port.api;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import com.neosoft.app.domain.dto.ProductDTO;
 import com.neosoft.app.domain.dto.Response;
-import com.neosoft.app.infrastructure.entity.Product;
 
 
 @Component
@@ -19,10 +19,10 @@ public interface ProductServicePort {
 	Response getProduct(int productId);
 	
 	// CREATE requests
-	Response createProduct(Product productDTO);
+	Response createProduct(ProductDTO productDTO);
 
 	// UPDATE requests
-	Response updateProduct(int productId, Product productDTO);
+	Response updateProduct(int productId, ProductDTO productDTO);
 	
 	// DELETE requests
 	Response deleteProduct(int productId);
