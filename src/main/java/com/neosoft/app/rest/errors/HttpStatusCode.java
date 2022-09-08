@@ -42,7 +42,7 @@ public enum HttpStatusCode {
 	
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	
-	FORBIDDEN_EXCEPTION(403, "Forbidden access attempted"),
+	FORBIDDEN_EXCEPTION(403, "Forbidden resource access attempted!"),
 	
 	INTERNAL_SERVER_ERROR (500, "Internal Server Error Occured"),
 	

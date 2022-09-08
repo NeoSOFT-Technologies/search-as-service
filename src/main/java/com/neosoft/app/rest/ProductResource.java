@@ -120,6 +120,7 @@ public class ProductResource {
 	@DeleteMapping("/del/{productId}")
 	@Operation(summary = "DELETE A PRODUCT FROM DATABASE.", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<Response> deleteProduct(@PathVariable int productId) {
+		
 		Response deleteResponseDTO = productServicePort.deleteProduct(productId);
 		if (deleteResponseDTO.getStatusCode() == 200) {
 			return ResponseEntity.status(HttpStatus.OK).body(deleteResponseDTO);

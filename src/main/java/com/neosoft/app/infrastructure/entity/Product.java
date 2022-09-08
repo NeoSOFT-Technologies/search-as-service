@@ -21,9 +21,6 @@ public class Product extends EntityId {
 	@Column(name = "product_name")
 	private String productName;
 
-//	@OneToMany(mappedBy = "product")
-//	private List<Property> fields;
-
 	public Product() {
 		super();
 	}
