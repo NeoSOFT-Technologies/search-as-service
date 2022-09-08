@@ -48,6 +48,8 @@ public enum HttpStatusCode {
 	
 	PROCESSING_NOT_COMPLETED (202, "Request cannot be Processed"),
 	
+	REQUEST_FORBIDEN(403, "Request Unable To Authorize"),
+	
 	NOT_ACCEPTABLE_ERROR (406, "Request Not accpetable");
 	
 	private int code;
