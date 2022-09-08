@@ -96,20 +96,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// Set session management to stateless
 		http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
 		
-		http.authorizeRequests().antMatchers("/api/v1/login").permitAll();
-		
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, productUrl)
-			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel());
-		http.authorizeRequests().antMatchers(HttpMethod.DELETE, productUrl)
-			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_MANAGER.getLabel());
-		http.authorizeRequests().antMatchers(HttpMethod.POST, productUrl)
-			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel(), "admin");
-		http.authorizeRequests().antMatchers(HttpMethod.GET, productUrl).permitAll();
-		
-		http.authorizeRequests().antMatchers(appUserUrl)
-			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel());
-		
-		http.authorizeRequests().anyRequest().authenticated();
+		http.authorizeRequests().antMatchers("/api/v1/login").permitAll()
+//		.antMatchers(HttpMethod.PUT, productUrl)
+//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel())
+		.antMatchers("api/v1/product/del/**")
+			.hasAnyAuthority("sjhdbc").and();
+//		http.authorizeRequests().antMatchers(HttpMethod.DELETE, productUrl)
+//			.hasRole("sjdhfvb");
+//		.antMatchers(HttpMethod.POST, productUrl)
+//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel(), "admin")
+//		.antMatchers(HttpMethod.GET, productUrl).permitAll()
+//		.antMatchers(appUserUrl)
+//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel())
+//		.anyRequest().authenticated();
         
 		// Add Auth filter
 		http.addFilterBefore(new UserAuthorizationFilter(authUtil, appUserService), UsernamePasswordAuthenticationFilter.class);
