@@ -76,8 +76,8 @@ public class ProductResource {
 				productResponseDTO.setDataSize(existingProductsList.size());
 				return ResponseEntity.status(HttpStatus.OK).body(productResponseDTO);
 			} else if(productResponseDTO.getStatusCode() == 404)
-				throw new CustomException(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(),
-						HttpStatusCode.PRODUCT_NOT_FOUND, HttpStatusCode.PRODUCT_NOT_FOUND.getMessage());
+				throw new CustomException(HttpStatusCode.ENTITY_NOT_FOUND.getCode(),
+						HttpStatusCode.ENTITY_NOT_FOUND, HttpStatusCode.ENTITY_NOT_FOUND.getMessage());
 			else {
 				throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 						HttpStatusCode.BAD_REQUEST_EXCEPTION, HttpStatusCode.BAD_REQUEST_EXCEPTION.getMessage());
@@ -109,8 +109,8 @@ public class ProductResource {
 			updateResponseDTO.setMessage("Product is updated successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(updateResponseDTO);
 		}  else if(updateResponseDTO.getStatusCode() == 404)
-			throw new CustomException(HttpStatusCode.PRODUCT_NOT_FOUND.getCode(),
-					HttpStatusCode.PRODUCT_NOT_FOUND, HttpStatusCode.PRODUCT_NOT_FOUND.getMessage());
+			throw new CustomException(HttpStatusCode.ENTITY_NOT_FOUND.getCode(),
+					HttpStatusCode.ENTITY_NOT_FOUND, HttpStatusCode.ENTITY_NOT_FOUND.getMessage());
 		else {
 			throw new CustomException(HttpStatusCode.BAD_REQUEST_EXCEPTION.getCode(),
 					HttpStatusCode.BAD_REQUEST_EXCEPTION, HttpStatusCode.BAD_REQUEST_EXCEPTION.getMessage());
@@ -126,8 +126,8 @@ public class ProductResource {
 			return ResponseEntity.status(HttpStatus.OK).body(deleteResponseDTO);
 		} else if(deleteResponseDTO.getStatusCode() == 404)
 			throw new CustomException(
-					HttpStatusCode.PRODUCT_NOT_FOUND.getCode(),
-					HttpStatusCode.PRODUCT_NOT_FOUND, 
+					HttpStatusCode.ENTITY_NOT_FOUND.getCode(),
+					HttpStatusCode.ENTITY_NOT_FOUND, 
 					deleteResponseDTO.getMessage());
 		else {
 			log.debug("Exception occurred: {}", deleteResponseDTO);

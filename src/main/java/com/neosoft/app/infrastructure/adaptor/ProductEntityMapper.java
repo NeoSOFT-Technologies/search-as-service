@@ -1,4 +1,4 @@
-package com.neosoft.app.infrastructure.entity.mapper;
+package com.neosoft.app.infrastructure.adaptor;
 
 import java.util.List;
 import java.util.Objects;

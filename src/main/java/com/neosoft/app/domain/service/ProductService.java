@@ -14,7 +14,6 @@ import com.neosoft.app.domain.dto.Response.ProductResponse;
 import com.neosoft.app.domain.port.api.ProductServicePort;
 import com.neosoft.app.domain.port.spi.ProductPersistencePort;
 import com.neosoft.app.domain.utils.PersistenceLabel;
-import com.neosoft.app.infrastructure.entity.Product;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class ProductService implements ProductServicePort {
 		Response responseDTO = new Response();
 
 		try {
-			List<Product> products = productPersistencePort.getAll();
+			List<ProductDTO> products = productPersistencePort.getAll();
 			if(products != null) {
 				responseDTO.setStatusCode(200);
 				responseDTO.setMessage("All products are retrieved successfully.");
@@ -60,7 +59,7 @@ public class ProductService implements ProductServicePort {
 		Response responseDTO = new Response();
 
 		try {
-			Optional<Product> getProduct = productPersistencePort.getOne(productId);
+			Optional<ProductDTO> getProduct = productPersistencePort.getOne(productId);
 			if (getProduct.isPresent()) {
 				List<ProductResponse> productsResponse = new ArrayList<>();
 				productsResponse.add(new ProductResponse(getProduct.get().getId(), getProduct.get().getProductName()));
@@ -83,7 +82,7 @@ public class ProductService implements ProductServicePort {
 
 		responseDTO.setDataSize(null);
 		try {
-			Optional<Product> addProduct = productPersistencePort.addOne(productDTO);
+			Optional<ProductDTO> addProduct = productPersistencePort.addOne(productDTO);
 			if (addProduct.isPresent()) {
 				List<ProductResponse> productsResponse = new ArrayList<>();
 				productsResponse.add(new ProductResponse(addProduct.get().getId(), addProduct.get().getProductName()));
@@ -105,7 +104,7 @@ public class ProductService implements ProductServicePort {
 		Response responseDTO = new Response();
 
 		try {
-			Optional<Product> updateProduct = productPersistencePort.getOne(productId);
+			Optional<ProductDTO> updateProduct = productPersistencePort.getOne(productId);
 			if (updateProduct.isPresent()) {
 				productDTO.setId(productId);
 				productPersistencePort.addOne(productDTO);

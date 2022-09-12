@@ -11,7 +11,7 @@ public enum HttpStatusCode {
 	
 	UNRECOGNIZED_FIELD(106, "Check sequence of fields or field name"),
 
-	PRODUCT_NOT_FOUND(108, "Product does not exist"),
+	ENTITY_NOT_FOUND(108, "Given entity does not exist"),
 
 	PRODUCT_ALREADY_EXISTS(110, "Already exists"),
 	
