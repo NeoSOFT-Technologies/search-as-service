@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.neosoft.app.domain.dto.ProductDTO;
 import com.neosoft.app.domain.port.spi.ProductPersistencePort;
 import com.neosoft.app.infrastructure.entity.Product;
-import com.neosoft.app.infrastructure.entity.mapper.ProductEntityMapper;
 import com.neosoft.app.infrastructure.repository.ProductRepository;
 
 
@@ -30,13 +29,20 @@ public class ProductJPAAdapter implements ProductPersistencePort {
 	}
 
 	@Override
-	public List<Product> getAll() {
-		return productRepository.findAll();
+	public List<ProductDTO> getAll() {
+		return productEntityMapper.entitiesToDTOs(productRepository.findAll());
 	}
 
 	@Override
-	public Optional<Product> getOne(int productId) {
-		return productRepository.findById(productId);
+	public Optional<ProductDTO> getOne(int productId) {
+		
+		Optional<Product> getProduct = productRepository.findById(productId);
+		
+		if(getProduct.isPresent()) {
+			return Optional.ofNullable(productEntityMapper.entityToDTO(getProduct.get()));
+		} else
+			return Optional.ofNullable(null);
+		
 	}
 
 	@Override
@@ -45,8 +51,10 @@ public class ProductJPAAdapter implements ProductPersistencePort {
 	}
 
 	@Override
-	public Optional<Product> addOne(ProductDTO productDTO) {
-		return Optional.ofNullable(productRepository.save(productEntityMapper.dtoToEntity(productDTO)));
+	public Optional<ProductDTO> addOne(ProductDTO productDTO) {
+		return Optional.ofNullable(
+				productEntityMapper.entityToDTO(
+						productRepository.save(productEntityMapper.dtoToEntity(productDTO))));
 	}
 
 	@Override

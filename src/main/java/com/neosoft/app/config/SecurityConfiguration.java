@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.neosoft.app.domain.filter.UserAuthorizationFilter;
@@ -29,6 +30,8 @@ import com.neosoft.app.domain.utils.security.AuthUtil;
 import com.neosoft.app.domain.utils.security.SecurityLabel;
 import com.neosoft.app.infrastructure.entity.security.AppUser;
 import com.neosoft.app.infrastructure.repository.security.AppUserRepository;
+import com.neosoft.app.rest.errors.security.DelegatedAuthenticationEntryPoint;
+import com.neosoft.app.rest.errors.security.ResourceAccessDeniedHandler;
 
 import lombok.NoArgsConstructor;
 
@@ -42,17 +45,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AuthUtil authUtil;
-	
+
 	@Autowired
 	private AppUserService appUserService;
-	
+
 	@Value("${base-url.api-endpoint.product}")
 	private String productUrl;
-	
+
 	@Value("${base-url.api-endpoint.app-user}")
 	private String appUserUrl;
-	
-	public SecurityConfiguration(AppUserRepository appUserRepository, AuthUtil authUtil, AppUserService appUserService) {
+
+	public SecurityConfiguration(AppUserRepository appUserRepository, AuthUtil authUtil,
+			AppUserService appUserService) {
 		super();
 		this.appUserRepository = appUserRepository;
 		this.authUtil = authUtil;
@@ -83,37 +87,55 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
 	}
 
-    @Override
+	@Override
 	public void configure(WebSecurity web) throws Exception {
-    	web.ignoring().antMatchers("/app-user").antMatchers("/v3/api-docs/**").antMatchers("/swagger-ui/**").antMatchers("/test/**");
+		web.ignoring().antMatchers("/app-user").antMatchers("/v3/api-docs/**").antMatchers("/swagger-ui/**")
+				.antMatchers("/test/**");
 	}
-	
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
 		// Disable CSRF
 		http = http.csrf().disable();
 
 		// Set session management to stateless
 		http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
-		
-		http.authorizeRequests().antMatchers("/api/v1/login").permitAll()
-//		.antMatchers(HttpMethod.PUT, productUrl)
-//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel())
-		.antMatchers("api/v1/product/del/**")
-			.hasAnyAuthority("sjhdbc").and();
-//		http.authorizeRequests().antMatchers(HttpMethod.DELETE, productUrl)
-//			.hasRole("sjdhfvb");
-//		.antMatchers(HttpMethod.POST, productUrl)
-//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel(), "admin")
-//		.antMatchers(HttpMethod.GET, productUrl).permitAll()
-//		.antMatchers(appUserUrl)
-//			.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel())
-//		.anyRequest().authenticated();
-        
-		// Add Auth filter
-		http.addFilterBefore(new UserAuthorizationFilter(authUtil, appUserService), UsernamePasswordAuthenticationFilter.class);
-    }
 
+		// secure product resource
+		http.authorizeRequests().antMatchers("/api/v1/login").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.GET, SecurityLabel.URL_PRODUCT.getLabel()).permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.GET, SecurityLabel.URL_PRODUCT.getLabel() + "/**").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.PUT, SecurityLabel.URL_PRODUCT.getLabel() + "/**")
+				.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel());
+		http.authorizeRequests().antMatchers(HttpMethod.POST, SecurityLabel.URL_PRODUCT.getLabel())
+				.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel(), "admin");
+		http.authorizeRequests().antMatchers(HttpMethod.DELETE, SecurityLabel.URL_PRODUCT.getLabel() + "/**")
+				.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel())
+				.and()
+				.exceptionHandling().accessDeniedHandler(resourceAccessDeniedHandler())
+				.authenticationEntryPoint(authenticationEntryPoint());
+
+		// secure app-user resource
+		http.authorizeRequests()
+				.antMatchers(SecurityLabel.URL_APP_USER.getLabel(), SecurityLabel.URL_APP_USER.getLabel() + "/**")
+				.hasAnyAuthority(SecurityLabel.KEYWORD_ROLE_ADMIN.getLabel());
+
+		http.authorizeRequests().anyRequest().authenticated();
+
+		// Add Auth filter
+		http.addFilterBefore(new UserAuthorizationFilter(authUtil, appUserService),
+				UsernamePasswordAuthenticationFilter.class);
+	}
+	
+	@Bean
+	public AccessDeniedHandler resourceAccessDeniedHandler() {
+		return new ResourceAccessDeniedHandler();
+	}
+	
+	@Bean
+	public DelegatedAuthenticationEntryPoint authenticationEntryPoint() {
+		return new DelegatedAuthenticationEntryPoint();
+	}
 
 	@Bean(name = "AuthenticationManager")
 	@Override

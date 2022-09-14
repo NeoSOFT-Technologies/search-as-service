@@ -11,7 +11,8 @@ public enum SecurityLabel {
 	
 	URL_LOGIN ("/api/v1/login"), 		// For Login API
 	URL_SIGNIN ("/api/v1/signin"), 		// For CustomAuthenticationFilter
-	URL_APP_USER ("/api/v1/app-user");
+	URL_APP_USER ("/api/v1/app-user"), 
+	URL_PRODUCT ("/api/v1/product");
 	
 	
 	private String message;

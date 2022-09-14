@@ -11,7 +11,7 @@ public enum HttpStatusCode {
 	
 	UNRECOGNIZED_FIELD(106, "Check sequence of fields or field name"),
 
-	PRODUCT_NOT_FOUND(108, "Product does not exist"),
+	ENTITY_NOT_FOUND(108, "Given entity does not exist"),
 
 	PRODUCT_ALREADY_EXISTS(110, "Already exists"),
 	
@@ -42,7 +42,7 @@ public enum HttpStatusCode {
 	
 	UNAUTHORIZED_EXCEPTION(401, "Unauthorized To Perform Request"),
 	
-	FORBIDDEN_EXCEPTION(403, "Forbidden access attempted"),
+	FORBIDDEN_EXCEPTION(403, "Forbidden resource access attempted!"),
 	
 	INTERNAL_SERVER_ERROR (500, "Internal Server Error Occured"),
 	

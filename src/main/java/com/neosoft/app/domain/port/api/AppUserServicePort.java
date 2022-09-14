@@ -4,15 +4,13 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.neosoft.app.infrastructure.entity.security.AppUser;
-import com.neosoft.app.infrastructure.entity.security.Role;
+import com.neosoft.app.domain.dto.security.AppUserDTO;
 
 public interface AppUserServicePort {
-	AppUser saveUser(AppUser newAppUser);
-	Role saveRole(Role role);
-	void addRoleToAppUser(String username,String rolename);
-	AppUser getUser(String username);
-	List<AppUser>getUsers();
-	void deleteUserByUsername(String username) throws UsernameNotFoundException;
+	AppUserDTO saveAppUser(AppUserDTO newAppUserDTO);
+	void addRoleToAppUser(String username, String rolename);
+	AppUserDTO getAppUser(String username);
+	List<AppUserDTO>getAppUsers();
+	void deleteAppUserByUsername(String username) throws UsernameNotFoundException;
 	
 }

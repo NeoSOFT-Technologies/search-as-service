@@ -87,7 +87,7 @@ class ProductResourceTest {
 
 
 	@Test
-	@Disabled
+//	@Disabled
 	void testGetAllProducts() throws Exception {
 		restMvcMock
 				.perform(MockMvcRequestBuilders.get(apiEndpoint + "/")
@@ -96,7 +96,7 @@ class ProductResourceTest {
 	}
 
 	@Test
-	@Disabled
+//	@Disabled
 	void testGetProduct() throws Exception {
 		restMvcMock
 				.perform(MockMvcRequestBuilders.get(apiEndpoint + "/" + productId)
@@ -112,7 +112,7 @@ class ProductResourceTest {
 	}
 	
 	@Test
-	@Disabled
+//	@Disabled
 	void testUpdateProduct() throws Exception {
 		restMvcMock.perform(MockMvcRequestBuilders.put(apiEndpoint + "/" + productId)
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +120,7 @@ class ProductResourceTest {
 	}
 
 	@Test
-	@Disabled
+//	@Disabled
 	void testDeleteProduct() throws Exception {
 		Response deleteProductResponseDTO = new Response();
 		restMvcMock.perform(MockMvcRequestBuilders.delete(apiEndpoint + "/" + productId)

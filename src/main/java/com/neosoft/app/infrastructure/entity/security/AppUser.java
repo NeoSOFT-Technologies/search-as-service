@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ import lombok.ToString;
 @Data
 @ToString
 @JsonIdentityInfo(generator = IntSequenceGenerator.class, property = "json_id")
+@JsonIgnoreProperties("id")
 public class AppUser {
 
 	@Id
